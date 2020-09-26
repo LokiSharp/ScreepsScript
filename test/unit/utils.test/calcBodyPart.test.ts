@@ -17,7 +17,6 @@ describe("calcBodyPart", () => {
     const testBodyPartConstant = calcBodyPart(testBodySet);
     assert.isDefined(testBodyPartConstant);
     assert.equal(testBodyPartConstant.length, 16);
-    assert.include(testBodyPartConstant, WORK);
-    assert.include(testBodyPartConstant, CLAIM);
+    assert.includeMembers(testBodyPartConstant, [ATTACK, CARRY, CLAIM, HEAL, MOVE, RANGED_ATTACK, TOUGH, WORK]);
   });
 });

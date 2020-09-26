@@ -15,3 +15,9 @@ interface BodySet {
   [TOUGH]?: number;
   [HEAL]?: number;
 }
+
+type BodySets = [BodySet, BodySet, BodySet, BodySet, BodySet, BodySet, BodySet, BodySet];
+
+type BodyConfig = {
+  [energyLevel in 300 | 550 | 800 | 1300 | 1800 | 2300 | 5600 | 10000]: BodyPartConstant[];
+};
