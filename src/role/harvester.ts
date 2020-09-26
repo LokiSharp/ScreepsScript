@@ -96,7 +96,7 @@ export default (data: HarvesterData): ICreepConfig => ({
     else creep.memory.constructionSiteId = constructionSite.id;
 
     creep.build(constructionSite);
-    return true;
+    return false;
   },
   target: creep => {
     creep.getEngryFrom(Game.getObjectById(data.sourceId as Id<Structure | Source>));
