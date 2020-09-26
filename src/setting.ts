@@ -1,7 +1,7 @@
 import { getBodyConfig } from "utils/getBodyConfig";
 
 // 每个房间最多同时存在多少 upgrader 和 harvester
-export const MAX_UPGRADER_NUM = 8;
+export const MAX_UPGRADER_NUM = 4;
 export const MAX_HARVESTER_NUM = 4;
 // 造好新墙时 builder 会先将墙刷到超过下面值，之后才会去建其他建筑
 export const MIN_WALL_HITS = 8000;
@@ -70,3 +70,24 @@ export const creepDefaultMemory: CreepMemory = {
 
 // 用于维持房间能量正常运转的重要角色
 export const importantRoles: CreepRoleConstant[] = ["harvester", "filler"];
+
+/**
+ * 此处定义了所有的房间物流任务类型
+ * 每个房间物流的任务的 type 属性都必须是下列定义之一
+ */
+export const ROOM_TRANSFER_TASK = {
+  // 基础运维
+  FILL_EXTENSION: "fillExtension",
+  FILL_TOWER: "fillTower",
+  // nuker 填充
+  FILL_NUKER: "fillNuker",
+  // lab 物流
+  LAB_IN: "labIn",
+  LAB_OUT: "labOut",
+  LAB_GET_ENERGY: "labGetEnergy",
+  FILL_POWERSPAWN: "fillPowerSpawn",
+  // boost 物流
+  BOOST_GET_RESOURCE: "boostGetResource",
+  BOOST_GET_ENERGY: "boostGetEnergy",
+  BOOST_CLEAR: "boostClear"
+};

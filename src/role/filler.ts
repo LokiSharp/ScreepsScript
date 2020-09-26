@@ -1,3 +1,6 @@
+import { getRoomTransferTask, transferTaskOperations } from "./roomTransferTask";
+import { ROOM_TRANSFER_TASK } from "setting";
+
 /**
  * 填充单位
  * 从 container 中获取能量 > 执行房间物流任务
@@ -27,6 +30,13 @@ export default (data: HarvesterData): ICreepConfig => ({
   },
   // 维持房间能量填充
   target: creep => {
+    const task = getRoomTransferTask(creep.room);
+
+    // 只会执行能量填充任务
+    if (task && (task.type === ROOM_TRANSFER_TASK.FILL_EXTENSION || task.type === ROOM_TRANSFER_TASK.FILL_TOWER)) {
+      return transferTaskOperations[task.type].target(creep, task);
+    }
+
     // 空闲时间会尝试把能量存放到 storage 里
     if (!creep.room.storage) return false;
 

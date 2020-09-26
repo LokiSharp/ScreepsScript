@@ -1,4 +1,4 @@
-import { bodyConfigs, creepDefaultMemory, importantRoles } from "setting";
+import { ROOM_TRANSFER_TASK, bodyConfigs, creepDefaultMemory, importantRoles } from "setting";
 import roles from "role";
 
 /**
@@ -10,6 +10,20 @@ export default class SpawnExtension extends StructureSpawn {
    * @todo 能量不足时挂起任务
    */
   public work(): void {
+    if (this.spawning) {
+      /**
+       * 如果孵化已经开始了，就向物流队列推送任务
+       * 不在 mySpawnCreep 返回 OK 时判断是因为：
+       * 由于孵化是在 tick 末的行动执行阶段进行的，所以能量在 tick 末期才会从 extension 中扣除
+       * 如果返回 OK 就推送任务的话，就会出现任务已经存在了，而 extension 还是满的
+       * 而 creep 恰好就是在这段时间里执行的物流任务，就会出现如下错误逻辑：
+       * mySpawnCreep 返回 OK > 推送填充任务 > creep 执行任务 > 发现能量都是满的 > **移除任务** > tick 末期开始孵化 > extension 扣除能量
+       */
+      if (this.spawning.needTime - this.spawning.remainingTime === 1) {
+        this.room.addRoomTransferTask({ type: ROOM_TRANSFER_TASK.FILL_EXTENSION }, 1);
+      }
+      return;
+    }
     if (!this.room.memory.spawnList) this.room.memory.spawnList = [];
     // 生成中 / 生产队列为空 就啥都不干
     if (this.spawning || this.room.memory.spawnList.length === 0) return;

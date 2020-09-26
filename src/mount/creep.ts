@@ -4,6 +4,18 @@ import roles from "role";
 
 export class CreepExtension extends Creep {
   /**
+   * 发送日志
+   *
+   * @param content 日志内容
+   * @param instanceName 发送日志的实例名
+   * @param color 日志前缀颜色
+   * @param notify 是否发送邮件
+   */
+  public log(content: string, color: Colors = undefined, notify = false): void {
+    this.room.log(content, this.name, color, notify);
+  }
+
+  /**
    * creep 主要工作
    */
   public work(): void {

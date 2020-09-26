@@ -223,6 +223,13 @@ interface Room {
   clearSpawnTask(): void;
   hangSpawnTask(): void;
 
+  // 房间物流 api
+  addRoomTransferTask(task: RoomTransferTasks, priority?: number): number;
+  hasRoomTransferTask(taskType: string): boolean;
+  getRoomTransferTask(): RoomTransferTasks | null;
+  handleLabInTask(resourceType: ResourceConstant, amount: number): boolean;
+  deleteCurrentRoomTransferTask(): void;
+
   // 禁止通行点位 api
   addRestrictedPos(creepName: string, pos: RoomPosition): void;
   getRestrictedPos(): { [creepName: string]: string };
@@ -271,11 +278,28 @@ interface RoomMemory {
     id: string;
     endTime: number;
   };
+
+  // 房间物流任务队列
+  transferTasks: RoomTransferTasks[];
 }
 
 interface RoomPosition {
   directionToPos(direction: DirectionConstant): RoomPosition | undefined;
   getFreeSpace(): RoomPosition[];
+}
+
+type RoomTransferTasks = IFillExtension;
+
+// 房间物流任务 - 填充拓展
+interface IFillExtension {
+  type: string;
+}
+
+interface transferTaskOperation {
+  // creep 工作时执行的方法
+  target: (creep: Creep, task: RoomTransferTasks) => boolean;
+  // creep 非工作(收集资源时)执行的方法
+  source: (creep: Creep, task: RoomTransferTasks, sourceId: string) => boolean;
 }
 
 /**
