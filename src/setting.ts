@@ -3,6 +3,8 @@ import { getBodyConfig } from "utils/getBodyConfig";
 // 每个房间最多同时存在多少 upgrader 和 harvester
 export const MAX_UPGRADER_NUM = 8;
 export const MAX_HARVESTER_NUM = 4;
+// 造好新墙时 builder 会先将墙刷到超过下面值，之后才会去建其他建筑
+export const MIN_WALL_HITS = 8000;
 
 /**
  * storage 中的能量和对应发布的 upgrader 数量

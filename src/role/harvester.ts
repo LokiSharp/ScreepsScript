@@ -64,7 +64,6 @@ export default (data: HarvesterData): ICreepConfig => ({
 
     // 存在 container，把血量修满
     if (target && target instanceof StructureContainer) {
-      creep.say("🚧" + String(target.hits));
       creep.repair(target);
       // 血修满了就正式进入采集阶段
       return target.hits >= target.hitsMax;

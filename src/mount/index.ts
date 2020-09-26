@@ -1,5 +1,6 @@
 import mountCreep from "./creep";
 import mountRoom from "./room";
+import mountRoomPostio from "./roomPosition";
 import mountStructure from "./structures";
 /**
  * 挂载所有的额外属性和方法
@@ -11,6 +12,7 @@ export default function (): void {
     // 存储的兜底工作
     initStorage();
     mountRoom();
+    mountRoomPostio();
     mountCreep();
     mountStructure();
     global.hasExtension = true;

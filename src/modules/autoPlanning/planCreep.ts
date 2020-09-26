@@ -253,7 +253,7 @@ const releaseTransporter = function (room: Room): OK {
  * 发布升级者
  * @param room 要发布角色的房间
  */
-const releaseupgrader = function (room: Room): OK {
+const releaseUpgrader = function (room: Room): OK {
   // 先移除所有的配置项
   for (let i = 0; i < MAX_UPGRADER_NUM; i++) creepApi.remove(`${room.name} upgrader${i}`);
 
@@ -263,12 +263,30 @@ const releaseupgrader = function (room: Room): OK {
 };
 
 /**
+ * 发布建造者
+ * @param room 要发布角色的房间
+ */
+const releaseBuilder = function (room: Room): OK {
+  creepApi.add(
+    `${room.name} builder${Game.time}`,
+    "builder",
+    {
+      sourceId: room.getAvailableSource().id
+    },
+    room.name
+  );
+
+  return OK;
+};
+
+/**
  * 房间运营角色名对应的发布逻辑
  */
 const roleToRelease: { [role in BaseRoleConstant]: (room: Room) => OK | ERR_NOT_FOUND } = {
   harvester: releaseHarvester,
   filler: releaseTransporter,
-  upgrader: releaseupgrader
+  upgrader: releaseUpgrader,
+  builder: releaseBuilder
 };
 
 /**

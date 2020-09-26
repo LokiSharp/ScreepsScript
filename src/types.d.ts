@@ -31,6 +31,46 @@ interface Memory {
       bodys: BodyAutoConfigConstant | BodyPartConstant[];
     };
   };
+  stats: {
+    // GCl/GPL 升级百分比
+    gcl?: number;
+    gclLevel?: number;
+    gpl?: number;
+    gplLevel?: number;
+    // CPU 当前数值及百分比
+    cpu?: number;
+    // bucket 当前数值
+    bucket?: number;
+    // 当前还有多少钱
+    credit?: number;
+
+    // 已经完成的房间物流任务比例
+    roomTaskNumber?: {
+      [roomTransferTaskType: string]: number;
+    };
+
+    /**
+     * 房间内的数据统计
+     */
+    rooms: {
+      [roomName: string]: {
+        // storage 中的能量剩余量
+        energy?: number;
+        // 终端中的 power 数量
+        power?: number;
+        // nuker 的资源存储量
+        nukerEnergy?: number;
+        nukerG?: number;
+        nukerCooldown?: number;
+        // 控制器升级进度，只包含没有到 8 级的
+        controllerRatio?: number;
+        controllerLevel?: number;
+
+        // 其他种类的资源数量，由 factory 统计
+        [commRes: string]: number;
+      };
+    };
+  };
 }
 
 /**
@@ -116,6 +156,8 @@ interface Creep {
   getEngryFrom(target: Structure | Source): ScreepsReturnCode;
   transferTo(target: Structure, RESOURCE: ResourceConstant): ScreepsReturnCode;
   upgrade(): ScreepsReturnCode;
+  buildStructure(): CreepActionReturnCode | ERR_NOT_ENOUGH_RESOURCES | ERR_RCL_NOT_ENOUGH | ERR_NOT_FOUND;
+  steadyWall(): OK | ERR_NOT_FOUND;
 }
 
 /**
@@ -138,15 +180,20 @@ interface CreepMemory {
   sourceId?: string;
   // 要存放到的目标建筑
   targetId?: string;
+  fillWallId?: string;
+  // manager 特有 要填充能量的建筑 id
+  fillStructureId?: string;
   // 建筑工特有，当前缓存的建筑工地（目前只有外矿采集者在用）
   constructionSiteId?: string;
+  // 可以执行建筑的单位特有，当该值为 true 时将不会尝试建造
+  dontBuild?: boolean;
 }
 
 // 所有的 creep 角色
 type CreepRoleConstant = BaseRoleConstant;
 
 // 房间基础运营
-type BaseRoleConstant = "harvester" | "filler" | "upgrader";
+type BaseRoleConstant = "harvester" | "filler" | "upgrader" | "builder";
 
 /**
  * creep 工作逻辑集合
@@ -190,6 +237,9 @@ interface Room {
 
   _sources: Source[];
   _sourceContainers: StructureContainer[];
+
+  // 获取房间中的有效能量来源
+  getAvailableSource(): StructureTerminal | StructureStorage | StructureContainer | Source;
 }
 
 /**
@@ -208,6 +258,24 @@ interface RoomMemory {
   };
   // 基地中心点坐标, [0] 为 x 坐标, [1] 为 y 坐标
   center: [number, number];
+
+  // 建筑工的当前工地目标，用于保证多个建筑工的工作统一以及建筑工死后不会寻找新的工地
+  constructionSiteId: string;
+  // 建筑工特有，当前正在修建的建筑类型，用于在修建完成后触发对应的事件
+  constructionSiteType?: StructureConstant;
+  // 建筑工地的坐标，用于在建造完成后进行 lookFor 来确认其是否成功修建了建筑
+  constructionSitePos: number[];
+
+  // 当前被 repairer 或 tower 关注的墙
+  focusWall: {
+    id: string;
+    endTime: number;
+  };
+}
+
+interface RoomPosition {
+  directionToPos(direction: DirectionConstant): RoomPosition | undefined;
+  getFreeSpace(): RoomPosition[];
 }
 
 /**

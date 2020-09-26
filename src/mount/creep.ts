@@ -1,3 +1,4 @@
+import { MIN_WALL_HITS } from "setting";
 import { assignPrototype } from "utils/prototype";
 import roles from "role";
 
@@ -123,6 +124,111 @@ export class CreepExtension extends Creep {
       this.goTo(this.room.controller.pos);
     }
     return result;
+  }
+
+  /**
+   * 建设房间内存在的建筑工地
+   */
+  public buildStructure(): CreepActionReturnCode | ERR_NOT_ENOUGH_RESOURCES | ERR_RCL_NOT_ENOUGH | ERR_NOT_FOUND {
+    // 新建目标建筑工地
+    let target: ConstructionSite;
+    // 检查是否有缓存
+    if (this.room.memory.constructionSiteId) {
+      target = Game.getObjectById(this.room.memory.constructionSiteId as Id<ConstructionSite>);
+      // 如果缓存中的工地不存在则说明建筑完成
+      if (!target) {
+        // 获取曾经工地的位置
+        const constructionSitePos = new RoomPosition(
+          this.room.memory.constructionSitePos[0],
+          this.room.memory.constructionSitePos[1],
+          this.room.name
+        );
+        // 检查上面是否有已经造好的同类型建筑
+        const structure = _.find(
+          constructionSitePos.lookFor(LOOK_STRUCTURES),
+          s => s.structureType === this.room.memory.constructionSiteType
+        );
+        if (structure) {
+          // 如果有的话就执行回调
+          if (structure.onBuildComplete) structure.onBuildComplete();
+
+          // 如果刚修好的是墙的话就记住该墙的 id，然后把血量刷高一点（相关逻辑见 builder.target()）
+          if (structure.structureType === STRUCTURE_WALL || structure.structureType === STRUCTURE_RAMPART) {
+            this.memory.fillWallId = structure.id;
+          }
+          // 如果修好的是 source container 的话，就执行注册
+          else if (structure instanceof StructureContainer && this.room.sources.find(s => structure.pos.isNearTo(s))) {
+            this.room.registerContainer(structure);
+          }
+        }
+
+        // 获取下个建筑目标
+        // eslint-disable-next-line no-underscore-dangle
+        target = this._updateConstructionSite();
+      }
+    }
+    // 没缓存就直接获取
+    // eslint-disable-next-line no-underscore-dangle
+    else target = this._updateConstructionSite();
+    if (!target) return ERR_NOT_FOUND;
+
+    // 建设
+    const buildResult = this.build(target);
+    if (buildResult === OK) {
+      // 如果修好的是 rempart 的话就移除墙壁缓存
+      // 让维修单位可以快速发现新 rempart
+      if (target.structureType === STRUCTURE_RAMPART) delete this.room.memory.focusWall;
+    } else if (buildResult === ERR_NOT_IN_RANGE) this.goTo(target.pos);
+    return buildResult;
+  }
+
+  /**
+   * 稳定新墙
+   * 会把内存中 fillWallId 标注的墙声明值刷到定值以上
+   */
+  public steadyWall(): OK | ERR_NOT_FOUND {
+    const wall = Game.getObjectById<StructureWall | StructureRampart>(
+      this.memory.fillWallId as Id<StructureWall | StructureRampart>
+    );
+    if (!wall) return ERR_NOT_FOUND;
+
+    if (wall.hits < MIN_WALL_HITS) {
+      const result = this.repair(wall);
+      if (result === ERR_NOT_IN_RANGE) this.goTo(wall.pos);
+    } else delete this.memory.fillWallId;
+
+    return OK;
+  }
+
+  /**
+   * 获取下一个建筑工地
+   * 有的话将其 id 写入自己 memory.constructionSiteId
+   *
+   * @returns 下一个建筑工地，或者 null
+   */
+  private _updateConstructionSite(): ConstructionSite | undefined {
+    const targets: ConstructionSite[] = this.room.find(FIND_MY_CONSTRUCTION_SITES);
+    if (targets.length > 0) {
+      let target: ConstructionSite;
+      // 优先建造 spawn，然后是 extension，想添加新的优先级就在下面的数组里追加即可
+      for (const type of [STRUCTURE_SPAWN, STRUCTURE_EXTENSION]) {
+        target = targets.find(cs => cs.structureType === type);
+        if (target) break;
+      }
+      // 优先建造的都完成了，按照距离建造
+      if (!target) target = this.pos.findClosestByRange(targets);
+
+      // 缓存工地信息，用于统一建造并在之后验证是否完成建造
+      this.room.memory.constructionSiteId = target.id;
+      this.room.memory.constructionSiteType = target.structureType;
+      this.room.memory.constructionSitePos = [target.pos.x, target.pos.y];
+      return target;
+    } else {
+      delete this.room.memory.constructionSiteId;
+      delete this.room.memory.constructionSiteType;
+      delete this.room.memory.constructionSitePos;
+      return undefined;
+    }
   }
 }
 
