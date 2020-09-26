@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import { assignPrototype } from "../../src/utils/prototype";
+import { assignPrototype } from "../../../src/utils/prototype";
 
 // eslint-disable-next-line id-blacklist
 export class TestPrototypeExtension extends Object {
