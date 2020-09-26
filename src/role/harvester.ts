@@ -64,6 +64,7 @@ export default (data: HarvesterData): ICreepConfig => ({
 
     // 存在 container，把血量修满
     if (target && target instanceof StructureContainer) {
+      creep.say("🚧" + String(target.hits));
       creep.repair(target);
       // 血修满了就正式进入采集阶段
       return target.hits >= target.hitsMax;
@@ -90,13 +91,13 @@ export default (data: HarvesterData): ICreepConfig => ({
       }
 
       // 还没找到，等下个 tick 会重新新建工地
-      return false;
+      return true;
     }
     // 找到了就缓存 id
     else creep.memory.constructionSiteId = constructionSite.id;
 
     creep.build(constructionSite);
-    return false;
+    return true;
   },
   target: creep => {
     creep.getEngryFrom(Game.getObjectById(data.sourceId as Id<Structure | Source>));
