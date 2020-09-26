@@ -17,11 +17,11 @@ describe("main", () => {
     global.Memory = _.clone(Memory);
   });
 
-  it("should export a loop function", () => {
+  it("会导出 loop 函数", () => {
     assert.isTrue(typeof loop === "function");
   });
 
-  it("should return void when called with no context", () => {
+  it("会在没有上下文时返回空", () => {
     assert.isUndefined(loop());
   });
 });
