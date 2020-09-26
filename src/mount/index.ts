@@ -26,5 +26,6 @@ function initStorage() {
   if (!Memory.rooms) Memory.rooms = {};
   else delete Memory.rooms.undefined;
 
+  if (!Memory.stats) Memory.stats = { rooms: {} };
   if (!Memory.creepConfigs) Memory.creepConfigs = {};
 }

@@ -13,4 +13,12 @@ export const loop = ErrorMapper.wrapLoop(() => {
 
   // 所有建筑、creep、powerCreep 执行工作
   doing(Game.structures, Game.creeps);
+
+  if (Game.cpu.bucket > 9000) {
+    try {
+      Game.cpu.generatePixel();
+    } catch (error) {
+      // PASS
+    }
+  }
 });
