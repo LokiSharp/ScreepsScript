@@ -83,8 +83,8 @@ export class CreepExtension extends Creep {
   public goTo(target: RoomPosition): CreepMoveReturnCode | ERR_NO_PATH | ERR_INVALID_TARGET | ERR_NOT_FOUND {
     // const baseCost = Game.cpu.getUsed()
     const moveResult = this.moveTo(target, {
-      reusePath: 20,
-      ignoreCreeps: true,
+      reusePath: 10,
+      ignoreCreeps: false,
       costCallback: (roomName, costMatrix) => {
         if (roomName === this.room.name) {
           // 避开房间中的禁止通行点

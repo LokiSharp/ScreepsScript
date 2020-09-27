@@ -255,6 +255,16 @@ interface Room {
   _sources: Source[];
   _sourceContainers: StructureContainer[];
 
+  // 已拥有的房间特有，tower 负责维护
+  _enemys: (Creep | PowerCreep)[];
+  // 需要维修的建筑，tower 负责维护，为 1 说明建筑均良好
+  _damagedStructure: AnyStructure | 1;
+  // 该 tick 是否已经有 tower 刷过墙了
+  _hasFillWall: boolean;
+  // 外矿房间特有，外矿单位维护
+  // 一旦该字段为 true 就告诉出生点暂时禁止自己重生直到 1500 tick 之后
+  _hasEnemy: boolean;
+
   // 焦点墙，维修单位总是倾向于优先修复该墙体
   _importantWall: StructureWall | StructureRampart;
 
@@ -294,6 +304,10 @@ interface RoomMemory {
 
   // 房间物流任务队列
   transferTasks: RoomTransferTasks[];
+
+  // 当前房间所处的防御模式
+  // defense 为基础防御，active 为主动防御，该值未定义时为日常模式
+  defenseMode?: "defense" | "active";
 }
 
 interface RoomPosition {
@@ -301,11 +315,22 @@ interface RoomPosition {
   getFreeSpace(): RoomPosition[];
 }
 
-type RoomTransferTasks = IFillExtension;
+type RoomTransferTasks = IFillExtension | IFillTower;
 
 // 房间物流任务 - 填充拓展
 interface IFillExtension {
   type: string;
+}
+
+// 房间物流任务 - 填充塔
+interface IFillTower {
+  type: string;
+  id: string;
+}
+
+interface StructureController {
+  // 检查房间内敌人是否有威胁
+  checkEnemyThreat(): boolean;
 }
 
 interface transferTaskOperation {
