@@ -3,7 +3,7 @@
  * 不会采集能量，只会从指定目标获取能量
  * 从指定建筑中获取能量 > 升级 controller
  */
-export default (data: HarvesterData): ICreepConfig => ({
+export default (data: WorkerData): ICreepConfig => ({
   source: creep => {
     // 因为只会从建筑里拿，所以只要拿到了就去升级
     if (creep.store[RESOURCE_ENERGY] > 0) return true;

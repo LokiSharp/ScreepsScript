@@ -280,13 +280,35 @@ const releaseBuilder = function (room: Room): OK {
 };
 
 /**
+ * 发布刷墙工
+ * @param room 要发布角色的房间
+ */
+const releaseRepairer = function (room: Room, num = 1): OK {
+  Array(num)
+    .fill(undefined)
+    .forEach((_, index) => {
+      creepApi.add(
+        `${room.name} repair${index}`,
+        "repairer",
+        {
+          sourceId: room.storage ? room.storage.id : ""
+        },
+        room.name
+      );
+    });
+
+  return OK;
+};
+
+/**
  * 房间运营角色名对应的发布逻辑
  */
 const roleToRelease: { [role in BaseRoleConstant]: (room: Room) => OK | ERR_NOT_FOUND } = {
   harvester: releaseHarvester,
   filler: releaseTransporter,
   upgrader: releaseUpgrader,
-  builder: releaseBuilder
+  builder: releaseBuilder,
+  repairer: releaseRepairer
 };
 
 /**

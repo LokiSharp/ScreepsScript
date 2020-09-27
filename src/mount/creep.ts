@@ -1,4 +1,4 @@
-import { MIN_WALL_HITS } from "setting";
+import { MIN_WALL_HITS, repairSetting } from "setting";
 import { assignPrototype } from "utils/prototype";
 import roles from "role";
 
@@ -256,6 +256,56 @@ export class CreepExtension extends Creep {
       delete this.room.memory.constructionSitePos;
       return undefined;
     }
+  }
+
+  /**
+   * 填充防御性建筑
+   * 包括 wall 和 rempart
+   */
+  public fillDefenseStructure(): boolean {
+    const focusWall = this.room.memory.focusWall;
+    let targetWall: StructureWall | StructureRampart = null;
+    // 该属性不存在 或者 当前时间已经大于关注时间 就刷新
+    if (!focusWall || (focusWall && Game.time >= focusWall.endTime)) {
+      // 获取所有没填满的墙
+      const walls = this.room.find(FIND_STRUCTURES, {
+        filter: s => s.hits < s.hitsMax && (s.structureType === STRUCTURE_WALL || s.structureType === STRUCTURE_RAMPART)
+      }) as (StructureWall | StructureRampart)[];
+      // 没有目标就啥都不干
+      if (walls.length <= 0) return false;
+
+      // 找到血量最小的墙
+      targetWall = walls.sort((a, b) => a.hits - b.hits)[0];
+
+      // 将其缓存在内存里
+      this.room.memory.focusWall = {
+        id: targetWall.id,
+        endTime: Game.time + repairSetting.focusTime
+      };
+    }
+
+    // 获取墙壁
+    if (!targetWall) targetWall = Game.getObjectById(focusWall.id as Id<StructureWall | StructureRampart>);
+    // 如果缓存里的 id 找不到墙壁，就清除缓存下次再找
+    if (!targetWall) {
+      delete this.room.memory.focusWall;
+      return false;
+    }
+
+    // 填充墙壁
+    const result = this.repair(targetWall);
+    if (result === OK) {
+      if (!this.memory.standed) {
+        this.memory.standed = true;
+        this.room.addRestrictedPos(this.name, this.pos);
+      }
+
+      // 离墙三格远可能正好把路堵上，所以要走进一点
+      if (!targetWall.pos.inRangeTo(this.pos, 2)) this.goTo(targetWall.pos);
+    } else if (result === ERR_NOT_IN_RANGE) {
+      this.goTo(targetWall.pos);
+    }
+    return true;
   }
 }
 

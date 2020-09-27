@@ -124,7 +124,7 @@ type BodyAutoConfigConstant = "worker" | "manager" | "upgrader";
 /**
  * 所有 creep 角色的 data
  */
-type CreepData = EmptyData | HarvesterData;
+type CreepData = EmptyData | HarvesterData | WorkerData;
 
 /**
  * 有些角色不需要 data
@@ -144,6 +144,15 @@ interface HarvesterData {
 }
 
 /**
+ * 工作单位的 data
+ * 由于由确定的工作目标所以不需要 targetId
+ */
+interface WorkerData {
+  // 要使用的资源存放建筑 id
+  sourceId: string;
+}
+
+/**
  * Creep 拓展
  * 来自于 mount.creep.ts
  */
@@ -158,6 +167,7 @@ interface Creep {
   upgrade(): ScreepsReturnCode;
   buildStructure(): CreepActionReturnCode | ERR_NOT_ENOUGH_RESOURCES | ERR_RCL_NOT_ENOUGH | ERR_NOT_FOUND;
   steadyWall(): OK | ERR_NOT_FOUND;
+  fillDefenseStructure(expectHits?: number): boolean;
 }
 
 /**
@@ -193,7 +203,7 @@ interface CreepMemory {
 type CreepRoleConstant = BaseRoleConstant;
 
 // 房间基础运营
-type BaseRoleConstant = "harvester" | "filler" | "upgrader" | "builder";
+type BaseRoleConstant = "harvester" | "filler" | "upgrader" | "builder" | "repairer";
 
 /**
  * creep 工作逻辑集合
@@ -244,6 +254,9 @@ interface Room {
 
   _sources: Source[];
   _sourceContainers: StructureContainer[];
+
+  // 焦点墙，维修单位总是倾向于优先修复该墙体
+  _importantWall: StructureWall | StructureRampart;
 
   // 获取房间中的有效能量来源
   getAvailableSource(): StructureTerminal | StructureStorage | StructureContainer | Source;

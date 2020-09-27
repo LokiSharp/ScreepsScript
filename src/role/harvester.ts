@@ -1,10 +1,7 @@
 /**
- * 采矿者配置生成器
+ * 采矿者
  * 从指定矿中挖矿 > 将矿转移到 spawn 和 extension 中
  *
- * @param sourceId 要挖的矿 id
- * @param spawnName 出生点名称
- * @param bodys 身体部件 (可选)
  */
 export default (data: HarvesterData): ICreepConfig => ({
   prepare: creep => {

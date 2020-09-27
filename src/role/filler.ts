@@ -6,7 +6,7 @@ import { ROOM_TRANSFER_TASK } from "setting";
  * 从 container 中获取能量 > 执行房间物流任务
  * 在空闲时间会尝试把能量运输至 storage
  */
-export default (data: HarvesterData): ICreepConfig => ({
+export default (data: WorkerData): ICreepConfig => ({
   // 能量来源（container）没了就自觉放弃
   isNeed: room => {
     // 这里调用 room.sourceContainers 可以移除掉过期的 container id
