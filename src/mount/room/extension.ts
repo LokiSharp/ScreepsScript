@@ -219,4 +219,17 @@ export default class RoomExtension extends Room {
     // 没有就设为 1
     else Memory.stats.roomTaskNumber[finishedTask.type] = 1;
   }
+
+  /**
+   * 将位置序列化字符串转换为位置
+   * 位置序列化字符串形如: 12/32/E1N2
+   *
+   * @param posStr 要进行转换的字符串
+   */
+  public unserializePos(posStr: string): RoomPosition | undefined {
+    // 形如 ["12", "32", "E1N2"]
+    const infos = posStr.split("/");
+
+    return infos.length === 3 ? new RoomPosition(Number(infos[0]), Number(infos[1]), infos[2]) : undefined;
+  }
 }

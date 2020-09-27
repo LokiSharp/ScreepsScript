@@ -24,7 +24,10 @@ export default (data: HarvesterData): ICreepConfig => ({
     if (!creep.memory.sourceId) {
       source = creep.room.getAvailableSource();
       creep.memory.sourceId = source.id;
-    } else source = Game.getObjectById(creep.memory.sourceId as Id<Source>);
+    } else
+      source = Game.getObjectById(
+        creep.memory.sourceId as Id<StructureStorage | StructureTerminal | StructureContainer | Source>
+      );
 
     // 之前用的能量来源没能量了就更新来源（如果来源已经是 source 的话就不改了）
     if (creep.getEngryFrom(source) === ERR_NOT_ENOUGH_RESOURCES && source instanceof Structure)

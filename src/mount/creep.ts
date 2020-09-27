@@ -84,7 +84,22 @@ export class CreepExtension extends Creep {
     // const baseCost = Game.cpu.getUsed()
     const moveResult = this.moveTo(target, {
       reusePath: 20,
-      ignoreCreeps: true
+      ignoreCreeps: true,
+      costCallback: (roomName, costMatrix) => {
+        if (roomName === this.room.name) {
+          // 避开房间中的禁止通行点
+          const restrictedPos = this.room.getRestrictedPos();
+          for (const creepName in restrictedPos) {
+            // 自己注册的禁止通行点位自己可以走
+            if (creepName === this.name) continue;
+
+            const pos = this.room.unserializePos(restrictedPos[creepName]);
+            costMatrix.set(pos.x, pos.y, 0xff);
+          }
+        }
+
+        return costMatrix;
+      }
     });
 
     return moveResult;
