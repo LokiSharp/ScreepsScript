@@ -92,7 +92,7 @@ export default (data: HarvesterData): ICreepConfig => ({
     // 找到了就缓存 id
     else creep.memory.constructionSiteId = constructionSite.id;
 
-    creep.build(constructionSite);
+    if (creep.build(constructionSite)) return true;
     return false;
   },
   target: creep => {
