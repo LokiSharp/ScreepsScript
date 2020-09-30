@@ -119,7 +119,7 @@ interface ICreepConfig {
   bodys: BodyAutoConfigConstant | BodyPartConstant[];
 }
 
-type BodyAutoConfigConstant = "worker" | "manager" | "upgrader";
+type BodyAutoConfigConstant = "harvester" | "worker" | "manager" | "upgrader";
 
 /**
  * 所有 creep 角色的 data

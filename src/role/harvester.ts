@@ -102,5 +102,5 @@ export default (data: HarvesterData): ICreepConfig => ({
     if (creep.ticksToLive < 2) creep.drop(RESOURCE_ENERGY);
     return false;
   },
-  bodys: "worker"
+  bodys: "harvester"
 });

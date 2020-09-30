@@ -1,7 +1,7 @@
 import { getBodyConfig } from "utils/getBodyConfig";
 
 // 每个房间最多同时存在多少 upgrader 和 harvester
-export const MAX_UPGRADER_NUM = 4;
+export const MAX_UPGRADER_NUM = 8;
 export const MAX_HARVESTER_NUM = 4;
 // 造好新墙时 builder 会先将墙刷到超过下面值，之后才会去建其他建筑
 export const MIN_WALL_HITS = 8000;
@@ -29,31 +29,46 @@ export const UPGRADE_WITH_STORAGE = [
 
 export const bodyConfigs: BodyConfigs = {
   /**
+   * 挖矿单位
+   * 诸如 harvester 之类的
+   */
+  harvester: getBodyConfig(
+    { [WORK]: 2, [CARRY]: 1, [MOVE]: 1 },
+    { [WORK]: 4, [CARRY]: 1, [MOVE]: 2 },
+    { [WORK]: 6, [CARRY]: 1, [MOVE]: 3 },
+    { [WORK]: 10, [CARRY]: 1, [MOVE]: 5 },
+    { [WORK]: 14, [CARRY]: 1, [MOVE]: 7 },
+    { [WORK]: 18, [CARRY]: 1, [MOVE]: 9 },
+    { [WORK]: 32, [CARRY]: 1, [MOVE]: 17 },
+    { [WORK]: 32, [CARRY]: 1, [MOVE]: 17 }
+  ),
+
+  /**
    * 工作单位
-   * 诸如 harvester、builder 之类的
+   * 诸如 builder 之类的
    */
   worker: getBodyConfig(
-    { [WORK]: 1, [CARRY]: 1, [MOVE]: 1 },
-    { [WORK]: 2, [CARRY]: 2, [MOVE]: 2 },
-    { [WORK]: 3, [CARRY]: 3, [MOVE]: 3 },
-    { [WORK]: 4, [CARRY]: 4, [MOVE]: 4 },
-    { [WORK]: 6, [CARRY]: 6, [MOVE]: 6 },
-    { [WORK]: 7, [CARRY]: 7, [MOVE]: 7 },
-    { [WORK]: 12, [CARRY]: 6, [MOVE]: 9 },
-    { [WORK]: 20, [CARRY]: 8, [MOVE]: 14 }
+    { [WORK]: 1, [CARRY]: 2, [MOVE]: 2 },
+    { [WORK]: 2, [CARRY]: 3, [MOVE]: 4 },
+    { [WORK]: 3, [CARRY]: 5, [MOVE]: 5 },
+    { [WORK]: 5, [CARRY]: 8, [MOVE]: 8 },
+    { [WORK]: 8, [CARRY]: 10, [MOVE]: 10 },
+    { [WORK]: 11, [CARRY]: 12, [MOVE]: 12 },
+    { [WORK]: 16, [CARRY]: 16, [MOVE]: 16 },
+    { [WORK]: 17, [CARRY]: 16, [MOVE]: 17 }
   ),
   /**
    * 升级单位
    * 最大的身体部件只包含 12 个 WORK
    */
   upgrader: getBodyConfig(
-    { [WORK]: 1, [CARRY]: 1, [MOVE]: 1 },
-    { [WORK]: 2, [CARRY]: 2, [MOVE]: 2 },
-    { [WORK]: 3, [CARRY]: 3, [MOVE]: 3 },
-    { [WORK]: 4, [CARRY]: 4, [MOVE]: 4 },
-    { [WORK]: 6, [CARRY]: 6, [MOVE]: 6 },
-    { [WORK]: 9, [CARRY]: 9, [MOVE]: 9 },
-    { [WORK]: 17, [CARRY]: 9, [MOVE]: 17 },
+    { [WORK]: 1, [CARRY]: 2, [MOVE]: 2 },
+    { [WORK]: 2, [CARRY]: 3, [MOVE]: 4 },
+    { [WORK]: 3, [CARRY]: 5, [MOVE]: 5 },
+    { [WORK]: 5, [CARRY]: 8, [MOVE]: 8 },
+    { [WORK]: 8, [CARRY]: 10, [MOVE]: 10 },
+    { [WORK]: 11, [CARRY]: 12, [MOVE]: 12 },
+    { [WORK]: 16, [CARRY]: 16, [MOVE]: 16 },
     { [WORK]: 12, [CARRY]: 12, [MOVE]: 12 }
   ),
 
@@ -62,13 +77,13 @@ export const bodyConfigs: BodyConfigs = {
    * 负责转移基地资源的 creep
    */
   manager: getBodyConfig(
-    { [CARRY]: 2, [MOVE]: 1 },
-    { [CARRY]: 3, [MOVE]: 2 },
-    { [CARRY]: 4, [MOVE]: 2 },
-    { [CARRY]: 5, [MOVE]: 3 },
-    { [CARRY]: 8, [MOVE]: 4 },
-    { [CARRY]: 14, [MOVE]: 7 },
-    { [CARRY]: 20, [MOVE]: 10 },
+    { [CARRY]: 3, [MOVE]: 3 },
+    { [CARRY]: 7, [MOVE]: 4 },
+    { [CARRY]: 10, [MOVE]: 6 },
+    { [CARRY]: 17, [MOVE]: 9 },
+    { [CARRY]: 24, [MOVE]: 12 },
+    { [CARRY]: 30, [MOVE]: 15 },
+    { [CARRY]: 32, [MOVE]: 16 },
     { [CARRY]: 32, [MOVE]: 16 }
   )
 };
