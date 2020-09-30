@@ -25,7 +25,12 @@ export default {
   plugins: [
     clear({ targets: ["dist/test.bundle.js"] }),
     resolve(),
-    commonjs(),
+    commonjs({
+      include: /node_modules/,
+      namedExports: {
+        "node_modules/lodash/index.js": ["get", "set", "each"]
+      }
+    }),
     typescript({ tsconfig: "./tsconfig.test-integration.json" }),
     nodent(),
     multiEntry(),
