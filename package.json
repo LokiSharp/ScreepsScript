@@ -21,6 +21,16 @@
     "watch-sim": "rollup -cw --environment DEST:sim",
     "release": "standard-version"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LokiSharp/ScreepsScript.git"
+  },
+  "author": "LokiSharp",
+  "license": "Unlicense",
+  "bugs": {
+    "url": "https://github.com/LokiSharp/ScreepsScript/issues"
+  },
+  "homepage": "https://github.com/LokiSharp/ScreepsScript#readme",
   "engines": {
     "node": "10.x || 12.x"
   },
