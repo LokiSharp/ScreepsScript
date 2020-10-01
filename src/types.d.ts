@@ -45,9 +45,7 @@ interface Memory {
     credit?: number;
 
     // 已经完成的房间物流任务比例
-    roomTaskNumber?: {
-      [roomTransferTaskType: string]: number;
-    };
+    roomTaskNumber?: { [roomTransferTaskType: string]: number };
 
     /**
      * 房间内的数据统计
@@ -59,6 +57,7 @@ interface Memory {
         // 控制器升级进度，只包含没有到 8 级的
         controllerRatio?: number;
         controllerLevel?: number;
+        structureNums?: { [structureName: string]: number };
       };
     };
   };
