@@ -135,6 +135,7 @@ export default class ControllerExtension extends StructureController {
   private structureScanner(): void {
     const structures = this.room.find(FIND_MY_STRUCTURES);
     const structureNums: { [structureName: string]: number } = {};
+
     if (structures.length > 0) {
       Object.values(structures).forEach(structure => {
         if (!Object.keys(structureNums).includes(structure.structureType)) {

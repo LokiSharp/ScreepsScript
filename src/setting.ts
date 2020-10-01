@@ -4,7 +4,7 @@ import { getBodyConfig } from "utils/getBodyConfig";
 export const MAX_UPGRADER_NUM = 4;
 export const MAX_HARVESTER_NUM = 4;
 export const MAX_BUILDER_NUM = 2;
-export const MAX_RUIN_COLLECTOR_NUM = 2;
+export const MAX_RUIN_COLLECTOR_NUM = 6;
 
 // 造好新墙时 builder 会先将墙刷到超过下面值，之后才会去建其他建筑
 export const MIN_WALL_HITS = 8000;
