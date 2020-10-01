@@ -56,18 +56,9 @@ interface Memory {
       [roomName: string]: {
         // storage 中的能量剩余量
         energy?: number;
-        // 终端中的 power 数量
-        power?: number;
-        // nuker 的资源存储量
-        nukerEnergy?: number;
-        nukerG?: number;
-        nukerCooldown?: number;
         // 控制器升级进度，只包含没有到 8 级的
         controllerRatio?: number;
         controllerLevel?: number;
-
-        // 其他种类的资源数量，由 factory 统计
-        [commRes: string]: number;
       };
     };
   };
