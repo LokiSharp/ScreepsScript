@@ -1,4 +1,10 @@
-import { MAX_HARVESTER_NUM, MAX_UPGRADER_NUM, UPGRADE_WITH_STORAGE } from "setting";
+import {
+  MAX_BUILDER_NUM,
+  MAX_HARVESTER_NUM,
+  MAX_RUIN_COLLECTOR_NUM,
+  MAX_UPGRADER_NUM,
+  UPGRADE_WITH_STORAGE
+} from "setting";
 import { creepApi } from "modules/creepController";
 
 // 在 Function 原型上挂载 setNextPlan 方法来完成 creep 发布的职责链
@@ -216,6 +222,71 @@ const releasePlans: CreepReleasePlans = {
         return false;
       }
     ]
+  },
+
+  /**
+   * 发布废墟收集单位的相关逻辑
+   */
+  ruinCollector: {
+    // 状态收集
+    getStats(room: Room): RuinCollectorPlanStats {
+      const stats: RuinCollectorPlanStats = {
+        room
+      };
+
+      if (room.storage) stats.storageId = room.storage.id;
+      if (room.memory.ruinIds) stats.ruinIds = room.memory.ruinIds;
+      return stats;
+    },
+    // 发布计划
+    plans: [
+      ({ room, ruinIds }: RuinCollectorPlanStats) => {
+        const num = Math.min(ruinIds.length + 1, MAX_BUILDER_NUM);
+
+        for (let index = 0; index < num; index++) {
+          creepApi.add(`${room.name} ruinCollector${index}`, "ruinCollector", {}, room.name);
+        }
+
+        room.log(`发布 ruinCollector * ${num}`, "ruinCollector", "green");
+        return false;
+      }
+    ]
+  },
+
+  /**
+   * 发布建造单位的相关逻辑
+   */
+  builder: {
+    // 状态收集
+    getStats(room: Room): BuilderPlanStats {
+      const stats: BuilderPlanStats = {
+        room,
+        constructionSiteIds: room.memory.constructionSiteIds
+      };
+
+      if (room.storage) stats.storageId = room.storage.id;
+      return stats;
+    },
+    // 发布计划
+    plans: [
+      ({ room, constructionSiteIds }: BuilderPlanStats) => {
+        const num = Math.min(constructionSiteIds.length + 1, MAX_BUILDER_NUM);
+
+        for (let index = 0; index < num; index++) {
+          creepApi.add(
+            `${room.name} builder${index}`,
+            "builder",
+            {
+              sourceId: room.getAvailableSource().id
+            },
+            room.name
+          );
+        }
+
+        room.log(`发布 builder * ${num}`, "builder", "green");
+        return false;
+      }
+    ]
   }
 };
 
@@ -267,14 +338,10 @@ const releaseUpgrader = function (room: Room): OK {
  * @param room 要发布角色的房间
  */
 const releaseBuilder = function (room: Room): OK {
-  creepApi.add(
-    `${room.name} builder${Game.time}`,
-    "builder",
-    {
-      sourceId: room.getAvailableSource().id
-    },
-    room.name
-  );
+  for (let i = 0; i < MAX_BUILDER_NUM; i++) creepApi.remove(`${room.name} builder${i}`);
+
+  // 然后重新发布
+  planChains.builder(releasePlans.builder.getStats(room));
 
   return OK;
 };
@@ -301,6 +368,19 @@ const releaseRepairer = function (room: Room, num = 1): OK {
 };
 
 /**
+ * 发布废墟收集者
+ * @param room 要发布角色的房间
+ */
+const releaseRuinCollector = function (room: Room): OK {
+  for (let i = 0; i < MAX_RUIN_COLLECTOR_NUM; i++) creepApi.remove(`${room.name} ruinCollector${i}`);
+
+  // 然后重新发布
+  planChains.ruinCollector(releasePlans.ruinCollector.getStats(room));
+
+  return OK;
+};
+
+/**
  * 房间运营角色名对应的发布逻辑
  */
 const roleToRelease: { [role in BaseRoleConstant]: (room: Room) => OK | ERR_NOT_FOUND } = {
@@ -308,7 +388,8 @@ const roleToRelease: { [role in BaseRoleConstant]: (room: Room) => OK | ERR_NOT_
   filler: releaseTransporter,
   upgrader: releaseUpgrader,
   builder: releaseBuilder,
-  repairer: releaseRepairer
+  repairer: releaseRepairer,
+  ruinCollector: releaseRuinCollector
 };
 
 /**

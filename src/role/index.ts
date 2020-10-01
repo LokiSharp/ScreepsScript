@@ -2,6 +2,7 @@ import builder from "./builder";
 import filler from "./filler";
 import harvester from "./harvester";
 import repairer from "./repairer";
+import ruinCollector from "./ruinCollector";
 import upgrader from "./upgrader";
 
 const roles: CreepWork = {
@@ -9,7 +10,8 @@ const roles: CreepWork = {
   filler,
   upgrader,
   builder,
-  repairer
+  repairer,
+  ruinCollector
 };
 
 /**

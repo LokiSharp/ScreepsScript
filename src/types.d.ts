@@ -203,7 +203,7 @@ interface CreepMemory {
 type CreepRoleConstant = BaseRoleConstant;
 
 // 房间基础运营
-type BaseRoleConstant = "harvester" | "filler" | "upgrader" | "builder" | "repairer";
+type BaseRoleConstant = "harvester" | "filler" | "upgrader" | "builder" | "repairer" | "ruinCollector";
 
 /**
  * creep 工作逻辑集合
@@ -280,6 +280,8 @@ interface RoomMemory {
   spawnList?: string[];
   sourceIds: string[];
   sourceContainersIds: string[];
+  ruinIds: string[];
+  constructionSiteIds: string[];
 
   // 该房间禁止通行点的存储
   // 键为注册禁止通行点位的 creep 名称，值为禁止通行点位 RoomPosition 对象的序列字符串
@@ -346,7 +348,9 @@ interface transferTaskOperation {
  * @param detail 该 creep 发布所需的房间信息
  * @returns 代表该发布计划是否适合房间状态
  */
-type PlanNodeFunction = (detail: UpgraderPlanStats | HarvesterPlanStats | TransporterPlanStats) => boolean;
+type PlanNodeFunction = (
+  detail: UpgraderPlanStats | HarvesterPlanStats | TransporterPlanStats | RuinCollectorPlanStats
+) => boolean;
 
 // 房间中用于发布 upgrader 所需要的信息
 interface UpgraderPlanStats {
@@ -399,6 +403,24 @@ interface TransporterPlanStats {
   centerPos?: [number, number];
 }
 
+// 房间中用于发布 ruinCollector 所需要的信息
+interface RuinCollectorPlanStats {
+  // 房间对象
+  room: Room;
+  // 房间内 storage 的 id，房间没 storage 时该值为空，下同
+  storageId?: string;
+  ruinIds?: string[];
+}
+
+// 房间中用于发布 ruinCollector 所需要的信息
+interface BuilderPlanStats {
+  // 房间对象
+  room: Room;
+  // 房间内 storage 的 id，房间没 storage 时该值为空，下同
+  storageId?: string;
+  constructionSiteIds: string[];
+}
+
 // 发布角色配置项需要的素材集合
 interface ReleasePlanConstructor<T> {
   // 搜集发布该角色需要的房间信息
@@ -412,6 +434,8 @@ interface CreepReleasePlans {
   harvester: ReleasePlanConstructor<HarvesterPlanStats>;
   upgrader: ReleasePlanConstructor<UpgraderPlanStats>;
   transporter: ReleasePlanConstructor<TransporterPlanStats>;
+  ruinCollector: ReleasePlanConstructor<RuinCollectorPlanStats>;
+  builder: ReleasePlanConstructor<BuilderPlanStats>;
 }
 
 /**

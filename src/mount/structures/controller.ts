@@ -7,7 +7,8 @@ import { creepApi } from "modules/creepController";
 export default class ControllerExtension extends StructureController {
   public work(): void {
     if (Game.time % 20) return;
-
+    if (this.constructionSiteScanner()) this.room.releaseCreep("builder");
+    if (this.room.storage && this.ruinScanner()) this.room.releaseCreep("ruinCollector");
     // 如果等级发生变化了就运行 creep 规划
     if (this.stateScanner()) this.onLevelChange(this.level);
 
@@ -79,5 +80,49 @@ export default class ControllerExtension extends StructureController {
       .reduce((pre, cur) => pre + cur);
     // 满配 creep 数量大于 1，就启动主动防御
     return bodyNum > MAX_CREEP_SIZE;
+  }
+
+  /**
+   * 扫描房间内有资源的废墟
+   *
+   * @returns 为 true 时说明自己房间内有资源的废墟
+   */
+  private ruinScanner(): boolean {
+    let hasRuins = false;
+    Memory.rooms[this.room.name].ruinIds = [];
+
+    const ruins = this.room.find(FIND_RUINS);
+
+    if (ruins.length > 0) {
+      Object.values(ruins).forEach(ruin => {
+        if (ruin.store.getUsedCapacity() > 0) {
+          hasRuins = true;
+          Memory.rooms[this.room.name].ruinIds.push(ruin.id);
+        }
+      });
+    }
+
+    return hasRuins;
+  }
+
+  /**
+   * 扫描房间内工地
+   *
+   * @returns 为 true 时说明自己房间内有工地
+   */
+  private constructionSiteScanner(): boolean {
+    let hasConstructionSites = false;
+    Memory.rooms[this.room.name].constructionSiteIds = [];
+
+    const constructionSites = this.room.find(FIND_MY_CONSTRUCTION_SITES);
+
+    if (constructionSites.length > 0) {
+      hasConstructionSites = true;
+      Object.values(constructionSites).forEach(constructionSite => {
+        Memory.rooms[this.room.name].constructionSiteIds.push(constructionSite.id);
+      });
+    }
+
+    return hasConstructionSites;
   }
 }
