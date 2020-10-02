@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable no-underscore-dangle */
@@ -13,7 +14,7 @@ const { ScreepsServer, stdHooks } = require("screeps-server-mockup");
  * See https://github.com/Hiryus/screeps-server-mockup for instructions on
  * manipulating the terrain and game state.
  */
-class IntegrationTestHelper {
+export class IntegrationTestHelper {
   private _server: any;
 
   get server() {
