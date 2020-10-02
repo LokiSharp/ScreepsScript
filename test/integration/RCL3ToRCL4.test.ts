@@ -7,7 +7,7 @@ import { helper } from "./helper";
 import { initRCLTestRoom } from "./init/initRCLTestRoom";
 import { printDebugInfo } from "./utils/printDebugInfo";
 const TICK_NUM = 100000;
-const RCL = 1;
+const RCL = 3;
 
 describe("main", () => {
   it(`测试 RCL${RCL} -> RCL${RCL + 1}`, async () => {

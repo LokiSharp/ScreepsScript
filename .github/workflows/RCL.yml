@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         node-version: [12.x]
-        RCL: ["RCL1ToRCL2", "RCL2ToRCL3"]
+        RCL: ["RCL1ToRCL2", "RCL2ToRCL3", "RCL3ToRCL4"]
 
     steps:
       - uses: actions/checkout@v2

@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -21,7 +22,7 @@ export async function initWorld(helper: IntegrationTestHelper, RCL: number): Pro
 
   await helper.server.world.addRoom("W0N0");
   await helper.server.world.setTerrain("W0N0", terrain);
-  await helper.server.world.addRoomObject("W0N0", "controller", 10, 10, { level: RCL });
+  await helper.server.world.addRoomObject("W0N0", "controller", 10, 10, { level: 1 });
   await helper.server.world.addRoomObject("W0N0", "source", 10, 40, {
     energy: 1000,
     energyCapacity: 1000,

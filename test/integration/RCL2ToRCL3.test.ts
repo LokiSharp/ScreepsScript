@@ -4,14 +4,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { helper } from "./helper";
-import { initRCL2 } from "./init/initRCL2";
+import { initRCLTestRoom } from "./init/initRCLTestRoom";
 import { printDebugInfo } from "./utils/printDebugInfo";
 const TICK_NUM = 100000;
+const RCL = 2;
 
 describe("main", () => {
-  it(`测试 RCL2 -> RCL3`, async () => {
-    const RCL = 2;
-    await initRCL2(helper, RCL);
+  it(`测试 RCL${RCL} -> RCL${RCL + 1}`, async () => {
+    await initRCLTestRoom(helper, RCL);
 
     for (let gameTime = 1; gameTime < TICK_NUM; gameTime += 1) {
       await helper.server.tick();
