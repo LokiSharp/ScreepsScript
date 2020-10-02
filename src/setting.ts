@@ -6,6 +6,8 @@ export const MAX_HARVESTER_NUM = 4;
 export const MAX_BUILDER_NUM = 2;
 export const MAX_RUIN_COLLECTOR_NUM = 6;
 
+export const TRANSFER_DEATH_LIMIT = 20;
+
 // 造好新墙时 builder 会先将墙刷到超过下面值，之后才会去建其他建筑
 export const MIN_WALL_HITS = 8000;
 // 设置 tower 刷墙上限，避免前期过多刷墙
@@ -101,7 +103,7 @@ export const creepDefaultMemory: CreepMemory = {
 };
 
 // 用于维持房间能量正常运转的重要角色
-export const importantRoles: CreepRoleConstant[] = ["harvester", "filler"];
+export const importantRoles: CreepRoleConstant[] = ["harvester", "filler", "manager"];
 
 /**
  * 此处定义了所有的房间物流任务类型

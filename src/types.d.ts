@@ -194,7 +194,7 @@ interface CreepMemory {
 type CreepRoleConstant = BaseRoleConstant;
 
 // 房间基础运营
-type BaseRoleConstant = "harvester" | "filler" | "upgrader" | "builder" | "repairer" | "ruinCollector";
+type BaseRoleConstant = "harvester" | "filler" | "upgrader" | "builder" | "repairer" | "ruinCollector" | "manager";
 
 /**
  * creep 工作逻辑集合

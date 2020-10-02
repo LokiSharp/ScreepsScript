@@ -220,6 +220,23 @@ const releasePlans: CreepReleasePlans = {
         room.log(`发布 filler * ${sourceContainerIds.length}`, "transporter", "green");
         // 发布并没有完成，继续检查是否可以发布 manager 和 processor
         return false;
+      },
+      // storage 修建完成
+      ({ room, storageId }: TransporterPlanStats) => {
+        if (!storageId) return true;
+
+        // 发布房间物流管理单位
+        creepApi.add(
+          `${room.name} manager`,
+          "manager",
+          {
+            sourceId: storageId
+          },
+          room.name
+        );
+
+        room.log(`发布 manager`, "transporter", "green");
+        return false;
       }
     ]
   },
@@ -386,6 +403,7 @@ const releaseRuinCollector = function (room: Room): OK {
 const roleToRelease: { [role in BaseRoleConstant]: (room: Room) => OK | ERR_NOT_FOUND } = {
   harvester: releaseHarvester,
   filler: releaseTransporter,
+  manager: releaseTransporter,
   upgrader: releaseUpgrader,
   builder: releaseBuilder,
   repairer: releaseRepairer,
