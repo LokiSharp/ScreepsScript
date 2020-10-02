@@ -7,10 +7,10 @@ import { creepApi } from "modules/creepController";
 export default class ControllerExtension extends StructureController {
   public work(): void {
     if (Game.time % 20) return;
-    if (this.constructionSiteScanner()) this.room.releaseCreep("builder");
-    if (this.room.storage && this.ruinScanner()) this.room.releaseCreep("ruinCollector");
     // 如果等级发生变化了就运行 creep 规划
     if (this.stateScanner()) this.onLevelChange(this.level);
+    if (this.constructionSiteScanner()) this.room.releaseCreep("builder");
+    if (this.room.storage && this.ruinScanner()) this.room.releaseCreep("ruinCollector");
     this.structureScanner();
 
     // 8 级并且快掉级了就孵化 upgrader
@@ -114,27 +114,37 @@ export default class ControllerExtension extends StructureController {
    */
   private constructionSiteScanner(): boolean {
     let hasConstructionSites = false;
-    const constructionSites = this.room.find(FIND_MY_CONSTRUCTION_SITES);
+    const constructionSites = this.room.find(FIND_CONSTRUCTION_SITES);
 
     const constructionSiteIds: string[] = [];
+    const constructionSiteNums: { [structureName: string]: number } = {};
+
     if (constructionSites.length > 0) {
       hasConstructionSites = true;
       Object.values(constructionSites).forEach(constructionSite => {
         constructionSiteIds.push(constructionSite.id);
+
+        if (
+          constructionSiteNums &&
+          !Object.keys(constructionSiteNums).includes(constructionSite.structureType.toString())
+        ) {
+          constructionSiteNums[constructionSite.structureType.toString()] = 1;
+        } else {
+          constructionSiteNums[constructionSite.structureType.toString()] += 1;
+        }
       });
     }
 
     Memory.rooms[this.room.name].constructionSiteIds = constructionSiteIds;
+    Memory.stats.rooms[this.room.name].constructionSiteNums = constructionSiteNums;
     return hasConstructionSites;
   }
 
   /**
-   * 扫描房间内
-   *
-   * @returns 为 true 时说明自己房间内有工地
+   * 扫描房间内建筑
    */
   private structureScanner(): void {
-    const structures = this.room.find(FIND_MY_STRUCTURES);
+    const structures = this.room.find(FIND_STRUCTURES);
     const structureNums: { [structureName: string]: number } = {};
 
     if (structures.length > 0) {

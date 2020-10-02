@@ -58,6 +58,7 @@ interface Memory {
         controllerRatio?: number;
         controllerLevel?: number;
         structureNums?: { [structureName: string]: number };
+        constructionSiteNums?: { [structureName: string]: number };
       };
     };
   };

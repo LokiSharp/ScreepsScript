@@ -7,6 +7,7 @@ import { IntegrationTestHelper } from "../helper";
 const { readFileSync } = require("fs");
 const { TerrainMatrix } = require("screeps-server-mockup");
 const DIST_MAIN_JS = "dist/main.js";
+const DIST_MAIN_JS_MAP = "dist/main.js.map.js";
 
 export async function initRCL1(helper: IntegrationTestHelper, RCL = 1): Promise<void> {
   const terrain = new TerrainMatrix();
@@ -26,6 +27,11 @@ export async function initRCL1(helper: IntegrationTestHelper, RCL = 1): Promise<
     energyCapacity: 1000,
     ticksToRegeneration: 300
   });
+  await helper.server.world.addRoomObject("W0N0", "source", 40, 10, {
+    energy: 1000,
+    energyCapacity: 1000,
+    ticksToRegeneration: 300
+  });
   await helper.server.world.addRoomObject("W0N0", "mineral", 40, 40, {
     mineralType: "X",
     density: 3,
@@ -33,7 +39,8 @@ export async function initRCL1(helper: IntegrationTestHelper, RCL = 1): Promise<
   });
 
   const modules = {
-    main: readFileSync(DIST_MAIN_JS).toString()
+    main: readFileSync(DIST_MAIN_JS).toString(),
+    "main.js.map": readFileSync(DIST_MAIN_JS_MAP).toString()
   };
   helper.player = await helper.server.world.addBot({ username: "player", room: "W0N0", x: 15, y: 15, modules });
 }
