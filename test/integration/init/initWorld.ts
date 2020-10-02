@@ -9,7 +9,7 @@ const { TerrainMatrix } = require("screeps-server-mockup");
 const DIST_MAIN_JS = "dist/main.js";
 const DIST_MAIN_JS_MAP = "dist/main.js.map.js";
 
-export async function initRCL1(helper: IntegrationTestHelper, RCL = 1): Promise<void> {
+export async function initWorld(helper: IntegrationTestHelper, RCL: number): Promise<void> {
   const terrain = new TerrainMatrix();
   const walls = [
     [10, 10],

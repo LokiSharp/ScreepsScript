@@ -9,7 +9,7 @@ import resolve from "@rollup/plugin-node-resolve";
 import typescript from "rollup-plugin-typescript2";
 
 export default {
-  input: "test/integration/**/*.test.ts",
+  input: "test/integration/integration.test.ts",
   output: {
     file: "dist/test-integration.bundle.js",
     name: "lib",
