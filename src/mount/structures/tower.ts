@@ -1,4 +1,4 @@
-import { ROOM_TRANSFER_TASK, repairSetting } from "setting";
+import { MAX_WALL_HITS, ROOM_TRANSFER_TASK, repairSetting } from "setting";
 import { creepApi } from "modules/creepController";
 
 // Tower 原型拓展
@@ -247,6 +247,8 @@ export default class TowerExtension extends StructureTower {
 
       // 找到血量最小的墙
       targetWall = walls.sort((a, b) => a.hits - b.hits)[0] as StructureRampart | StructureWall;
+
+      if (targetWall.hits > MAX_WALL_HITS) return false;
 
       // 将其缓存在内存里
       this.room.memory.focusWall = {

@@ -90,18 +90,19 @@ export default class ControllerExtension extends StructureController {
    */
   private ruinScanner(): boolean {
     let hasRuins = false;
-    Memory.rooms[this.room.name].ruinIds = [];
 
     const ruins = this.room.find(FIND_RUINS);
-
+    const ruinsTmp: string[] = [];
     if (ruins.length > 0) {
       Object.values(ruins).forEach(ruin => {
         if (ruin.store.getUsedCapacity() > 0) {
           hasRuins = true;
-          Memory.rooms[this.room.name].ruinIds.push(ruin.id);
+          ruinsTmp.push(ruin.id);
         }
       });
     }
+
+    Memory.rooms[this.room.name].ruinIds = ruinsTmp;
 
     return hasRuins;
   }
