@@ -44,10 +44,10 @@ export const bodyConfigs: BodyConfigs = {
     { [WORK]: 4, [CARRY]: 1, [MOVE]: 2 },
     { [WORK]: 6, [CARRY]: 1, [MOVE]: 3 },
     { [WORK]: 10, [CARRY]: 1, [MOVE]: 5 },
-    { [WORK]: 14, [CARRY]: 1, [MOVE]: 7 },
-    { [WORK]: 18, [CARRY]: 1, [MOVE]: 9 },
-    { [WORK]: 32, [CARRY]: 1, [MOVE]: 17 },
-    { [WORK]: 32, [CARRY]: 1, [MOVE]: 17 }
+    { [WORK]: 12, [CARRY]: 1, [MOVE]: 6 },
+    { [WORK]: 12, [CARRY]: 1, [MOVE]: 6 },
+    { [WORK]: 12, [CARRY]: 1, [MOVE]: 6 },
+    { [WORK]: 12, [CARRY]: 1, [MOVE]: 6 }
   ),
 
   /**
@@ -55,26 +55,26 @@ export const bodyConfigs: BodyConfigs = {
    * 诸如 builder 之类的
    */
   worker: getBodyConfig(
-    { [WORK]: 1, [CARRY]: 2, [MOVE]: 2 },
-    { [WORK]: 2, [CARRY]: 3, [MOVE]: 4 },
-    { [WORK]: 3, [CARRY]: 5, [MOVE]: 5 },
-    { [WORK]: 5, [CARRY]: 8, [MOVE]: 8 },
-    { [WORK]: 8, [CARRY]: 10, [MOVE]: 10 },
-    { [WORK]: 11, [CARRY]: 12, [MOVE]: 12 },
+    { [WORK]: 1, [CARRY]: 1, [MOVE]: 1 },
+    { [WORK]: 2, [CARRY]: 2, [MOVE]: 2 },
+    { [WORK]: 3, [CARRY]: 3, [MOVE]: 3 },
+    { [WORK]: 5, [CARRY]: 5, [MOVE]: 5 },
+    { [WORK]: 8, [CARRY]: 8, [MOVE]: 8 },
+    { [WORK]: 10, [CARRY]: 10, [MOVE]: 10 },
     { [WORK]: 16, [CARRY]: 16, [MOVE]: 16 },
-    { [WORK]: 17, [CARRY]: 16, [MOVE]: 17 }
+    { [WORK]: 18, [CARRY]: 18, [MOVE]: 18 }
   ),
   /**
    * 升级单位
    * 最大的身体部件只包含 12 个 WORK
    */
   upgrader: getBodyConfig(
-    { [WORK]: 1, [CARRY]: 2, [MOVE]: 2 },
-    { [WORK]: 2, [CARRY]: 3, [MOVE]: 4 },
-    { [WORK]: 3, [CARRY]: 5, [MOVE]: 5 },
-    { [WORK]: 5, [CARRY]: 8, [MOVE]: 8 },
-    { [WORK]: 8, [CARRY]: 10, [MOVE]: 10 },
-    { [WORK]: 11, [CARRY]: 12, [MOVE]: 12 },
+    { [WORK]: 1, [CARRY]: 1, [MOVE]: 1 },
+    { [WORK]: 2, [CARRY]: 2, [MOVE]: 2 },
+    { [WORK]: 3, [CARRY]: 3, [MOVE]: 3 },
+    { [WORK]: 5, [CARRY]: 5, [MOVE]: 5 },
+    { [WORK]: 8, [CARRY]: 8, [MOVE]: 8 },
+    { [WORK]: 10, [CARRY]: 10, [MOVE]: 10 },
     { [WORK]: 16, [CARRY]: 16, [MOVE]: 16 },
     { [WORK]: 12, [CARRY]: 12, [MOVE]: 12 }
   ),
@@ -85,13 +85,13 @@ export const bodyConfigs: BodyConfigs = {
    */
   manager: getBodyConfig(
     { [CARRY]: 3, [MOVE]: 3 },
-    { [CARRY]: 7, [MOVE]: 4 },
-    { [CARRY]: 10, [MOVE]: 6 },
-    { [CARRY]: 17, [MOVE]: 9 },
-    { [CARRY]: 24, [MOVE]: 12 },
-    { [CARRY]: 30, [MOVE]: 15 },
-    { [CARRY]: 32, [MOVE]: 16 },
-    { [CARRY]: 32, [MOVE]: 16 }
+    { [CARRY]: 5, [MOVE]: 5 },
+    { [CARRY]: 8, [MOVE]: 8 },
+    { [CARRY]: 10, [MOVE]: 10 },
+    { [CARRY]: 12, [MOVE]: 12 },
+    { [CARRY]: 15, [MOVE]: 15 },
+    { [CARRY]: 18, [MOVE]: 18 },
+    { [CARRY]: 20, [MOVE]: 20 }
   )
 };
 

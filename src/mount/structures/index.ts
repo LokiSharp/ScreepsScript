@@ -1,5 +1,6 @@
 import ControllerExtension from "./controller";
 import SpawnExtension from "./spawn";
+import StorageExtension from "./storage";
 import StructureExtension from "./structure";
 import TowerExtension from "./tower";
 import { assignPrototype } from "utils/prototype";
@@ -12,4 +13,5 @@ export default function (): void {
   assignPrototype(StructureController, ControllerExtension);
   assignPrototype(StructureTower, TowerExtension);
   assignPrototype(Spawn, SpawnExtension);
+  assignPrototype(StructureStorage, StorageExtension);
 }
