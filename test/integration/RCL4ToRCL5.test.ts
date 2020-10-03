@@ -25,6 +25,8 @@ describe("main", () => {
         break;
       }
 
+      const { db } = helper.server.common.storage;
+      await Promise.all([db["rooms.objects"].update({ type: "constructionSite" }, { $set: { progress: 99999 } })]);
       _.each(await helper.player.newNotifications, ({ message }) => console.log("[notification]", message));
     }
   });
