@@ -1,4 +1,4 @@
-import { getRoomTransferTask, transferTaskOperations } from "./roomTransferTask";
+import { getRoomTransferTask, transferTaskOperations } from "../../utils/roomTransferTask";
 import { ROOM_TRANSFER_TASK } from "setting";
 
 /**

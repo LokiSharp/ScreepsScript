@@ -1,10 +1,10 @@
-import builder from "./builder";
-import filler from "./filler";
-import harvester from "./harvester";
+import builder from "./base/builder";
+import filler from "./base/filler";
+import harvester from "./base/harvester";
 import manager from "./manager";
-import repairer from "./repairer";
+import repairer from "./base/repairer";
 import ruinCollector from "./ruinCollector";
-import upgrader from "./upgrader";
+import upgrader from "./base/upgrader";
 
 const roles: CreepWork = {
   harvester,

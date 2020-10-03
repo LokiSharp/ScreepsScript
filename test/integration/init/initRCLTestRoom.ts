@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 import { IntegrationTestHelper } from "../helper";
 import { initExtension } from "./initExtension";
 import { initStorage } from "./initStorage";

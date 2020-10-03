@@ -1,4 +1,4 @@
-import { getRoomTransferTask, transferTaskOperations } from "./roomTransferTask";
+import { getRoomTransferTask, transferTaskOperations } from "../utils/roomTransferTask";
 import { TRANSFER_DEATH_LIMIT } from "setting";
 import { deathPrepare } from "../utils/deathPrepare";
 
