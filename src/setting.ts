@@ -4,14 +4,14 @@ import { getBodyConfig } from "utils/getBodyConfig";
 export const MAX_UPGRADER_NUM = 8;
 export const MAX_HARVESTER_NUM = 4;
 export const MAX_BUILDER_NUM = 2;
-export const MAX_RUIN_COLLECTOR_NUM = 6;
+export const MAX_RUIN_COLLECTOR_NUM = 1;
 
 export const TRANSFER_DEATH_LIMIT = 20;
 
 // 造好新墙时 builder 会先将墙刷到超过下面值，之后才会去建其他建筑
 export const MIN_WALL_HITS = 8000;
 // 设置 tower 刷墙上限，避免前期过多刷墙
-export const MAX_WALL_HITS = 30000;
+export const MAX_WALL_HITS = 1000000;
 
 // 房间建筑维修需要的设置
 export const repairSetting = {

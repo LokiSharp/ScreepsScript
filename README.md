@@ -33,9 +33,9 @@ yarn
 向服务器提交代码
 
 ```
-npm run push-main       # 官方服务器
-npm run push-pserver    # 个人服务器
-npm run push-sim        # 模拟环境
+npm run push-main           # 官方服务器
+npm run push-pserver        # 个人服务器
+npm run push-sim            # 模拟环境
 ```
 
 监视代码变动并自动向服务器提交代码

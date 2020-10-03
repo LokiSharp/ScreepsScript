@@ -7,13 +7,13 @@ on:
     branches: [master]
 
 jobs:
-  build:
+  RCLtest:
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
         node-version: [12.x]
-        RCL: ["RCL1ToRCL2", "RCL2ToRCL3", "RCL3ToRCL4", "RCL4ToRCL5"]
+        RCL: ["RCL1ToRCL2", "RCL2ToRCL3", "RCL3ToRCL4", "RCL4ToRCL5", "RCL5ToRCL6", "RCL6ToRCL7", "RCL7ToRCL8"]
 
     steps:
       - uses: actions/checkout@v2
