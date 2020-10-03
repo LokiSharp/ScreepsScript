@@ -90,4 +90,42 @@ export async function initRCLTestRoom(helper: IntegrationTestHelper, RCL: number
       structureType: "storage"
     });
   }
+
+  if (RCL >= 4) {
+    await helper.server.world.addRoomObject("W0N0", "extension", 25 - 5, 28, {
+      user: helper.player.id,
+      store: { energy: C.EXTENSION_ENERGY_CAPACITY[RCL] },
+      storeCapacityResource: { energy: C.EXTENSION_ENERGY_CAPACITY[RCL] },
+      hits: C.EXTENSION_HITS,
+      hitsMax: C.EXTENSION_HITS
+    });
+    await helper.server.world.addRoomObject("W0N0", "extension", 25 - 5, 29, {
+      user: helper.player.id,
+      store: { energy: C.EXTENSION_ENERGY_CAPACITY[RCL] },
+      storeCapacityResource: { energy: C.EXTENSION_ENERGY_CAPACITY[RCL] },
+      hits: C.EXTENSION_HITS,
+      hitsMax: C.EXTENSION_HITS
+    });
+    await helper.server.world.addRoomObject("W0N0", "extension", 26 - 5, 29, {
+      user: helper.player.id,
+      store: { energy: C.EXTENSION_ENERGY_CAPACITY[RCL] },
+      storeCapacityResource: { energy: C.EXTENSION_ENERGY_CAPACITY[RCL] },
+      hits: C.EXTENSION_HITS,
+      hitsMax: C.EXTENSION_HITS
+    });
+    await helper.server.world.addRoomObject("W0N0", "extension", 24 - 5, 29, {
+      user: helper.player.id,
+      store: { energy: C.EXTENSION_ENERGY_CAPACITY[RCL] },
+      storeCapacityResource: { energy: C.EXTENSION_ENERGY_CAPACITY[RCL] },
+      hits: C.EXTENSION_HITS,
+      hitsMax: C.EXTENSION_HITS
+    });
+    await helper.server.world.addRoomObject("W0N0", "extension", 25 - 5, 30, {
+      user: helper.player.id,
+      store: { energy: C.EXTENSION_ENERGY_CAPACITY[RCL] },
+      storeCapacityResource: { energy: C.EXTENSION_ENERGY_CAPACITY[RCL] },
+      hits: C.EXTENSION_HITS,
+      hitsMax: C.EXTENSION_HITS
+    });
+  }
 }

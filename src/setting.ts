@@ -1,7 +1,7 @@
 import { getBodyConfig } from "utils/getBodyConfig";
 
 // 每个房间最多同时存在多少单位
-export const MAX_UPGRADER_NUM = 4;
+export const MAX_UPGRADER_NUM = 8;
 export const MAX_HARVESTER_NUM = 4;
 export const MAX_BUILDER_NUM = 2;
 export const MAX_RUIN_COLLECTOR_NUM = 6;
