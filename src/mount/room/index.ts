@@ -1,9 +1,11 @@
-import RoomExtension from "./extension";
-import RoomShortcut from "./shortcut";
+import CreepControl from "./CreepControl";
+import RoomConsole from "./RoomConsole";
+import RoomExtension from "./RoomExtension";
+import RoomShortcut from "./RoomShortcut";
 import { assignPrototype } from "utils/prototype";
 
 // 定义好挂载顺序
-const plugins = [RoomShortcut, RoomExtension];
+const plugins = [RoomShortcut, RoomExtension, RoomConsole, CreepControl];
 
 /**
  * 依次挂载所有的 Room 拓展

@@ -342,6 +342,9 @@ export class CreepExtension extends Creep {
     if (!this.memory.farMove) this.memory.farMove = {};
     this.memory.farMove.index = 0;
 
+    if (!global.routeCache) {
+      global.routeCache = {};
+    }
     // 先查询下缓存里有没有值
     const routeKey = `${this.room.serializePos(this.pos)} ${this.room.serializePos(target)}`;
     let route = global.routeCache[routeKey];

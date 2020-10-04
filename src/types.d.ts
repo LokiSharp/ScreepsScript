@@ -186,6 +186,9 @@ interface Creep {
     target: RoomPosition,
     range?: number
   ): CreepMoveReturnCode | ERR_NO_PATH | ERR_INVALID_TARGET | ERR_NOT_IN_RANGE | ERR_INVALID_ARGS;
+
+  addRemote(remoteRoomName: string, targetId: string): OK | ERR_INVALID_TARGET | ERR_NOT_FOUND;
+  removeRemote(remoteRoomName: string, removeFlag?: boolean): OK | ERR_NOT_FOUND;
 }
 
 /**
@@ -302,6 +305,9 @@ interface Room {
 
   // 获取房间中的有效能量来源
   getAvailableSource(): StructureTerminal | StructureStorage | StructureContainer | Source;
+
+  addRemoteCreepGroup(remoteRoomName: string);
+  addRemoteReserver(remoteRoomName): void;
 }
 
 /**
@@ -342,6 +348,17 @@ interface RoomMemory {
   // 当前房间所处的防御模式
   // defense 为基础防御，active 为主动防御，该值未定义时为日常模式
   defenseMode?: "defense" | "active";
+
+  // 外矿专用内存字段
+  remote: {
+    // 外矿房间名
+    [roomName: string]: {
+      // 该外矿什么时候可以恢复采集，在被入侵时触发
+      disableTill?: number;
+      // 该外矿要把能量运到哪个建筑里，保存下来是为了后面方便自动恢复外矿采集
+      targetId: string;
+    };
+  };
 }
 
 interface RoomPosition {

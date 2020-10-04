@@ -1,4 +1,5 @@
 import { createRoomLink } from "utils/createRoomLink";
+import { creepApi } from "modules/creepController";
 import { log } from "utils/log";
 import { releaseCreep } from "modules/autoPlanning/planCreep";
 
@@ -231,5 +232,58 @@ export default class RoomExtension extends Room {
     const infos = posStr.split("/");
 
     return infos.length === 3 ? new RoomPosition(Number(infos[0]), Number(infos[1]), infos[2]) : undefined;
+  }
+
+  /**
+   * 拓展新的外矿
+   *
+   * @param remoteRoomName 要拓展的外矿房间名
+   * @param targetId 能量搬到哪个建筑里
+   * @returns ERR_INVALID_TARGET targetId 找不到对应的建筑
+   * @returns ERR_NOT_FOUND 没有找到足够的 source 旗帜
+   */
+  public addRemote(remoteRoomName: string, targetId: string): OK | ERR_INVALID_TARGET | ERR_NOT_FOUND {
+    // target 建筑一定要有
+    if (!Game.getObjectById(targetId as Id<Room>)) return ERR_INVALID_TARGET;
+    // 目标 source 也至少要有一个
+    const sourceFlagsName = [`${remoteRoomName} source0`, `${remoteRoomName} source1`];
+    if (!(sourceFlagsName[0] in Game.flags)) return ERR_NOT_FOUND;
+    // 兜底
+    if (!this.memory.remote) this.memory.remote = {};
+
+    // 添加对应的键值对
+    this.memory.remote[remoteRoomName] = { targetId };
+
+    this.addRemoteCreepGroup(remoteRoomName);
+    return OK;
+  }
+
+  /**
+   * 移除外矿
+   *
+   * @param remoteRoomName 要移除的外矿
+   * @param removeFlag 是否移除外矿的 source 旗帜
+   */
+  public removeRemote(remoteRoomName: string, removeFlag = false): OK | ERR_NOT_FOUND {
+    // 兜底
+    if (!this.memory.remote) return ERR_NOT_FOUND;
+    if (!(remoteRoomName in this.memory.remote)) return ERR_NOT_FOUND;
+
+    delete this.memory.remote[remoteRoomName];
+    if (Object.keys(this.memory.remote).length <= 0) delete this.memory.remote;
+
+    const sourceFlagsName = [`${remoteRoomName} source0`, `${remoteRoomName} source1`];
+    // 移除对应的旗帜和外矿采集单位
+    sourceFlagsName.forEach((flagName, index) => {
+      if (!(flagName in Game.flags)) return;
+
+      if (removeFlag) Game.flags[flagName].remove();
+      creepApi.remove(`${remoteRoomName} remoteHarvester${index}`);
+    });
+
+    // 移除预定者
+    creepApi.remove(`${remoteRoomName} reserver`);
+
+    return OK;
   }
 }
