@@ -3,6 +3,12 @@ declare namespace NodeJS {
   interface Global {
     // 是否已经挂载拓展
     hasExtension: boolean;
+    // 全局的路径缓存
+    // Creep 在执行远程寻路时会优先检查该缓存
+    routeCache: {
+      // 键为路径的起点和终点名，例如："12/32/W1N1 23/12/W2N2"，值是使用 Creep.serializeFarPath 序列化后的路径
+      [routeKey: string]: string;
+    };
   }
 }
 
@@ -31,6 +37,10 @@ interface Memory {
       bodys: BodyAutoConfigConstant | BodyPartConstant[];
     };
   };
+
+  // 要绕过的房间名列表，由全局模块 bypass 负责。
+  bypassRooms: string[];
+
   stats: {
     // GCl/GPL 升级百分比
     gcl?: number;
@@ -110,12 +120,12 @@ interface ICreepConfig {
   bodys: BodyAutoConfigConstant | BodyPartConstant[];
 }
 
-type BodyAutoConfigConstant = "harvester" | "worker" | "manager" | "upgrader";
+type BodyAutoConfigConstant = "harvester" | "worker" | "manager" | "upgrader" | "reserver";
 
 /**
  * 所有 creep 角色的 data
  */
-type CreepData = EmptyData | HarvesterData | WorkerData;
+type CreepData = EmptyData | HarvesterData | WorkerData | RemoteDeclarerData;
 
 /**
  * 有些角色不需要 data
@@ -144,6 +154,19 @@ interface WorkerData {
 }
 
 /**
+ * 远程声明单位的 data
+ * 这些单位都会和目标房间的 controller 打交道
+ */
+interface RemoteDeclarerData {
+  // 要声明控制的房间名
+  targetRoomName: string;
+  // 自己出生的房间，claim 需要这个字段来向老家发布支援 creep
+  spawnRoom?: string;
+  // 给控制器的签名
+  signText?: string;
+}
+
+/**
  * Creep 拓展
  * 来自于 mount.creep.ts
  */
@@ -159,6 +182,10 @@ interface Creep {
   buildStructure(): CreepActionReturnCode | ERR_NOT_ENOUGH_RESOURCES | ERR_RCL_NOT_ENOUGH | ERR_NOT_FOUND;
   steadyWall(): OK | ERR_NOT_FOUND;
   fillDefenseStructure(expectHits?: number): boolean;
+  farMoveTo(
+    target: RoomPosition,
+    range?: number
+  ): CreepMoveReturnCode | ERR_NO_PATH | ERR_INVALID_TARGET | ERR_NOT_IN_RANGE | ERR_INVALID_ARGS;
 }
 
 /**
@@ -188,13 +215,27 @@ interface CreepMemory {
   constructionSiteId?: string;
   // 可以执行建筑的单位特有，当该值为 true 时将不会尝试建造
   dontBuild?: boolean;
+  // 远程寻路缓存
+  farMove?: {
+    // 序列化之后的路径信息
+    path?: string;
+    // 移动索引，标志 creep 现在走到的第几个位置
+    index?: number;
+    // 上一个位置信息，形如"14/4"，用于在 creep.move 返回 OK 时检查有没有撞墙
+    prePos?: string;
+    // 缓存路径的目标，该目标发生变化时刷新路径, 形如"14/4E14S1"
+    targetPos?: string;
+  };
 }
 
 // 所有的 creep 角色
-type CreepRoleConstant = BaseRoleConstant;
+type CreepRoleConstant = BaseRoleConstant | RemoteRoleConstant;
 
 // 房间基础运营
 type BaseRoleConstant = "harvester" | "filler" | "upgrader" | "builder" | "repairer" | "ruinCollector" | "manager";
+
+// 远程单位
+type RemoteRoleConstant = "reserver";
 
 /**
  * creep 工作逻辑集合

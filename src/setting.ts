@@ -92,6 +92,20 @@ export const bodyConfigs: BodyConfigs = {
     { [CARRY]: 15, [MOVE]: 15 },
     { [CARRY]: 18, [MOVE]: 18 },
     { [CARRY]: 20, [MOVE]: 20 }
+  ),
+
+  /**
+   * 外矿预定单位
+   */
+  reserver: getBodyConfig(
+    { [MOVE]: 1, [CLAIM]: 1 },
+    { [MOVE]: 1, [CLAIM]: 1 },
+    { [MOVE]: 1, [CLAIM]: 1 },
+    { [MOVE]: 1, [CLAIM]: 1 },
+    { [MOVE]: 2, [CLAIM]: 2 },
+    { [MOVE]: 2, [CLAIM]: 2 },
+    { [MOVE]: 3, [CLAIM]: 3 },
+    { [MOVE]: 5, [CLAIM]: 5 }
   )
 };
 

@@ -307,6 +307,182 @@ export class CreepExtension extends Creep {
     }
     return true;
   }
+
+  /**
+   * 压缩 PathFinder 返回的路径数组
+   *
+   * @param positions 房间位置对象数组，必须连续
+   * @returns 压缩好的路径
+   */
+  public serializeFarPath(positions: RoomPosition[]): string {
+    if (positions.length === 0) return "";
+    // 确保路径的第一个位置是自己的当前位置
+    if (!positions[0].isEqualTo(this.pos)) positions.splice(0, 0, this.pos);
+
+    return positions
+      .map((pos, index) => {
+        // 最后一个位置就不用再移动
+        if (index >= positions.length - 1) return null;
+        // 由于房间边缘地块会有重叠，所以这里筛除掉重叠的步骤
+        if (pos.roomName !== positions[index + 1].roomName) return null;
+        // 获取到下个位置的方向
+        return pos.getDirectionTo(positions[index + 1]);
+      })
+      .join("");
+  }
+
+  /**
+   * 远程寻路
+   *
+   * @param target 目标位置
+   * @param range 搜索范围 默认为 1
+   * @returns PathFinder.search 的返回值
+   */
+  public findPath(target: RoomPosition, range: number): string | null {
+    if (!this.memory.farMove) this.memory.farMove = {};
+    this.memory.farMove.index = 0;
+
+    // 先查询下缓存里有没有值
+    const routeKey = `${this.room.serializePos(this.pos)} ${this.room.serializePos(target)}`;
+    let route = global.routeCache[routeKey];
+    // 如果有值则直接返回
+    if (route) {
+      return route;
+    }
+
+    const result = PathFinder.search(
+      this.pos,
+      { pos: target, range },
+      {
+        plainCost: 2,
+        swampCost: 10,
+        maxOps: 4000,
+        roomCallback: roomName => {
+          // 强调了不许走就不走
+          if (Memory.bypassRooms && Memory.bypassRooms.includes(roomName)) return false;
+
+          const room = Game.rooms[roomName];
+          // 房间没有视野
+          if (!room) return null;
+
+          const costs = new PathFinder.CostMatrix();
+
+          room.find(FIND_STRUCTURES).forEach(struct => {
+            if (struct.structureType === STRUCTURE_ROAD) {
+              costs.set(struct.pos.x, struct.pos.y, 1);
+            }
+            // 不能穿过无法行走的建筑
+            else if (
+              struct.structureType !== STRUCTURE_CONTAINER &&
+              (struct.structureType !== STRUCTURE_RAMPART || !struct.my)
+            )
+              costs.set(struct.pos.x, struct.pos.y, 0xff);
+          });
+
+          // 避开房间中的禁止通行点
+          const restrictedPos = room.getRestrictedPos();
+          for (const creepName in restrictedPos) {
+            // 自己注册的禁止通行点位自己可以走
+            if (creepName === this.name) continue;
+            const pos = room.unserializePos(restrictedPos[creepName]);
+            costs.set(pos.x, pos.y, 0xff);
+          }
+
+          return costs;
+        }
+      }
+    );
+
+    // 寻路失败就通知玩家
+    if (result.incomplete) {
+      const states = [
+        `[${this.name} 未完成寻路] [游戏时间] ${Game.time} [所在房间] ${this.room.name}`,
+        `[creep 内存]`,
+        JSON.stringify(this.memory, null, 4),
+        `[寻路结果]`,
+        JSON.stringify(result)
+      ];
+      Game.notify(states.join("\n"));
+    }
+
+    // 没找到就返回 null
+    if (result.path.length <= 0) return null;
+    // 找到了就进行压缩
+    route = this.serializeFarPath(result.path);
+    // 保存到全局缓存
+    if (!result.incomplete) global.routeCache[routeKey] = route;
+
+    return route;
+  }
+
+  /**
+   * 使用缓存进行移动
+   * 该方法会对 creep.memory.farMove 产生影响
+   *
+   * @returns ERR_NO_PATH 找不到缓存
+   * @returns ERR_INVALID_TARGET 撞墙上了
+   */
+  public goByCache(): CreepMoveReturnCode | ERR_NO_PATH | ERR_NOT_IN_RANGE | ERR_INVALID_TARGET | ERR_INVALID_ARGS {
+    if (!this.memory.farMove) return ERR_NO_PATH;
+
+    const index = this.memory.farMove.index;
+    // 移动索引超过数组上限代表到达目的地
+    if (index >= this.memory.farMove.path.length) {
+      delete this.memory.farMove.path;
+      return OK;
+    }
+
+    // 获取方向，进行移动
+    const direction = Number(this.memory.farMove.path[index]) as DirectionConstant;
+    const goResult = this.move(direction);
+
+    // 移动成功，更新下次移动索引
+    if (goResult === OK) this.memory.farMove.index++;
+
+    return goResult;
+  }
+
+  /**
+   * 远程寻路
+   * 包含对穿功能，会自动躲避 bypass 中配置的绕过房间
+   *
+   * @param target 要移动到的位置对象
+   * @param range 允许移动到目标周围的范围
+   */
+  public farMoveTo(
+    target: RoomPosition,
+    range = 0
+  ): CreepMoveReturnCode | ERR_NO_PATH | ERR_NOT_IN_RANGE | ERR_INVALID_TARGET | ERR_INVALID_ARGS {
+    if (this.memory.farMove === undefined) this.memory.farMove = {};
+    // 确认目标有没有变化, 变化了则重新规划路线
+    const targetPosTag = this.room.serializePos(target);
+    if (targetPosTag !== this.memory.farMove.targetPos) {
+      this.memory.farMove.targetPos = targetPosTag;
+      this.memory.farMove.path = this.findPath(target, range);
+    }
+    // 确认缓存有没有被清除
+    if (!this.memory.farMove.path) {
+      this.memory.farMove.path = this.findPath(target, range);
+    }
+
+    // 还为空的话就是没找到路径
+    if (!this.memory.farMove.path) {
+      delete this.memory.farMove.path;
+      return OK;
+    }
+
+    // 使用缓存进行移动
+    const goResult = this.goByCache();
+
+    // 如果发生撞停或者参数异常的话说明缓存可能存在问题，移除缓存
+    if (goResult === ERR_INVALID_TARGET || goResult === ERR_INVALID_ARGS) {
+      delete this.memory.farMove.path;
+    }
+    // 其他异常直接报告
+    else if (goResult !== OK && goResult !== ERR_TIRED) this.say(`远程寻路 ${goResult}`);
+
+    return goResult;
+  }
 }
 
 // 挂载拓展到 Creep 原型
