@@ -106,6 +106,21 @@ export const bodyConfigs: BodyConfigs = {
     { [MOVE]: 2, [CLAIM]: 2 },
     { [MOVE]: 3, [CLAIM]: 3 },
     { [MOVE]: 5, [CLAIM]: 5 }
+  ),
+
+  /**
+   * 外矿采集者
+   * 和采集者的区别就是外矿采集者拥有更多的 CARRY
+   */
+  remoteHarvester: getBodyConfig(
+    { [WORK]: 1, [CARRY]: 1, [MOVE]: 1 },
+    { [WORK]: 2, [CARRY]: 2, [MOVE]: 2 },
+    { [WORK]: 3, [CARRY]: 3, [MOVE]: 3 },
+    { [WORK]: 4, [CARRY]: 6, [MOVE]: 5 },
+    { [WORK]: 5, [CARRY]: 9, [MOVE]: 7 },
+    { [WORK]: 6, [CARRY]: 10, [MOVE]: 8 },
+    { [WORK]: 7, [CARRY]: 15, [MOVE]: 11 },
+    { [WORK]: 11, [CARRY]: 15, [MOVE]: 19 }
   )
 };
 

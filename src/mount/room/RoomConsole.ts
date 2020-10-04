@@ -21,4 +21,20 @@ export default class RoomConsole extends RoomExtension {
 
     return stats;
   }
+
+  /**
+   * 用户操作 - 移除外矿
+   *
+   * @param 同上 removeRemote()
+   */
+  public rremove(remoteRoomName: string, removeFlag = false): string {
+    let stats = `[${this.name} 外矿] `;
+
+    const actionResult = this.removeRemote(remoteRoomName, removeFlag);
+    if (actionResult === OK)
+      stats += "外矿及对应角色组已移除，" + (removeFlag ? "source 旗帜也被移除" : "source 旗帜未移除");
+    else if (actionResult === ERR_NOT_FOUND) stats += "未找到对应外矿";
+
+    return stats;
+  }
 }

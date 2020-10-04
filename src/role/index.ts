@@ -2,6 +2,7 @@ import builder from "./base/builder";
 import filler from "./base/filler";
 import harvester from "./base/harvester";
 import manager from "./manager";
+import remoteHarvester from "./remote/remoteHarvester";
 import repairer from "./base/repairer";
 import reserver from "./remote/reserver";
 import ruinCollector from "./ruinCollector";
@@ -15,7 +16,8 @@ const roles: CreepWork = {
   repairer,
   ruinCollector,
   manager,
-  reserver
+  reserver,
+  remoteHarvester
 };
 
 /**

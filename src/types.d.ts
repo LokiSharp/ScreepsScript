@@ -120,12 +120,12 @@ interface ICreepConfig {
   bodys: BodyAutoConfigConstant | BodyPartConstant[];
 }
 
-type BodyAutoConfigConstant = "harvester" | "worker" | "manager" | "upgrader" | "reserver";
+type BodyAutoConfigConstant = "harvester" | "worker" | "manager" | "upgrader" | "reserver" | "remoteHarvester";
 
 /**
  * 所有 creep 角色的 data
  */
-type CreepData = EmptyData | HarvesterData | WorkerData | RemoteDeclarerData;
+type CreepData = EmptyData | HarvesterData | WorkerData | RemoteDeclarerData | RemoteHarvesterData;
 
 /**
  * 有些角色不需要 data
@@ -164,6 +164,19 @@ interface RemoteDeclarerData {
   spawnRoom?: string;
   // 给控制器的签名
   signText?: string;
+}
+
+/**
+ * 远程采集单位的 data
+ * 包括外矿采集和公路房资源采集单位
+ */
+interface RemoteHarvesterData {
+  // 要采集的资源旗帜名称
+  sourceFlagName: string;
+  // 资源要存放到哪个建筑里，外矿采集者必须指定该参数
+  targetId?: string;
+  // 出生房名称，资源会被运输到该房间中
+  spawnRoom?: string;
 }
 
 /**
@@ -238,7 +251,7 @@ type CreepRoleConstant = BaseRoleConstant | RemoteRoleConstant;
 type BaseRoleConstant = "harvester" | "filler" | "upgrader" | "builder" | "repairer" | "ruinCollector" | "manager";
 
 // 远程单位
-type RemoteRoleConstant = "reserver";
+type RemoteRoleConstant = "reserver" | "remoteHarvester";
 
 /**
  * creep 工作逻辑集合
@@ -359,6 +372,24 @@ interface RoomMemory {
       targetId: string;
     };
   };
+}
+
+interface FlagMemory {
+  // deposit 旗帜特有，最长冷却时间
+  depositCooldown?: number;
+  // 公路房旗帜特有，抵达目标需要的时间
+  travelTime?: number;
+  // 公路房旗帜特有，travelTime 是否已经计算完成
+  travelComplete?: boolean;
+  // 该旗帜下标注的资源 id
+  sourceId?: string;
+
+  // 当前 powerbank 采集的状态
+  state?: string;
+
+  // 因为外矿房间有可能没视野
+  // 所以把房间名缓存进内存
+  roomName?: string;
 }
 
 interface RoomPosition {
