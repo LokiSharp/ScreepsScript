@@ -193,11 +193,10 @@ const releasePlans: CreepReleasePlans = {
     getStats(room: Room): TransporterPlanStats {
       const stats: TransporterPlanStats = {
         room,
-        sourceContainerIds: room.memory.sourceContainersIds || []
+        sourceContainerIds: room.sourceContainers.map(container => container.id) || []
       };
-
       if (room.storage) stats.storageId = room.storage.id;
-      if (room.memory.center) stats.centerPos = room.memory.center;
+      if (room.centerLink) stats.centerLinkId = room.centerLink.id;
 
       return stats;
     },
@@ -237,6 +236,25 @@ const releasePlans: CreepReleasePlans = {
 
         room.log(`发布 manager`, "transporter", "green");
         return false;
+      },
+
+      // centerLink 修建完成
+      ({ room, centerLinkId, centerPos }: TransporterPlanStats) => {
+        if (!centerLinkId || !centerPos) return true;
+
+        // 发布中央运输单位
+        creepApi.add(
+          `${room.name} processor`,
+          "processor",
+          {
+            x: centerPos[0],
+            y: centerPos[1]
+          },
+          room.name
+        );
+
+        room.log(`发布 processor`, "transporter", "green");
+        return true;
       }
     ]
   },
@@ -258,13 +276,13 @@ const releasePlans: CreepReleasePlans = {
     // 发布计划
     plans: [
       ({ room, ruinIds }: RuinCollectorPlanStats) => {
-        const num = Math.min(ruinIds.length + 1, MAX_BUILDER_NUM);
+        const releaseNumber = Math.min(ruinIds.length + 1, MAX_BUILDER_NUM);
 
-        for (let index = 0; index < num; index++) {
+        for (let index = 0; index < releaseNumber; index++) {
           creepApi.add(`${room.name} ruinCollector${index}`, "ruinCollector", {}, room.name);
         }
 
-        room.log(`发布 ruinCollector * ${num}`, "ruinCollector", "green");
+        room.log(`发布 ruinCollector * ${releaseNumber}`, "ruinCollector", "green");
         return false;
       }
     ]
@@ -287,9 +305,9 @@ const releasePlans: CreepReleasePlans = {
     // 发布计划
     plans: [
       ({ room, constructionSiteIds }: BuilderPlanStats) => {
-        const num = Math.min(constructionSiteIds.length + 1, MAX_BUILDER_NUM);
+        const releaseNumber = Math.min(constructionSiteIds.length + 1, MAX_BUILDER_NUM);
 
-        for (let index = 0; index < num; index++) {
+        for (let index = 0; index < releaseNumber; index++) {
           creepApi.add(
             `${room.name} builder${index}`,
             "builder",
@@ -300,7 +318,7 @@ const releasePlans: CreepReleasePlans = {
           );
         }
 
-        room.log(`发布 builder * ${num}`, "builder", "green");
+        room.log(`发布 builder * ${releaseNumber}`, "builder", "green");
         return false;
       }
     ]
@@ -367,8 +385,8 @@ const releaseBuilder = function (room: Room): OK {
  * 发布刷墙工
  * @param room 要发布角色的房间
  */
-const releaseRepairer = function (room: Room, num = 1): OK {
-  Array(num)
+const releaseRepairer = function (room: Room, releaseNumber = 1): OK {
+  Array(releaseNumber)
     .fill(undefined)
     .forEach((_, index) => {
       creepApi.add(
@@ -400,10 +418,11 @@ const releaseRuinCollector = function (room: Room): OK {
 /**
  * 房间运营角色名对应的发布逻辑
  */
-const roleToRelease: { [role in BaseRoleConstant]: (room: Room) => OK | ERR_NOT_FOUND } = {
+const roleToRelease: { [role in BaseRoleConstant | AdvancedRoleConstant]: (room: Room) => OK | ERR_NOT_FOUND } = {
   harvester: releaseHarvester,
   filler: releaseTransporter,
   manager: releaseTransporter,
+  processor: releaseTransporter,
   upgrader: releaseUpgrader,
   builder: releaseBuilder,
   repairer: releaseRepairer,

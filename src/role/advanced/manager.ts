@@ -1,6 +1,6 @@
-import { getRoomTransferTask, transferTaskOperations } from "../utils/roomTransferTask";
+import { getRoomTransferTask, transferTaskOperations } from "../../utils/roomTransferTask";
 import { TRANSFER_DEATH_LIMIT } from "setting";
-import { deathPrepare } from "../utils/deathPrepare";
+import { deathPrepare } from "../../utils/deathPrepare";
 
 /**
  * 填充单位

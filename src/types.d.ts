@@ -120,12 +120,19 @@ interface ICreepConfig {
   bodys: BodyAutoConfigConstant | BodyPartConstant[];
 }
 
-type BodyAutoConfigConstant = "harvester" | "worker" | "manager" | "upgrader" | "reserver" | "remoteHarvester";
+type BodyAutoConfigConstant =
+  | "harvester"
+  | "worker"
+  | "manager"
+  | "processor"
+  | "upgrader"
+  | "reserver"
+  | "remoteHarvester";
 
 /**
  * 所有 creep 角色的 data
  */
-type CreepData = EmptyData | HarvesterData | WorkerData | RemoteDeclarerData | RemoteHarvesterData;
+type CreepData = EmptyData | HarvesterData | WorkerData | RemoteDeclarerData | RemoteHarvesterData | ProcessorData;
 
 /**
  * 有些角色不需要 data
@@ -151,6 +158,15 @@ interface HarvesterData {
 interface WorkerData {
   // 要使用的资源存放建筑 id
   sourceId: string;
+}
+
+/**
+ * 中央运输者的 data
+ * x y 为其在房间中的固定位置
+ */
+interface ProcessorData {
+  x: number;
+  y: number;
 }
 
 /**
@@ -245,10 +261,12 @@ interface CreepMemory {
 }
 
 // 所有的 creep 角色
-type CreepRoleConstant = BaseRoleConstant | RemoteRoleConstant;
+type CreepRoleConstant = BaseRoleConstant | AdvancedRoleConstant | RemoteRoleConstant;
 
 // 房间基础运营
-type BaseRoleConstant = "harvester" | "filler" | "upgrader" | "builder" | "repairer" | "ruinCollector" | "manager";
+type BaseRoleConstant = "harvester" | "filler" | "upgrader" | "builder" | "repairer" | "ruinCollector";
+
+type AdvancedRoleConstant = "manager" | "processor";
 
 // 远程单位
 type RemoteRoleConstant = "reserver" | "remoteHarvester";
@@ -269,7 +287,7 @@ interface Room {
   log(content: string, instanceName: string, color?: Colors | undefined, notify?: boolean): void;
 
   // creep 发布 api
-  releaseCreep(role: BaseRoleConstant): ScreepsReturnCode;
+  releaseCreep(role: BaseRoleConstant | AdvancedRoleConstant): ScreepsReturnCode;
   registerContainer(container: StructureContainer): OK;
 
   /**
@@ -288,6 +306,14 @@ interface Room {
   handleLabInTask(resourceType: ResourceConstant, amount: number): boolean;
   deleteCurrentRoomTransferTask(): void;
 
+  // 中央物流 api
+  addCenterTask(task: ITransferTask, priority?: number): number;
+  hasCenterTask(submit: CenterStructures | number): boolean;
+  hangCenterTask(): number;
+  handleCenterTask(transferAmount: number): void;
+  getCenterTask(): ITransferTask | null;
+  deleteCurrentCenterTask(): void;
+
   // 禁止通行点位 api
   addRestrictedPos(creepName: string, pos: RoomPosition): void;
   getRestrictedPos(): { [creepName: string]: string };
@@ -297,10 +323,24 @@ interface Room {
   serializePos(pos: RoomPosition): string;
   unserializePos(posStr: string): RoomPosition | undefined;
 
+  // 房间基础服务
+  factory?: StructureFactory;
+  powerSpawn: StructurePowerSpawn;
+  nuker: StructureNuker;
+  observer: StructureObserver;
+  centerLink: StructureLink;
+  extractor: StructureExtractor;
+  mineral: Mineral;
   sources: Source[];
   sourceContainers: StructureContainer[];
-
+  _factory: StructureFactory;
+  _mineral: Mineral;
+  _powerspawn: StructurePowerSpawn;
+  _nuker: StructureNuker;
   _sources: Source[];
+  _centerLink: StructureLink;
+  _observer: StructureObserver;
+  _extractor: StructureExtractor;
   _sourceContainers: StructureContainer[];
 
   // 已拥有的房间特有，tower 负责维护
@@ -354,6 +394,9 @@ interface RoomMemory {
     id: string;
     endTime: number;
   };
+
+  // 中央集群的资源转移任务队列
+  centerTransferTasks: ITransferTask[];
 
   // 房间物流任务队列
   transferTasks: RoomTransferTasks[];
@@ -537,4 +580,23 @@ interface Structure {
   work?(): void;
   // 建筑在完成建造时触发的回调
   onBuildComplete?(): void;
+}
+
+type CenterStructures = STRUCTURE_STORAGE | STRUCTURE_TERMINAL | STRUCTURE_FACTORY | "centerLink";
+
+/**
+ * 房间中央物流 - 资源转移任务
+ */
+interface ITransferTask {
+  // 任务提交者类型
+  // number 类型是为了运行玩家自己推送中央任务
+  submit: CenterStructures | number;
+  // 资源的提供建筑类型
+  source: CenterStructures;
+  // 资源的接受建筑类型
+  target: CenterStructures;
+  // 资源类型
+  resourceType: ResourceConstant;
+  // 资源数量
+  amount: number;
 }

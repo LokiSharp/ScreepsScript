@@ -80,6 +80,21 @@ export const bodyConfigs: BodyConfigs = {
   ),
 
   /**
+   * 中央物流管理单位
+   * 负责转移中央物流的 creep（下面其实前 4 级都用不到，因为中央物流管理员只会在 5 级有了 centerLink 之后才会孵化）
+   */
+  processor: getBodyConfig(
+    { [CARRY]: 2, [MOVE]: 1 },
+    { [CARRY]: 3, [MOVE]: 1 },
+    { [CARRY]: 5, [MOVE]: 1 },
+    { [CARRY]: 7, [MOVE]: 1 },
+    { [CARRY]: 11, [MOVE]: 1 },
+    { [CARRY]: 14, [MOVE]: 1 },
+    { [CARRY]: 26, [MOVE]: 1 },
+    { [CARRY]: 39, [MOVE]: 1 }
+  ),
+
+  /**
    * 房间物流管理单位
    * 负责转移基地资源的 creep
    */
@@ -132,7 +147,7 @@ export const creepDefaultMemory: CreepMemory = {
 };
 
 // 用于维持房间能量正常运转的重要角色
-export const importantRoles: CreepRoleConstant[] = ["harvester", "filler", "manager"];
+export const importantRoles: CreepRoleConstant[] = ["harvester", "filler", "manager", "processor"];
 
 /**
  * 此处定义了所有的房间物流任务类型

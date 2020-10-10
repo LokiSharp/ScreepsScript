@@ -222,6 +222,67 @@ export default class RoomExtension extends Room {
   }
 
   /**
+   * 每个建筑同时只能提交一个任务
+   *
+   * @param submit 提交者的身份
+   * @returns 是否有该任务
+   */
+  public hasCenterTask(submit: CenterStructures | number): boolean {
+    if (!this.memory.centerTransferTasks) this.memory.centerTransferTasks = [];
+
+    const task = this.memory.centerTransferTasks.find(_task => _task.submit === submit);
+    return task ? true : false;
+  }
+
+  /**
+   * 暂时挂起当前任务
+   * 会将任务放置在队列末尾
+   *
+   * @returns 任务的排队位置, 0 是最前面
+   */
+  public hangCenterTask(): number {
+    const task = this.memory.centerTransferTasks.shift();
+    this.memory.centerTransferTasks.push(task);
+
+    return this.memory.centerTransferTasks.length - 1;
+  }
+
+  /**
+   * 获取中央队列中第一个任务信息
+   *
+   * @returns 有任务返回任务, 没有返回 null
+   */
+  public getCenterTask(): ITransferTask | null {
+    if (!this.memory.centerTransferTasks) this.memory.centerTransferTasks = [];
+
+    if (this.memory.centerTransferTasks.length <= 0) {
+      return null;
+    } else {
+      return this.memory.centerTransferTasks[0];
+    }
+  }
+
+  /**
+   * 处理任务
+   *
+   * @param submitId 提交者的 id
+   * @param transferAmount 本次转移的数量
+   */
+  public handleCenterTask(transferAmount: number): void {
+    this.memory.centerTransferTasks[0].amount -= transferAmount;
+    if (this.memory.centerTransferTasks[0].amount <= 0) {
+      this.deleteCurrentCenterTask();
+    }
+  }
+
+  /**
+   * 移除当前中央运输任务
+   */
+  public deleteCurrentCenterTask(): void {
+    this.memory.centerTransferTasks.shift();
+  }
+
+  /**
    * 将位置序列化字符串转换为位置
    * 位置序列化字符串形如: 12/32/E1N2
    *
