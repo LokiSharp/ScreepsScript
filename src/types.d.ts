@@ -374,6 +374,9 @@ interface RoomMemory {
   ruinIds: string[];
   constructionSiteIds: string[];
 
+  centerLinkId: string;
+  upgradeLinkId: string;
+
   // 该房间禁止通行点的存储
   // 键为注册禁止通行点位的 creep 名称，值为禁止通行点位 RoomPosition 对象的序列字符串
   restrictedPos?: {
