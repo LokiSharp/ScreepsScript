@@ -41,6 +41,12 @@ interface Memory {
   // 要绕过的房间名列表，由全局模块 bypass 负责。
   bypassRooms: string[];
 
+  // 资源来源表
+  resourceSourceMap: {
+    // 资源类型为键，房间名列表为值
+    [resourceType: string]: string[];
+  };
+
   stats: {
     // GCl/GPL 升级百分比
     gcl?: number;
@@ -323,6 +329,13 @@ interface Room {
   serializePos(pos: RoomPosition): string;
   unserializePos(posStr: string): RoomPosition | undefined;
 
+  // 资源共享 api
+  giver(roomName: string, resourceType: ResourceConstant, amount?: number): string;
+  shareRequest(resourceType: ResourceConstant, amount: number): boolean;
+  shareAddSource(resourceType: ResourceConstant): boolean;
+  shareRemoveSource(resourceType: ResourceConstant): void;
+  shareAdd(targetRoom: string, resourceType: ResourceConstant, amount: number): boolean;
+
   // 房间基础服务
   factory?: StructureFactory;
   powerSpawn: StructurePowerSpawn;
@@ -359,8 +372,8 @@ interface Room {
   // 获取房间中的有效能量来源
   getAvailableSource(): StructureTerminal | StructureStorage | StructureContainer | Source;
 
-  addRemoteCreepGroup(remoteRoomName: string);
-  addRemoteReserver(remoteRoomName): void;
+  addRemoteCreepGroup(remoteRoomName: string): void;
+  addRemoteReserver(remoteRoomName: string): void;
 }
 
 /**
@@ -418,6 +431,30 @@ interface RoomMemory {
       targetId: string;
     };
   };
+
+  // 终端监听矿物列表
+  // 数组中每一个字符串都代表了一个监听任务，形如 "0 0 power"，第一位对应 TerminalModes，第二位对应 TerminalChannels，第三位对应资源类型
+  terminalTasks: string[];
+  // 房间内终端缓存的订单id
+  targetOrderId?: string;
+  // 房间内终端要立刻支援的房间名
+  targetSupportRoom?: string;
+  // 当前终端要监听的资源索引
+  terminalIndex: number;
+
+  // 该房间要执行的资源共享任务
+  shareTask: IRoomShareTask;
+}
+
+// 房间要执行的资源共享任务
+// 和上面的资源共享任务的不同之处在于，该任务是发布在指定房间上的，所以不需要 source
+interface IRoomShareTask {
+  // 资源的接受房间
+  target: string;
+  // 共享的资源类型
+  resourceType: ResourceConstant;
+  // 期望数量
+  amount: number;
 }
 
 interface FlagMemory {
@@ -603,3 +640,71 @@ interface ITransferTask {
   // 资源数量
   amount: number;
 }
+
+interface StructureTerminal {
+  addTask(
+    resourceType: ResourceConstant,
+    amount: number,
+    mod?: TerminalModes,
+    channel?: TerminalChannels,
+    priceLimit?: number
+  ): void;
+  add(
+    resourceType: ResourceConstant,
+    amount: number,
+    mod?: TerminalModes,
+    channel?: TerminalChannels,
+    priceLimit?: number
+  ): string;
+  removeByType(type: ResourceConstant, mod: TerminalModes, channel: TerminalChannels): void;
+  remove(index: number): string;
+  show(): string;
+}
+
+/**
+ * 终端监听规则类型
+ * 具体值详见 ./setting.ts > terminalModes
+ */
+type ModeGet = 0;
+type ModePut = 1;
+type TerminalModes = ModeGet | ModePut;
+
+/**
+ * 终端监听规则的资源渠道
+ * 具体值详见 ./setting.ts > terminalChannels
+ */
+type ChannelTake = 0;
+type ChannelRelease = 1;
+type ChannelShare = 2;
+type ChannelSupport = 3;
+type TerminalChannels = ChannelTake | ChannelRelease | ChannelShare | ChannelSupport;
+
+// 终端监听任务，详见 doc/终端设计案
+interface TerminalListenerTask {
+  // 要监听的资源类型
+  type: ResourceConstant;
+  // 期望数量
+  amount: number;
+  // 监听类型
+  mod: TerminalModes;
+  // 渠道: market, share
+  channel: TerminalChannels;
+  // 价格限制
+  priceLimit?: number;
+  // 要支援的房间名
+  supportRoomName?: string;
+}
+
+/**
+ * 交易的合理范围
+ * 将以昨日该资源的交易范围为基准，上(MAX)下(MIN)浮动出一个区间，超过该区间的订单将被不会交易
+ * 如果没有特别指定的话将以 default 指定的区间为基准
+ */
+type DealRatios = {
+  [resType in ResourceConstant | "default"]?: {
+    // 卖单的最高价格
+    MAX: number;
+    // 买单的最低价格
+    MIN: number;
+  };
+};

@@ -197,6 +197,7 @@ const releasePlans: CreepReleasePlans = {
       };
       if (room.storage) stats.storageId = room.storage.id;
       if (room.centerLink) stats.centerLinkId = room.centerLink.id;
+      if (room.memory) stats.centerPos = room.memory.center;
 
       return stats;
     },
@@ -276,7 +277,7 @@ const releasePlans: CreepReleasePlans = {
     // 发布计划
     plans: [
       ({ room, ruinIds }: RuinCollectorPlanStats) => {
-        const releaseNumber = Math.min(ruinIds.length + 1, MAX_BUILDER_NUM);
+        const releaseNumber = Math.min(ruinIds.length + 1, MAX_RUIN_COLLECTOR_NUM);
 
         for (let index = 0; index < releaseNumber; index++) {
           creepApi.add(`${room.name} ruinCollector${index}`, "ruinCollector", {}, room.name);
