@@ -242,7 +242,6 @@ interface CreepMemory {
   // 该字段用于减少 creep 向 Room.restrictedPos 里添加自己位置的次数
   standed?: boolean;
   // 要采集的资源 Id
-  // 要采集的资源 Id
   sourceId?: string;
   // 要存放到的目标建筑
   targetId?: string;
@@ -270,7 +269,7 @@ interface CreepMemory {
 type CreepRoleConstant = BaseRoleConstant | AdvancedRoleConstant | RemoteRoleConstant;
 
 // 房间基础运营
-type BaseRoleConstant = "harvester" | "filler" | "upgrader" | "builder" | "repairer" | "ruinCollector";
+type BaseRoleConstant = "harvester" | "filler" | "upgrader" | "builder" | "repairer" | "ruinCollector" | "collector";
 
 type AdvancedRoleConstant = "manager" | "processor";
 

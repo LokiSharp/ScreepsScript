@@ -64,12 +64,49 @@ const releasePlans: CreepReleasePlans = {
       };
 
       // 收集 centerLink 及 storage
+      if (room.centerLink) stats.centerLinkId = room.centerLink.id;
       if (room.storage) stats.storageId = room.storage.id;
 
       return stats;
     },
     // 发布计划
     plans: [
+      // 有 storage 也有 centerLink，可以通过 sourceLink 转移能量了
+      ({ room, storageId, centerLinkId, sources }: HarvesterPlanStats) => {
+        if (!(storageId && centerLinkId)) return false;
+
+        // 遍历所有 source 进行发布
+        sources.forEach((sourceDetail, index) => {
+          // 有对应的 sourceLink 的话 harvester 把自己的能量放进去
+          if (sourceDetail.linkId) {
+            creepApi.add(
+              `${room.name} harvester${index}`,
+              "collector",
+              {
+                sourceId: sourceDetail.id,
+                targetId: sourceDetail.linkId
+              },
+              room.name
+            );
+            room.log(`能量将存放至 sourceLink`, "harvester", "green");
+          }
+          // 没有的话就还是老角色，新建 container 并采集
+          else {
+            creepApi.add(
+              `${room.name} harvester${index}`,
+              "harvester",
+              {
+                sourceId: sourceDetail.id
+              },
+              room.name
+            );
+            room.log(`能量将存放至 sourceContainer`, "harvester", "green");
+          }
+        });
+
+        return true;
+      },
+
       // 没有 storage，直接发布 harvester
       ({ room, sources }: HarvesterPlanStats) => {
         // 遍历所有 source 进行发布，多余能量直接存到 storage 里
@@ -421,6 +458,7 @@ const releaseRuinCollector = function (room: Room): OK {
  */
 const roleToRelease: { [role in BaseRoleConstant | AdvancedRoleConstant]: (room: Room) => OK | ERR_NOT_FOUND } = {
   harvester: releaseHarvester,
+  collector: releaseHarvester,
   filler: releaseTransporter,
   manager: releaseTransporter,
   processor: releaseTransporter,
