@@ -29,6 +29,9 @@ export const repairSetting = {
  * storage 中的能量和对应发布的 upgrader 数量
  */
 export const UPGRADE_WITH_STORAGE = [
+  { energy: 990000, num: 24 },
+  { energy: 980000, num: 18 },
+  { energy: 950000, num: 12 },
   { energy: 900000, num: 9 },
   { energy: 700000, num: 7 },
   { energy: 500000, num: 5 },
