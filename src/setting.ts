@@ -29,8 +29,10 @@ export const repairSetting = {
  * storage 中的能量和对应发布的 upgrader 数量
  */
 export const UPGRADE_WITH_STORAGE = [
-  { energy: 700000, num: 3 },
-  { energy: 500000, num: 2 },
+  { energy: 900000, num: 9 },
+  { energy: 700000, num: 7 },
+  { energy: 500000, num: 5 },
+  { energy: 300000, num: 3 },
   { energy: 100000, num: 1 }
 ];
 
@@ -87,11 +89,11 @@ export const bodyConfigs: BodyConfigs = {
     { [CARRY]: 2, [MOVE]: 1 },
     { [CARRY]: 3, [MOVE]: 1 },
     { [CARRY]: 5, [MOVE]: 1 },
-    { [CARRY]: 7, [MOVE]: 1 },
-    { [CARRY]: 11, [MOVE]: 1 },
-    { [CARRY]: 14, [MOVE]: 1 },
-    { [CARRY]: 26, [MOVE]: 1 },
-    { [CARRY]: 39, [MOVE]: 1 }
+    { [CARRY]: 10, [MOVE]: 1 },
+    { [CARRY]: 20, [MOVE]: 1 },
+    { [CARRY]: 30, [MOVE]: 1 },
+    { [CARRY]: 40, [MOVE]: 1 },
+    { [CARRY]: 50, [MOVE]: 1 }
   ),
 
   /**
