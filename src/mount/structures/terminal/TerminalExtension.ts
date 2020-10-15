@@ -25,6 +25,8 @@ export default class TerminalExtension extends StructureTerminal {
     // 优先执行共享任务
     this.execShareTask();
 
+    this.energyCheck();
+
     // 执行终端工作
     const resource = this.getResourceByIndex();
     // 没有配置监听任务的话就跳过
@@ -85,7 +87,6 @@ export default class TerminalExtension extends StructureTerminal {
 
       if (sendResult === OK) {
         delete this.room.memory.shareTask;
-        this.energyCheck();
       } else if (sendResult === ERR_INVALID_ARGS) {
         this.log(`共享任务参数异常，无法执行传送，已移除`, "yellow");
         delete this.room.memory.shareTask;
@@ -170,7 +171,6 @@ export default class TerminalExtension extends StructureTerminal {
       delete this.room.memory.targetOrderId;
 
       this.setNextIndex();
-      this.energyCheck();
 
       return false; // 把这个改成 true 可以加快交易速度
     } else if (dealResult === ERR_INVALID_ARGS) delete this.room.memory.targetOrderId;

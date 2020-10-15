@@ -1,7 +1,7 @@
 import { getBodyConfig } from "utils/getBodyConfig";
 
 // 每个房间最多同时存在多少单位
-export const MAX_UPGRADER_NUM = 8;
+export const MAX_UPGRADER_NUM = 24;
 export const MAX_HARVESTER_NUM = 4;
 export const MAX_BUILDER_NUM = 4;
 export const MAX_RUIN_COLLECTOR_NUM = 1;
@@ -152,7 +152,7 @@ export const creepDefaultMemory: CreepMemory = {
 };
 
 // 用于维持房间能量正常运转的重要角色
-export const importantRoles: CreepRoleConstant[] = ["harvester", "filler", "manager", "processor"];
+export const importantRoles: CreepRoleConstant[] = ["manager", "processor", "harvester", "filler"];
 
 /**
  * 此处定义了所有的房间物流任务类型
