@@ -7,6 +7,13 @@ import RoomExtension from "./RoomExtension";
 
 export default class RoomConsole extends RoomExtension {
   /**
+   * 用户操作 - 执行自动建筑规划
+   */
+  public planlayout(): string {
+    return this.planLayout();
+  }
+
+  /**
    * 用户操作 - 拓展新外矿
    *
    */

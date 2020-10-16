@@ -7,7 +7,6 @@ import processor from "./advanced/processor";
 import remoteHarvester from "./remote/remoteHarvester";
 import repairer from "./base/repairer";
 import reserver from "./remote/reserver";
-import ruinCollector from "./ruinCollector";
 import upgrader from "./base/upgrader";
 
 const roles: CreepWork = {
@@ -16,7 +15,6 @@ const roles: CreepWork = {
   upgrader,
   builder,
   repairer,
-  ruinCollector,
   manager,
   reserver,
   remoteHarvester,

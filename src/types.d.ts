@@ -78,7 +78,23 @@ interface Memory {
       };
     };
   };
+
+  // 在模拟器中调试布局时才会使用到该字段，在正式服务器中不会用到该字段
+  layoutInfo?: BaseLayout;
+  // 用于标记布局获取到了那一等级
+  layoutLevel?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 }
+
+/**
+ * 基地布局信息
+ */
+type BaseLayout = {
+  // 不同等级下应建造的建筑
+  [controllerLevel in 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8]: {
+    // 该类型建筑应该被放置在什么地方
+    [structureType in StructureConstant]?: [number, number][] | null;
+  };
+};
 
 /**
  * bodySet
@@ -221,9 +237,6 @@ interface Creep {
     target: RoomPosition,
     range?: number
   ): CreepMoveReturnCode | ERR_NO_PATH | ERR_INVALID_TARGET | ERR_NOT_IN_RANGE | ERR_INVALID_ARGS;
-
-  addRemote(remoteRoomName: string, targetId: string): OK | ERR_INVALID_TARGET | ERR_NOT_FOUND;
-  removeRemote(remoteRoomName: string, removeFlag?: boolean): OK | ERR_NOT_FOUND;
 }
 
 /**
@@ -269,7 +282,7 @@ interface CreepMemory {
 type CreepRoleConstant = BaseRoleConstant | AdvancedRoleConstant | RemoteRoleConstant;
 
 // 房间基础运营
-type BaseRoleConstant = "harvester" | "filler" | "upgrader" | "builder" | "repairer" | "ruinCollector" | "collector";
+type BaseRoleConstant = "harvester" | "filler" | "upgrader" | "builder" | "repairer" | "collector";
 
 type AdvancedRoleConstant = "manager" | "processor";
 
@@ -373,6 +386,14 @@ interface Room {
 
   addRemoteCreepGroup(remoteRoomName: string): void;
   addRemoteReserver(remoteRoomName: string): void;
+
+  findBaseCenterPos(): RoomPosition[];
+  confirmBaseCenter(targetPos?: RoomPosition[]): RoomPosition | ERR_NOT_FOUND;
+  setBaseCenter(pos: RoomPosition): OK | ERR_INVALID_ARGS;
+  planLayout(): string;
+  clearStructure(): OK | ERR_NOT_FOUND;
+  addRemote(remoteRoomName: string, targetId: string): OK | ERR_INVALID_TARGET | ERR_NOT_FOUND;
+  removeRemote(remoteRoomName: string, removeFlag?: boolean): OK | ERR_NOT_FOUND;
 }
 
 /**
@@ -381,13 +402,20 @@ interface Room {
 interface RoomMemory {
   // 该房间的生产队列，元素为 creepConfig 的键名
   spawnList?: string[];
+
+  // 房间内的资源和建筑 id
+  mineralId: string;
+  factoryId: string;
+  extractorId: string;
   sourceIds: string[];
   sourceContainersIds: string[];
   ruinIds: string[];
   constructionSiteIds: string[];
 
-  centerLinkId: string;
-  upgradeLinkId: string;
+  // 中央 link 的 id
+  centerLinkId?: string;
+  // 升级 link 的 id
+  upgradeLinkId?: string;
 
   // 该房间禁止通行点的存储
   // 键为注册禁止通行点位的 creep 名称，值为禁止通行点位 RoomPosition 对象的序列字符串
@@ -396,6 +424,10 @@ interface RoomMemory {
   };
   // 基地中心点坐标, [0] 为 x 坐标, [1] 为 y 坐标
   center: [number, number];
+  // 基地中心的待选位置, [0] 为 x 坐标, [1] 为 y 坐标
+  centerCandidates?: [number, number][];
+  // 是否关闭自动布局，该值为 true 时将不会对本房间运行自动布局
+  noLayout: boolean;
 
   // 建筑工的当前工地目标，用于保证多个建筑工的工作统一以及建筑工死后不会寻找新的工地
   constructionSiteId: string;
@@ -510,9 +542,7 @@ interface transferTaskOperation {
  * @param detail 该 creep 发布所需的房间信息
  * @returns 代表该发布计划是否适合房间状态
  */
-type PlanNodeFunction = (
-  detail: UpgraderPlanStats | HarvesterPlanStats | TransporterPlanStats | RuinCollectorPlanStats
-) => boolean;
+type PlanNodeFunction = (detail: UpgraderPlanStats | HarvesterPlanStats | TransporterPlanStats) => boolean;
 
 // 房间中用于发布 upgrader 所需要的信息
 interface UpgraderPlanStats {
@@ -565,16 +595,7 @@ interface TransporterPlanStats {
   centerPos?: [number, number];
 }
 
-// 房间中用于发布 ruinCollector 所需要的信息
-interface RuinCollectorPlanStats {
-  // 房间对象
-  room: Room;
-  // 房间内 storage 的 id，房间没 storage 时该值为空，下同
-  storageId?: string;
-  ruinIds?: string[];
-}
-
-// 房间中用于发布 ruinCollector 所需要的信息
+// 房间中用于发布建造者所需要的信息
 interface BuilderPlanStats {
   // 房间对象
   room: Room;
@@ -596,7 +617,6 @@ interface CreepReleasePlans {
   harvester: ReleasePlanConstructor<HarvesterPlanStats>;
   upgrader: ReleasePlanConstructor<UpgraderPlanStats>;
   transporter: ReleasePlanConstructor<TransporterPlanStats>;
-  ruinCollector: ReleasePlanConstructor<RuinCollectorPlanStats>;
   builder: ReleasePlanConstructor<BuilderPlanStats>;
 }
 

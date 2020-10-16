@@ -45,8 +45,8 @@ export async function initWorld(helper: IntegrationTestHelper, RCL: number): Pro
     main: readFileSync(DIST_MAIN_JS).toString(),
     "main.js.map": readFileSync(DIST_MAIN_JS_MAP).toString()
   };
-  helper.player = await helper.server.world.addBot({ username: "player", room: "W0N0", x: 15, y: 15, modules });
-
+  helper.player = await helper.server.world.addBot({ username: "LokiSharp", room: "W0N0", x: 21, y: 26, modules });
+  await helper.player.console(`Memory.rooms.W0N0.center = [24, 24]`);
   await Promise.all([
     db["rooms.objects"].update(
       { _id: controller._id },

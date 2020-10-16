@@ -1,3 +1,5 @@
+import { clearStructure, planLayout } from "modules/autoPlanning/planBaseLayout";
+import { confirmBasePos, findBaseCenterPos, setBaseCenter } from "modules/autoPlanning/planBasePos";
 import { ENERGY_SHARE_LIMIT } from "setting";
 import { createRoomLink } from "utils/createRoomLink";
 import { creepApi } from "modules/creepController";
@@ -486,5 +488,62 @@ export default class RoomExtension extends Room {
     // 把上面筛选出来的空字符串元素去除
     Memory.resourceSourceMap[resourceType] = roomWithEmpty.filter(roomName => roomName);
     return targetRoom;
+  }
+
+  /**
+   * 执行自动建筑规划
+   */
+  public planLayout(): string {
+    const result = planLayout(this);
+
+    if (result === OK) return `自动规划完成`;
+    else if (result === ERR_NOT_OWNER) return `自动规划失败，房间没有控制权限`;
+    else return `未找到基地中心点位，请执行 Game.rooms.${this.name}.setcenter 以启用自动规划`;
+  }
+
+  // 移除不必要的建筑
+  public clearStructure(): OK | ERR_NOT_FOUND {
+    return clearStructure(this);
+  }
+
+  /**
+   * 在本房间中查找可以放置基地的位置
+   * 会将可选位置保存至房间内存
+   *
+   * @returns 可以放置基地的中心点
+   */
+  public findBaseCenterPos(): RoomPosition[] {
+    const targetPos = findBaseCenterPos(this.name);
+    this.memory.centerCandidates = targetPos.map(pos => [pos.x, pos.y]);
+
+    return targetPos;
+  }
+
+  /**
+   * 确定基地选址
+   * 从给定的位置中挑选一个最优的作为基地中心点，如果没有提供的话就从 memory.centerCandidates 中挑选
+   * 挑选完成后会自动将其设置为中心点
+   *
+   * @param targetPos 待选的中心点数组
+   */
+  public confirmBaseCenter(targetPos: RoomPosition[] = undefined): RoomPosition | ERR_NOT_FOUND {
+    if (!targetPos) {
+      if (!this.memory.centerCandidates) return ERR_NOT_FOUND;
+      targetPos = this.memory.centerCandidates.map(c => new RoomPosition(c[0], c[1], this.name));
+    }
+
+    const center = confirmBasePos(this, targetPos);
+    setBaseCenter(this, center);
+    delete this.memory.centerCandidates;
+
+    return center;
+  }
+
+  /**
+   * 设置基地中心
+   * @param pos 中心点位
+   */
+  public setBaseCenter(pos: RoomPosition): OK | ERR_INVALID_ARGS {
+    return setBaseCenter(this, pos);
   }
 }

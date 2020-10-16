@@ -10,7 +10,6 @@ export default class ControllerExtension extends StructureController {
     // 如果等级发生变化了就运行 creep 规划
     if (this.stateScanner()) this.onLevelChange(this.level);
     if (this.constructionSiteScanner()) this.room.releaseCreep("builder");
-    if (this.room.storage && this.ruinScanner()) this.room.releaseCreep("ruinCollector");
     this.structureScanner();
 
     // 8 级并且快掉级了就孵化 upgrader
@@ -37,6 +36,9 @@ export default class ControllerExtension extends StructureController {
       // 多发布一个 build 协助建造
       this.room.releaseCreep("builder");
     }
+
+    // 规划布局
+    this.log(this.room.planLayout(), "green");
   }
 
   /**

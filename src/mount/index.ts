@@ -1,3 +1,4 @@
+import { planLayout } from "modules/autoPlanning/planBaseLayout";
 import mountCreep from "./creep";
 import mountRoom from "./room";
 import mountRoomPostio from "./roomPosition";
@@ -16,6 +17,8 @@ export default function (): void {
     mountCreep();
     mountStructure();
     global.hasExtension = true;
+
+    workAfterMount();
   }
 }
 
@@ -28,4 +31,14 @@ function initStorage() {
 
   if (!Memory.stats) Memory.stats = { rooms: {} };
   if (!Memory.creepConfigs) Memory.creepConfigs = {};
+}
+
+// 挂载完成后要执行的一些作业
+function workAfterMount() {
+  // 对所有的房间执行建筑规划，防止有房间缺失建筑
+  Object.values(Game.rooms).forEach(room => {
+    if (!room.controller || !room.controller.my) return;
+
+    planLayout(room);
+  });
 }

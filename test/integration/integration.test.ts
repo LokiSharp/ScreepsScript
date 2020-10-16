@@ -5,6 +5,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { assert } from "chai";
 import { helper } from "./helper";
+import { runRCLTest } from "./utils/runRCLTest";
 
 describe("main", () => {
   it("测试服务器的 tick 是否匹配", async () => {
@@ -12,5 +13,9 @@ describe("main", () => {
       assert.equal(await helper.server.world.gameTime, i);
       await helper.server.tick();
     }
+  });
+
+  it(`测试 RCL1 -> RCL8`, async () => {
+    await runRCLTest(1, 8, 1000000);
   });
 });
