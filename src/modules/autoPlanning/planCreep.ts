@@ -31,8 +31,8 @@ Function.prototype.setNextPlan = function (nextPlan): PlanNodeFunction {
  * @param indexs creep 的名称后缀
  * @param sourceId 能量来源 id
  */
-const addUpgrader = function (roomName: string, indexs: number[], sourceId: string): void {
-  indexs.forEach(i => creepApi.add(`${roomName} upgrader${i}`, "upgrader", { sourceId }, roomName));
+const addUpgrader = function (roomName: string, indexs: number[], sourceId: string, sourceType = ""): void {
+  indexs.forEach(i => creepApi.add(`${roomName} upgrader${i}${sourceType}`, "upgrader", { sourceId }, roomName));
 };
 
 const releasePlans: CreepReleasePlans = {
@@ -131,7 +131,8 @@ const releasePlans: CreepReleasePlans = {
         room,
         controllerLevel: room.controller.level,
         ticksToDowngrade: room.controller.ticksToDowngrade,
-        sourceContainerIds: room.memory.sourceContainersIds || []
+        sourceContainerIds: room.memory.sourceContainersIds || [],
+        upgradeLinkId: room.memory.upgradeLinkId
       };
 
       if (room.storage) {
@@ -165,10 +166,10 @@ const releasePlans: CreepReleasePlans = {
         if (!upgradeLinkId) return false;
 
         // 发布升级单位给 link
-        addUpgrader(room.name, [0, 1], upgradeLinkId);
+        addUpgrader(room.name, [0, 1], upgradeLinkId, " Link");
 
         room.log("将从 upgradeLink 获取能量", "upgrader", "green");
-        return true;
+        return false;
       },
 
       // 根据 storage 里的能量发布对应数量的 upgrader
@@ -374,6 +375,7 @@ const releaseTransporter = function (room: Room): OK {
 const releaseUpgrader = function (room: Room): OK {
   // 先移除所有的配置项
   for (let i = 0; i < MAX_UPGRADER_NUM; i++) creepApi.remove(`${room.name} upgrader${i}`);
+  for (let i = 0; i < MAX_UPGRADER_NUM; i++) creepApi.remove(`${room.name} upgrader${i} Link`);
 
   // 然后重新发布
   planChains.upgrader(releasePlans.upgrader.getStats(room));

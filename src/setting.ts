@@ -11,7 +11,7 @@ export const TRANSFER_DEATH_LIMIT = 20;
 // 造好新墙时 builder 会先将墙刷到超过下面值，之后才会去建其他建筑
 export const MIN_WALL_HITS = 8000;
 // 设置 tower 刷墙上限，避免前期过多刷墙
-export const MAX_WALL_HITS = 300000;
+export const MAX_WALL_HITS = 1000000;
 
 // 房间建筑维修需要的设置
 export const repairSetting = {
@@ -68,6 +68,7 @@ export const bodyConfigs: BodyConfigs = {
     { [WORK]: 16, [CARRY]: 16, [MOVE]: 16 },
     { [WORK]: 18, [CARRY]: 18, [MOVE]: 18 }
   ),
+
   /**
    * 升级单位
    * 最大的身体部件只包含 12 个 WORK

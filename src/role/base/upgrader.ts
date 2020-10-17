@@ -1,3 +1,5 @@
+import { calcBodyPart } from "utils/calcBodyPart";
+
 /**
  * 升级者
  * 不会采集能量，只会从指定目标获取能量
@@ -46,5 +48,8 @@ export default (data: WorkerData): ICreepConfig => ({
     if (creep.upgrade() === ERR_NOT_ENOUGH_RESOURCES) return true;
     else return false;
   },
-  bodys: "upgrader"
+  bodys:
+    Game.getObjectById(data.sourceId as Id<StructureLink>).structureType === STRUCTURE_LINK
+      ? calcBodyPart({ [WORK]: 36, [CARRY]: 5, [MOVE]: 9 })
+      : "upgrader"
 });
