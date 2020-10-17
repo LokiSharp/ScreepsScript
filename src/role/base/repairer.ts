@@ -27,8 +27,8 @@ export default (data: WorkerData): ICreepConfig => ({
       // eslint-disable-next-line no-underscore-dangle
       const actionResult = creep.repair(creep.room._importantWall);
       if (actionResult === OK) {
-        if (!creep.memory.standed) {
-          creep.memory.standed = true;
+        if (!creep.memory.stand) {
+          creep.memory.stand = true;
           creep.room.addRestrictedPos(creep.name, creep.pos);
         }
 

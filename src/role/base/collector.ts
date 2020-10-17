@@ -26,9 +26,9 @@ export default (data: HarvesterData): ICreepConfig => ({
     // harvest 需要长时间占用该位置，所以需要禁止对穿
     if (result === OK) {
       // 开始采集能量了就拒绝对穿
-      if (!creep.memory.standed) {
+      if (!creep.memory.stand) {
         creep.room.addRestrictedPos(creep.name, creep.pos);
-        creep.memory.standed = true;
+        creep.memory.stand = true;
       }
     } else if (result === ERR_NOT_IN_RANGE) creep.goTo(source.pos);
 

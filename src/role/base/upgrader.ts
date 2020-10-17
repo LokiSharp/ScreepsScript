@@ -46,10 +46,8 @@ export default (data: WorkerData): ICreepConfig => ({
   },
   target: creep => {
     if (creep.upgrade() === ERR_NOT_ENOUGH_RESOURCES) {
-      creep.memory.stand = false;
       return true;
     } else {
-      creep.memory.stand = true;
       return false;
     }
   },

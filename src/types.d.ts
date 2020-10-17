@@ -296,9 +296,6 @@ interface CreepMemory {
   working: boolean;
   // creep 在工作时需要的自定义配置，在孵化时由 spawn 复制
   data?: CreepData;
-  // 该 Creep 是否在站着不动进行工作
-  // 该字段用于减少 creep 向 Room.restrictedPos 里添加自己位置的次数
-  standed?: boolean;
   // 要采集的资源 Id
   sourceId?: string;
   // 要存放到的目标建筑
