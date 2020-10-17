@@ -361,7 +361,7 @@ type BaseRoleConstant = "harvester" | "filler" | "upgrader" | "builder" | "repai
 type AdvancedRoleConstant = "manager" | "processor";
 
 // 远程单位
-type RemoteRoleConstant = "reserver" | "remoteHarvester" | "reiver";
+type RemoteRoleConstant = "reserver" | "remoteHarvester" | "reiver" | "claimer" | "remoteUpgrader" | "remoteBuilder";
 
 /**
  * creep 工作逻辑集合
@@ -381,7 +381,9 @@ interface Room {
   // creep 发布 api
   releaseCreep(role: BaseRoleConstant | AdvancedRoleConstant): ScreepsReturnCode;
   spawnReiver(sourceFlagName: string, targetStructureId: string): string;
-  registerContainer(container: StructureContainer): OK;
+  addRemoteHelper(remoteRoomName: string): void;
+  addRemoteReserver(remoteRoomName: string, single?: boolean): void;
+  addRemoteCreepGroup(remoteRoomName: string): void;
 
   /**
    * 下述方法在 @see /src/mount.room.ts 中定义
@@ -459,9 +461,7 @@ interface Room {
   // 获取房间中的有效能量来源
   getAvailableSource(): StructureTerminal | StructureStorage | StructureContainer | Source;
 
-  addRemoteCreepGroup(remoteRoomName: string): void;
-  addRemoteReserver(remoteRoomName: string): void;
-
+  // 自动规划相关
   findBaseCenterPos(): RoomPosition[];
   confirmBaseCenter(targetPos?: RoomPosition[]): RoomPosition | ERR_NOT_FOUND;
   setBaseCenter(pos: RoomPosition): OK | ERR_INVALID_ARGS;
@@ -469,6 +469,8 @@ interface Room {
   clearStructure(): OK | ERR_NOT_FOUND;
   addRemote(remoteRoomName: string, targetId: string): OK | ERR_INVALID_TARGET | ERR_NOT_FOUND;
   removeRemote(remoteRoomName: string, removeFlag?: boolean): OK | ERR_NOT_FOUND;
+  claimRoom(targetRoomName: string, signText?: string): OK;
+  registerContainer(container: StructureContainer): OK;
 }
 
 /**

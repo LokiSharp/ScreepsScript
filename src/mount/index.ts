@@ -1,8 +1,9 @@
-import { planLayout } from "modules/autoPlanning/planBaseLayout";
 import mountCreep from "./creep";
 import mountRoom from "./room";
 import mountRoomPostio from "./roomPosition";
 import mountStructure from "./structures";
+import { planLayout } from "modules/autoPlanning/planBaseLayout";
+
 /**
  * 挂载所有的额外属性和方法
  */

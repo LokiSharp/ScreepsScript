@@ -48,7 +48,7 @@ export default class RoomShortcut extends Room {
     // 如果内存中存有 id 的话就读取并返回
     // mineral 不会过期，所以不需要进行处理
     if (this.memory.mineralId) {
-      this._mineral = Game.getObjectById(this.memory.mineralId);
+      this._mineral = Game.getObjectById(this.memory.mineralId as Id<Mineral>);
       return this._mineral;
     }
 

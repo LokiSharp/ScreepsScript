@@ -82,4 +82,35 @@ export default class CreepControl extends RoomConsole {
       sourceFlagName || DEFAULT_FLAG_NAME.REIVER
     }, 将搬运至 ${targetStructureId ? targetStructureId : this.name + " Terminal"}`;
   }
+
+  /**
+   * 发布支援角色组
+   *
+   * @param remoteRoomName 要支援的房间名
+   */
+  public addRemoteHelper(remoteRoomName: string): void {
+    const room = Game.rooms[remoteRoomName];
+
+    if (!room) return this.log(`目标房间没有视野，无法发布支援单位`, "", "yellow");
+
+    // 发布 upgrader 和 builder
+    creepApi.add(
+      `${remoteRoomName} RemoteUpgrader`,
+      "remoteUpgrader",
+      {
+        targetRoomName: remoteRoomName,
+        sourceId: room.sources[0].id
+      },
+      this.name
+    );
+    creepApi.add(
+      `${remoteRoomName} RemoteBuilder`,
+      "remoteBuilder",
+      {
+        targetRoomName: remoteRoomName,
+        sourceId: room.sources.length >= 2 ? room.sources[1].id : room.sources[0].id
+      },
+      this.name
+    );
+  }
 }
