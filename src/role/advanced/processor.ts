@@ -5,9 +5,12 @@
 export default (data: ProcessorData): ICreepConfig => ({
   // 移动到指定位置
   prepare: creep => {
-    if (creep.pos.isEqualTo(data.x, data.y)) return true;
-    else {
-      creep.goTo(new RoomPosition(data.x, data.y, creep.room.name));
+    if (creep.pos.isEqualTo(data.x, data.y)) {
+      creep.memory.stand = true;
+      creep.room.addRestrictedPos(creep.name, creep.pos);
+      return true;
+    } else {
+      creep.goTo(new RoomPosition(data.x, data.y, creep.room.name), { range: 0 });
       return false;
     }
   },
@@ -35,7 +38,7 @@ export default (data: ProcessorData): ICreepConfig => ({
     // 资源不足就移除任务
     else if (result === ERR_NOT_ENOUGH_RESOURCES) creep.room.deleteCurrentCenterTask();
     // 够不到就移动过去
-    else if (result === ERR_NOT_IN_RANGE) creep.goTo(structure.pos);
+    else if (result === ERR_NOT_IN_RANGE) creep.goTo(structure.pos, { range: 1 });
     else if (result === ERR_FULL) return true;
     else {
       creep.log(`source 阶段取出异常，错误码 ${result}`, "red");
@@ -67,7 +70,7 @@ export default (data: ProcessorData): ICreepConfig => ({
       return true;
     }
     // 如果目标建筑物太远了，就移动过去
-    else if (result === ERR_NOT_IN_RANGE) creep.goTo(structure.pos);
+    else if (result === ERR_NOT_IN_RANGE) creep.goTo(structure.pos, { range: 1 });
     else if (result === ERR_FULL) {
       creep.log(`${task.target} 满了`);
       if (task.target === STRUCTURE_TERMINAL) Game.notify(`[${creep.room.name}] ${task.target} 满了，请尽快处理`);

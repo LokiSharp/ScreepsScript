@@ -1,3 +1,4 @@
+import { DEFAULT_FLAG_NAME } from "setting";
 import RoomConsole from "./RoomConsole";
 import { creepApi } from "modules/creepController";
 import { releaseCreep } from "modules/autoPlanning/planCreep";
@@ -56,5 +57,29 @@ export default class CreepControl extends RoomConsole {
         },
         this.name
       );
+  }
+
+  /**
+   * 孵化掠夺者
+   *
+   * @param sourceFlagName 要搜刮的建筑上插好的旗帜名
+   * @param targetStructureId 要把资源存放到的建筑 id
+   */
+  public spawnReiver(sourceFlagName = "", targetStructureId = ""): string {
+    if (!targetStructureId && !this.terminal) return `[${this.name}] 发布失败，请填写要存放到的建筑 id`;
+    const reiverName = `${this.name} reiver ${Game.time}`;
+    creepApi.add(
+      reiverName,
+      "reiver",
+      {
+        flagName: sourceFlagName || DEFAULT_FLAG_NAME.REIVER,
+        targetId: targetStructureId || this.terminal.id
+      },
+      this.name
+    );
+
+    return `[${this.name}] 掠夺者 ${reiverName} 已发布, 目标旗帜名称 ${
+      sourceFlagName || DEFAULT_FLAG_NAME.REIVER
+    }, 将搬运至 ${targetStructureId ? targetStructureId : this.name + " Terminal"}`;
   }
 }

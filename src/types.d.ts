@@ -40,6 +40,8 @@ interface Memory {
 
   // 要绕过的房间名列表，由全局模块 bypass 负责。
   bypassRooms: string[];
+  // 掠夺资源列表，如果存在的话 reiver 将只会掠夺该名单中存在的资源
+  reiveList: ResourceConstant[];
 
   // 资源来源表
   resourceSourceMap: {
@@ -154,7 +156,14 @@ type BodyAutoConfigConstant =
 /**
  * 所有 creep 角色的 data
  */
-type CreepData = EmptyData | HarvesterData | WorkerData | RemoteDeclarerData | RemoteHarvesterData | ProcessorData;
+type CreepData =
+  | EmptyData
+  | HarvesterData
+  | WorkerData
+  | RemoteDeclarerData
+  | RemoteHarvesterData
+  | ProcessorData
+  | ReiverData;
 
 /**
  * 有些角色不需要 data
@@ -218,6 +227,16 @@ interface RemoteHarvesterData {
 }
 
 /**
+ * 掠夺者单位的 ddata
+ */
+interface ReiverData {
+  // 目标建筑上的旗帜名称
+  flagName: string;
+  // 要搬运到的建筑 id
+  targetId: string;
+}
+
+/**
  * Creep 拓展
  * 来自于 mount.creep.ts
  */
@@ -226,23 +245,49 @@ interface Creep {
 
   log(content: string, color?: Colors, notify?: boolean): void;
   work(): void;
-  goTo(target: RoomPosition, range?: number): CreepMoveReturnCode | ERR_NO_PATH | ERR_INVALID_TARGET | ERR_NOT_FOUND;
+  goTo(target?: RoomPosition, moveOpt?: MoveOpt): ScreepsReturnCode;
   getEngryFrom(target: Structure | Source): ScreepsReturnCode;
   transferTo(target: Structure, RESOURCE: ResourceConstant): ScreepsReturnCode;
   upgrade(): ScreepsReturnCode;
   buildStructure(): CreepActionReturnCode | ERR_NOT_ENOUGH_RESOURCES | ERR_RCL_NOT_ENOUGH | ERR_NOT_FOUND;
   steadyWall(): OK | ERR_NOT_FOUND;
   fillDefenseStructure(expectHits?: number): boolean;
-  farMoveTo(
-    target: RoomPosition,
-    range?: number
-  ): CreepMoveReturnCode | ERR_NO_PATH | ERR_INVALID_TARGET | ERR_NOT_IN_RANGE | ERR_INVALID_ARGS;
 }
 
 /**
  * creep 内存拓展
  */
 interface CreepMemory {
+  // 内置移动缓存
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  _move?: Object;
+
+  /**
+   * 移动缓存
+   */
+  _go?: MoveInfo;
+
+  // 上一个位置信息，形如"14/4"，用于在 creep.move 返回 OK 时检查有没有撞墙
+  prePos?: string;
+
+  /**
+   * 来自的 shard
+   * 在死后会向这个 shard 发送孵化任务
+   * creepController 会通过这个字段检查一个 creep 是不是跨 shard creep
+   */
+  fromShard?: ShardName;
+
+  /**
+   * 自己是否会向他人发起对穿
+   */
+  disableCross?: boolean;
+
+  /**
+   * 该 Creep 是否在进行工作（站着不动）
+   * 该字段用于减少 creep 向 Room.restrictedPos 里添加自己位置的次数
+   */
+  stand?: boolean;
+
   // creep 的角色
   role: CreepRoleConstant;
   // creep 是否已经准备好可以工作了
@@ -278,6 +323,38 @@ interface CreepMemory {
   };
 }
 
+/**
+ * PowerCreep 内存拓展
+ */
+interface PowerCreepMemory {
+  // 为 true 时执行 target，否则执行 source
+  working: boolean;
+  // 接下来要检查哪个 power
+  powerIndex: number;
+  // 当前要处理的工作
+  // 字段值均为 PWR_* 常量
+  // 在该字段不存在时将默认执行 PWR_GENERATE_OPS（如果 power 资源足够并且 ops 不足时）
+  task: PowerConstant;
+  // 工作的房间名，在第一次出生时由玩家指定，后面会根据该值自动出生到指定房间
+  workRoom: string;
+
+  /**
+   * 同 creep.memory.stand
+   */
+  stand: boolean;
+
+  /**
+   * 同 creep.memory.disableCross
+   */
+  disableCross?: boolean;
+
+  // 要添加 REGEN_SOURCE 的 souce 在 room.sources 中的索引值
+  sourceIndex?: number;
+}
+
+// 目前官服存在的所有 shard 的名字
+type ShardName = "shard0" | "shard1" | "shard2" | "shard3";
+
 // 所有的 creep 角色
 type CreepRoleConstant = BaseRoleConstant | AdvancedRoleConstant | RemoteRoleConstant;
 
@@ -287,7 +364,7 @@ type BaseRoleConstant = "harvester" | "filler" | "upgrader" | "builder" | "repai
 type AdvancedRoleConstant = "manager" | "processor";
 
 // 远程单位
-type RemoteRoleConstant = "reserver" | "remoteHarvester";
+type RemoteRoleConstant = "reserver" | "remoteHarvester" | "reiver";
 
 /**
  * creep 工作逻辑集合
@@ -306,6 +383,7 @@ interface Room {
 
   // creep 发布 api
   releaseCreep(role: BaseRoleConstant | AdvancedRoleConstant): ScreepsReturnCode;
+  spawnReiver(sourceFlagName: string, targetStructureId: string): string;
   registerContainer(container: StructureContainer): OK;
 
   /**
@@ -504,6 +582,12 @@ interface FlagMemory {
   // 因为外矿房间有可能没视野
   // 所以把房间名缓存进内存
   roomName?: string;
+
+  /**
+   * 路径点旗帜中生效
+   * 用于指定下一个路径点的旗帜名
+   */
+  next: string;
 }
 
 interface RoomPosition {
@@ -727,3 +811,90 @@ type DealRatios = {
     MIN: number;
   };
 };
+
+/**
+ * 包含 store 属性的建筑
+ */
+type StructureWithStore =
+  | StructureStorage
+  | StructureContainer
+  | StructureExtension
+  | StructureFactory
+  | StructureSpawn
+  | StructurePowerSpawn
+  | StructureLink
+  | StructureTerminal
+  | StructureNuker;
+
+/**
+ * 自定义移动的选项
+ */
+interface MoveOpt {
+  /**
+   * 重用距离，等同于 moveTo 的 reusePath
+   */
+  reusePath?: number;
+
+  /**
+   * 要移动到目标位置的距离
+   */
+  range?: number;
+
+  /**
+   * 是否禁用对穿（为 true 则会躲避 creep，默认为 false）
+   */
+  disableCross?: boolean;
+
+  /**
+   * 移动目标所在的 shard（不填则默认为本 shard）
+   */
+  shard?: ShardName;
+
+  /**
+   * 路径点
+   * 传入形如 [ '12 21 E1N1', '12 21 E2N2' ] 的路径点数组
+   * 或是任意路径旗帜名前缀
+   */
+  wayPoint?: string[] | string;
+
+  /**
+   * 最大的搜索成本
+   */
+  maxOps?: number;
+
+  /**
+   * 是否检查目标发生了变化，为 true 的话会每 tick 检查目标位置是否变化
+   * 一旦变化则会立刻重新规划
+   */
+  checkTarget?: boolean;
+}
+
+/**
+ * 移动的内存数据
+ */
+interface MoveInfo {
+  /**
+   * 序列化之后的路径信息
+   */
+  path?: string;
+
+  /**
+   * 上一个位置信息，形如"14/4"，用于在 creep.move 返回 OK 时检查有没有撞停
+   */
+  prePos?: string;
+
+  /**
+   * 要移动到的目标位置，creep 会用这个字段判断目标是否变化了
+   */
+  targetPos?: string;
+
+  /**
+   * 数组形式传入的路径点
+   */
+  wayPoints?: string[];
+
+  /**
+   * 路径旗帜名（包含后面的编号，如 waypoint1 或者 waypoint99）
+   */
+  wayPointFlag?: string;
+}

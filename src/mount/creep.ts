@@ -1,5 +1,6 @@
 import { MIN_WALL_HITS, repairSetting } from "setting";
 import { assignPrototype } from "utils/prototype";
+import { goTo } from "modules/move";
 import roles from "role";
 
 export class CreepExtension extends Creep {
@@ -80,29 +81,8 @@ export class CreepExtension extends Creep {
    *
    * @param target 要移动到的位置
    */
-  public goTo(target: RoomPosition): CreepMoveReturnCode | ERR_NO_PATH | ERR_INVALID_TARGET | ERR_NOT_FOUND {
-    // const baseCost = Game.cpu.getUsed()
-    const moveResult = this.moveTo(target, {
-      reusePath: 10,
-      ignoreCreeps: false,
-      costCallback: (roomName, costMatrix) => {
-        if (roomName === this.room.name) {
-          // 避开房间中的禁止通行点
-          const restrictedPos = this.room.getRestrictedPos();
-          for (const creepName in restrictedPos) {
-            // 自己注册的禁止通行点位自己可以走
-            if (creepName === this.name) continue;
-
-            const pos = this.room.unserializePos(restrictedPos[creepName]);
-            costMatrix.set(pos.x, pos.y, 0xff);
-          }
-        }
-
-        return costMatrix;
-      }
-    });
-
-    return moveResult;
+  public goTo(target?: RoomPosition, moveOpt?: MoveOpt): ScreepsReturnCode {
+    return goTo(this, target, moveOpt);
   }
 
   /**
@@ -146,6 +126,7 @@ export class CreepExtension extends Creep {
     // 如果刚开始站定工作，就把自己的位置设置为禁止通行点
     if (result === OK && !this.memory.standed) {
       this.memory.standed = true;
+      this.memory.stand = true;
       this.room.addRestrictedPos(this.name, this.pos);
     } else if (result === ERR_NOT_IN_RANGE) {
       this.goTo(this.room.controller.pos);

@@ -40,7 +40,7 @@ export default (data: HarvesterData): ICreepConfig => ({
 
     // 设置移动范围并进行移动（source 走到附近、其他就走到它上面）
     const range = target instanceof Source ? 1 : 0;
-    creep.goTo(target.pos, range);
+    creep.goTo(target.pos, { range });
 
     // 抵达位置了就准备完成
     if (creep.pos.inRangeTo(target.pos, range)) return true;

@@ -4,6 +4,7 @@ import filler from "./base/filler";
 import harvester from "./base/harvester";
 import manager from "./advanced/manager";
 import processor from "./advanced/processor";
+import reiver from "./remote/reiver";
 import remoteHarvester from "./remote/remoteHarvester";
 import repairer from "./base/repairer";
 import reserver from "./remote/reserver";
@@ -19,7 +20,8 @@ const roles: CreepWork = {
   reserver,
   remoteHarvester,
   processor,
-  collector
+  collector,
+  reiver
 };
 
 /**

@@ -422,3 +422,17 @@ export const baseLayout: BaseLayout = {
     ]
   }
 };
+
+/**
+ * 默认的旗帜名称
+ */
+export const DEFAULT_FLAG_NAME = {
+  // 进攻
+  ATTACK: "attack",
+  // 占领
+  CLAIM: "claim",
+  // 待命
+  STANDBY: "standBy",
+  // 掠夺
+  REIVER: "reiver"
+};

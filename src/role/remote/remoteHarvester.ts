@@ -35,7 +35,7 @@ export default (data: RemoteHarvesterData): ICreepConfig => ({
       }
 
       // 旗帜所在房间没视野, 就进行移动
-      if (!sourceFlag.room) creep.farMoveTo(sourceFlag.pos);
+      if (!sourceFlag.room) creep.goTo(sourceFlag.pos);
       else {
         // 缓存外矿房间名
         sourceFlag.memory.roomName = sourceFlag.room.name;
@@ -117,7 +117,7 @@ export default (data: RemoteHarvesterData): ICreepConfig => ({
     }
     // 这里只要有异常就直接向外矿移动, 因为外矿有可能没视野, 下同
     else {
-      creep.farMoveTo(sourceFlag.pos);
+      creep.goTo(sourceFlag.pos);
     }
     return false;
   },
@@ -161,7 +161,7 @@ export default (data: RemoteHarvesterData): ICreepConfig => ({
     const result = creep.transfer(target, RESOURCE_ENERGY);
     // 报自己身上资源不足了就说明能量放完了
     if (result === ERR_NOT_ENOUGH_RESOURCES) return true;
-    else if (result === ERR_NOT_IN_RANGE) creep.farMoveTo(target.pos, 1);
+    else if (result === ERR_NOT_IN_RANGE) creep.goTo(target.pos, { range: 1 });
     else if (result === ERR_FULL) creep.say("满了啊");
     else if (result !== OK) creep.log(`target 阶段 transfer 出现异常，错误码 ${result}`, "red");
 
