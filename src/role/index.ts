@@ -11,6 +11,7 @@ import remoteHarvester from "./remote/remoteHarvester";
 import remoteUpgrader from "./remote/remoteUpgrader";
 import repairer from "./base/repairer";
 import reserver from "./remote/reserver";
+import soldier from "./war/soldier";
 import upgrader from "./base/upgrader";
 
 const roles: CreepWork = {
@@ -27,7 +28,8 @@ const roles: CreepWork = {
   reiver,
   claimer,
   remoteBuilder,
-  remoteUpgrader
+  remoteUpgrader,
+  soldier
 };
 
 /**

@@ -141,6 +141,21 @@ export const bodyConfigs: BodyConfigs = {
     { [WORK]: 6, [CARRY]: 10, [MOVE]: 8 },
     { [WORK]: 7, [CARRY]: 15, [MOVE]: 11 },
     { [WORK]: 11, [CARRY]: 15, [MOVE]: 19 }
+  ),
+
+  /**
+   * 基础攻击单位
+   * 使用 attack 身体部件的攻击单位
+   */
+  attacker: getBodyConfig(
+    { [MOVE]: 2, [ATTACK]: 2 },
+    { [MOVE]: 3, [ATTACK]: 3 },
+    { [MOVE]: 4, [ATTACK]: 4 },
+    { [MOVE]: 5, [ATTACK]: 5 },
+    { [MOVE]: 6, [ATTACK]: 6 },
+    { [MOVE]: 7, [ATTACK]: 7 },
+    { [MOVE]: 8, [ATTACK]: 8 },
+    { [MOVE]: 9, [ATTACK]: 9 }
   )
 };
 

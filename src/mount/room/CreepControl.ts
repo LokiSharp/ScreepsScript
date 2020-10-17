@@ -113,4 +113,28 @@ export default class CreepControl extends RoomConsole {
       this.name
     );
   }
+
+  /**
+   * 孵化基础进攻单位
+   *
+   * @param targetFlagName 进攻旗帜名称
+   * @param num 要孵化的数量
+   */
+  public spwanSoldier(targetFlagName = "", num = 1): string {
+    if (num <= 0 || num > 10) num = 1;
+
+    for (let i = 0; i < num; i++) {
+      creepApi.add(
+        `${this.name} dismantler ${Game.time}-${i}`,
+        "soldier",
+        {
+          targetFlagName: targetFlagName || DEFAULT_FLAG_NAME.ATTACK,
+          keepSpawn: false
+        },
+        this.name
+      );
+    }
+
+    return `已发布 soldier*${num}，正在孵化`;
+  }
 }

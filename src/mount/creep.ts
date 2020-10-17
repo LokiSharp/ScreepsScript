@@ -287,6 +287,59 @@ export class CreepExtension extends Creep {
     }
     return true;
   }
+
+  /**
+   * 检查旗帜是否存在
+   * 不存在的话会在控制台给出提示
+   *
+   * @param flagName 要检查的 flag 名称
+   * @returns 有旗帜就返回旗帜, 否则返回 null
+   */
+  public getFlag(flagName: string): Flag | null {
+    const flag = Game.flags[flagName];
+    if (!flag) {
+      this.log(`场上不存在名称为 [${flagName}] 的旗帜，请新建`);
+      return null;
+    } else return flag;
+  }
+
+  /**
+   * 进攻
+   * 向指定旗帜旗帜发起进攻
+   *
+   * @param flagName 要进攻的旗帜名称
+   */
+  public attackFlag(flagName: string): boolean {
+    this.say("💢", true);
+    // 获取旗帜
+    const attackFlag = this.getFlag(flagName);
+    if (!attackFlag) return false;
+
+    // 如果 creep 不在房间里 则一直向旗帜移动
+    if (!attackFlag.room || (attackFlag.room && this.room.name !== attackFlag.room.name)) {
+      this.goTo(attackFlag.pos);
+      return true;
+    }
+
+    // 如果到旗帜所在房间了
+    // 优先攻击 creep
+    let target: Creep | PowerCreep | Structure | Flag;
+    const enemys = attackFlag.pos.findInRange(FIND_HOSTILE_CREEPS, 2);
+    if (enemys.length > 0) target = enemys[0];
+    else {
+      // 没有的话再攻击 structure
+      const structures = attackFlag.pos.lookFor(LOOK_STRUCTURES);
+      if (structures.length === 0) {
+        this.say("干谁？");
+        target = attackFlag;
+      } else target = structures[0];
+    }
+
+    this.moveTo(target);
+    this.attack(target as Creep);
+
+    return true;
+  }
 }
 
 // 挂载拓展到 Creep 原型

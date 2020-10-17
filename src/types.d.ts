@@ -151,7 +151,8 @@ type BodyAutoConfigConstant =
   | "processor"
   | "upgrader"
   | "reserver"
-  | "remoteHarvester";
+  | "remoteHarvester"
+  | "attacker";
 
 /**
  * 所有 creep 角色的 data
@@ -163,7 +164,8 @@ type CreepData =
   | RemoteDeclarerData
   | RemoteHarvesterData
   | ProcessorData
-  | ReiverData;
+  | ReiverData
+  | WarUnitData;
 
 /**
  * 有些角色不需要 data
@@ -237,6 +239,20 @@ interface ReiverData {
 }
 
 /**
+ * 战斗单位的 data
+ */
+interface WarUnitData {
+  // 要攻击的旗帜名
+  targetFlagName: string;
+  // 其治疗者名称，战斗单位会尽量保持该单位和自己相邻
+  healerName?: string;
+  // 待命位置旗帜名
+  // standByFlagName: string
+  // 是否持续孵化
+  keepSpawn: boolean;
+}
+
+/**
  * Creep 拓展
  * 来自于 mount.creep.ts
  */
@@ -252,6 +268,9 @@ interface Creep {
   buildStructure(): CreepActionReturnCode | ERR_NOT_ENOUGH_RESOURCES | ERR_RCL_NOT_ENOUGH | ERR_NOT_FOUND;
   steadyWall(): OK | ERR_NOT_FOUND;
   fillDefenseStructure(expectHits?: number): boolean;
+
+  getFlag(flagName: string): Flag | null;
+  attackFlag(flagName: string): boolean;
 }
 
 /**
@@ -353,7 +372,7 @@ interface PowerCreepMemory {
 type ShardName = "shard0" | "shard1" | "shard2" | "shard3";
 
 // 所有的 creep 角色
-type CreepRoleConstant = BaseRoleConstant | AdvancedRoleConstant | RemoteRoleConstant;
+type CreepRoleConstant = BaseRoleConstant | AdvancedRoleConstant | RemoteRoleConstant | WarRoleConstant;
 
 // 房间基础运营
 type BaseRoleConstant = "harvester" | "filler" | "upgrader" | "builder" | "repairer" | "collector";
@@ -362,6 +381,9 @@ type AdvancedRoleConstant = "manager" | "processor";
 
 // 远程单位
 type RemoteRoleConstant = "reserver" | "remoteHarvester" | "reiver" | "claimer" | "remoteUpgrader" | "remoteBuilder";
+
+// 战斗单位
+type WarRoleConstant = "soldier";
 
 /**
  * creep 工作逻辑集合
@@ -384,6 +406,7 @@ interface Room {
   addRemoteHelper(remoteRoomName: string): void;
   addRemoteReserver(remoteRoomName: string, single?: boolean): void;
   addRemoteCreepGroup(remoteRoomName: string): void;
+  spwanSoldier(targetFlagName: string, num?: number): string;
 
   /**
    * 下述方法在 @see /src/mount.room.ts 中定义
