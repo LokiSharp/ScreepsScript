@@ -45,8 +45,13 @@ export default (data: WorkerData): ICreepConfig => ({
     return false;
   },
   target: creep => {
-    if (creep.upgrade() === ERR_NOT_ENOUGH_RESOURCES) return true;
-    else return false;
+    if (creep.upgrade() === ERR_NOT_ENOUGH_RESOURCES) {
+      creep.memory.stand = false;
+      return true;
+    } else {
+      creep.memory.stand = true;
+      return false;
+    }
   },
   bodys:
     Game.getObjectById(data.sourceId as Id<StructureLink>).structureType === STRUCTURE_LINK

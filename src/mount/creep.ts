@@ -126,7 +126,6 @@ export class CreepExtension extends Creep {
     // 如果刚开始站定工作，就把自己的位置设置为禁止通行点
     if (result === OK && !this.memory.standed) {
       this.memory.standed = true;
-      this.memory.stand = true;
       this.room.addRestrictedPos(this.name, this.pos);
     } else if (result === ERR_NOT_IN_RANGE) {
       this.goTo(this.room.controller.pos);
