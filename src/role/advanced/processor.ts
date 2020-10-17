@@ -6,7 +6,6 @@ export default (data: ProcessorData): ICreepConfig => ({
   // 移动到指定位置
   prepare: creep => {
     if (creep.pos.isEqualTo(data.x, data.y)) {
-      creep.memory.stand = true;
       creep.room.addRestrictedPos(creep.name, creep.pos);
       return true;
     } else {
@@ -16,6 +15,8 @@ export default (data: ProcessorData): ICreepConfig => ({
   },
   // 从中央任务队列中取出任务并执行
   source: creep => {
+    // source 阶段允许对穿
+    creep.memory.stand = false;
     // 快死了就拒绝执行任务
     if (creep.ticksToLive <= 5) return false;
     // 获取任务
@@ -49,6 +50,8 @@ export default (data: ProcessorData): ICreepConfig => ({
   },
   // 将资源移动到指定建筑
   target: creep => {
+    // target 阶段拒绝对穿
+    creep.memory.stand = true;
     // 没有任务就返回 source 阶段待命
     const task = creep.room.getCenterTask();
     if (!task) return true;
