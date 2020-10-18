@@ -279,6 +279,7 @@ interface Creep {
   log(content: string, color?: Colors, notify?: boolean): void;
   work(): void;
   goTo(target?: RoomPosition, moveOpt?: MoveOpt): ScreepsReturnCode;
+  setWayPoint(target: string[] | string): ScreepsReturnCode;
   getEngryFrom(target: Structure | Source): ScreepsReturnCode;
   transferTo(target: Structure, RESOURCE: ResourceConstant): ScreepsReturnCode;
   upgrade(): ScreepsReturnCode;
@@ -394,7 +395,14 @@ type BaseRoleConstant = "harvester" | "filler" | "upgrader" | "builder" | "repai
 type AdvancedRoleConstant = "manager" | "processor";
 
 // 远程单位
-type RemoteRoleConstant = "reserver" | "remoteHarvester" | "reiver" | "claimer" | "remoteUpgrader" | "remoteBuilder";
+type RemoteRoleConstant =
+  | "reserver"
+  | "remoteHarvester"
+  | "reiver"
+  | "claimer"
+  | "remoteUpgrader"
+  | "remoteBuilder"
+  | "moveTester";
 
 // 战斗单位
 type WarRoleConstant = "soldier";

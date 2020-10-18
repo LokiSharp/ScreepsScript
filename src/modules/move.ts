@@ -1,3 +1,4 @@
+import { addCrossShardRequest } from "./crossShard";
 import { getOppositeDirection } from "utils/getOppositeDirection";
 
 /**
@@ -380,6 +381,45 @@ export const goTo = function (
   // eslint-disable-next-line no-underscore-dangle
   const direction = Number(creep.memory._go.path[0]) as DirectionConstant;
   const goResult = move(creep, direction, moveOpt);
+
+  /**
+   * 如果是跨 shard 单位的话就要检查下目标是不是传送门
+   *
+   * 这里没办法直接通过判断当前位置在不在传送门上来确定是不是要跨 shard
+   * 因为在 screeps 声明周期的创建阶段中：位置变更到传送门上后会立刻把 creep 转移到新 shard
+   * 而这时还没有到代码执行阶段，即：
+   *
+   * - tick1: 执行 move > 判断当前位置 > 不是传送门
+   * - tick2: 更新位置 > 发现新位置在传送门上 > 发送到新 shard > 执行代码（creep 到了新 shard，当前位置依旧不在传送门上）
+   *
+   * 所以要在路径还有一格时判断前方是不是传送门
+   */
+  // eslint-disable-next-line no-underscore-dangle
+  if (creep.memory.fromShard && creep.memory._go.path && creep.memory._go.path.length === 1) {
+    const nextPos = creep.pos.directionToPos(direction);
+    const portal = nextPos.lookFor(LOOK_STRUCTURES).find(s => s.structureType === STRUCTURE_PORTAL) as StructurePortal;
+
+    // 移动到去其他 shard 的传送门上了，发送跨 shard 请求
+    if (portal && !(portal.destination instanceof RoomPosition)) {
+      updateWayPoint(creep);
+      const { name, memory } = creep;
+      // 移除移动路径，到下个 shard 可以重新规划路径
+      // eslint-disable-next-line no-underscore-dangle
+      delete memory._go.path;
+      console.log(`向 ${portal.destination.shard} 发送 sendCreep 任务`, JSON.stringify({ name, memory }));
+      // 发送跨 shard 请求来转移自己的 memory
+      addCrossShardRequest(`sendCreep${creep.name}${Game.time}`, portal.destination.shard as ShardName, "sendCreep", {
+        name,
+        memory
+      });
+
+      // 主动释放掉自己的内存，从而避免 creepController 认为自己去世了而直接重新孵化
+      // 这里因为上面已经执行了 move，所以下个 tick 就直接到目标 shard 了，不会报错找不到自己内存
+      delete Memory.creeps[creep.name];
+
+      return OK;
+    }
+  }
 
   // 移动成功，更新路径
   // eslint-disable-next-line no-underscore-dangle

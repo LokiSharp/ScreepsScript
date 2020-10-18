@@ -4,6 +4,7 @@ import collector from "./base/collector";
 import filler from "./base/filler";
 import harvester from "./base/harvester";
 import manager from "./advanced/manager";
+import moveTester from "./remote/moveTester";
 import processor from "./advanced/processor";
 import reiver from "./remote/reiver";
 import remoteBuilder from "./remote/remoteBuilder";
@@ -29,6 +30,7 @@ const roles: CreepWork = {
   claimer,
   remoteBuilder,
   remoteUpgrader,
+  moveTester,
   soldier
 };
 
