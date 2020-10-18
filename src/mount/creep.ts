@@ -98,6 +98,16 @@ export class CreepExtension extends Creep {
     // 不是的话就用 harvest
     else {
       result = this.harvest(target);
+
+      // harvest 需要长时间占用该位置，所以需要禁止对穿
+      // withdraw 则不需要
+      if (result === OK) {
+        // 开始采集能量了就拒绝对穿
+        if (!this.memory.stand) {
+          this.room.addRestrictedPos(this.name, this.pos);
+          this.memory.stand = true;
+        }
+      }
     }
 
     if (result === ERR_NOT_IN_RANGE) this.goTo(target.pos);
@@ -256,6 +266,12 @@ export class CreepExtension extends Creep {
 
       // 找到血量最小的墙
       targetWall = walls.sort((a, b) => a.hits - b.hits)[0];
+
+      // 将其缓存在内存里
+      this.room.memory.focusWall = {
+        id: targetWall.id,
+        endTime: Game.time + repairSetting.focusTime
+      };
 
       // 将其缓存在内存里
       this.room.memory.focusWall = {

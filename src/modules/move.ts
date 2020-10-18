@@ -385,7 +385,7 @@ export const goTo = function (
   // eslint-disable-next-line no-underscore-dangle
   if (goResult === OK) creep.memory._go.path = creep.memory._go.path.substr(1);
   // 如果发生撞停或者参数异常的话说明缓存可能存在问题，移除缓存
-  else if (goResult === ERR_INVALID_TARGET || goResult === ERR_INVALID_ARGS) {
+  else if (goResult === ERR_INVALID_TARGET || goResult === ERR_INVALID_ARGS || goResult === ERR_BUSY) {
     // eslint-disable-next-line no-underscore-dangle
     delete creep.memory._go.path;
     delete costCache[creep.room.name];

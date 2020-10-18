@@ -1,13 +1,7 @@
+import { addCrossShardRequest } from "./crossShard";
 import { colorful } from "utils/colorful";
 import { log } from "utils/log";
 import roles from "role";
-
-/**
- * creep 控制模块
- *
- * 负责 creep 的新增、删除及修改，creep 死后也会由该模块负责回收或再孵化
- * 更多细节 @see creep控制协议设计案.md
- */
 
 /**
  * creep 发布 api
@@ -136,45 +130,77 @@ export const creepApi = {
 };
 
 /**
+ * 处理去世的 creep
+ * 会检查其是否需要再次孵化
+ *
+ * @param creepName creep 名字
+ * @param creepMemory creep 死时的内存
+ */
+export const handleNotExistCreep = function (creepName: string, creepMemory: CreepMemory): void {
+  const creepConfig = Memory.creepConfigs[creepName];
+  // 获取配置项
+  if (!creepConfig) {
+    log(`死亡 ${creepName} 未找到对应 creepConfig, 已删除`, ["creepController"]);
+    delete Memory.creeps[creepName];
+    return;
+  }
+
+  // 检查指定的 room 中有没有它的生成任务
+  const spawnRoom = Game.rooms[creepConfig.spawnRoom];
+  if (!spawnRoom) {
+    log(`死亡 ${creepName} 未找到 ${creepConfig.spawnRoom}, 已删除`, ["creepController"]);
+    delete Memory.creeps[creepName];
+    return;
+  }
+
+  const creepWork = roles[creepConfig.role](creepConfig.data);
+
+  // 通过 isNeed 阶段判断该 creep 是否要继续孵化
+  // 没有提供 isNeed 阶段的话则默认需要重新孵化
+  if (creepWork.isNeed && !creepWork.isNeed(spawnRoom, creepName, creepMemory)) {
+    // creep 不需要了，遗弃该 creep
+    creepApi.remove(creepName);
+    delete Memory.creeps[creepName];
+    return;
+  }
+
+  // 加入生成，加入成功的话删除过期内存
+  if (spawnRoom.addSpawnTask(creepName) !== ERR_NAME_EXISTS) delete Memory.creeps[creepName];
+};
+
+/**
  * creep 的数量控制器
  * 负责发现死去的 creep 并检查其是否需要再次孵化
  *
  * @param intrval 搜索间隔
  */
-export default function creepNumberListener(intrval = 5): void {
-  if (Game.time % intrval) return;
-
+export default function creepNumberListener(): void {
   // 遍历所有 creep 内存，检查其是否存在
   for (const name in Memory.creeps) {
     if (name in Game.creeps) continue;
 
-    // 如果 creep 已经凉了
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const creepConfig = Memory.creepConfigs[name];
-    // 获取配置项
-    if (!creepConfig) {
-      log(`死亡 ${name} 未找到对应 creepConfig, 已删除`, ["creepController"]);
+    // creep 的内存不可能完全未空，所以这里只有可能是 creep 主动释放（比如去了其他 shard）
+    // 所以这里不予重生
+    if (Object.keys(Memory.creeps[name]).length <= 0) {
+      // console.log(name, '离开了', Game.shard.name)
       delete Memory.creeps[name];
-      return;
+      continue;
     }
 
-    // 检查指定的 room 中有没有它的生成任务
-    const spawnRoom = Game.rooms[creepConfig.spawnRoom];
-    if (!spawnRoom) {
-      log(`死亡 ${name} 未找到 ${creepConfig.spawnRoom}`, ["creepController"]);
-      return;
-    }
+    const { fromShard } = Memory.creeps[name];
 
-    const creepWork = roles[creepConfig.role](creepConfig.data);
+    // 有 fromShard 这个字段说明是跨 shard creep，只要不是自己 shard 的，统统发送跨 shard 重生任务
+    // 有 fromShard 字段并且该字段又等于自己 shard 的名字，说明该跨 shard creep 死在了本 shard 的路上
+    if (fromShard && fromShard !== Game.shard.name) {
+      // console.log(`向 ${fromShard} 发送 sendRespawn 任务`, JSON.stringify({ name, memory: Memory.creeps[name] }))
+      addCrossShardRequest(`respawnCreep ${name}`, fromShard, "sendRespawn", {
+        name,
+        memory: Memory.creeps[name]
+      });
 
-    // 如果有 isNeed 阶段并且该阶段返回 false 则遗弃该 creep
-    if (creepWork.isNeed && !creepWork.isNeed(Game.rooms[creepConfig.spawnRoom], name, Memory.creeps[name])) {
-      creepApi.remove(name);
       delete Memory.creeps[name];
-      return;
     }
-
-    // 加入生成，加入成功的话删除过期内存
-    if (spawnRoom.addSpawnTask(name) !== ERR_NAME_EXISTS) delete Memory.creeps[name];
+    // 如果 creep 凉在了本 shard
+    else handleNotExistCreep(name, Memory.creeps[name]);
   }
 }

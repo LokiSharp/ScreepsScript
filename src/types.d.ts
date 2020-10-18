@@ -1,15 +1,21 @@
 declare namespace NodeJS {
   // 全局对象
   interface Global {
+    InterShardMemory: InterShardMemory;
     // 是否已经挂载拓展
     hasExtension: boolean;
-    // 全局的路径缓存
-    // Creep 在执行远程寻路时会优先检查该缓存
-    routeCache: {
-      // 键为路径的起点和终点名，例如："12/32/W1N1 23/12/W2N2"，值是使用 Creep.serializeFarPath 序列化后的路径
-      [routeKey: string]: string;
-    };
   }
+}
+
+/**
+ * Game 对象拓展
+ */
+interface Game {
+  // 本 tick 是否已经执行了 creep 数量控制器了
+  // 每 tick 只会调用一次
+  _hasRunCreepNumberController: boolean;
+  // 本 tick 是否需要执行保存 InterShardMemory
+  _needSaveInterShardData: boolean;
 }
 
 // 当 creep 不需要生成时 mySpawnCreep 返回的值
@@ -36,6 +42,17 @@ interface Memory {
       // 为 string 时则自动规划身体部件，为 BodyPartConstant[] 时则强制生成该身体配置
       bodys: BodyAutoConfigConstant | BodyPartConstant[];
     };
+  };
+
+  /**
+   * 从其他 shard 跳跃过来的 creep 内存会被存放在这里
+   * 等 creep 抵达后在由其亲自放在 creepConfigs 里
+   *
+   * 不能直接放在 creepConfigs
+   * 因为有可能出现内存到了但是 creep 还没到的情况，这时候 creepController 就会以为这个 creep 死掉了从而直接把内存回收掉
+   */
+  crossShardCreeps: {
+    [creepName: string]: CreepMemory;
   };
 
   // 要绕过的房间名列表，由全局模块 bypass 负责。
@@ -367,9 +384,6 @@ interface PowerCreepMemory {
   // 要添加 REGEN_SOURCE 的 souce 在 room.sources 中的索引值
   sourceIndex?: number;
 }
-
-// 目前官服存在的所有 shard 的名字
-type ShardName = "shard0" | "shard1" | "shard2" | "shard3";
 
 // 所有的 creep 角色
 type CreepRoleConstant = BaseRoleConstant | AdvancedRoleConstant | RemoteRoleConstant | WarRoleConstant;
@@ -909,4 +923,77 @@ interface MoveInfo {
    * 路径旗帜名（包含后面的编号，如 waypoint1 或者 waypoint99）
    */
   wayPointFlag?: string;
+}
+
+// 目前官服存在的所有 shard 的名字
+type ShardName = "shard0" | "shard1" | "shard2" | "shard3";
+
+// 跨 shard 请求构造器
+interface CrossShardRequestConstructor<RequestType, RequestData> {
+  // 要处理请求的 shard
+  to: ShardName;
+  // 该请求的类型
+  type: RequestType;
+  // 该请求携带的数据
+  data: RequestData;
+}
+
+/**
+ * 跨 shard 请求 - 发送 creep
+ */
+type SendCreep = "sendCreep";
+interface SendCreepData {
+  // 要发送 creep 的名字
+  name: string;
+  // 要发送 creep 的内存
+  memory: CreepMemory;
+}
+
+/**
+ * 跨 shard 请求 - 提交重新孵化任务
+ */
+type SendRespawn = "sendRespawn";
+interface SendRespawnData {
+  // 要重新孵化的 creep 的名字
+  name: string;
+  // 要重新孵化的 creep 的内存
+  memory: CreepMemory;
+}
+
+// 构造所有的跨 shard 请求
+type CrossShardRequest =
+  | CrossShardRequestConstructor<SendCreep, SendCreepData>
+  | CrossShardRequestConstructor<SendRespawn, SendRespawnData>;
+
+// 所有跨 shard 请求的类型和数据
+type CrossShardRequestType = SendCreep | SendRespawn;
+type CrossShardRequestData = SendCreepData | SendRespawnData;
+
+// 所有跨 shard 请求的执行策略
+type CrossShardRequestStrategies = {
+  [type in CrossShardRequestType]: (data: CrossShardRequestData) => ScreepsReturnCode;
+};
+
+// 镜面的跨 shard 数据
+type InterShardData = {
+  [shard in ShardName]?: {
+    // 一个键值对构成了一个消息
+    [msgName: string]: CrossShardRequest | ScreepsReturnCode;
+  };
+};
+
+// 跨 shard 响应
+interface CrossShardReply {
+  // 响应是否存在
+  has: boolean;
+  // 响应的状态
+  result?: ScreepsReturnCode;
+}
+
+// 跨 shard 请求的元数据
+interface CrossShardRequestInfo {
+  // 请求的发送 shard
+  source: ShardName;
+  // 请求的名称
+  name: string;
 }

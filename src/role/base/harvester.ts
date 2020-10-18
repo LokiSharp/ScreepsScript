@@ -87,12 +87,12 @@ export default (data: HarvesterData): ICreepConfig => ({
       }
 
       // 还没找到，等下个 tick 会重新新建工地
-      return true;
+      return false;
     }
     // 找到了就缓存 id
     else creep.memory.constructionSiteId = constructionSite.id;
 
-    if (creep.build(constructionSite)) return true;
+    creep.build(constructionSite);
     return false;
   },
   target: creep => {
