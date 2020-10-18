@@ -88,7 +88,7 @@ export default class CreepControl extends RoomConsole {
    *
    * @param remoteRoomName 要支援的房间名
    */
-  public addRemoteHelper(remoteRoomName: string): void {
+  public addRemoteHelper(remoteRoomName: string, wayPointFlagName?: string): void {
     const room = Game.rooms[remoteRoomName];
 
     if (!room) return this.log(`目标房间没有视野，无法发布支援单位`, "", "yellow");
@@ -99,6 +99,7 @@ export default class CreepControl extends RoomConsole {
       "remoteUpgrader",
       {
         targetRoomName: remoteRoomName,
+        wayPointFlagName,
         sourceId: room.sources[0].id
       },
       this.name
@@ -108,6 +109,7 @@ export default class CreepControl extends RoomConsole {
       "remoteBuilder",
       {
         targetRoomName: remoteRoomName,
+        wayPointFlagName,
         sourceId: room.sources.length >= 2 ? room.sources[1].id : room.sources[0].id
       },
       this.name

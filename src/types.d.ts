@@ -230,6 +230,7 @@ interface RemoteDeclarerData {
   spawnRoom?: string;
   // 给控制器的签名
   signText?: string;
+  wayPointFlagName?: string;
 }
 
 /**
@@ -425,7 +426,7 @@ interface Room {
   // creep 发布 api
   releaseCreep(role: BaseRoleConstant | AdvancedRoleConstant): ScreepsReturnCode;
   spawnReiver(sourceFlagName: string, targetStructureId: string): string;
-  addRemoteHelper(remoteRoomName: string): void;
+  addRemoteHelper(remoteRoomName: string, wayPointFlagName?: string): void;
   addRemoteReserver(remoteRoomName: string, single?: boolean): void;
   addRemoteCreepGroup(remoteRoomName: string): void;
   spwanSoldier(targetFlagName: string, num?: number): string;

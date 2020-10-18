@@ -9,9 +9,22 @@ export default (data: RemoteDeclarerData): ICreepConfig => ({
   isNeed: () => false,
   // 向指定房间移动，这里移动是为了避免 target 阶段里 controller 所在的房间没有视野
   prepare: creep => {
+    if (data.wayPointFlagName && !creep.memory.fromShard) {
+      creep.setWayPoint(data.wayPointFlagName);
+      creep.memory.fromShard = Game.shard.name as ShardName;
+    }
+
     // 只要进入房间则准备结束
     if (creep.room.name !== data.targetRoomName) {
-      creep.goTo(new RoomPosition(25, 25, data.targetRoomName));
+      if (data.wayPointFlagName && creep.memory.fromShard) {
+        creep.goTo(undefined, {
+          checkTarget: true,
+          range: 0
+        });
+      } else {
+        creep.goTo(new RoomPosition(25, 25, data.targetRoomName));
+      }
+
       return false;
     }
     // 进入房间之后运行基地选址规划
@@ -50,7 +63,13 @@ export default (data: RemoteDeclarerData): ICreepConfig => ({
 
       // 占领成功，发布支援组
       const spawnRoom = Game.rooms[data.spawnRoom];
-      if (spawnRoom) spawnRoom.addRemoteHelper(data.targetRoomName);
+      if (spawnRoom) {
+        if (data.wayPointFlagName) {
+          spawnRoom.addRemoteHelper(data.targetRoomName, data.wayPointFlagName);
+        } else {
+          spawnRoom.addRemoteHelper(data.targetRoomName);
+        }
+      }
 
       // 添加签名
       if (data.signText) creep.signController(controller, data.signText);
