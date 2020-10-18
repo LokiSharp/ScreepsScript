@@ -53,6 +53,8 @@ export default (data: ProcessorData): ICreepConfig => ({
     // 提前获取携带量
     const amount: number = creep.store.getUsedCapacity(task.resourceType);
 
+    if (amount > 0) creep.room.addRestrictedPos(creep.name, creep.pos);
+
     // 通过房间基础服务获取对应的建筑
     const structure = creep.room[task.target];
     if (!structure) {
@@ -61,6 +63,7 @@ export default (data: ProcessorData): ICreepConfig => ({
     }
 
     const result = creep.transfer(structure, task.resourceType);
+
     // 如果转移完成则增加任务进度
     if (result === OK) {
       creep.room.handleCenterTask(amount);

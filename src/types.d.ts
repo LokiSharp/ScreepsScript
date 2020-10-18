@@ -701,15 +701,6 @@ interface TransporterPlanStats {
   centerPos?: [number, number];
 }
 
-// 房间中用于发布建造者所需要的信息
-interface BuilderPlanStats {
-  // 房间对象
-  room: Room;
-  // 房间内 storage 的 id，房间没 storage 时该值为空，下同
-  storageId?: string;
-  constructionSiteIds: string[];
-}
-
 // 发布角色配置项需要的素材集合
 interface ReleasePlanConstructor<T> {
   // 搜集发布该角色需要的房间信息
@@ -723,7 +714,6 @@ interface CreepReleasePlans {
   harvester: ReleasePlanConstructor<HarvesterPlanStats>;
   upgrader: ReleasePlanConstructor<UpgraderPlanStats>;
   transporter: ReleasePlanConstructor<TransporterPlanStats>;
-  builder: ReleasePlanConstructor<BuilderPlanStats>;
 }
 
 /**

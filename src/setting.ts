@@ -3,7 +3,6 @@ import { getBodyConfig } from "utils/getBodyConfig";
 // 每个房间最多同时存在多少单位
 export const MAX_UPGRADER_NUM = 24;
 export const MAX_HARVESTER_NUM = 4;
-export const MAX_BUILDER_NUM = 4;
 export const MAX_RUIN_COLLECTOR_NUM = 1;
 
 export const TRANSFER_DEATH_LIMIT = 20;
@@ -29,8 +28,6 @@ export const repairSetting = {
  * storage 中的能量和对应发布的 upgrader 数量
  */
 export const UPGRADE_WITH_STORAGE = [
-  { energy: 970000, num: 14 },
-  { energy: 950000, num: 12 },
   { energy: 900000, num: 10 },
   { energy: 700000, num: 8 },
   { energy: 500000, num: 6 },
@@ -107,11 +104,11 @@ export const bodyConfigs: BodyConfigs = {
     { [CARRY]: 3, [MOVE]: 3 },
     { [CARRY]: 5, [MOVE]: 5 },
     { [CARRY]: 8, [MOVE]: 8 },
-    { [CARRY]: 10, [MOVE]: 10 },
-    { [CARRY]: 12, [MOVE]: 12 },
-    { [CARRY]: 15, [MOVE]: 15 },
+    { [CARRY]: 13, [MOVE]: 13 },
     { [CARRY]: 18, [MOVE]: 18 },
-    { [CARRY]: 20, [MOVE]: 20 }
+    { [CARRY]: 20, [MOVE]: 20 },
+    { [CARRY]: 25, [MOVE]: 25 },
+    { [CARRY]: 25, [MOVE]: 25 }
   ),
 
   /**

@@ -1,4 +1,4 @@
-import { MAX_BUILDER_NUM, MAX_HARVESTER_NUM, MAX_UPGRADER_NUM, UPGRADE_WITH_STORAGE } from "setting";
+import { MAX_HARVESTER_NUM, MAX_UPGRADER_NUM, UPGRADE_WITH_STORAGE } from "setting";
 import { creepApi } from "modules/creepController";
 
 // 在 Function 原型上挂载 setNextPlan 方法来完成 creep 发布的职责链
@@ -31,8 +31,8 @@ Function.prototype.setNextPlan = function (nextPlan): PlanNodeFunction {
  * @param indexs creep 的名称后缀
  * @param sourceId 能量来源 id
  */
-const addUpgrader = function (roomName: string, indexs: number[], sourceId: string, sourceType = ""): void {
-  indexs.forEach(i => creepApi.add(`${roomName} upgrader${i}${sourceType}`, "upgrader", { sourceId }, roomName));
+const addUpgrader = function (roomName: string, indexs: number[], sourceId: string): void {
+  indexs.forEach(i => creepApi.add(`${roomName} upgrader${i}`, "upgrader", { sourceId }, roomName));
 };
 
 const releasePlans: CreepReleasePlans = {
@@ -166,10 +166,10 @@ const releasePlans: CreepReleasePlans = {
         if (!upgradeLinkId) return false;
 
         // 发布升级单位给 link
-        addUpgrader(room.name, [0, 1], upgradeLinkId, " Link");
+        addUpgrader(room.name, [0, 1, 2], upgradeLinkId);
 
         room.log("将从 upgradeLink 获取能量", "upgrader", "green");
-        return false;
+        return true;
       },
 
       // 根据 storage 里的能量发布对应数量的 upgrader
@@ -256,19 +256,11 @@ const releasePlans: CreepReleasePlans = {
       // storage 修建完成
       ({ room, storageId }: TransporterPlanStats) => {
         if (!storageId) return true;
+        if (!Game.getObjectById(storageId as Id<StructureStorage>).my) return true;
 
         // 发布房间物流管理单位
         creepApi.add(
-          `${room.name} manager1`,
-          "manager",
-          {
-            sourceId: storageId
-          },
-          room.name
-        );
-
-        creepApi.add(
-          `${room.name} manager2`,
+          `${room.name} manager`,
           "manager",
           {
             sourceId: storageId
@@ -297,42 +289,6 @@ const releasePlans: CreepReleasePlans = {
 
         room.log(`发布 processor`, "transporter", "green");
         return true;
-      }
-    ]
-  },
-
-  /**
-   * 发布建造单位的相关逻辑
-   */
-  builder: {
-    // 状态收集
-    getStats(room: Room): BuilderPlanStats {
-      const stats: BuilderPlanStats = {
-        room,
-        constructionSiteIds: room.memory.constructionSiteIds
-      };
-
-      if (room.storage) stats.storageId = room.storage.id;
-      return stats;
-    },
-    // 发布计划
-    plans: [
-      ({ room, constructionSiteIds }: BuilderPlanStats) => {
-        const releaseNumber = Math.min(constructionSiteIds.length + 1, MAX_BUILDER_NUM);
-
-        for (let index = 0; index < releaseNumber; index++) {
-          creepApi.add(
-            `${room.name} builder${index}`,
-            "builder",
-            {
-              sourceId: room.getAvailableSource().id
-            },
-            room.name
-          );
-        }
-
-        room.log(`发布 builder * ${releaseNumber}`, "builder", "green");
-        return false;
       }
     ]
   }
@@ -375,7 +331,6 @@ const releaseTransporter = function (room: Room): OK {
 const releaseUpgrader = function (room: Room): OK {
   // 先移除所有的配置项
   for (let i = 0; i < MAX_UPGRADER_NUM; i++) creepApi.remove(`${room.name} upgrader${i}`);
-  for (let i = 0; i < MAX_UPGRADER_NUM; i++) creepApi.remove(`${room.name} upgrader${i} Link`);
 
   // 然后重新发布
   planChains.upgrader(releasePlans.upgrader.getStats(room));
@@ -387,10 +342,14 @@ const releaseUpgrader = function (room: Room): OK {
  * @param room 要发布角色的房间
  */
 const releaseBuilder = function (room: Room): OK {
-  for (let i = 0; i < MAX_BUILDER_NUM; i++) creepApi.remove(`${room.name} builder${i}`);
-
-  // 然后重新发布
-  planChains.builder(releasePlans.builder.getStats(room));
+  creepApi.add(
+    `${room.name} builder${Game.time}`,
+    "builder",
+    {
+      sourceId: room.getAvailableSource().id
+    },
+    room.name
+  );
 
   return OK;
 };
