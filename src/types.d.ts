@@ -230,7 +230,7 @@ interface RemoteDeclarerData {
   spawnRoom?: string;
   // 给控制器的签名
   signText?: string;
-  wayPointFlagName?: string;
+  wayPoint?: string;
 }
 
 /**

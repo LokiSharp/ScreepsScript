@@ -418,6 +418,8 @@ export const goTo = function (
       delete Memory.creeps[creep.name];
 
       return OK;
+    } else if (portal && portal.destination instanceof RoomPosition) {
+      updateWayPoint(creep);
     }
   }
 

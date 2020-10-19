@@ -12,14 +12,14 @@ export default (data: RemoteDeclarerData): ICreepConfig => ({
   },
   // 向指定房间移动
   prepare: creep => {
-    if (data.wayPointFlagName && !creep.memory.fromShard) {
-      creep.setWayPoint(data.wayPointFlagName);
+    if (data.wayPoint && !creep.memory.fromShard) {
+      creep.setWayPoint(data.wayPoint);
       creep.memory.fromShard = Game.shard.name as ShardName;
     }
 
     // 只要进入房间则准备结束
     if (creep.room.name !== data.targetRoomName) {
-      if (data.wayPointFlagName && creep.memory.fromShard) {
+      if (data.wayPoint && creep.memory.fromShard) {
         creep.goTo(undefined, {
           checkTarget: true,
           range: 0
