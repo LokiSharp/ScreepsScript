@@ -1,5 +1,5 @@
 import { MAX_WALL_HITS, ROOM_TRANSFER_TASK, repairSetting } from "setting";
-import { creepApi } from "modules/creepController";
+import { creepApi } from "modules/creepController/creepApi";
 
 // Tower 原型拓展
 export default class TowerExtension extends StructureTower {

@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 import { baseLayout } from "setting";
-import { creepApi } from "modules/creepController";
+import { creepApi } from "modules/creepController/creepApi";
 import { findBaseCenterPos } from "modules/autoPlanning/planBasePos";
 
 // 全局拓展对象

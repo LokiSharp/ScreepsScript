@@ -1,6 +1,6 @@
 import { execShard, saveShardData } from "modules/crossShard";
 import { ErrorMapper } from "utils/ErrorMapper";
-import creepNumberListener from "modules/creepController";
+import creepNumberListener from "modules/creepController/creepNumberListener";
 import { doing } from "utils/doing";
 import mountWork from "mount";
 import { stateScanner } from "utils/stateScanner";

@@ -1,6 +1,6 @@
 import { DEFAULT_FLAG_NAME } from "setting";
 import RoomConsole from "./RoomConsole";
-import { creepApi } from "modules/creepController";
+import { creepApi } from "modules/creepController/creepApi";
 import { releaseCreep } from "modules/autoPlanning/planCreep";
 
 export default class CreepControl extends RoomConsole {

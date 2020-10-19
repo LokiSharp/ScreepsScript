@@ -1,5 +1,5 @@
 import { MAX_HARVESTER_NUM, MAX_UPGRADER_NUM, UPGRADE_WITH_STORAGE } from "setting";
-import { creepApi } from "modules/creepController";
+import { creepApi } from "modules/creepController/creepApi";
 
 // 在 Function 原型上挂载 setNextPlan 方法来完成 creep 发布的职责链
 declare global {

@@ -2,7 +2,7 @@ import { clearStructure, planLayout } from "modules/autoPlanning/planBaseLayout"
 import { confirmBasePos, findBaseCenterPos, setBaseCenter } from "modules/autoPlanning/planBasePos";
 import { ENERGY_SHARE_LIMIT } from "setting";
 import { createRoomLink } from "utils/createRoomLink";
-import { creepApi } from "modules/creepController";
+import { creepApi } from "modules/creepController/creepApi";
 import { log } from "utils/log";
 import { releaseCreep } from "modules/autoPlanning/planCreep";
 

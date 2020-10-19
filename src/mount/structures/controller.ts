@@ -1,4 +1,4 @@
-import { creepApi } from "modules/creepController";
+import { creepApi } from "modules/creepController/creepApi";
 
 /**
  * Controller 拓展
