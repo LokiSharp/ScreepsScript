@@ -21,7 +21,6 @@ export default (data: RemoteDeclarerData): ICreepConfig => ({
           checkTarget: true,
           range: 0
         });
-        creep.log(`位置 ${creep.memory.prePos}`);
       } else {
         creep.goTo(new RoomPosition(25, 25, data.targetRoomName));
       }

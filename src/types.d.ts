@@ -169,7 +169,8 @@ type BodyAutoConfigConstant =
   | "upgrader"
   | "reserver"
   | "remoteHarvester"
-  | "attacker";
+  | "attacker"
+  | "remoteHelper";
 
 /**
  * 所有 creep 角色的 data

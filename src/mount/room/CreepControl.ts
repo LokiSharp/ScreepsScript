@@ -99,6 +99,7 @@ export default class CreepControl extends RoomConsole {
       "remoteUpgrader",
       {
         targetRoomName: remoteRoomName,
+        spawnRoom: this.name,
         wayPoint: wayPointFlagName,
         sourceId: room.sources[0].id
       },
@@ -109,6 +110,7 @@ export default class CreepControl extends RoomConsole {
       "remoteBuilder",
       {
         targetRoomName: remoteRoomName,
+        spawnRoom: this.name,
         wayPoint: wayPointFlagName,
         sourceId: room.sources.length >= 2 ? room.sources[1].id : room.sources[0].id
       },

@@ -141,6 +141,21 @@ export const bodyConfigs: BodyConfigs = {
   ),
 
   /**
+   * 远程支援者
+   * 完成支援建设工作的单位
+   */
+  remoteHelper: getBodyConfig(
+    { [WORK]: 1, [CARRY]: 1, [MOVE]: 1 },
+    { [WORK]: 2, [CARRY]: 4, [MOVE]: 3 },
+    { [WORK]: 2, [CARRY]: 6, [MOVE]: 4 },
+    { [WORK]: 4, [CARRY]: 10, [MOVE]: 7 },
+    { [WORK]: 6, [CARRY]: 14, [MOVE]: 10 },
+    { [WORK]: 8, [CARRY]: 16, [MOVE]: 12 },
+    { [WORK]: 10, [CARRY]: 22, [MOVE]: 16 },
+    { [WORK]: 10, [CARRY]: 22, [MOVE]: 16 }
+  ),
+
+  /**
    * 基础攻击单位
    * 使用 attack 身体部件的攻击单位
    */
