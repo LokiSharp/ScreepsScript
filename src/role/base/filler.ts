@@ -49,5 +49,5 @@ export default (data: WorkerData): ICreepConfig => ({
     if (creep.store[RESOURCE_ENERGY] <= 0) return true;
     else return false;
   },
-  bodys: "manager"
+  bodys: "transporter"
 });

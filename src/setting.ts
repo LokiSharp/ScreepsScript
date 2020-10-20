@@ -86,21 +86,21 @@ export const bodyConfigs: BodyConfigs = {
    * 负责转移中央物流的 creep（下面其实前 4 级都用不到，因为中央物流管理员只会在 5 级有了 centerLink 之后才会孵化）
    */
   processor: getBodyConfig(
-    { [CARRY]: 2, [MOVE]: 1 },
-    { [CARRY]: 3, [MOVE]: 1 },
-    { [CARRY]: 5, [MOVE]: 1 },
-    { [CARRY]: 10, [MOVE]: 1 },
-    { [CARRY]: 20, [MOVE]: 1 },
-    { [CARRY]: 30, [MOVE]: 1 },
-    { [CARRY]: 40, [MOVE]: 1 },
-    { [CARRY]: 50, [MOVE]: 1 }
+    { [CARRY]: 4, [MOVE]: 2 },
+    { [CARRY]: 6, [MOVE]: 3 },
+    { [CARRY]: 10, [MOVE]: 5 },
+    { [CARRY]: 16, [MOVE]: 8 },
+    { [CARRY]: 20, [MOVE]: 10 },
+    { [CARRY]: 20, [MOVE]: 10 },
+    { [CARRY]: 20, [MOVE]: 10 },
+    { [CARRY]: 20, [MOVE]: 10 }
   ),
 
   /**
    * 房间物流管理单位
    * 负责转移基地资源的 creep
    */
-  manager: getBodyConfig(
+  transporter: getBodyConfig(
     { [CARRY]: 3, [MOVE]: 3 },
     { [CARRY]: 5, [MOVE]: 5 },
     { [CARRY]: 8, [MOVE]: 8 },

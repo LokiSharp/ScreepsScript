@@ -136,5 +136,5 @@ export default (data: ReiverData): ICreepConfig => ({
     } else creep.goTo(targetStructure.pos);
     return false;
   },
-  bodys: "manager"
+  bodys: "transporter"
 });

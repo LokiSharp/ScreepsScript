@@ -3,9 +3,9 @@ import { TRANSFER_DEATH_LIMIT } from "setting";
 import { deathPrepare } from "../../utils/deathPrepare";
 
 /**
- * 填充单位
- * 从 container 中获取能量 > 执行房间物流任务
- * 在空闲时间会尝试把能量运输至 storage
+ * 房间物流运输者
+ * 执行 ROOM_TRANSFER_TASK 中定义的任务
+ * 任务处理逻辑定义在 transferTaskOperations 中
  */
 export default (data: WorkerData): ICreepConfig => ({
   source: creep => {
@@ -27,5 +27,5 @@ export default (data: WorkerData): ICreepConfig => ({
     if (task) return transferTaskOperations[task.type].target(creep, task);
     else return true;
   },
-  bodys: "manager"
+  bodys: "transporter"
 });
