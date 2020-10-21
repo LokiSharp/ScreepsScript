@@ -323,7 +323,6 @@ interface CreepMemory {
 
   /**
    * 该 Creep 是否在进行工作（站着不动）
-   * 该字段用于减少 creep 向 Room.restrictedPos 里添加自己位置的次数
    */
   stand?: boolean;
 
@@ -363,6 +362,16 @@ interface CreepMemory {
  * PowerCreep 内存拓展
  */
 interface PowerCreepMemory {
+  /**
+   * 移动缓存
+   */
+  _go?: MoveInfo;
+
+  // 等同于 Creep.memory.fromShard
+  fromShard?: ShardName;
+
+  // pc 暂时没有角色
+  role: undefined;
   // 为 true 时执行 target，否则执行 source
   working: boolean;
   // 接下来要检查哪个 power
@@ -456,11 +465,6 @@ interface Room {
   getCenterTask(): ITransferTask | null;
   deleteCurrentCenterTask(): void;
 
-  // 禁止通行点位 api
-  addRestrictedPos(creepName: string, pos: RoomPosition): void;
-  getRestrictedPos(): { [creepName: string]: string };
-  removeRestrictedPos(creepName: string): void;
-
   // pos 处理 api
   serializePos(pos: RoomPosition): string;
   unserializePos(posStr: string): RoomPosition | undefined;
@@ -541,11 +545,6 @@ interface RoomMemory {
   // 升级 link 的 id
   upgradeLinkId?: string;
 
-  // 该房间禁止通行点的存储
-  // 键为注册禁止通行点位的 creep 名称，值为禁止通行点位 RoomPosition 对象的序列字符串
-  restrictedPos?: {
-    [creepName: string]: string;
-  };
   // 基地中心点坐标, [0] 为 x 坐标, [1] 为 y 坐标
   center: [number, number];
   // 基地中心的待选位置, [0] 为 x 坐标, [1] 为 y 坐标
@@ -920,6 +919,11 @@ interface MoveInfo {
   prePos?: string;
 
   /**
+   * 上一次移动的方向，用于在下个 tick 发现移动失败时检查前面时什么东西
+   */
+  lastMove?: DirectionConstant;
+
+  /**
    * 要移动到的目标位置，creep 会用这个字段判断目标是否变化了
    */
   targetPos?: string;
@@ -1007,3 +1011,23 @@ interface CrossShardRequestInfo {
   // 请求的名称
   name: string;
 }
+
+/**
+ * 是否允许对穿
+ *
+ * @param creep 被对穿的 creep
+ * @param requireCreep 发起对穿的 creep
+ * @return 为 true 时允许对穿
+ */
+type AllowCrossRuleFunc = (creep: Creep | PowerCreep, requireCreep: Creep | PowerCreep) => boolean;
+
+/**
+ * 对穿请求的规则集合
+ *
+ * 键为 creep 的角色类型，值为一个返回 boolean 的方法
+ * 该方法用于判断有其他 creep 向该 creep 发起对穿时是否同意对穿，在寻路时也会使用该方法确定是否要绕过一个 creep
+ * 该方法为空则使用默认规则（键为 default）
+ */
+type CrossRules = {
+  [role in CreepRoleConstant | "default"]?: AllowCrossRuleFunc;
+};

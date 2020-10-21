@@ -40,12 +40,6 @@ export class CreepExtension extends Creep {
       return;
     }
 
-    // 快死时的处理
-    if (this.ticksToLive <= 3) {
-      // 如果还在工作，就释放掉自己的工作位置
-      if (this.memory.stand) this.room.removeRestrictedPos(this.name);
-    }
-
     // 获取对应配置项
     const creepConfig: ICreepConfig = roles[this.memory.role](this.memory.data);
 
@@ -76,7 +70,6 @@ export class CreepExtension extends Creep {
     if (stateChange) {
       this.memory.working = !this.memory.working;
       if (this.memory.stand) {
-        this.room.removeRestrictedPos(this.name);
         delete this.memory.stand;
       }
     }
@@ -120,7 +113,6 @@ export class CreepExtension extends Creep {
       if (result === OK) {
         // 开始采集能量了就拒绝对穿
         if (!this.memory.stand) {
-          this.room.addRestrictedPos(this.name, this.pos);
           this.memory.stand = true;
         }
       }
@@ -152,7 +144,6 @@ export class CreepExtension extends Creep {
     // 如果刚开始站定工作，就把自己的位置设置为禁止通行点
     if (result === OK && !this.memory.stand) {
       this.memory.stand = true;
-      this.room.addRestrictedPos(this.name, this.pos);
     } else if (result === ERR_NOT_IN_RANGE) {
       this.goTo(this.room.controller.pos);
     }
@@ -309,7 +300,6 @@ export class CreepExtension extends Creep {
     if (result === OK) {
       if (!this.memory.stand) {
         this.memory.stand = true;
-        this.room.addRestrictedPos(this.name, this.pos);
       }
 
       // 离墙三格远可能正好把路堵上，所以要走进一点

@@ -29,7 +29,6 @@ export default (data: WorkerData): ICreepConfig => ({
       if (actionResult === OK) {
         if (!creep.memory.stand) {
           creep.memory.stand = true;
-          creep.room.addRestrictedPos(creep.name, creep.pos);
         }
 
         // 离墙三格远可能正好把路堵上，所以要走进一点

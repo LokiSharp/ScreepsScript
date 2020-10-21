@@ -129,14 +129,12 @@ export default (data: RemoteHarvesterData): ICreepConfig => ({
       // 正在建造就禁止对穿
       if (buildResult === OK) {
         if (!creep.memory.stand) {
-          creep.room.addRestrictedPos(creep.name, creep.pos);
           creep.memory.stand = true;
         }
       }
       if (buildResult === ERR_NOT_FOUND) creep.memory.dontBuild = true;
       // 能量不足了就去 source 阶段，同时释放掉禁止通行点位
       else if (buildResult === ERR_NOT_ENOUGH_ENERGY) {
-        creep.room.removeRestrictedPos(creep.name);
         delete creep.memory.stand;
         return true;
       }

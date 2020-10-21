@@ -116,87 +116,112 @@ const updateWayPoint = function (creep: Creep) {
 };
 
 /**
+ * 对穿规则合集
+ */
+const crossRules: CrossRules = {
+  // 【默认规则】自己在工作时有同角色 creep 发起对穿则拒绝对穿
+  default: (creep, requireCreep) => {
+    return !(creep.memory.stand && requireCreep.memory.role === creep.memory.role);
+  },
+  // 填充单位无论什么时候都会允许对穿，因为其不会长时间停在一个位置上工作
+  filler: () => true,
+  manager: () => true,
+  // 中央处理单位在携带有资源时不允许对穿
+  processor: creep => !creep.memory.working,
+  // 采集单位在工作时不允许任何 creep 对穿
+  harvester: creep => !creep.memory.stand,
+  collector: creep => !creep.memory.stand,
+  // upgrader 和 remoteHelper 功能重叠，所以这里不会在工作时允许对方对穿，下同
+  upgrader: (creep, requireCreep) => {
+    return !(
+      creep.memory.stand &&
+      (requireCreep.memory.role === creep.memory.role || requireCreep.memory.role === "remoteUpgrader")
+    );
+  },
+  remoteUpgrader: (creep, requireCreep) => {
+    return !(
+      creep.memory.stand &&
+      (requireCreep.memory.role === creep.memory.role || requireCreep.memory.role === "upgrader")
+    );
+  },
+  builder: (creep, requireCreep) => {
+    return !(
+      creep.memory.stand &&
+      (requireCreep.memory.role === creep.memory.role || requireCreep.memory.role === "remoteBuilder")
+    );
+  },
+  remoteBuilder: (creep, requireCreep) => {
+    return !(
+      creep.memory.stand &&
+      (requireCreep.memory.role === creep.memory.role || requireCreep.memory.role === "builder")
+    );
+  }
+};
+
+/**
  * 请求对穿
  * 自己内存中 stand 为 true 时将拒绝对穿
  *
+ * @param creep 被请求对穿的 creep
  * @param direction 请求该 creep 进行对穿
+ * @param requireCreep 发起请求的 creep
  */
-const requireCross = function (creep: Creep | PowerCreep, direction: DirectionConstant): boolean {
+const requireCross = function (
+  creep: Creep | PowerCreep,
+  direction: DirectionConstant,
+  requireCreep: Creep | PowerCreep
+): ScreepsReturnCode {
   // creep 下没有 memory 说明 creep 已经凉了，直接移动即可
-  if (!creep.memory) return true;
-  // 拒绝对穿
-  if (creep.memory.stand) {
+  if (!creep.memory) return OK;
+
+  // 获取对穿规则并进行判断
+  const allowCross = crossRules[creep.memory.role] || crossRules.default;
+  if (!allowCross(creep, requireCreep)) {
     creep.say("👊");
-    return false;
+    return ERR_BUSY;
   }
 
   // 同意对穿
   creep.say("👌");
-  creep.move(direction);
-  return true;
+  const moveResult = creep.move(direction);
+  // eslint-disable-next-line no-underscore-dangle
+  if (moveResult === OK && creep.memory._go?.path?.length > 0) {
+    // 如果移动的方向就是
+    // eslint-disable-next-line no-underscore-dangle
+    if ((Number(creep.memory._go.path[0]) as DirectionConstant) !== direction) {
+      // eslint-disable-next-line no-underscore-dangle
+      delete creep.memory._go.path;
+      // eslint-disable-next-line no-underscore-dangle
+      delete creep.memory._go.prePos;
+    }
+  }
+  return moveResult;
 };
 
 /**
  * 向指定方向发起对穿
  *
+ * @param creep 发起对穿的 creep
  * @param direction 要进行对穿的方向
+ * @param fontCreep 要被对穿的 creep
+ *
  * @returns OK 成功对穿
  * @returns ERR_BUSY 对方拒绝对穿
  * @returns ERR_INVALID_TARGET 前方没有 creep
  */
-const mutualCross = function (creep: Creep, direction: DirectionConstant): OK | ERR_BUSY | ERR_INVALID_TARGET {
-  // 获取前方位置上的 creep（fontCreep）
-  const fontPos = creep.pos.directionToPos(direction);
-  if (!fontPos) return ERR_INVALID_TARGET;
-
-  const fontCreep = fontPos.lookFor(LOOK_CREEPS)[0] || fontPos.lookFor(LOOK_POWER_CREEPS)[0];
-  // 前方不是 creep 或者不是自己的 creep 或者内存被清空（正在跨越 shard）的话就不会发起对穿
-  if (!fontCreep || !fontCreep.my || Object.keys(fontCreep.memory).length <= 0) return ERR_INVALID_TARGET;
-
+const mutualCross = function (
+  creep: Creep,
+  direction: DirectionConstant,
+  fontCreep: Creep | PowerCreep
+): OK | ERR_BUSY | ERR_INVALID_TARGET {
   creep.say(`👉`);
   // 如果前面的 creep 同意对穿了，自己就朝前移动
-  if (requireCross(fontCreep, getOppositeDirection(direction))) {
-    creep.cancelOrder("move");
-    creep.move(direction);
-  } else return ERR_BUSY;
+  const reverseDirection = getOppositeDirection(direction);
+  const fontMoveResult = requireCross(fontCreep, reverseDirection, creep);
+  if (fontMoveResult !== OK) return ERR_BUSY;
 
-  return OK;
-};
-
-/**
- * 向指定方向移动
- *
- * @param target 要移动到的方向
- * @returns ERR_INVALID_TARGET 发生撞停
- */
-const move = function (
-  creep: Creep,
-  target: DirectionConstant,
-  moveOpt: MoveOpt
-): CreepMoveReturnCode | ERR_INVALID_TARGET | ERR_NOT_IN_RANGE | ERR_INVALID_ARGS {
-  // 进行移动，并分析其移动结果，OK 时才有可能发生撞停
-  const moveResult = creep.move(target);
-
-  if (moveResult !== OK) return moveResult;
-
-  const currentPos = `${creep.pos.x}/${creep.pos.y}`;
-  // 如果和之前位置重复了就分析撞上了啥
-  if (creep.memory.prePos && currentPos === creep.memory.prePos) {
-    // 尝试对穿，如果自己禁用了对穿的话则直接重新寻路
-    const crossResult = moveOpt.disableCross ? ERR_BUSY : mutualCross(creep, target);
-
-    // 没找到说明撞墙上了或者前面的 creep 拒绝对穿，重新寻路
-    if (crossResult !== OK) {
-      // eslint-disable-next-line no-underscore-dangle
-      delete creep.memory._go.path;
-      return crossResult;
-    }
-  }
-
-  // 没有之前的位置或者没重复就正常返回 OK 和更新之前位置
-  creep.memory.prePos = currentPos;
-
-  return OK;
+  const selfMoveResult = creep.move(direction);
+  return selfMoveResult === OK && fontMoveResult === OK ? OK : ERR_BUSY;
 };
 
 /**
@@ -206,7 +231,7 @@ const move = function (
  * @param range 搜索范围 默认为 1
  * @returns PathFinder.search 的返回值
  */
-const findPath = function (creep: Creep, target: RoomPosition, moveOpt: MoveOpt): string | undefined {
+const findPath = function (creep: Creep, target: RoomPosition, moveOpt: MoveOpt = {}): string | undefined {
   // 先查询下缓存里有没有值
   const routeKey = `${creep.room.serializePos(creep.pos)} ${creep.room.serializePos(target)}`;
   let route = routeCache[routeKey];
@@ -220,8 +245,6 @@ const findPath = function (creep: Creep, target: RoomPosition, moveOpt: MoveOpt)
     creep.pos,
     { pos: target, range },
     {
-      plainCost: 2,
-      swampCost: 10,
       maxOps: moveOpt.maxOps || 4000,
       roomCallback: roomName => {
         // 强调了不许走就不走
@@ -232,41 +255,57 @@ const findPath = function (creep: Creep, target: RoomPosition, moveOpt: MoveOpt)
         if (!room) return undefined;
 
         // 尝试从缓存中读取，没有缓存就进行查找
-        let costs = room.name in costCache ? costCache[room.name].clone() : undefined;
+        let costs = roomName in costCache ? costCache[roomName].clone() : undefined;
         if (!costs) {
           costs = new PathFinder.CostMatrix();
+          const terrain = new Room.Terrain(roomName);
 
-          room.find(FIND_STRUCTURES).forEach(struct => {
+          // 设置基础地形 cost
+          for (let x = 0; x < 50; x++)
+            for (let y = 0; y < 50; y++) {
+              const tile = terrain.get(x, y);
+              const weight = tile === TERRAIN_MASK_WALL ? 255 : tile === TERRAIN_MASK_SWAMP ? 10 : 2;
+
+              costs.set(x, y, weight);
+            }
+
+          const addCost = (item: Structure | ConstructionSite) => {
             // 更倾向走道路
-            if (struct.structureType === STRUCTURE_ROAD) {
-              costs.set(struct.pos.x, struct.pos.y, 1);
+            if (item.structureType === STRUCTURE_ROAD) {
+              // 造好的路可以走
+              if (item instanceof Structure) costs.set(item.pos.x, item.pos.y, 1);
+              // 路的工地保持原有 cost
+              else return;
             }
             // 不能穿过无法行走的建筑
             else if (
-              struct.structureType !== STRUCTURE_CONTAINER &&
-              (struct.structureType !== STRUCTURE_RAMPART || !struct.my)
+              item.structureType !== STRUCTURE_CONTAINER &&
+              (item.structureType !== STRUCTURE_RAMPART || !item.my)
             )
-              costs.set(struct.pos.x, struct.pos.y, 255);
-          });
+              costs.set(item.pos.x, item.pos.y, 255);
+          };
 
-          costCache[room.name] = costs;
-        }
+          // 给建筑和工地添加 cost
+          room.find(FIND_STRUCTURES).forEach(addCost);
+          room.find(FIND_CONSTRUCTION_SITES).forEach(addCost);
 
-        // 避开房间中的禁止通行点
-        const restrictedPos = room.getRestrictedPos();
-        for (const creepName in restrictedPos) {
-          // 自己注册的禁止通行点位自己可以走
-          if (creepName === creep.name) continue;
-          const pos = room.unserializePos(restrictedPos[creepName]);
-          costs.set(pos.x, pos.y, 255);
+          costCache[room.name] = costs.clone();
         }
 
         // 躲避房间中的 creep
-        // eslint-disable-next-line no-shadow
-        const addCreepCost = (creep: Creep | PowerCreep) => {
-          // 如果没有禁用对穿并且 creep 属于自己则不会躲避
-          if (!moveOpt.disableCross && creep.my && !creep.memory.disableCross) return;
-          costs.set(creep.pos.x, creep.pos.y, 255);
+        const addCreepCost = (otherCreep: Creep | PowerCreep) => {
+          // 以下情况会躲避
+          if (
+            // 如果禁用对穿了
+            moveOpt.disableCross ||
+            otherCreep.memory.disableCross ||
+            // 或者对方不属于自己
+            !otherCreep.my ||
+            // 或者对穿规则不允许
+            !(crossRules[otherCreep.memory.role] || crossRules.default)(otherCreep, creep)
+          ) {
+            costs.set(otherCreep.pos.x, otherCreep.pos.y, 255);
+          }
         };
 
         room.find(FIND_CREEPS).forEach(addCreepCost);
@@ -345,28 +384,75 @@ export const goTo = function (
 ): ScreepsReturnCode {
   // eslint-disable-next-line no-underscore-dangle
   if (!creep.memory._go) creep.memory._go = {};
+  // eslint-disable-next-line no-underscore-dangle
+  const moveMemory = creep.memory._go;
   // 如果没有指定目标的话则默认为路径模式
   const target: RoomPosition = targetPos || getTarget(creep);
   if (!target) return ERR_INVALID_ARGS;
+
+  const currentPos = `${creep.pos.x}/${creep.pos.y}`;
 
   // 确认目标有没有变化, 变化了则重新规划路线
   if (moveOpt.checkTarget) {
     const targetPosTag = creep.room.serializePos(target);
 
     // eslint-disable-next-line no-underscore-dangle
-    if (targetPosTag !== creep.memory._go?.targetPos) {
-      // eslint-disable-next-line no-underscore-dangle
-      creep.memory._go.targetPos = targetPosTag;
-      // eslint-disable-next-line no-underscore-dangle
-      delete creep.memory._go.path;
+    if (targetPosTag !== moveMemory.targetPos) {
+      moveMemory.targetPos = targetPosTag;
+      delete moveMemory.path;
+      delete moveMemory.prePos;
     }
   }
 
   // 确认缓存有没有被清除
-  // eslint-disable-next-line no-underscore-dangle
-  if (!creep.memory._go.path) {
-    // eslint-disable-next-line no-underscore-dangle
-    creep.memory._go.path = findPath(creep, target, moveOpt);
+  if (!moveMemory.path) {
+    moveMemory.path = findPath(creep, target, moveOpt);
+  }
+  // 之前有缓存说明已经在移动了，检查上一 tick 移动是否成功
+  // （因为上一步的移动结果在这一 tick 开始时才会更新，所以要先检查之前移动是否成功，然后再决定是否要继续移动）
+  else {
+    // 如果和之前位置重复了就分析撞上了啥
+    if (moveMemory.prePos && currentPos === moveMemory.prePos) {
+      if (!moveMemory.lastMove) {
+        delete moveMemory.path;
+        delete moveMemory.prePos;
+        return ERR_INVALID_TARGET;
+      }
+
+      // 获取前方位置上的 creep（fontCreep）
+      const fontPos = creep.pos.directionToPos(moveMemory.lastMove);
+
+      if (!fontPos) {
+        delete moveMemory.path;
+        delete moveMemory.prePos;
+        return ERR_INVALID_TARGET;
+      }
+
+      const fontCreep = fontPos.lookFor(LOOK_CREEPS)[0] || fontPos.lookFor(LOOK_POWER_CREEPS)[0];
+
+      // 前方不是 creep 或者不是自己的 creep 或者内存被清空（正在跨越 shard）的话就不会发起对穿
+      if (!fontCreep || !fontCreep.my || Object.keys(fontCreep.memory).length <= 0) {
+        delete moveMemory.path;
+        delete moveMemory.prePos;
+        return ERR_INVALID_TARGET;
+      }
+      // 尝试对穿，如果自己禁用了对穿的话则直接重新寻路
+      const crossResult = moveOpt.disableCross ? ERR_BUSY : mutualCross(creep, moveMemory.lastMove, fontCreep);
+
+      // 对穿失败说明撞墙上了或者前面的 creep 拒绝对穿，重新寻路
+      if (crossResult !== OK) {
+        // eslint-disable-next-line no-underscore-dangle
+        delete creep.memory._go.path;
+        // eslint-disable-next-line no-underscore-dangle
+        delete creep.memory._go.prePos;
+        // ERR_BUSY 代表了前面 creep 拒绝对穿，所以不用更新房间 Cost 缓存
+        if (crossResult !== ERR_BUSY) delete costCache[creep.room.name];
+      }
+
+      // 对穿失败，需要重新寻路，不需要往下继续执行
+      // 对穿成功，相当于重新执行了上一步，也不需要继续往下执行
+      return crossResult;
+    }
   }
 
   // 还为空的话就是没找到路径或者已经到了
@@ -380,7 +466,7 @@ export const goTo = function (
   // 使用缓存进行移动
   // eslint-disable-next-line no-underscore-dangle
   const direction = Number(creep.memory._go.path[0]) as DirectionConstant;
-  const goResult = move(creep, direction, moveOpt);
+  const goResult = creep.move(direction);
 
   /**
    * 如果是跨 shard 单位的话就要检查下目标是不是传送门
@@ -424,16 +510,40 @@ export const goTo = function (
   }
 
   // 移动成功，更新路径
-  // eslint-disable-next-line no-underscore-dangle
-  if (goResult === OK) creep.memory._go.path = creep.memory._go.path.substr(1);
+  if (goResult === OK) {
+    moveMemory.prePos = currentPos;
+    moveMemory.lastMove = Number(moveMemory.path.substr(0, 1)) as DirectionConstant;
+    // eslint-disable-next-line no-underscore-dangle
+    creep.memory._go.path = creep.memory._go.path.substr(1);
+  }
   // 如果发生撞停或者参数异常的话说明缓存可能存在问题，移除缓存
-  else if (goResult === ERR_INVALID_TARGET || goResult === ERR_INVALID_ARGS || goResult === ERR_BUSY) {
+  else if (goResult === ERR_BUSY) {
     // eslint-disable-next-line no-underscore-dangle
     delete creep.memory._go.path;
+    // eslint-disable-next-line no-underscore-dangle
+    delete creep.memory._go.prePos;
     delete costCache[creep.room.name];
   }
   // 其他异常直接报告
   else if (goResult !== ERR_TIRED) creep.say(`寻路 ${goResult}`);
 
   return goResult;
+};
+
+export const visualAllCreepPath = function (): void {
+  Object.values(Game.creeps).forEach(creep => {
+    // eslint-disable-next-line no-underscore-dangle
+    if (!creep.memory._go || !creep.memory._go.path) return;
+
+    // eslint-disable-next-line no-underscore-dangle
+    const directions: (string | RoomPosition)[] = creep.memory._go.path.split("");
+    directions.unshift(creep.pos);
+    directions.reduce((pre: RoomPosition, next: string) => {
+      const nextPos = pre.directionToPos((next as unknown) as DirectionConstant);
+      console.log("visualAllCreepPath -> nextPos", nextPos);
+      new RoomVisual(pre.roomName).line(pre, nextPos, { color: "#a9b7c6", lineStyle: "dashed" });
+
+      return nextPos;
+    });
+  });
 };
