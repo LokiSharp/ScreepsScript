@@ -59,21 +59,16 @@ const serializeFarPath = function (creep: Creep, positions: RoomPosition[]): str
  * @param target 路径点目标
  */
 export const setWayPoint = function (creep: Creep, target: string[] | string): CreepMoveReturnCode {
-  // eslint-disable-next-line no-underscore-dangle
-  if (!creep.memory._go) creep.memory._go = {};
+  if (!creep.memory.moveInfo) creep.memory.moveInfo = {};
   delete wayPointCache[creep.name];
 
   // 设置时会移除另一个路径模式的数据，防止这个移动完之后再回头走之前留下的路径点
   if (target instanceof Array) {
-    // eslint-disable-next-line no-underscore-dangle
-    creep.memory._go.wayPoints = target;
-    // eslint-disable-next-line no-underscore-dangle
-    delete creep.memory._go.wayPointFlag;
+    creep.memory.moveInfo.wayPoints = target;
+    delete creep.memory.moveInfo.wayPointFlag;
   } else {
-    // eslint-disable-next-line no-underscore-dangle
-    creep.memory._go.wayPointFlag = target + "0";
-    // eslint-disable-next-line no-underscore-dangle
-    delete creep.memory._go.wayPoints;
+    creep.memory.moveInfo.wayPointFlag = target + "0";
+    delete creep.memory.moveInfo.wayPoints;
   }
 
   return OK;
@@ -85,10 +80,8 @@ export const setWayPoint = function (creep: Creep, target: string[] | string): C
  * 当抵达当前路径点后就需要更新内存数据以移动到下一个路径点
  */
 const updateWayPoint = function (creep: Creep) {
-  // eslint-disable-next-line no-underscore-dangle
-  if (!creep.memory._go) creep.memory._go = {};
-  // eslint-disable-next-line no-underscore-dangle
-  const memory = creep.memory._go;
+  if (!creep.memory.moveInfo) creep.memory.moveInfo = {};
+  const memory = creep.memory.moveInfo;
 
   if (memory.wayPoints) {
     // 弹出已经抵达的路径点
@@ -139,15 +132,11 @@ const requireCross = function (creep: Creep, direction: DirectionConstant, requi
     creep.say("👌");
     creep.log(`同意对穿！${requireCreep.name} ${direction}`);
     const moveResult = creep.move(direction);
-    // eslint-disable-next-line no-underscore-dangle
-    if (moveResult === OK && creep.memory._go?.path?.length > 0) {
+    if (moveResult === OK && creep.memory.moveInfo?.path?.length > 0) {
       // 如果移动的方向就是
-      // eslint-disable-next-line no-underscore-dangle
-      if ((Number(creep.memory._go.path[0]) as DirectionConstant) !== direction) {
-        // eslint-disable-next-line no-underscore-dangle
-        delete creep.memory._go.path;
-        // eslint-disable-next-line no-underscore-dangle
-        delete creep.memory._go.prePos;
+      if ((Number(creep.memory.moveInfo.path[0]) as DirectionConstant) !== direction) {
+        delete creep.memory.moveInfo.path;
+        delete creep.memory.moveInfo.prePos;
       }
     }
     return moveResult;
@@ -301,8 +290,7 @@ const getTarget = function (creep: Creep): RoomPosition {
   let target = wayPointCache[creep.name];
   if (target) return target;
 
-  // eslint-disable-next-line no-underscore-dangle
-  const memroy = creep.memory._go;
+  const memroy = creep.memory.moveInfo;
   if (!memroy) return undefined;
 
   // 优先用路径旗帜
@@ -321,8 +309,7 @@ const getTarget = function (creep: Creep): RoomPosition {
   wayPointCache[creep.name] = target;
 
   // 如果还没有找到目标的话说明路径点失效了，移除整个缓存
-  // eslint-disable-next-line no-underscore-dangle
-  if (!target) delete creep.memory._go;
+  if (!target) delete creep.memory.moveInfo;
 
   return target;
 };
@@ -339,10 +326,8 @@ export const goTo = function (
   targetPos: RoomPosition | undefined,
   moveOpt: MoveOpt = {}
 ): ScreepsReturnCode {
-  // eslint-disable-next-line no-underscore-dangle
-  if (!creep.memory._go) creep.memory._go = {};
-  // eslint-disable-next-line no-underscore-dangle
-  const moveMemory = creep.memory._go;
+  if (!creep.memory.moveInfo) creep.memory.moveInfo = {};
+  const moveMemory = creep.memory.moveInfo;
   // 如果没有指定目标的话则默认为路径模式
   const target: RoomPosition = targetPos || getTarget(creep);
   if (!target) return ERR_INVALID_ARGS;
@@ -353,7 +338,6 @@ export const goTo = function (
   if (moveOpt.checkTarget) {
     const targetPosTag = creep.room.serializePos(target);
 
-    // eslint-disable-next-line no-underscore-dangle
     if (targetPosTag !== moveMemory.targetPos) {
       moveMemory.targetPos = targetPosTag;
       delete moveMemory.path;
@@ -398,10 +382,8 @@ export const goTo = function (
 
       // 对穿失败说明撞墙上了或者前面的 creep 拒绝对穿，重新寻路
       if (crossResult !== OK) {
-        // eslint-disable-next-line no-underscore-dangle
-        delete creep.memory._go.path;
-        // eslint-disable-next-line no-underscore-dangle
-        delete creep.memory._go.prePos;
+        delete creep.memory.moveInfo.path;
+        delete creep.memory.moveInfo.prePos;
         // ERR_BUSY 代表了前面 creep 拒绝对穿，所以不用更新房间 Cost 缓存
         if (crossResult !== ERR_BUSY) delete costCache[creep.room.name];
       }
@@ -413,16 +395,14 @@ export const goTo = function (
   }
 
   // 还为空的话就是没找到路径或者已经到了
-  // eslint-disable-next-line no-underscore-dangle
-  if (!creep.memory._go.path) {
+  if (!creep.memory.moveInfo.path) {
     // 到达目的地后如果是路径模式的话就需要更新路径点
     if (!targetPos) updateWayPoint(creep);
     return OK;
   }
 
   // 使用缓存进行移动
-  // eslint-disable-next-line no-underscore-dangle
-  const direction = Number(creep.memory._go.path[0]) as DirectionConstant;
+  const direction = Number(creep.memory.moveInfo.path[0]) as DirectionConstant;
   const goResult = creep.move(direction);
 
   /**
@@ -437,8 +417,7 @@ export const goTo = function (
    *
    * 所以要在路径还有一格时判断前方是不是传送门
    */
-  // eslint-disable-next-line no-underscore-dangle
-  if (creep.memory.fromShard && creep.memory._go.path && creep.memory._go.path.length === 1) {
+  if (creep.memory.fromShard && creep.memory.moveInfo.path && creep.memory.moveInfo.path.length === 1) {
     const nextPos = creep.pos.directionToPos(direction);
     const portal = nextPos.lookFor(LOOK_STRUCTURES).find(s => s.structureType === STRUCTURE_PORTAL) as StructurePortal;
 
@@ -447,8 +426,7 @@ export const goTo = function (
       updateWayPoint(creep);
       const { name, memory } = creep;
       // 移除移动路径，到下个 shard 可以重新规划路径
-      // eslint-disable-next-line no-underscore-dangle
-      delete memory._go.path;
+      delete memory.moveInfo.path;
       console.log(`向 ${portal.destination.shard} 发送 sendCreep 任务`, JSON.stringify({ name, memory }));
       // 发送跨 shard 请求来转移自己的 memory
       addCrossShardRequest(`sendCreep${creep.name}${Game.time}`, portal.destination.shard as ShardName, "sendCreep", {
@@ -470,15 +448,12 @@ export const goTo = function (
   if (goResult === OK) {
     moveMemory.prePos = currentPos;
     moveMemory.lastMove = Number(moveMemory.path.substr(0, 1)) as DirectionConstant;
-    // eslint-disable-next-line no-underscore-dangle
-    creep.memory._go.path = creep.memory._go.path.substr(1);
+    creep.memory.moveInfo.path = creep.memory.moveInfo.path.substr(1);
   }
   // 如果发生撞停或者参数异常的话说明缓存可能存在问题，移除缓存
   else if (goResult === ERR_BUSY) {
-    // eslint-disable-next-line no-underscore-dangle
-    delete creep.memory._go.path;
-    // eslint-disable-next-line no-underscore-dangle
-    delete creep.memory._go.prePos;
+    delete creep.memory.moveInfo.path;
+    delete creep.memory.moveInfo.prePos;
     delete costCache[creep.room.name];
   }
   // 其他异常直接报告
@@ -489,11 +464,9 @@ export const goTo = function (
 
 export const visualAllCreepPath = function (): void {
   Object.values(Game.creeps).forEach(creep => {
-    // eslint-disable-next-line no-underscore-dangle
-    if (!creep.memory._go || !creep.memory._go.path) return;
+    if (!creep.memory.moveInfo || !creep.memory.moveInfo.path) return;
 
-    // eslint-disable-next-line no-underscore-dangle
-    const directions: (string | RoomPosition)[] = creep.memory._go.path.split("");
+    const directions: (string | RoomPosition)[] = creep.memory.moveInfo.path.split("");
     directions.unshift(creep.pos);
     directions.reduce((pre: RoomPosition, next: string) => {
       const nextPos = pre.directionToPos((next as unknown) as DirectionConstant);

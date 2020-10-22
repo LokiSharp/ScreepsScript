@@ -68,8 +68,7 @@ export default class ControllerExtension extends StructureController {
    */
   public checkEnemyThreat(): boolean {
     // 这里并没有搜索 PC，因为 PC 不是敌人主力
-    // eslint-disable-next-line no-underscore-dangle
-    const enemy = this.room._enemys;
+    const enemy = this.room.enemys;
     if (enemy.length <= 0) return false;
 
     // 如果来的都是入侵者的话，就算撑破天了也不管

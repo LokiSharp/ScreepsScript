@@ -41,7 +41,7 @@ export const clearStructure = function (room: Room): OK | ERR_NOT_FOUND {
 /**
  * 设计基地布局的开发者工具
  */
-export const layout = {
+export const getLayout = {
   /**
    * 获取基地的布局信息
    * 每个建筑到基准点的相对位置和建筑类型
@@ -61,7 +61,6 @@ export const layout = {
 
     const allStructure = flag.room.find(FIND_STRUCTURES);
 
-    // eslint-disable-next-line no-shadow
     const layout: {
       // 该类型建筑应该被放置在什么地方
       [structureType in StructureConstant]?: [number, number][] | null;

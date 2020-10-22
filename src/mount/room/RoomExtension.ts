@@ -33,7 +33,6 @@ export default class RoomExtension extends Room {
     // 把 container 添加到房间基础服务
     if (!this.memory.sourceContainersIds) this.memory.sourceContainersIds = [];
     // 去重，防止推入了多个相同的 container
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     this.memory.sourceContainersIds = _.uniq([...this.memory.sourceContainersIds, container.id]);
 
     // 触发对应的 creep 发布规划
@@ -93,8 +92,7 @@ export default class RoomExtension extends Room {
    * 给本房间发布或重新规划指定的 creep 角色
    * @param role 要发布的 creep 角色
    */
-  // eslint-disable-next-line @typescript-eslint/explicit-member-accessibility
-  releaseCreep(role: BaseRoleConstant): ScreepsReturnCode {
+  public releaseCreep(role: BaseRoleConstant): ScreepsReturnCode {
     return releaseCreep(this, role);
   }
 
@@ -159,9 +157,8 @@ export default class RoomExtension extends Room {
   public hasRoomTransferTask(taskType: string): boolean {
     if (!this.memory.transferTasks) this.memory.transferTasks = [];
 
-    // eslint-disable-next-line no-shadow
-    const task = this.memory.transferTasks.find(task => task.type === taskType);
-    return task ? true : false;
+    const transferTask = this.memory.transferTasks.find(task => task.type === taskType);
+    return transferTask ? true : false;
   }
 
   /**

@@ -13,9 +13,9 @@ declare namespace NodeJS {
 interface Game {
   // 本 tick 是否已经执行了 creep 数量控制器了
   // 每 tick 只会调用一次
-  _hasRunCreepNumberController: boolean;
+  hasRunCreepNumberController: boolean;
   // 本 tick 是否需要执行保存 InterShardMemory
-  _needSaveInterShardData: boolean;
+  needSaveInterShardData: boolean;
 }
 
 // 当 creep 不需要生成时 mySpawnCreep 返回的值
@@ -297,14 +297,10 @@ interface Creep {
  * creep 内存拓展
  */
 interface CreepMemory {
-  // 内置移动缓存
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  _move?: Object;
-
   /**
    * 移动缓存
    */
-  _go?: MoveInfo;
+  moveInfo?: MoveInfo;
 
   // 上一个位置信息，形如"14/4"，用于在 creep.move 返回 OK 时检查有没有撞墙
   prePos?: string;
@@ -365,7 +361,7 @@ interface PowerCreepMemory {
   /**
    * 移动缓存
    */
-  _go?: MoveInfo;
+  moveInfo?: MoveInfo;
 
   // 等同于 Creep.memory.fromShard
   fromShard?: ShardName;
@@ -486,28 +482,30 @@ interface Room {
   mineral: Mineral;
   sources: Source[];
   sourceContainers: StructureContainer[];
-  _factory: StructureFactory;
-  _mineral: Mineral;
-  _powerspawn: StructurePowerSpawn;
-  _nuker: StructureNuker;
-  _sources: Source[];
-  _centerLink: StructureLink;
-  _observer: StructureObserver;
-  _extractor: StructureExtractor;
-  _sourceContainers: StructureContainer[];
+
+  // 房间基础服务缓存
+  factoryCache: StructureFactory;
+  mineralCache: Mineral;
+  powerSpawnCache: StructurePowerSpawn;
+  nukerCache: StructureNuker;
+  sourcesCache: Source[];
+  centerLinkCache: StructureLink;
+  observerCache: StructureObserver;
+  extractorCache: StructureExtractor;
+  sourceContainersCache: StructureContainer[];
 
   // 已拥有的房间特有，tower 负责维护
-  _enemys: (Creep | PowerCreep)[];
+  enemys: (Creep | PowerCreep)[];
   // 需要维修的建筑，tower 负责维护，为 1 说明建筑均良好
-  _damagedStructure: AnyStructure | 1;
+  damagedStructure: AnyStructure | 1;
   // 该 tick 是否已经有 tower 刷过墙了
-  _hasFillWall: boolean;
+  hasFillWall: boolean;
   // 外矿房间特有，外矿单位维护
   // 一旦该字段为 true 就告诉出生点暂时禁止自己重生直到 1500 tick 之后
-  _hasEnemy: boolean;
+  hasEnemy: boolean;
 
   // 焦点墙，维修单位总是倾向于优先修复该墙体
-  _importantWall: StructureWall | StructureRampart;
+  importantWall: StructureWall | StructureRampart;
 
   // 获取房间中的有效能量来源
   getAvailableSource(): StructureTerminal | StructureStorage | StructureContainer | Source;

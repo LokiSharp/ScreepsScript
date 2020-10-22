@@ -45,13 +45,12 @@ const releasePlans: CreepReleasePlans = {
       const stats: HarvesterPlanStats = {
         room,
         // 查找 source 及其身边的 link
-        sources: room.sources.map(s => {
-          const nearLinks = s.pos.findInRange<StructureLink>(FIND_MY_STRUCTURES, 2, {
-            // eslint-disable-next-line no-shadow
-            filter: s => s.structureType === STRUCTURE_LINK
+        sources: room.sources.map(source => {
+          const nearLinks = source.pos.findInRange<StructureLink>(FIND_MY_STRUCTURES, 2, {
+            filter: structure => structure.structureType === STRUCTURE_LINK
           });
           return {
-            id: s.id,
+            id: source.id,
             linkId: nearLinks.length > 0 ? nearLinks[0].id : undefined
           };
         })

@@ -112,8 +112,7 @@ export default class TowerExtension extends StructureTower {
         if (!log.data || (log.data.type !== STRUCTURE_RAMPART && log.data.type !== STRUCTURE_WALL)) continue;
         // 有墙体被摧毁，直接启动安全模式
         this.room.controller.activateSafeMode();
-        // eslint-disable-next-line no-underscore-dangle
-        const enemyUsername = _.uniq(this.room._enemys.map(creep => creep.owner.username)).join(", ");
+        const enemyUsername = _.uniq(this.room.enemys.map(creep => creep.owner.username)).join(", ");
         Game.notify(`[${this.room.name}] 墙壁被击破，已启动安全模式 [Game.ticks] ${Game.time} [敌人] ${enemyUsername}`);
 
         break;
@@ -125,8 +124,7 @@ export default class TowerExtension extends StructureTower {
 
         if (target instanceof StructureRampart || target instanceof StructureWall) {
           // 设为焦点墙体
-          // eslint-disable-next-line no-underscore-dangle
-          this.room._importantWall = target;
+          this.room.importantWall = target;
 
           const repairCreepName = `${this.room.name} repair`;
           if (creepApi.has(`${repairCreepName} 1`)) break;
@@ -179,8 +177,7 @@ export default class TowerExtension extends StructureTower {
 
     // 找到受损建筑
     // 没有缓存就进行搜索
-    // eslint-disable-next-line no-underscore-dangle
-    if (!this.room._damagedStructure) {
+    if (!this.room.damagedStructure) {
       const damagedStructures = this.room.find(FIND_STRUCTURES, {
         filter: s =>
           s.hits < s.hitsMax &&
@@ -193,26 +190,19 @@ export default class TowerExtension extends StructureTower {
 
       // 找到最近的受损建筑并更新缓存
       if (damagedStructures.length > 0) {
-        // eslint-disable-next-line no-underscore-dangle
-        this.room._damagedStructure = this.pos.findClosestByRange(damagedStructures);
+        this.room.damagedStructure = this.pos.findClosestByRange(damagedStructures);
       } else {
-        // eslint-disable-next-line no-underscore-dangle
-        this.room._damagedStructure = 1;
+        this.room.damagedStructure = 1;
         return false;
       }
     }
 
     // 代码能执行到这里就说明缓存肯定不为空
     // 如果是 1 说明都不需要维修
-    // eslint-disable-next-line no-underscore-dangle
-    if (this.room._damagedStructure !== 1) {
-      // eslint-disable-next-line no-underscore-dangle
-      this.repair(this.room._damagedStructure);
+    if (this.room.damagedStructure !== 1) {
+      this.repair(this.room.damagedStructure);
       // 这里把需要维修的建筑置为 1 是为了避免其他的 tower 奶一个满血建筑从而造成 cpu 浪费
-      // eslint-disable-next-line no-underscore-dangle
-      if (this.room._damagedStructure.hits + 500 >= this.room._damagedStructure.hitsMax)
-        // eslint-disable-next-line no-underscore-dangle
-        this.room._damagedStructure = 1;
+      if (this.room.damagedStructure.hits + 500 >= this.room.damagedStructure.hitsMax) this.room.damagedStructure = 1;
 
       return true;
     }
@@ -229,8 +219,7 @@ export default class TowerExtension extends StructureTower {
     // 还没到检查时间跳过
     if (Game.time % repairSetting.wallCheckInterval) return false;
     // 如果有 tower 已经刷过墙了就跳过
-    // eslint-disable-next-line no-underscore-dangle
-    if (this.room._hasFillWall) return false;
+    if (this.room.hasFillWall) return false;
     // 能量不够跳过
     if (this.store[RESOURCE_ENERGY] < repairSetting.energyLimit) return false;
 
@@ -269,8 +258,7 @@ export default class TowerExtension extends StructureTower {
     this.repair(targetWall);
 
     // 标记一下防止其他 tower 继续刷墙
-    // eslint-disable-next-line no-underscore-dangle
-    this.room._hasFillWall = true;
+    this.room.hasFillWall = true;
     return true;
   }
 
@@ -282,14 +270,11 @@ export default class TowerExtension extends StructureTower {
   private findEnemy(searchInterval = 1): (Creep | PowerCreep)[] {
     if (Game.time % searchInterval) return [];
     // 有其他 tower 搜索好的缓存就直接返回
-    // eslint-disable-next-line no-underscore-dangle
-    if (this.room._enemys) return this.room._enemys;
+    if (this.room.enemys) return this.room.enemys;
 
-    // eslint-disable-next-line no-underscore-dangle
-    this.room._enemys = this.room.find(FIND_HOSTILE_CREEPS);
+    this.room.enemys = this.room.find(FIND_HOSTILE_CREEPS);
 
-    // eslint-disable-next-line no-underscore-dangle
-    return this.room._enemys;
+    return this.room.enemys;
   }
 
   /**

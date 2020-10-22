@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 /**
  * Room 快捷访问
  *
@@ -14,9 +13,8 @@
  * @param memoryKey 建筑 id 在房间内存中对应的字段名
  * @returns 对应的建筑
  */
-const getStructure = function <T>(room: Room, privateKey: string, memoryKey: string): T {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  if (room[privateKey]) return room[privateKey];
+const getStructure = function <T>(room: Room, roomStructureCacheKey: string, memoryKey: string): T {
+  if (room[roomStructureCacheKey]) return room[roomStructureCacheKey] as T;
 
   // 内存中没有 id 就说明没有该建筑
   if (!room.memory[memoryKey]) return undefined;
@@ -31,7 +29,7 @@ const getStructure = function <T>(room: Room, privateKey: string, memoryKey: str
   }
 
   // 否则就暂存对象并返回
-  room[privateKey] = target;
+  room[roomStructureCacheKey] = target;
   return target;
 };
 
@@ -43,13 +41,13 @@ export default class RoomShortcut extends Room {
    * 如果没有该字段的话会自行搜索并保存至房间内存
    */
   public mineralGetter(): Mineral {
-    if (this._mineral) return this._mineral;
+    if (this.mineralCache) return this.mineralCache;
 
     // 如果内存中存有 id 的话就读取并返回
     // mineral 不会过期，所以不需要进行处理
     if (this.memory.mineralId) {
-      this._mineral = Game.getObjectById(this.memory.mineralId as Id<Mineral>);
-      return this._mineral;
+      this.mineralCache = Game.getObjectById(this.memory.mineralId as Id<Mineral>);
+      return this.mineralCache;
     }
 
     // 没有 id 就进行搜索
@@ -61,8 +59,8 @@ export default class RoomShortcut extends Room {
 
     // 缓存数据并返回
     this.memory.mineralId = mineral.id;
-    this._mineral = mineral;
-    return this._mineral;
+    this.mineralCache = mineral;
+    return this.mineralCache;
   }
 
   /**
@@ -71,13 +69,13 @@ export default class RoomShortcut extends Room {
    * 工作机制同上 mineral 访问器
    */
   public sourcesGetter(): Source[] {
-    if (this._sources) return this._sources;
+    if (this.sourcesCache) return this.sourcesCache;
 
     // 如果内存中存有 id 的话就读取并返回
     // source 不会过期，所以不需要进行处理
     if (this.memory.sourceIds) {
-      this._sources = this.memory.sourceIds.map(id => Game.getObjectById(id as Id<Source>));
-      return this._sources;
+      this.sourcesCache = this.memory.sourceIds.map(id => Game.getObjectById(id as Id<Source>));
+      return this.sourcesCache;
     }
 
     // 没有 id 就进行搜索
@@ -89,8 +87,8 @@ export default class RoomShortcut extends Room {
 
     // 缓存数据并返回
     this.memory.sourceIds = sources.map(s => s.id);
-    this._sources = sources;
-    return this._sources;
+    this.sourcesCache = sources;
+    return this.sourcesCache;
   }
 
   /**
@@ -99,7 +97,7 @@ export default class RoomShortcut extends Room {
    * 内存中的对应 id 由新建 container 的 harvester 角色上传
    */
   public sourceContainersGetter(): StructureContainer[] {
-    if (this._sourceContainers) return this._sourceContainers;
+    if (this.sourceContainersCache) return this.sourceContainersCache;
 
     // 内存中没有 id 就说明没有 container
     if (!this.memory.sourceContainersIds) return [];
@@ -124,31 +122,31 @@ export default class RoomShortcut extends Room {
     if (this.memory.sourceContainersIds.length <= 0) delete this.memory.sourceContainersIds;
 
     // 暂存对象并返回
-    this._sourceContainers = targets as StructureContainer[];
-    return this._sourceContainers;
+    this.sourceContainersCache = targets as StructureContainer[];
+    return this.sourceContainersCache;
   }
 
   public factoryGetter(): StructureFactory {
-    return getStructure<StructureFactory>(this, "_factory", "factoryId");
+    return getStructure<StructureFactory>(this, "factoryCache", "factoryId");
   }
 
   public powerSpawnGetter(): StructurePowerSpawn {
-    return getStructure<StructurePowerSpawn>(this, "_powerSpawn", "powerSpawnId");
+    return getStructure<StructurePowerSpawn>(this, "powerSpawnCache", "powerSpawnId");
   }
 
   public nukerGetter(): StructureNuker {
-    return getStructure<StructureNuker>(this, "_nuker", "nukerId");
+    return getStructure<StructureNuker>(this, "nukerCache", "nukerId");
   }
 
   public observerGetter(): StructureObserver {
-    return getStructure<StructureObserver>(this, "_observer", "observerId");
+    return getStructure<StructureObserver>(this, "observerCache", "observerId");
   }
 
   public centerLinkGetter(): StructureLink {
-    return getStructure<StructureLink>(this, "_centerLink", "centerLinkId");
+    return getStructure<StructureLink>(this, "centerLinkCache", "centerLinkId");
   }
 
   public extractorGetter(): StructureExtractor {
-    return getStructure<StructureExtractor>(this, "_extractor", "extractorId");
+    return getStructure<StructureExtractor>(this, "extractorCache", "extractorId");
   }
 }

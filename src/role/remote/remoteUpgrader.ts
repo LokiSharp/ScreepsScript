@@ -31,8 +31,7 @@ export default (data: RemoteDeclarerData): ICreepConfig => ({
 
       return false;
     } else {
-      // eslint-disable-next-line no-underscore-dangle
-      delete creep.memory._go;
+      delete creep.memory.moveInfo;
       return true;
     }
   },

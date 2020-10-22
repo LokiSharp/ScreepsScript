@@ -35,7 +35,6 @@ export class CreepExtension extends Creep {
 
     // 还没出生就啥都不干
     if (this.spawning) {
-      // eslint-disable-next-line no-underscore-dangle
       if (this.ticksToLive === CREEP_LIFE_TIME) this._id = this.id; // 解决 this creep not exist 问题
       return;
     }
@@ -187,13 +186,11 @@ export class CreepExtension extends Creep {
         }
 
         // 获取下个建筑目标
-        // eslint-disable-next-line no-underscore-dangle
-        target = this._updateConstructionSite();
+        target = this.updateConstructionSite();
       }
     }
     // 没缓存就直接获取
-    // eslint-disable-next-line no-underscore-dangle
-    else target = this._updateConstructionSite();
+    else target = this.updateConstructionSite();
     if (!target) return ERR_NOT_FOUND;
 
     // 建设
@@ -230,7 +227,7 @@ export class CreepExtension extends Creep {
    *
    * @returns 下一个建筑工地，或者 null
    */
-  private _updateConstructionSite(): ConstructionSite | undefined {
+  private updateConstructionSite(): ConstructionSite | undefined {
     const targets: ConstructionSite[] = this.room.find(FIND_MY_CONSTRUCTION_SITES);
     if (targets.length > 0) {
       let target: ConstructionSite;

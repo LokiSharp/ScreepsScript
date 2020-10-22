@@ -72,13 +72,12 @@ const getReplyName = function (requestName: string, sourceShard: ShardName): str
  * @param sourceShard 请求的发起 shard
  * @param result 请求处理结果
  */
-const reply = function (requestName: string, sourceShard: ShardName, result: ScreepsReturnCode) {
+const doReply = function (requestName: string, sourceShard: ShardName, result: ScreepsReturnCode) {
   const replyName = getReplyName(requestName, sourceShard);
 
   // 暂存数据，等待 tick 结尾统一保存
   selfData[replyName] = result;
-  // eslint-disable-next-line no-underscore-dangle
-  Game._needSaveInterShardData = true;
+  Game.needSaveInterShardData = true;
 };
 
 /**
@@ -91,7 +90,6 @@ const reply = function (requestName: string, sourceShard: ShardName, result: Scr
  */
 const checkReply = function (sourceShard: ShardName, requestName: string, request: CrossShardRequest): CrossShardReply {
   // 尝试从目标 shard 获取响应
-  // eslint-disable-next-line no-shadow
   const reply = otherShardData[request.to][getReplyName(requestName, sourceShard)] as InterShardData;
 
   // 返回响应结果
@@ -119,19 +117,16 @@ const handleSelfMessage = function () {
       // 如果请求已经被移除的话说明目标 shard 察觉到自己的响应了，所以直接把响应移除即可
       else {
         delete selfData[msgName];
-        // eslint-disable-next-line no-underscore-dangle
-        Game._needSaveInterShardData = true;
+        Game.needSaveInterShardData = true;
       }
     }
     // 如果消息是请求
     else {
       // 请求有响应了就直接移除该请求
-      // eslint-disable-next-line no-shadow
       const reply = checkReply(selfShardName, msgName, selfData[msgName]);
       if (reply.has) {
         delete selfData[msgName];
-        // eslint-disable-next-line no-underscore-dangle
-        Game._needSaveInterShardData = true;
+        Game.needSaveInterShardData = true;
       }
     }
   }
@@ -152,8 +147,7 @@ const handleOtherMessage = function (): ScreepsReturnCode {
         // 如果是自己请求的响应的话，关闭对应请求
         if (source === selfShardName) {
           delete selfData[requestName];
-          // eslint-disable-next-line no-underscore-dangle
-          Game._needSaveInterShardData = true;
+          Game.needSaveInterShardData = true;
         }
       }
       // 该信息是请求
@@ -167,7 +161,7 @@ const handleOtherMessage = function (): ScreepsReturnCode {
 
           // 执行请求并作出回应
           const result = requestHandleStrategies[request.type](request.data);
-          reply(msgName, shardName as ShardName, result);
+          doReply(msgName, shardName as ShardName, result);
         }
       }
     }
@@ -182,8 +176,7 @@ const handleOtherMessage = function (): ScreepsReturnCode {
  * @param msgContent 消息内容
  */
 export const saveShardData = function (): void {
-  // eslint-disable-next-line no-underscore-dangle
-  if (!Game._needSaveInterShardData) return;
+  if (!Game.needSaveInterShardData) return;
   // 需要保存时再执行保存
   InterShardMemory.setLocal(JSON.stringify(selfData));
 };
@@ -203,8 +196,7 @@ export const addCrossShardRequest = function (
   data: CrossShardRequestData
 ): void {
   selfData[name] = { to, type, data } as CrossShardRequest;
-  // eslint-disable-next-line no-underscore-dangle
-  Game._needSaveInterShardData = true;
+  Game.needSaveInterShardData = true;
 };
 
 /**

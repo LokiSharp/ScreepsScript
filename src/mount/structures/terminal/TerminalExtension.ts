@@ -359,8 +359,7 @@ export default class TerminalExtension extends StructureTerminal {
    * 将索引指向下一个要监听的资源
    */
   private setNextIndex(): void {
-    // eslint-disable-next-line no-bitwise
-    const index = this.room.memory.terminalIndex | 0;
+    const index = this.room.memory.terminalIndex || 0;
     const tasksLength = this.room.memory.terminalTasks.length;
     // 循环设置索引
     this.room.memory.terminalIndex = index + 1 >= tasksLength ? 0 : index + 1;
@@ -375,8 +374,7 @@ export default class TerminalExtension extends StructureTerminal {
    */
   private getResourceByIndex(): TerminalListenerTask | null {
     if (!this.room.memory.terminalTasks) return null;
-    // eslint-disable-next-line no-bitwise
-    let index = this.room.memory.terminalIndex | 0;
+    let index = this.room.memory.terminalIndex || 0;
 
     // 做个兜底，防止玩家手动移除任务后指针指向 undefined
     if (index >= this.room.memory.terminalTasks.length) {

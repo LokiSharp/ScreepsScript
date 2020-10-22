@@ -116,8 +116,7 @@ export class LinkExtension extends StructureLink {
     if (!source) return;
 
     // 以 centerLink 的名义发布中央物流任务
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const result = this.room.addCenterTask({
+    this.room.addCenterTask({
       submit: "centerLink",
       source: source.structureType,
       target: "centerLink",

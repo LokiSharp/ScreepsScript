@@ -17,12 +17,10 @@ export default (data: RemoteDeclarerData): ICreepConfig => ({
       checkTarget: true,
       range: 0
     });
-    // eslint-disable-next-line no-underscore-dangle
     creep.log(`位置 ${creep.memory.prePos}`);
     // creep.log(`移动消耗 ${Game.cpu.getUsed() - cost1}`);
-    // eslint-disable-next-line no-underscore-dangle
-    const _go = creep.memory._go;
-    const path = _go ? _go.path || "" : "";
+    const moveInfo = creep.memory.moveInfo;
+    const path = moveInfo ? moveInfo.path || "" : "";
     creep.say(`${result.toString()} ${path}`);
 
     return false;

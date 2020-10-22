@@ -74,8 +74,7 @@ export const creepApi = {
     Object.keys(Memory.creepConfigs).map(configName => {
       if (configName.includes(creepNamePart)) {
         delete Memory.creepConfigs[configName];
-        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-        Game.creeps[configName] && Game.creeps[configName].suicide();
+        if (Game.creeps[configName]) Game.creeps[configName].suicide();
       }
     });
 
