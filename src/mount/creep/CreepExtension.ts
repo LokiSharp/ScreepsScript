@@ -1,10 +1,9 @@
 import { MIN_WALL_HITS, repairSetting } from "setting";
 import { goTo, setWayPoint } from "modules/move";
-import { assignPrototype } from "utils/prototype";
 import { getMemoryFromCrossShard } from "modules/crossShard";
 import roles from "role";
 
-export class CreepExtension extends Creep {
+export default class CreepExtension extends Creep {
   /**
    * 发送日志
    *
@@ -35,6 +34,8 @@ export class CreepExtension extends Creep {
 
     // 还没出生就啥都不干
     if (this.spawning) {
+      // eslint-disable-next-line no-underscore-dangle
+      if (this.ticksToLive === CREEP_LIFE_TIME) this._id = this.id; // 解决 this creep not exist 问题
       return;
     }
 
@@ -337,9 +338,4 @@ export class CreepExtension extends Creep {
 
     return true;
   }
-}
-
-// 挂载拓展到 Creep 原型
-export default function (): void {
-  assignPrototype(Creep, CreepExtension);
 }

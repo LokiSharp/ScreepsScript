@@ -2,11 +2,13 @@ import { execShard, saveShardData } from "modules/crossShard";
 import { ErrorMapper } from "utils/ErrorMapper";
 import creepNumberListener from "modules/creepController/creepNumberListener";
 import { doing } from "utils/doing";
+import { generatePixel } from "utils/generatePixel";
 import mountWork from "mount";
 import { stateScanner } from "utils/stateScanner";
 
-// This utility uses source maps to get the line numbers and file names of the original, TS source code
 export const loop = ErrorMapper.wrapLoop(() => {
+  if (Memory.showCost) console.log(`-------------------------- [${Game.time}] -------------------------- `);
+
   // 挂载所有拓展
   mountWork();
 
@@ -19,16 +21,11 @@ export const loop = ErrorMapper.wrapLoop(() => {
   // 所有建筑、creep、powerCreep 执行工作
   doing(Game.structures, Game.creeps);
 
-  // 保存自己的跨 shard 消息
+  // 搓 pixel
+  generatePixel();
+
+  // // 保存自己的跨 shard 消息
   saveShardData();
 
   stateScanner();
-
-  if (Game.cpu.bucket > 9000) {
-    try {
-      Game.cpu.generatePixel();
-    } catch (error) {
-      // PASS
-    }
-  }
 });

@@ -1,4 +1,4 @@
-import RoomPostionExtension from "./extension";
+import RoomPostionExtension from "./RoomPostionExtension";
 import { assignPrototype } from "utils/prototype";
 
 /**

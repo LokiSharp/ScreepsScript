@@ -1,4 +1,4 @@
-import { addCrossShardRequest } from "./crossShard";
+import { addCrossShardRequest } from "../crossShard";
 import crossRules from "./crossRules";
 import { getOppositeDirection } from "utils/getOppositeDirection";
 
