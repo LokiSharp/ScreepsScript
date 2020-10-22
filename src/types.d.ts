@@ -276,8 +276,6 @@ interface WarUnitData {
  * 来自于 mount.creep.ts
  */
 interface Creep {
-  _id: string;
-
   log(content: string, color?: Colors, notify?: boolean): void;
   work(): void;
   goTo(target?: RoomPosition, moveOpt?: MoveOpt): ScreepsReturnCode;

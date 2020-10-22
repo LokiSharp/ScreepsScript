@@ -125,12 +125,10 @@ const requireCross = function (creep: Creep, direction: DirectionConstant, requi
   const allowCross = crossRules[creep.memory.role] || crossRules.default;
   if (!allowCross(creep, requireCreep)) {
     creep.say("👊");
-    creep.log(`拒绝对穿！${requireCreep.name} ${direction}`);
     return ERR_BUSY;
   } else {
     // 同意对穿
     creep.say("👌");
-    creep.log(`同意对穿！${requireCreep.name} ${direction}`);
     const moveResult = creep.move(direction);
     if (moveResult === OK && creep.memory.moveInfo?.path?.length > 0) {
       // 如果移动的方向就是
@@ -160,7 +158,6 @@ const mutualCross = function (
   fontCreep: Creep
 ): OK | ERR_BUSY | ERR_INVALID_TARGET {
   creep.say(`👉`);
-  creep.log(`发起对穿！${fontCreep.name} ${direction}`);
 
   // 如果前面的 creep 同意对穿了，自己就朝前移动
   const reverseDirection = getOppositeDirection(direction);
@@ -327,6 +324,7 @@ export const goTo = function (
   moveOpt: MoveOpt = {}
 ): ScreepsReturnCode {
   if (!creep.memory.moveInfo) creep.memory.moveInfo = {};
+
   const moveMemory = creep.memory.moveInfo;
   // 如果没有指定目标的话则默认为路径模式
   const target: RoomPosition = targetPos || getTarget(creep);

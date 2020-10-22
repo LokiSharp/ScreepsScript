@@ -35,7 +35,6 @@ export class CreepExtension extends Creep {
 
     // 还没出生就啥都不干
     if (this.spawning) {
-      if (this.ticksToLive === CREEP_LIFE_TIME) this._id = this.id; // 解决 this creep not exist 问题
       return;
     }
 
@@ -106,15 +105,6 @@ export class CreepExtension extends Creep {
     // 不是的话就用 harvest
     else {
       result = this.harvest(target);
-
-      // harvest 需要长时间占用该位置，所以需要禁止对穿
-      // withdraw 则不需要
-      if (result === OK) {
-        // 开始采集能量了就拒绝对穿
-        if (!this.memory.stand) {
-          this.memory.stand = true;
-        }
-      }
     }
 
     if (result === ERR_NOT_IN_RANGE) this.goTo(target.pos);
@@ -140,10 +130,7 @@ export class CreepExtension extends Creep {
   public upgrade(): ScreepsReturnCode {
     const result = this.upgradeController(this.room.controller);
 
-    // 如果刚开始站定工作，就把自己的位置设置为禁止通行点
-    if (result === OK && !this.memory.stand) {
-      this.memory.stand = true;
-    } else if (result === ERR_NOT_IN_RANGE) {
+    if (result === ERR_NOT_IN_RANGE) {
       this.goTo(this.room.controller.pos);
     }
     return result;
@@ -294,16 +281,7 @@ export class CreepExtension extends Creep {
 
     // 填充墙壁
     const result = this.repair(targetWall);
-    if (result === OK) {
-      if (!this.memory.stand) {
-        this.memory.stand = true;
-      }
-
-      // 离墙三格远可能正好把路堵上，所以要走进一点
-      if (!targetWall.pos.inRangeTo(this.pos, 2)) this.goTo(targetWall.pos);
-    } else if (result === ERR_NOT_IN_RANGE) {
-      this.goTo(targetWall.pos);
-    }
+    if (result === ERR_NOT_IN_RANGE) this.goTo(targetWall.pos);
     return true;
   }
 
