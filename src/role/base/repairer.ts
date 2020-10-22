@@ -5,10 +5,28 @@
  *
  */
 export default (data: WorkerData): ICreepConfig => ({
+  // 根据敌人威胁决定是否继续生成
+  isNeed: room => {
+    const source = Game.getObjectById(data.sourceId as Id<StructureContainer>);
+
+    // 如果能量来源没了就删除自己
+    if (!source) return false;
+    // 如果能量来源是 container 的话说明还在发展期，只要 container 在就一直孵化
+    else if (source && source instanceof StructureContainer) return true;
+
+    // 否则就看当前房间里有没有威胁，有的话就继续孵化并刷墙
+    return room.controller.checkEnemyThreat();
+  },
   source: creep => {
-    creep.getEngryFrom(
-      Game.getObjectById(data.sourceId as Id<Structure | Source>) || creep.room.storage || creep.room.terminal
-    );
+    const source =
+      Game.getObjectById(data.sourceId as Id<StructureContainer>) || creep.room.storage || creep.room.terminal;
+
+    // 能量不足就先等待，优先满足 filler 需求
+    if (source.store[RESOURCE_ENERGY] < 500) {
+      creep.say("🎮");
+      return false;
+    }
+    creep.getEngryFrom(source);
 
     if (creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) return true;
     else return false;
@@ -25,10 +43,6 @@ export default (data: WorkerData): ICreepConfig => ({
     if (importantWall) {
       const actionResult = creep.repair(creep.room.importantWall);
       if (actionResult === OK) {
-        if (!creep.memory.stand) {
-          creep.memory.stand = true;
-        }
-
         // 离墙三格远可能正好把路堵上，所以要走进一点
         if (!creep.room.importantWall.pos.inRangeTo(creep.pos, 2)) creep.goTo(creep.room.importantWall.pos);
       } else if (actionResult === ERR_NOT_IN_RANGE) creep.goTo(creep.room.importantWall.pos);

@@ -242,9 +242,9 @@ const findPath = function (creep: Creep, target: RoomPosition, moveOpt: MoveOpt 
           if (
             // 如果禁用对穿了
             moveOpt.disableCross ||
-            otherCreep.memory.disableCross ||
             // 或者对方不属于自己
             !otherCreep.my ||
+            otherCreep.memory.disableCross ||
             // 或者对穿规则不允许
             !(crossRules[otherCreep.memory.role] || crossRules.default)(otherCreep, creep)
           ) {

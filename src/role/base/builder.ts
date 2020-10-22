@@ -23,6 +23,11 @@ export default (data: HarvesterData): ICreepConfig => ({
     let source: StructureStorage | StructureTerminal | StructureContainer | Source;
     if (!creep.memory.sourceId) {
       source = creep.room.getAvailableSource();
+      if (!source) {
+        creep.say("没能量了，歇会");
+        return false;
+      }
+
       creep.memory.sourceId = source.id;
     } else
       source = Game.getObjectById(
@@ -37,14 +42,10 @@ export default (data: HarvesterData): ICreepConfig => ({
   target: creep => {
     // 有新墙就先刷新墙
     if (creep.memory.fillWallId) creep.steadyWall();
+    // 执行建造之后检查下是不是都造好了，如果是的话这辈子就不会再建造了，等下辈子出生后再检查（因为一千多 tick 基本上不会出现新的工地）
+    else if (creep.memory.dontBuild) creep.upgrade();
     // 没有就建其他工地
-    else if (creep.buildStructure() !== ERR_NOT_FOUND) {
-      // PASS
-    }
-    // 工地也没了就去升级
-    else if (creep.upgrade()) {
-      // PASS
-    }
+    else if (creep.buildStructure() === ERR_NOT_FOUND) creep.memory.dontBuild = true;
 
     if (creep.store.getUsedCapacity() === 0) return true;
     else return false;

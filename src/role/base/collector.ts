@@ -23,13 +23,7 @@ export default (data: HarvesterData): ICreepConfig => ({
 
     const result = creep.harvest(source);
 
-    // harvest 需要长时间占用该位置，所以需要禁止对穿
-    if (result === OK) {
-      // 开始采集能量了就拒绝对穿
-      if (!creep.memory.stand) {
-        creep.memory.stand = true;
-      }
-    } else if (result === ERR_NOT_IN_RANGE) creep.goTo(source.pos);
+    if (result === ERR_NOT_IN_RANGE) creep.goTo(source.pos);
 
     // 快死了就把能量移出去
     if (creep.ticksToLive <= 3) return true;
