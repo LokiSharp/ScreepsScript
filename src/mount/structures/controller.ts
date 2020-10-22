@@ -31,10 +31,14 @@ export default class ControllerExtension extends StructureController {
    */
   public onLevelChange(level: number): void {
     // 刚占领，添加最基础的角色组
-    this.room.releaseCreep("harvester");
     if (level === 1) {
+      this.room.releaseCreep("harvester");
       // 多发布一个 build 协助建造
-      this.room.releaseCreep("builder");
+      this.room.releaseCreep("builder", 1);
+    }
+    // 8 级之后重新规划升级单位
+    else if (level === 8) {
+      this.room.releaseCreep("upgrader");
     }
 
     // 规划布局

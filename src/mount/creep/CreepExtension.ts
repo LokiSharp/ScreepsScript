@@ -33,11 +33,7 @@ export default class CreepExtension extends Creep {
     }
 
     // 还没出生就啥都不干
-    if (this.spawning) {
-      // eslint-disable-next-line no-underscore-dangle
-      if (this.ticksToLive === CREEP_LIFE_TIME) this._id = this.id; // 解决 this creep not exist 问题
-      return;
-    }
+    if (this.spawning) return;
 
     // 获取对应配置项
     const creepConfig: ICreepConfig = roles[this.memory.role](this.memory.data);

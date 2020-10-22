@@ -339,16 +339,19 @@ const releaseUpgrader = function (room: Room): OK {
 /**
  * 发布建造者
  * @param room 要发布角色的房间
+ * @param releaseNumber 要发布的角色数量
  */
-const releaseBuilder = function (room: Room): OK {
-  creepApi.add(
-    `${room.name} builder${Game.time}`,
-    "builder",
-    {
-      sourceId: room.getAvailableSource().id
-    },
-    room.name
-  );
+const releaseBuilder = function (room: Room, releaseNumber = 2): OK {
+  for (let i = 0; i < releaseNumber; i++) {
+    creepApi.add(
+      `${room.name} builder${i}`,
+      "builder",
+      {
+        sourceId: room.getAvailableSource()?.id
+      },
+      room.name
+    );
+  }
 
   return OK;
 };
@@ -356,6 +359,7 @@ const releaseBuilder = function (room: Room): OK {
 /**
  * 发布刷墙工
  * @param room 要发布角色的房间
+ * @param releaseNumber 要发布的角色数量
  */
 const releaseRepairer = function (room: Room, releaseNumber = 1): OK {
   Array(releaseNumber)
@@ -377,7 +381,9 @@ const releaseRepairer = function (room: Room, releaseNumber = 1): OK {
 /**
  * 房间运营角色名对应的发布逻辑
  */
-const roleToRelease: { [role in BaseRoleConstant | AdvancedRoleConstant]: (room: Room) => OK | ERR_NOT_FOUND } = {
+const roleToRelease: {
+  [role in BaseRoleConstant | AdvancedRoleConstant]: (room: Room, releaseNumber: number) => OK | ERR_NOT_FOUND;
+} = {
   harvester: releaseHarvester,
   collector: releaseHarvester,
   filler: releaseTransporter,
@@ -395,6 +401,10 @@ const roleToRelease: { [role in BaseRoleConstant | AdvancedRoleConstant]: (room:
  * @param room 要发布 creep 的房间
  * @param role 要发布的角色名
  */
-export const releaseCreep = function (room: Room, role: BaseRoleConstant): OK | ERR_NOT_FOUND {
-  return roleToRelease[role](room);
+export const releaseCreep = function (
+  room: Room,
+  role: BaseRoleConstant | AdvancedRoleConstant,
+  num = 1
+): OK | ERR_NOT_FOUND {
+  return roleToRelease[role](room, num);
 };

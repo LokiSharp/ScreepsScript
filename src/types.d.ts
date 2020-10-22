@@ -430,7 +430,7 @@ interface Room {
   log(content: string, instanceName: string, color?: Colors | undefined, notify?: boolean): void;
 
   // creep 发布 api
-  releaseCreep(role: BaseRoleConstant | AdvancedRoleConstant): ScreepsReturnCode;
+  releaseCreep(role: BaseRoleConstant | AdvancedRoleConstant, releaseNumber?: number): ScreepsReturnCode;
   spawnReiver(sourceFlagName: string, targetStructureId: string): string;
   addRemoteHelper(remoteRoomName: string, wayPointFlagName?: string): void;
   addRemoteReserver(remoteRoomName: string, single?: boolean): void;

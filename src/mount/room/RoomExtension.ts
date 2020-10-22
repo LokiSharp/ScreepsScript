@@ -92,8 +92,8 @@ export default class RoomExtension extends Room {
    * 给本房间发布或重新规划指定的 creep 角色
    * @param role 要发布的 creep 角色
    */
-  public releaseCreep(role: BaseRoleConstant): ScreepsReturnCode {
-    return releaseCreep(this, role);
+  public releaseCreep(role: BaseRoleConstant | AdvancedRoleConstant, releaseNumber = 1): ScreepsReturnCode {
+    return releaseCreep(this, role, releaseNumber);
   }
 
   /**
