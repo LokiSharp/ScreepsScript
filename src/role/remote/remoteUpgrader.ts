@@ -12,15 +12,6 @@ export default (data: RemoteDeclarerData): ICreepConfig => ({
   },
   // 向指定房间移动
   prepare: creep => {
-    // 从初始房间获取能量
-    if (
-      creep.room.name === (creep.memory.data as RemoteDeclarerData).spawnRoom &&
-      creep.store.getFreeCapacity(RESOURCE_ENERGY) !== 0
-    ) {
-      creep.getEngryFrom(creep.room.getAvailableSource());
-      return false;
-    }
-
     // 设定路径点
     if (data.wayPoint && !creep.memory.fromShard) {
       creep.setWayPoint(data.wayPoint);

@@ -1,4 +1,5 @@
 import { addCrossShardRequest } from "./crossShard";
+import crossRules from "./crossRules";
 import { getOppositeDirection } from "utils/getOppositeDirection";
 
 /**
@@ -116,49 +117,6 @@ const updateWayPoint = function (creep: Creep) {
 };
 
 /**
- * 对穿规则合集
- */
-const crossRules: CrossRules = {
-  // 【默认规则】自己在工作时有同角色 creep 发起对穿则拒绝对穿
-  default: (creep, requireCreep) => {
-    return !(creep.memory.stand && requireCreep.memory.role === creep.memory.role);
-  },
-  // 填充单位无论什么时候都会允许对穿，因为其不会长时间停在一个位置上工作
-  filler: () => true,
-  manager: () => true,
-  // 中央处理单位在携带有资源时不允许对穿
-  processor: creep => !creep.memory.working,
-  // 采集单位在工作时不允许任何 creep 对穿
-  harvester: creep => !creep.memory.stand,
-  collector: creep => !creep.memory.stand,
-  // upgrader 和 remoteHelper 功能重叠，所以这里不会在工作时允许对方对穿，下同
-  upgrader: (creep, requireCreep) => {
-    return !(
-      creep.memory.stand &&
-      (requireCreep.memory.role === creep.memory.role || requireCreep.memory.role === "remoteUpgrader")
-    );
-  },
-  remoteUpgrader: (creep, requireCreep) => {
-    return !(
-      creep.memory.stand &&
-      (requireCreep.memory.role === creep.memory.role || requireCreep.memory.role === "upgrader")
-    );
-  },
-  builder: (creep, requireCreep) => {
-    return !(
-      creep.memory.stand &&
-      (requireCreep.memory.role === creep.memory.role || requireCreep.memory.role === "remoteBuilder")
-    );
-  },
-  remoteBuilder: (creep, requireCreep) => {
-    return !(
-      creep.memory.stand &&
-      (requireCreep.memory.role === creep.memory.role || requireCreep.memory.role === "builder")
-    );
-  }
-};
-
-/**
  * 请求对穿
  * 自己内存中 stand 为 true 时将拒绝对穿
  *
@@ -166,11 +124,7 @@ const crossRules: CrossRules = {
  * @param direction 请求该 creep 进行对穿
  * @param requireCreep 发起请求的 creep
  */
-const requireCross = function (
-  creep: Creep | PowerCreep,
-  direction: DirectionConstant,
-  requireCreep: Creep | PowerCreep
-): ScreepsReturnCode {
+const requireCross = function (creep: Creep, direction: DirectionConstant, requireCreep: Creep): ScreepsReturnCode {
   // creep 下没有 memory 说明 creep 已经凉了，直接移动即可
   if (!creep.memory) return OK;
 
@@ -178,24 +132,26 @@ const requireCross = function (
   const allowCross = crossRules[creep.memory.role] || crossRules.default;
   if (!allowCross(creep, requireCreep)) {
     creep.say("👊");
+    creep.log(`拒绝对穿！${requireCreep.name} ${direction}`);
     return ERR_BUSY;
-  }
-
-  // 同意对穿
-  creep.say("👌");
-  const moveResult = creep.move(direction);
-  // eslint-disable-next-line no-underscore-dangle
-  if (moveResult === OK && creep.memory._go?.path?.length > 0) {
-    // 如果移动的方向就是
+  } else {
+    // 同意对穿
+    creep.say("👌");
+    creep.log(`同意对穿！${requireCreep.name} ${direction}`);
+    const moveResult = creep.move(direction);
     // eslint-disable-next-line no-underscore-dangle
-    if ((Number(creep.memory._go.path[0]) as DirectionConstant) !== direction) {
+    if (moveResult === OK && creep.memory._go?.path?.length > 0) {
+      // 如果移动的方向就是
       // eslint-disable-next-line no-underscore-dangle
-      delete creep.memory._go.path;
-      // eslint-disable-next-line no-underscore-dangle
-      delete creep.memory._go.prePos;
+      if ((Number(creep.memory._go.path[0]) as DirectionConstant) !== direction) {
+        // eslint-disable-next-line no-underscore-dangle
+        delete creep.memory._go.path;
+        // eslint-disable-next-line no-underscore-dangle
+        delete creep.memory._go.prePos;
+      }
     }
+    return moveResult;
   }
-  return moveResult;
 };
 
 /**
@@ -212,9 +168,11 @@ const requireCross = function (
 const mutualCross = function (
   creep: Creep,
   direction: DirectionConstant,
-  fontCreep: Creep | PowerCreep
+  fontCreep: Creep
 ): OK | ERR_BUSY | ERR_INVALID_TARGET {
   creep.say(`👉`);
+  creep.log(`发起对穿！${fontCreep.name} ${direction}`);
+
   // 如果前面的 creep 同意对穿了，自己就朝前移动
   const reverseDirection = getOppositeDirection(direction);
   const fontMoveResult = requireCross(fontCreep, reverseDirection, creep);
@@ -293,7 +251,7 @@ const findPath = function (creep: Creep, target: RoomPosition, moveOpt: MoveOpt 
         }
 
         // 躲避房间中的 creep
-        const addCreepCost = (otherCreep: Creep | PowerCreep) => {
+        const addCreepCost = (otherCreep: Creep) => {
           // 以下情况会躲避
           if (
             // 如果禁用对穿了
@@ -309,7 +267,6 @@ const findPath = function (creep: Creep, target: RoomPosition, moveOpt: MoveOpt 
         };
 
         room.find(FIND_CREEPS).forEach(addCreepCost);
-        room.find(FIND_POWER_CREEPS).forEach(addCreepCost);
 
         // 跨 shard creep 需要解除目标 portal 的不可移动性（如果有的话）
         if (creep.memory.fromShard && target.roomName === roomName) {
@@ -428,7 +385,7 @@ export const goTo = function (
         return ERR_INVALID_TARGET;
       }
 
-      const fontCreep = fontPos.lookFor(LOOK_CREEPS)[0] || fontPos.lookFor(LOOK_POWER_CREEPS)[0];
+      const fontCreep = fontPos.lookFor(LOOK_CREEPS)[0];
 
       // 前方不是 creep 或者不是自己的 creep 或者内存被清空（正在跨越 shard）的话就不会发起对穿
       if (!fontCreep || !fontCreep.my || Object.keys(fontCreep.memory).length <= 0) {
