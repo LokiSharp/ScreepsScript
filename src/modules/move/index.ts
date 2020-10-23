@@ -1,6 +1,7 @@
+import { updateWayPoint, wayPointCache } from "./WayPoint";
 import { addCrossShardRequest } from "../crossShard";
 import crossRules from "./crossRules";
-import { getOppositeDirection } from "utils/getOppositeDirection";
+import { mutualCross } from "./Cross";
 
 /**
  * 房间移动成本缓存
@@ -17,16 +18,6 @@ const costCache: { [roomName: string]: CostMatrix } = {};
  * 键为路径的起点和终点名，例如："12/32/W1N1 23/12/W2N2"，值是使用 serializeFarPath 序列化后的路径
  */
 export const routeCache: { [routeKey: string]: string } = {};
-
-/**
- * 路径点缓存
- *
- * Creep 会把自己下一个路径点对应的位置缓存在这里，这样就不用每 tick 都从内存中的路径点字符串重建位置
- * 不过这么做会导致 creep 无法立刻感知到位置的变化
- *
- * 其键为 creep 的名字，值为下一个路径目标
- */
-const wayPointCache: { [creepName: string]: RoomPosition } = {};
 
 /**
  * 压缩 PathFinder 返回的路径数组
@@ -52,123 +43,6 @@ const serializeFarPath = function (creep: Creep, positions: RoomPosition[]): str
 };
 
 /**
- * 给 Creep 设置路径点目标
- *
- * target 是一个路径数组或者路径旗帜
- *
- * @param target 路径点目标
- */
-export const setWayPoint = function (creep: Creep, target: string[] | string): CreepMoveReturnCode {
-  if (!creep.memory.moveInfo) creep.memory.moveInfo = {};
-  delete wayPointCache[creep.name];
-
-  // 设置时会移除另一个路径模式的数据，防止这个移动完之后再回头走之前留下的路径点
-  if (target instanceof Array) {
-    creep.memory.moveInfo.wayPoints = target;
-    delete creep.memory.moveInfo.wayPointFlag;
-  } else {
-    creep.memory.moveInfo.wayPointFlag = target + "0";
-    delete creep.memory.moveInfo.wayPoints;
-  }
-
-  return OK;
-};
-
-/**
- * 更新路径点
- *
- * 当抵达当前路径点后就需要更新内存数据以移动到下一个路径点
- */
-const updateWayPoint = function (creep: Creep) {
-  if (!creep.memory.moveInfo) creep.memory.moveInfo = {};
-  const memory = creep.memory.moveInfo;
-
-  if (memory.wayPoints) {
-    // 弹出已经抵达的路径点
-    if (memory.wayPoints.length > 0) memory.wayPoints.shift();
-  } else if (memory.wayPointFlag) {
-    const preFlag = Game.flags[memory.wayPointFlag];
-
-    // 如果旗帜内存里指定了下一个路径点名称的话就直接使用
-    if (preFlag && preFlag.memory && preFlag.memory.next) {
-      memory.wayPointFlag = preFlag.memory.next;
-    }
-    // 否则就默认自增编号
-    else {
-      // 获取路径旗帜名
-      const flagPrefix = memory.wayPointFlag.slice(0, memory.wayPointFlag.length - 1);
-      // 把路径旗帜的编号 + 1
-      const nextFlagCode = Number(memory.wayPointFlag.substr(-1)) + 1;
-      // 把新旗帜更新到内存，这里没有检查旗帜是否存在
-      // 原因在于跨 shard 需要在跨越之前将旗帜更新到下一个，但是这时还没有到下个 shard，就获取不到位于下个 shard 的旗帜
-      memory.wayPointFlag = flagPrefix + nextFlagCode.toString();
-    }
-  }
-
-  // 移除缓存以便下次可以重新查找目标
-  delete wayPointCache[creep.name];
-};
-
-/**
- * 请求对穿
- * 自己内存中 stand 为 true 时将拒绝对穿
- *
- * @param creep 被请求对穿的 creep
- * @param direction 请求该 creep 进行对穿
- * @param requireCreep 发起请求的 creep
- */
-const requireCross = function (creep: Creep, direction: DirectionConstant, requireCreep: Creep): ScreepsReturnCode {
-  // creep 下没有 memory 说明 creep 已经凉了，直接移动即可
-  if (!creep.memory) return OK;
-
-  // 获取对穿规则并进行判断
-  const allowCross = crossRules[creep.memory.role] || crossRules.default;
-  if (!allowCross(creep, requireCreep)) {
-    creep.say("👊");
-    return ERR_BUSY;
-  } else {
-    // 同意对穿
-    creep.say("👌");
-    const moveResult = creep.move(direction);
-    if (moveResult === OK && creep.memory.moveInfo?.path?.length > 0) {
-      // 如果移动的方向就是
-      if ((Number(creep.memory.moveInfo.path[0]) as DirectionConstant) !== direction) {
-        delete creep.memory.moveInfo.path;
-        delete creep.memory.moveInfo.prePos;
-      }
-    }
-    return moveResult;
-  }
-};
-
-/**
- * 向指定方向发起对穿
- *
- * @param creep 发起对穿的 creep
- * @param direction 要进行对穿的方向
- * @param fontCreep 要被对穿的 creep
- *
- * @returns OK 成功对穿
- * @returns ERR_BUSY 对方拒绝对穿
- * @returns ERR_INVALID_TARGET 前方没有 creep
- */
-const mutualCross = function (
-  creep: Creep,
-  direction: DirectionConstant,
-  fontCreep: Creep
-): OK | ERR_BUSY | ERR_INVALID_TARGET {
-  creep.say(`👉`);
-
-  // 如果前面的 creep 同意对穿了，自己就朝前移动
-  const reverseDirection = getOppositeDirection(direction);
-  const fontMoveResult = requireCross(fontCreep, reverseDirection, creep);
-  if (fontMoveResult !== OK) return ERR_BUSY;
-
-  const selfMoveResult = creep.move(direction);
-  return selfMoveResult === OK && fontMoveResult === OK ? OK : ERR_BUSY;
-};
-
-/**
  * 远程寻路
  *
  * @param target 目标位置
@@ -178,10 +52,11 @@ const mutualCross = function (
 const findPath = function (creep: Creep, target: RoomPosition, moveOpt: MoveOpt = {}): string | undefined {
   // 先查询下缓存里有没有值
   const routeKey = `${creep.room.serializePos(creep.pos)} ${creep.room.serializePos(target)}`;
-  let route = routeCache[routeKey];
-  // 如果有值则直接返回
-  if (route) {
-    return route;
+
+  if (!moveOpt.disableRouteCache) {
+    const cachedRoute = routeCache[routeKey];
+    // 如果有值则直接返回
+    if (cachedRoute) return cachedRoute;
   }
 
   const range = moveOpt.range === undefined ? 1 : moveOpt.range;
@@ -237,7 +112,7 @@ const findPath = function (creep: Creep, target: RoomPosition, moveOpt: MoveOpt 
         }
 
         // 躲避房间中的 creep
-        const addCreepCost = (otherCreep: Creep) => {
+        room.find(FIND_CREEPS).forEach(otherCreep => {
           // 以下情况会躲避
           if (
             // 如果禁用对穿了
@@ -250,9 +125,12 @@ const findPath = function (creep: Creep, target: RoomPosition, moveOpt: MoveOpt 
           ) {
             costs.set(otherCreep.pos.x, otherCreep.pos.y, 255);
           }
-        };
+        });
 
-        room.find(FIND_CREEPS).forEach(addCreepCost);
+        // 躲避房间中的非己方 powercreep
+        room.find(FIND_POWER_CREEPS).forEach(pc => {
+          if (!pc.my) costs.set(pc.pos.x, pc.pos.y, 255);
+        });
 
         // 跨 shard creep 需要解除目标 portal 的不可移动性（如果有的话）
         if (creep.memory.fromShard && target.roomName === roomName) {
@@ -268,7 +146,7 @@ const findPath = function (creep: Creep, target: RoomPosition, moveOpt: MoveOpt 
   // 没找到就返回空
   if (result.path.length <= 0) return undefined;
   // 找到了就进行压缩
-  route = serializeFarPath(creep, result.path);
+  const route = serializeFarPath(creep, result.path);
   // 保存到全局缓存
   if (!result.incomplete) routeCache[routeKey] = route;
 
@@ -343,13 +221,9 @@ export const goTo = function (
     }
   }
 
-  // 确认缓存有没有被清除
-  if (!moveMemory.path) {
-    moveMemory.path = findPath(creep, target, moveOpt);
-  }
-  // 之前有缓存说明已经在移动了，检查上一 tick 移动是否成功
+  // 有 lastMove 说明已经在移动了，检查上一 tick 移动是否成功
   // （因为上一步的移动结果在这一 tick 开始时才会更新，所以要先检查之前移动是否成功，然后再决定是否要继续移动）
-  else {
+  if (moveMemory.lastMove) {
     // 如果和之前位置重复了就分析撞上了啥
     if (moveMemory.prePos && currentPos === moveMemory.prePos) {
       if (!moveMemory.lastMove) {
@@ -379,17 +253,29 @@ export const goTo = function (
       const crossResult = moveOpt.disableCross ? ERR_BUSY : mutualCross(creep, moveMemory.lastMove, fontCreep);
 
       // 对穿失败说明撞墙上了或者前面的 creep 拒绝对穿，重新寻路
-      if (crossResult !== OK) {
-        delete creep.memory.moveInfo.path;
-        delete creep.memory.moveInfo.prePos;
-        // ERR_BUSY 代表了前面 creep 拒绝对穿，所以不用更新房间 Cost 缓存
-        if (crossResult !== ERR_BUSY) delete costCache[creep.room.name];
+      if (crossRules === ERR_BUSY) {
+        moveMemory.path = findPath(creep, targetPos, { disableRouteCache: true });
+        delete moveMemory.prePos;
+      } else if (crossResult !== OK) {
+        // creep.log('撞停！重新寻路！' + crossResult)
+        delete moveMemory.path;
+        delete moveMemory.prePos;
+        // 撞地形上了说明房间 cost 过期了
+        delete costCache[creep.room.name];
       }
 
       // 对穿失败，需要重新寻路，不需要往下继续执行
       // 对穿成功，相当于重新执行了上一步，也不需要继续往下执行
       return crossResult;
     }
+
+    // 验证通过，没有撞停，继续下一步
+    delete moveMemory.lastMove;
+  }
+
+  // 如果路走完了就要重新寻路
+  if (!moveMemory.path && !moveMemory.lastMove) {
+    moveMemory.path = findPath(creep, target, moveOpt);
   }
 
   // 还为空的话就是没找到路径或者已经到了
@@ -415,7 +301,7 @@ export const goTo = function (
    *
    * 所以要在路径还有一格时判断前方是不是传送门
    */
-  if (creep.memory.fromShard && creep.memory.moveInfo.path && creep.memory.moveInfo.path.length === 1) {
+  if (creep.memory.fromShard && moveMemory.path && moveMemory.path.length === 1) {
     const nextPos = creep.pos.directionToPos(direction);
     const portal = nextPos.lookFor(LOOK_STRUCTURES).find(s => s.structureType === STRUCTURE_PORTAL) as StructurePortal;
 
@@ -444,14 +330,20 @@ export const goTo = function (
 
   // 移动成功，更新路径
   if (goResult === OK) {
-    moveMemory.prePos = currentPos;
-    moveMemory.lastMove = Number(moveMemory.path.substr(0, 1)) as DirectionConstant;
-    creep.memory.moveInfo.path = creep.memory.moveInfo.path.substr(1);
+    // 移动到终端了，不需要再检查位置是否重复了
+    if (moveMemory.path.length === 0) {
+      delete moveMemory.lastMove;
+      delete moveMemory.prePos;
+    } else {
+      moveMemory.prePos = currentPos;
+      moveMemory.lastMove = Number(moveMemory.path.substr(0, 1)) as DirectionConstant;
+      moveMemory.path = moveMemory.path.substr(1);
+    }
   }
   // 如果发生撞停或者参数异常的话说明缓存可能存在问题，移除缓存
   else if (goResult === ERR_BUSY) {
-    delete creep.memory.moveInfo.path;
-    delete creep.memory.moveInfo.prePos;
+    delete moveMemory.path;
+    delete moveMemory.prePos;
     delete costCache[creep.room.name];
   }
   // 其他异常直接报告

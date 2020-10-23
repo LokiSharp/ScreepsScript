@@ -1,7 +1,8 @@
 import { MIN_WALL_HITS, repairSetting } from "setting";
-import { goTo, setWayPoint } from "modules/move";
 import { getMemoryFromCrossShard } from "modules/crossShard";
+import { goTo } from "modules/move";
 import roles from "role";
+import { setWayPoint } from "modules/move/WayPoint";
 
 export default class CreepExtension extends Creep {
   /**

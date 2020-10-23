@@ -900,6 +900,13 @@ interface MoveOpt {
    * 一旦变化则会立刻重新规划
    */
   checkTarget?: boolean;
+
+  /**
+   * 是否禁用路径缓存
+   * 当 creep 因为对方拒绝对穿而重新寻路时，就需要开启该选项
+   * 否则如果恰好有缓存的路径经过了拒绝对穿者，那该 creep 就会由于使用了该缓存从而不停的撞击拒绝对穿的单位
+   */
+  disableRouteCache?: boolean;
 }
 
 /**
