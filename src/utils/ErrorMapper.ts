@@ -30,7 +30,7 @@ export class ErrorMapper {
       return this.cache[stack];
     }
 
-    const re = /^\s+at\s+(.+?\s+)?\(?([0-z._\-\\\/]+):(\d+):(\d+)\)?$/gm;
+    const re = /^\s+at\s+(.+?\s+)?\(?([0-z._\-\\/]+):(\d+):(\d+)\)?$/gm;
     let match: RegExpExecArray | null;
     let outStack = error.toString();
 

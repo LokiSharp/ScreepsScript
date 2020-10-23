@@ -1,8 +1,7 @@
 import { MIN_WALL_HITS, repairSetting } from "setting";
+import { Move, WayPoint } from "modules/move";
 import { getMemoryFromCrossShard } from "modules/crossShard";
-import { goTo } from "modules/move";
 import roles from "role";
-import { setWayPoint } from "modules/move/WayPoint";
 
 export default class CreepExtension extends Creep {
   /**
@@ -77,7 +76,7 @@ export default class CreepExtension extends Creep {
    * @param target 要移动到的位置
    */
   public goTo(target?: RoomPosition, moveOpt?: MoveOpt): ScreepsReturnCode {
-    return goTo(this, target, moveOpt);
+    return Move.goTo(this, target, moveOpt);
   }
 
   /**
@@ -87,7 +86,7 @@ export default class CreepExtension extends Creep {
    * @param target 要进行设置的目标，位置字符串数组或者是路径名前缀
    */
   public setWayPoint(target: string[] | string): ScreepsReturnCode {
-    return setWayPoint(this, target);
+    return WayPoint.setWayPoint(this, target);
   }
 
   /**
