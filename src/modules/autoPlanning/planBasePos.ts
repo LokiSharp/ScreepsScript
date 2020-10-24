@@ -21,7 +21,7 @@ const ROOM_MAX_SIZE = 50;
  * @param j 目标正方形右下角的 x 坐标
  * @param len 正方形的边长
  */
-const getOtherArea = function (
+function getOtherArea(
   dp: DpNode[][],
   i: number,
   j: number,
@@ -35,7 +35,7 @@ const getOtherArea = function (
     top: i - len > -1 ? dp[i - len][j] : nullNode,
     left: j - len > -1 ? dp[i][j - len] : nullNode
   };
-};
+}
 
 /**
  * 获取该正方形中心点的坐标
@@ -45,9 +45,9 @@ const getOtherArea = function (
  * @param len 正方形的边长
  * @returns [0] 为中央点 x 坐标，[1] 为 y 坐标
  */
-const getCenterBybottomRight = function (i: number, j: number, len: number): [number, number] {
+function getCenterBybottomRight(i: number, j: number, len: number): [number, number] {
   return [i - len / 2 + 0.5, j - len / 2 + 0.5];
-};
+}
 
 /**
  * 在房间中找到所有可以放下基地的点
@@ -57,7 +57,7 @@ const getCenterBybottomRight = function (i: number, j: number, len: number): [nu
  * @param baseSize 正方形基地的尺寸
  * @returns 所有满足条件的房间位置
  */
-export const findBaseCenterPos = function (roomName: string, baseSize = 11): RoomPosition[] {
+export function findBaseCenterPos(roomName: string, baseSize = 11): RoomPosition[] {
   const terrain = new Room.Terrain(roomName);
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -107,7 +107,7 @@ export const findBaseCenterPos = function (roomName: string, baseSize = 11): Roo
   }
 
   return result;
-};
+}
 
 /**
  * 确定唯一的基地中心点
@@ -116,7 +116,7 @@ export const findBaseCenterPos = function (roomName: string, baseSize = 11): Roo
  * @param targetPos 待选的中心点数组
  * @returns 基地中心点
  */
-export const confirmBasePos = function (room: Room, targetPos: RoomPosition[]): RoomPosition {
+export function confirmBasePos(room: Room, targetPos: RoomPosition[]): RoomPosition {
   if (!targetPos || targetPos.length <= 0) return undefined;
 
   const controller = room.controller;
@@ -132,7 +132,7 @@ export const confirmBasePos = function (room: Room, targetPos: RoomPosition[]): 
   // 找到最小值并返回对应的位置
   const target = _.min(totalDistances, item => item.distance);
   return targetPos[target.index];
-};
+}
 
 /**
  * 给指定房间设置中心点
@@ -140,9 +140,9 @@ export const confirmBasePos = function (room: Room, targetPos: RoomPosition[]): 
  * @param room 要设置中心点的房间
  * @param centerPos 中心点坐标
  */
-export const setBaseCenter = function (room: Room, centerPos: RoomPosition): OK | ERR_INVALID_ARGS {
+export function setBaseCenter(room: Room, centerPos: RoomPosition): OK | ERR_INVALID_ARGS {
   if (!centerPos) return ERR_INVALID_ARGS;
 
   room.memory.center = [centerPos.x, centerPos.y];
   return OK;
-};
+}

@@ -5,7 +5,7 @@
  */
 import RoomExtension from "./RoomExtension";
 import { getName } from "utils/getName";
-import { planLayout } from "modules/autoPlanning/planBaseLayout";
+import { manageStructure } from "modules/autoPlanning";
 import { setBaseCenter } from "modules/autoPlanning/planBasePos";
 
 export default class RoomConsole extends RoomExtension {
@@ -76,7 +76,7 @@ export default class RoomConsole extends RoomExtension {
     setBaseCenter(this, flag.pos);
     flag.remove();
     // 设置好了之后自动运行布局规划
-    planLayout(this);
+    manageStructure(this);
     return `[${this.name}] 已将 ${flagName} 设置为中心点，controller 升级时自动执行布局规划`;
   }
 }

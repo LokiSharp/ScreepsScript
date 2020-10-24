@@ -1,9 +1,9 @@
+import { manageStructure } from "modules/autoPlanning";
 import mountCreep from "./creep";
 import mountGlobal from "./global";
 import mountRoom from "./room";
 import mountRoomPostio from "./roomPosition";
 import mountStructure from "./structures";
-import { planLayout } from "modules/autoPlanning/planBaseLayout";
 
 /**
  * 挂载所有的额外属性和方法
@@ -42,7 +42,6 @@ function workAfterMount() {
   // 对所有的房间执行建筑规划，防止有房间缺失建筑
   Object.values(Game.rooms).forEach(room => {
     if (!room.controller || !room.controller.my) return;
-
-    planLayout(room);
+    manageStructure(room);
   });
 }

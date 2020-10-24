@@ -1,10 +1,9 @@
-import { clearStructure, planLayout } from "modules/autoPlanning/planBaseLayout";
 import { confirmBasePos, findBaseCenterPos, setBaseCenter } from "modules/autoPlanning/planBasePos";
+import { manageStructure, releaseCreep } from "modules/autoPlanning";
 import { ENERGY_SHARE_LIMIT } from "setting";
 import { createRoomLink } from "utils/createRoomLink";
 import { creepApi } from "modules/creepController/creepApi";
 import { log } from "utils/log";
-import { releaseCreep } from "modules/autoPlanning/planCreep";
 
 export default class RoomExtension extends Room {
   /**
@@ -461,16 +460,11 @@ export default class RoomExtension extends Room {
    * 执行自动建筑规划
    */
   public planLayout(): string {
-    const result = planLayout(this);
+    const result = manageStructure(this);
 
     if (result === OK) return `自动规划完成`;
     else if (result === ERR_NOT_OWNER) return `自动规划失败，房间没有控制权限`;
     else return `未找到基地中心点位，请执行 Game.rooms.${this.name}.setcenter 以启用自动规划`;
-  }
-
-  // 移除不必要的建筑
-  public clearStructure(): OK | ERR_NOT_FOUND {
-    return clearStructure(this);
   }
 
   /**

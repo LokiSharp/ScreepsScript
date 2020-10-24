@@ -4,6 +4,15 @@ import { getBodyConfig } from "utils/getBodyConfig";
 export const MAX_UPGRADER_NUM = 24;
 export const MAX_HARVESTER_NUM = 4;
 export const MAX_RUIN_COLLECTOR_NUM = 1;
+// tower 将在几级之后参与刷墙
+export const TOWER_FILL_WALL_LEVEL = 6;
+
+// RCL 几级时开始放置外墙
+export const LEVEL_START_BUILD_RAMPART = 3;
+
+// RCL 几级的时候开始放置通向 [ source, controller, mineral ] 的道路
+// 注意这个顺序要和 src\modules\autoPlanning\planRoad.ts 的默认方法返回值保持一致
+export const LEVEL_BUILD_ROAD = [3, 4, 6];
 
 export const TRANSFER_DEATH_LIMIT = 20;
 
@@ -256,11 +265,11 @@ export const DEAL_RATIO: DealRatios = {
  * 描述了在不同等级时应该将不同建筑放置在何处（相对于基地中心点）
  * 值为 null 代表在集中式布局之外，会自动选择其放置点
  */
-export const baseLayout: BaseLayout = {
-  1: {
+export const baseLayout: BaseLayout = [
+  {
     [STRUCTURE_SPAWN]: [[-3, 2]]
   },
-  2: {
+  {
     [STRUCTURE_EXTENSION]: [
       [-4, 3],
       [-3, 4],
@@ -269,7 +278,7 @@ export const baseLayout: BaseLayout = {
       [-5, 2]
     ]
   },
-  3: {
+  {
     [STRUCTURE_EXTENSION]: [
       [-4, 5],
       [-3, 5],
@@ -288,7 +297,7 @@ export const baseLayout: BaseLayout = {
       [-4, 4]
     ]
   },
-  4: {
+  {
     [STRUCTURE_EXTENSION]: [
       [-3, 1],
       [-4, 1],
@@ -316,7 +325,7 @@ export const baseLayout: BaseLayout = {
       [-2, 1]
     ]
   },
-  5: {
+  {
     [STRUCTURE_EXTENSION]: [
       [5, 3],
       [5, 2],
@@ -346,7 +355,7 @@ export const baseLayout: BaseLayout = {
       [-1, 0]
     ]
   },
-  6: {
+  {
     [STRUCTURE_EXTENSION]: [
       [-5, -2],
       [-5, -3],
@@ -379,7 +388,7 @@ export const baseLayout: BaseLayout = {
     ],
     [STRUCTURE_RAMPART]: [[1, 0]]
   },
-  7: {
+  {
     [STRUCTURE_EXTENSION]: [
       [5, -1],
       [5, 1],
@@ -415,7 +424,7 @@ export const baseLayout: BaseLayout = {
       [2, 1]
     ]
   },
-  8: {
+  {
     [STRUCTURE_EXTENSION]: [
       [1, -4],
       [1, -5]
@@ -448,7 +457,7 @@ export const baseLayout: BaseLayout = {
       [2, -1]
     ]
   }
-};
+];
 
 /**
  * 默认的旗帜名称

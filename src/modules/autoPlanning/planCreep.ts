@@ -31,9 +31,9 @@ Function.prototype.setNextPlan = function (nextPlan): PlanNodeFunction {
  * @param indexs creep 的名称后缀
  * @param sourceId 能量来源 id
  */
-const addUpgrader = function (roomName: string, indexs: number[], sourceId: string): void {
+function addUpgrader(roomName: string, indexs: number[], sourceId: string): void {
   indexs.forEach(i => creepApi.add(`${roomName} upgrader${i}`, "upgrader", { sourceId }, roomName));
-};
+}
 
 const releasePlans: CreepReleasePlans = {
   /**
@@ -304,44 +304,44 @@ Object.keys(releasePlans).forEach(role => {
  * 发布采集者
  * @param room 要发布角色的房间
  */
-const releaseHarvester = function (room: Room): OK {
+function releaseHarvester(room: Room): OK {
   // 先移除所有的配置项
   for (let i = 0; i < MAX_HARVESTER_NUM; i++) creepApi.remove(`${room.name} harvester${i}`);
 
   // 然后重新发布
   planChains.harvester(releasePlans.harvester.getStats(room));
   return OK;
-};
+}
 
 /**
  * 发布运输者
  * @param room 要发布角色的房间
  */
-const releaseTransporter = function (room: Room): OK {
+function releaseTransporter(room: Room): OK {
   // 不需要提前移除，因为运输者的数量不会发生大范围波动
   planChains.transporter(releasePlans.transporter.getStats(room));
   return OK;
-};
+}
 
 /**
  * 发布升级者
  * @param room 要发布角色的房间
  */
-const releaseUpgrader = function (room: Room): OK {
+function releaseUpgrader(room: Room): OK {
   // 先移除所有的配置项
   for (let i = 0; i < MAX_UPGRADER_NUM; i++) creepApi.remove(`${room.name} upgrader${i}`);
 
   // 然后重新发布
   planChains.upgrader(releasePlans.upgrader.getStats(room));
   return OK;
-};
+}
 
 /**
  * 发布建造者
  * @param room 要发布角色的房间
  * @param releaseNumber 要发布的角色数量
  */
-const releaseBuilder = function (room: Room, releaseNumber = 2): OK {
+function releaseBuilder(room: Room, releaseNumber = 2): OK {
   for (let i = 0; i < releaseNumber; i++) {
     creepApi.add(
       `${room.name} builder${i}`,
@@ -354,14 +354,14 @@ const releaseBuilder = function (room: Room, releaseNumber = 2): OK {
   }
 
   return OK;
-};
+}
 
 /**
  * 发布刷墙工
  * @param room 要发布角色的房间
  * @param releaseNumber 要发布的角色数量
  */
-const releaseRepairer = function (room: Room, releaseNumber = 1): OK {
+function releaseRepairer(room: Room, releaseNumber = 1): OK {
   Array(releaseNumber)
     .fill(undefined)
     .forEach((_, index) => {
@@ -376,12 +376,12 @@ const releaseRepairer = function (room: Room, releaseNumber = 1): OK {
     });
 
   return OK;
-};
+}
 
 /**
  * 房间运营角色名对应的发布逻辑
  */
-const roleToRelease: {
+export const roleToRelease: {
   [role in BaseRoleConstant | AdvancedRoleConstant]: (room: Room, releaseNumber: number) => OK | ERR_NOT_FOUND;
 } = {
   harvester: releaseHarvester,
@@ -401,10 +401,6 @@ const roleToRelease: {
  * @param room 要发布 creep 的房间
  * @param role 要发布的角色名
  */
-export const releaseCreep = function (
-  room: Room,
-  role: BaseRoleConstant | AdvancedRoleConstant,
-  num = 1
-): OK | ERR_NOT_FOUND {
+export function releaseCreep(room: Room, role: BaseRoleConstant | AdvancedRoleConstant, num = 1): OK | ERR_NOT_FOUND {
   return roleToRelease[role](room, num);
-};
+}
