@@ -27,7 +27,6 @@ export class Cross {
         // 如果移动的方向就是
         if ((Number(creep.memory.moveInfo.path[0]) as DirectionConstant) !== direction) {
           delete creep.memory.moveInfo.path;
-          delete creep.memory.moveInfo.prePos;
         }
       }
       return moveResult;
@@ -54,8 +53,10 @@ export class Cross {
     // 如果前面的 creep 同意对穿了，自己就朝前移动
     const reverseDirection = getOppositeDirection(direction);
     const fontMoveResult = this.requireCross(fontCreep, reverseDirection, creep);
-    if (fontMoveResult !== OK) return ERR_BUSY;
-
+    if (fontMoveResult !== OK) {
+      creep.say(`👉 ${fontMoveResult}`);
+      return ERR_BUSY;
+    }
     const selfMoveResult = creep.move(direction);
     return selfMoveResult === OK && fontMoveResult === OK ? OK : ERR_BUSY;
   }
