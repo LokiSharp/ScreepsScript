@@ -393,14 +393,3 @@ export const roleToRelease: {
   builder: releaseBuilder,
   repairer: releaseRepairer
 };
-
-/**
- * 在指定房间发布 creep
- * 本函数的发布会控制房间内的所有同种类 creep，所以对于某些角色来说调用一次本函数可能会新增或删除多个 creep
- *
- * @param room 要发布 creep 的房间
- * @param role 要发布的角色名
- */
-export function releaseCreep(room: Room, role: BaseRoleConstant | AdvancedRoleConstant, num = 1): OK | ERR_NOT_FOUND {
-  return roleToRelease[role](room, num);
-}
