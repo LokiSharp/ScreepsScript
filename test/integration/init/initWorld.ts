@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -12,7 +13,7 @@ const DIST_MAIN_JS_MAP = "dist/main.js.map.js";
 export async function initWorld(helper: IntegrationTestHelper, RCL: number): Promise<void> {
   const { db } = helper.server.common.storage;
   const C = helper.server.constants;
-  const terrain = new TerrainMatrix();
+  const terrain: MockedTerrainMatrix = new TerrainMatrix();
   const walls = [
     [10, 10],
     [10, 40],
@@ -49,7 +50,7 @@ export async function initWorld(helper: IntegrationTestHelper, RCL: number): Pro
   await Promise.all([
     db["rooms.objects"].update(
       { _id: controller._id },
-      { $set: { level: RCL, progress: (C.CONTROLLER_LEVELS[RCL] / 100) * 99 } }
+      { $set: { level: RCL, progress: (C.CONTROLLER_LEVELS[RCL] / 100) * 99.9 } }
     )
   ]);
 }

@@ -1,49 +1,40 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @typescript-eslint/no-use-before-define */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable no-underscore-dangle */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/explicit-member-accessibility */
 const { ScreepsServer, stdHooks } = require("screeps-server-mockup");
 
-/*
- * Helper class for creating a ScreepsServer and resetting it between tests.
- * See https://github.com/Hiryus/screeps-server-mockup for instructions on
- * manipulating the terrain and game state.
- */
 export class IntegrationTestHelper {
-  private _server: any;
+  private mockedServer;
 
-  get server() {
-    return this._server;
+  public get server(): MockedServer {
+    return this.mockedServer as MockedServer;
   }
 
-  private _player: any;
+  private mockedUser;
 
-  get player() {
-    return this._player;
+  public get player(): MockedUser {
+    return this.mockedUser as MockedUser;
   }
 
-  set player(player) {
-    this._player = player;
+  public set player(player: MockedUser) {
+    this.mockedUser = player;
   }
 
-  async beforeEach() {
-    this._server = new ScreepsServer();
-
-    await this._server.world.reset();
+  public async beforeEach(): Promise<void> {
+    this.mockedServer = new ScreepsServer();
+    await this.mockedServer.world.reset();
 
     // Start server
-    await this._server.start();
+    await this.mockedServer.start();
   }
 
-  async afterEach() {
-    await this._server.stop();
+  public async afterEach(): Promise<void> {
+    await this.mockedServer.stop();
   }
 }
+
+export const helper = new IntegrationTestHelper();
 
 beforeEach(async () => {
   await helper.beforeEach();
@@ -54,7 +45,5 @@ afterEach(async () => {
 });
 
 before(() => {
-  stdHooks.hookWrite();
+  (stdHooks as StdHooks).hookWrite();
 });
-
-export const helper = new IntegrationTestHelper();

@@ -30,9 +30,10 @@ export default class ControllerExtension extends StructureController {
    * @param level 当前的等级
    */
   public onLevelChange(level: number): void {
+    this.room.releaseCreep("harvester");
+
     // 刚占领，添加最基础的角色组
     if (level === 1) {
-      this.room.releaseCreep("harvester");
       // 多发布一个 build 协助建造
       this.room.releaseCreep("builder", 1);
     }
