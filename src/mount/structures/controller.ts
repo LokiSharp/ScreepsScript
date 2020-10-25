@@ -73,8 +73,8 @@ export default class ControllerExtension extends StructureController {
    */
   public checkEnemyThreat(): boolean {
     // 这里并没有搜索 PC，因为 PC 不是敌人主力
-    const enemy = this.room.enemys;
-    if (enemy.length <= 0) return false;
+    const enemy = this.room.enemys || this.room.find(FIND_HOSTILE_CREEPS);
+    if (enemy && enemy.length <= 0) return false;
 
     // 如果来的都是入侵者的话，就算撑破天了也不管
     if (!enemy.find(creep => creep.owner.username !== "Invader")) return false;
