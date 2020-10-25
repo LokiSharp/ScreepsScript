@@ -50,7 +50,7 @@ export async function initWorld(helper: IntegrationTestHelper, RCL: number): Pro
   await Promise.all([
     db["rooms.objects"].update(
       { _id: controller._id },
-      { $set: { level: RCL, progress: (C.CONTROLLER_LEVELS[RCL] / 100) * 99.9 } }
+      { $set: { level: RCL, progress: (C.CONTROLLER_LEVELS[RCL] / 100) * 99 } }
     )
   ]);
 }
