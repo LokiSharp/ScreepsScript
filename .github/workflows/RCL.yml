@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [12.x]
+        node-version: [10.x]
         RCL: ["RCL1ToRCL2", "RCL2ToRCL3", "RCL3ToRCL4", "RCL4ToRCL5", "RCL5ToRCL6", "RCL6ToRCL7", "RCL7ToRCL8"]
 
     steps:
@@ -34,3 +34,15 @@ jobs:
       - run: npm run build
       - run: npx rollup -c rollup.test-integration-config.js -i test/integration/${{ matrix.RCL }}.test.ts
       - run: npx mocha dist/test-integration.bundle.js
+
+      - name: Update Code Artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: dist
+        path: dist
+
+      - name: Update Server Artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: server
+        path: server
