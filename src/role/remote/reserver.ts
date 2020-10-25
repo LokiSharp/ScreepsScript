@@ -1,3 +1,6 @@
+import { bodyConfigs } from "setting";
+import { createBodyGetter } from "utils/createBodyGetter";
+
 /**
  * 预定者
  * 这个角色并不会想太多，出生了就去预定，一辈子走完了就不再出生，外矿采集单位采集的时候会检查预定剩余时间，如果不够了会自己发布该角色
@@ -33,5 +36,5 @@ export default (data: RemoteDeclarerData): ICreepConfig => ({
     }
     return false;
   },
-  bodys: "reserver"
+  bodys: createBodyGetter(bodyConfigs.reserver)
 });

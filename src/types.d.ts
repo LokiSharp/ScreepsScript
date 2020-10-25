@@ -38,9 +38,6 @@ interface Memory {
       data: CreepData;
       // 执行 creep 孵化的房间名
       spawnRoom: string;
-      // creep 孵化时使用的身体部件
-      // 为 string 时则自动规划身体部件，为 BodyPartConstant[] 时则强制生成该身体配置
-      bodys: BodyAutoConfigConstant | BodyPartConstant[];
     };
   };
 
@@ -132,8 +129,10 @@ interface BodySet {
 type BodySets = [BodySet, BodySet, BodySet, BodySet, BodySet, BodySet, BodySet, BodySet];
 
 type BodyConfig = {
-  [energyLevel in 300 | 550 | 800 | 1300 | 1800 | 2300 | 5600 | 10000]: BodyPartConstant[];
+  [energyLevel in EnergyLevel]: BodyPartConstant[];
 };
+
+type EnergyLevel = "300" | "550" | "800" | "1300" | "1800" | "2300" | "5600" | "10000";
 
 /**
  * 身体配置项类别
@@ -155,7 +154,7 @@ interface ICreepConfig {
   prepare?: (creep: Creep) => boolean;
   source?: (creep: Creep) => boolean;
   target?: (creep: Creep) => boolean;
-  bodys: BodyAutoConfigConstant | BodyPartConstant[];
+  bodys: (room: Room, spawn: StructureSpawn) => BodyPartConstant[];
 }
 
 type BodyAutoConfigConstant =

@@ -1,5 +1,6 @@
+import { ROOM_TRANSFER_TASK, bodyConfigs } from "setting";
 import { getRoomTransferTask, transferTaskOperations } from "../../utils/roomTransferTask";
-import { ROOM_TRANSFER_TASK } from "setting";
+import { createBodyGetter } from "utils/createBodyGetter";
 
 /**
  * 填充单位
@@ -49,5 +50,5 @@ export default (data: WorkerData): ICreepConfig => ({
     if (creep.store[RESOURCE_ENERGY] <= 0) return true;
     else return false;
   },
-  bodys: "transporter"
+  bodys: createBodyGetter(bodyConfigs.transporter)
 });

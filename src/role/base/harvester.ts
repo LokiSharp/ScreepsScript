@@ -1,3 +1,6 @@
+import { bodyConfigs } from "setting";
+import { createBodyGetter } from "utils/createBodyGetter";
+
 /**
  * 采矿者
  * 从指定矿中挖矿 > 将矿转移到 spawn 和 extension 中
@@ -102,5 +105,5 @@ export default (data: HarvesterData): ICreepConfig => ({
     if (creep.ticksToLive < 2) creep.drop(RESOURCE_ENERGY);
     return false;
   },
-  bodys: "harvester"
+  bodys: createBodyGetter(bodyConfigs.harvester)
 });

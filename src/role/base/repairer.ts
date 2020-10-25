@@ -1,3 +1,6 @@
+import { bodyConfigs } from "setting";
+import { createBodyGetter } from "utils/createBodyGetter";
+
 /**
  * 维修者
  * 从指定结构中获取能量 > 维修房间内的建筑
@@ -53,5 +56,5 @@ export default (data: WorkerData): ICreepConfig => ({
     if (creep.store.getUsedCapacity() === 0) return true;
     else return false;
   },
-  bodys: "worker"
+  bodys: createBodyGetter(bodyConfigs.worker)
 });

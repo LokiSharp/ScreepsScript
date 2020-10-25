@@ -1,3 +1,6 @@
+import { bodyConfigs } from "setting";
+import { createBodyGetter } from "utils/createBodyGetter";
+
 /**
  * 建筑者
  * 只有在有工地时才会生成
@@ -56,5 +59,5 @@ export default (data: HarvesterData): ICreepConfig => ({
     if (creep.store.getUsedCapacity() === 0) return true;
     else return false;
   },
-  bodys: "worker"
+  bodys: createBodyGetter(bodyConfigs.worker)
 });

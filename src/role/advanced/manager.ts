@@ -1,6 +1,7 @@
-import { getRoomTransferTask, transferTaskOperations } from "../../utils/roomTransferTask";
-import { TRANSFER_DEATH_LIMIT } from "setting";
-import { deathPrepare } from "../../utils/deathPrepare";
+import { TRANSFER_DEATH_LIMIT, bodyConfigs } from "setting";
+import { getRoomTransferTask, transferTaskOperations } from "utils/roomTransferTask";
+import { createBodyGetter } from "utils/createBodyGetter";
+import { deathPrepare } from "utils/deathPrepare";
 
 /**
  * 房间物流运输者
@@ -27,5 +28,5 @@ export default (data: WorkerData): ICreepConfig => ({
     if (task) return transferTaskOperations[task.type].target(creep, task);
     else return true;
   },
-  bodys: "transporter"
+  bodys: createBodyGetter(bodyConfigs.transporter)
 });

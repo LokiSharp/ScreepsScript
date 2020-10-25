@@ -1,3 +1,6 @@
+import { bodyConfigs } from "setting";
+import { createBodyGetter } from "utils/createBodyGetter";
+
 /**
  * 收集者
  * 从指定 source 中获取资源 > 将资源转移到指定建筑中
@@ -44,5 +47,5 @@ export default (data: HarvesterData): ICreepConfig => ({
     if (creep.store.getUsedCapacity() === 0) return true;
     return false;
   },
-  bodys: "worker"
+  bodys: createBodyGetter(bodyConfigs.worker)
 });

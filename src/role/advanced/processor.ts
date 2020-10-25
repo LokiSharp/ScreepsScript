@@ -1,3 +1,6 @@
+import { bodyConfigs } from "setting";
+import { createBodyGetter } from "utils/createBodyGetter";
+
 /**
  * 中心搬运者
  * 从房间的中央任务队列 Room.memory.centerTransferTasks 中取出任务并执行
@@ -85,5 +88,5 @@ export default (data: ProcessorData): ICreepConfig => ({
 
     return false;
   },
-  bodys: "processor"
+  bodys: createBodyGetter(bodyConfigs.processor)
 });

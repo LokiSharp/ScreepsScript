@@ -1,3 +1,6 @@
+import { bodyConfigs } from "setting";
+import { createBodyGetter } from "utils/createBodyGetter";
+
 /**
  * 外矿采集者
  * 从指定矿中挖矿 > 将矿转移到建筑中
@@ -155,5 +158,5 @@ export default (data: RemoteHarvesterData): ICreepConfig => ({
 
     return false;
   },
-  bodys: "remoteHarvester"
+  bodys: createBodyGetter(bodyConfigs.remoteHarvester)
 });

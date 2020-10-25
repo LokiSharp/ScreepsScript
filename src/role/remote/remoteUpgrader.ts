@@ -1,3 +1,5 @@
+import { bodyConfigs } from "setting";
+import { createBodyGetter } from "utils/createBodyGetter";
 import { remoteHelperIsNeed } from "utils/remoteHelperIsNeed";
 
 /**
@@ -69,5 +71,5 @@ export default (data: RemoteDeclarerData): ICreepConfig => ({
     if (creep.store.getUsedCapacity() === 0) return true;
     return false;
   },
-  bodys: "remoteHelper"
+  bodys: createBodyGetter(bodyConfigs.remoteHelper)
 });

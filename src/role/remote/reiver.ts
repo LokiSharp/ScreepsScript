@@ -1,3 +1,6 @@
+import { bodyConfigs } from "setting";
+import { createBodyGetter } from "utils/createBodyGetter";
+
 /**
  * 掠夺者
  * 暂不支持从 ruin 中获取资源
@@ -136,5 +139,5 @@ export default (data: ReiverData): ICreepConfig => ({
     } else creep.goTo(targetStructure.pos);
     return false;
   },
-  bodys: "transporter"
+  bodys: createBodyGetter(bodyConfigs.transporter)
 });

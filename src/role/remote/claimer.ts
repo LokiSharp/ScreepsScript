@@ -105,5 +105,5 @@ export default (data: RemoteDeclarerData): ICreepConfig => ({
     }
     return false;
   },
-  bodys: [MOVE, CLAIM]
+  bodys: () => [MOVE, CLAIM]
 });

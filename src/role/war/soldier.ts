@@ -1,3 +1,6 @@
+import { bodyConfigs } from "setting";
+import { createBodyGetter } from "utils/createBodyGetter";
+
 /**
  * 士兵
  * 会一直向旗帜发起进攻,
@@ -19,5 +22,5 @@ export default (data: WarUnitData): ICreepConfig => ({
     }
     return false;
   },
-  bodys: "attacker"
+  bodys: createBodyGetter(bodyConfigs.attacker)
 });

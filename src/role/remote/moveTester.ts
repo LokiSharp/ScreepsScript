@@ -25,5 +25,5 @@ export default (data: RemoteDeclarerData): ICreepConfig => ({
 
     return false;
   },
-  bodys: [MOVE]
+  bodys: () => [MOVE]
 });
