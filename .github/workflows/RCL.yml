@@ -36,13 +36,13 @@ jobs:
       - run: npx mocha dist/test-integration.bundle.js
 
       - name: Update Code Artifact
-      uses: actions/upload-artifact@v1
-      with:
-        name: dist
-        path: dist
+        uses: actions/upload-artifact@v1
+        with:
+          name: dist
+          path: dist
 
       - name: Update Server Artifact
-      uses: actions/upload-artifact@v1
-      with:
-        name: server
-        path: server
+        uses: actions/upload-artifact@v1
+        with:
+          name: server
+          path: server
