@@ -224,7 +224,11 @@ export const manageStructure = function (room: Room): OK | ERR_NOT_OWNER | ERR_N
   if (needBuild) releaseCreep(room, "builder", 2);
 
   // 存档到房间
-  if (delayQueue.length > 0) room.memory.delayCSList = delayQueue;
+  if (delayQueue.length > 0) {
+    room.memory.delayCSList = delayQueue;
+  } else {
+    delete room.memory.delayCSList;
+  }
 
   return OK;
 };
