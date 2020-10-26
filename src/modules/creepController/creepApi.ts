@@ -1,4 +1,4 @@
-import { colorful } from "utils/colorful";
+import colorful from "utils/colorful";
 import roles from "role";
 
 /**

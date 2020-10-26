@@ -1,6 +1,6 @@
 import TerminalConsole from "./TerminalConsole";
 import TerminalExtension from "./TerminalExtension";
-import { assignPrototype } from "utils/prototype";
+import assignPrototype from "utils/assignPrototype";
 
 // 定义好挂载顺序
 const plugins = [TerminalExtension, TerminalConsole];

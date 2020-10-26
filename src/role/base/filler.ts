@@ -1,6 +1,6 @@
 import { ROOM_TRANSFER_TASK, bodyConfigs } from "setting";
 import { getRoomTransferTask, transferTaskOperations } from "../../utils/roomTransferTask";
-import { createBodyGetter } from "utils/createBodyGetter";
+import createBodyGetter from "utils/createBodyGetter";
 
 /**
  * 填充单位

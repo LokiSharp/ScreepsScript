@@ -1,5 +1,5 @@
 import { bodyConfigs } from "setting";
-import { createBodyGetter } from "utils/createBodyGetter";
+import createBodyGetter from "utils/createBodyGetter";
 
 /**
  * 中心搬运者

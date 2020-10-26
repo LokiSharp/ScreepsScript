@@ -2,7 +2,7 @@
  * 全局统计信息扫描器
  * 负责搜集关于 cpu、memory、GCL、GPL 的相关信息
  */
-export function stateScanner(): void {
+export default function stateScanner(): void {
   if (Game.time % 20) return;
 
   if (!Memory.stats) Memory.stats = { rooms: {} };

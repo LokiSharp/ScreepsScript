@@ -6,7 +6,7 @@
  * @param creep manager
  * @param sourceId 能量存放处
  */
-export const deathPrepare = function (creep: Creep, sourceId: string): false {
+export default function deathPrepare(creep: Creep, sourceId: string): false {
   if (creep.store.getUsedCapacity() > 0) {
     for (const resourceType in creep.store) {
       let target: StructureStorage | StructureTerminal;
@@ -26,4 +26,4 @@ export const deathPrepare = function (creep: Creep, sourceId: string): false {
   } else creep.suicide();
 
   return false;
-};
+}

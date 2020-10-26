@@ -5,7 +5,7 @@
  */
 import { LAB_STATE, labTarget } from "setting";
 import RoomExtension from "./RoomExtension";
-import { colorful } from "utils/colorful";
+import colorful from "utils/colorful";
 import { getName } from "utils/getName";
 import { manageStructure } from "modules/autoPlanning";
 import { setBaseCenter } from "modules/autoPlanning/planBasePos";

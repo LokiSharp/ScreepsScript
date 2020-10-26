@@ -5,7 +5,7 @@
  * @param target 被支援的房间
  * @param customCondition 自定义判断条件
  */
-export const remoteHelperIsNeed = function (source: Room, target: Room, customCondition: () => boolean): boolean {
+export default function remoteHelperIsNeed(source: Room, target: Room, customCondition: () => boolean): boolean {
   // 源房间没视野就默认孵化
   if (!target) return true;
 
@@ -18,4 +18,4 @@ export const remoteHelperIsNeed = function (source: Room, target: Room, customCo
     return false;
 
   return true;
-};
+}

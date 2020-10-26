@@ -1,7 +1,7 @@
 import { ENERGY_SHARE_LIMIT, ROOM_TRANSFER_TASK } from "setting";
 import { confirmBasePos, findBaseCenterPos, setBaseCenter } from "modules/autoPlanning/planBasePos";
 import { manageStructure, releaseCreep } from "modules/autoPlanning";
-import { createRoomLink } from "utils/createRoomLink";
+import createRoomLink from "utils/createRoomLink";
 import { creepApi } from "modules/creepController/creepApi";
 import { log } from "utils/log";
 

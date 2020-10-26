@@ -1,6 +1,6 @@
 import { SourceMapConsumer } from "source-map";
 
-export class ErrorMapper {
+export default class ErrorMapper {
   // Cache consumer
   protected static _?: SourceMapConsumer;
 

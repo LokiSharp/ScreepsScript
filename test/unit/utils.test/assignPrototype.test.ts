@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import { assignPrototype } from "../../../src/utils/prototype";
+import assignPrototype from "../../../src/utils/assignPrototype";
 
 export class TestPrototypeExtension extends Object {
   public methodIsAssignable(): boolean {

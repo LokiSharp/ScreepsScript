@@ -1,11 +1,11 @@
-import ControllerExtension from "./controller";
-import LabExtension from "./lab";
-import { LinkExtension } from "./link";
-import SpawnExtension from "./spawn";
-import StorageExtension from "./storage";
-import StructureExtension from "./structure";
-import TowerExtension from "./tower";
-import { assignPrototype } from "utils/prototype";
+import ControllerExtension from "./ControllerExtension";
+import LabExtension from "./LabExtension";
+import LinkExtension from "./LinkExtension";
+import SpawnExtension from "./SpawnExtension";
+import StorageExtension from "./StorageExtension";
+import StructureExtension from "./StructureExtension";
+import TowerExtension from "./TowerExtension";
+import assignPrototype from "utils/assignPrototype";
 import mountTerminal from "./terminal";
 
 /**

@@ -1,4 +1,4 @@
-import { getBodyConfig } from "utils/getBodyConfig";
+import getBodyConfig from "utils/getBodyConfig";
 
 // 每个房间最多同时存在多少单位
 export const MAX_UPGRADER_NUM = 24;

@@ -1,10 +1,10 @@
 import { execShard, saveShardData } from "modules/crossShard";
-import { ErrorMapper } from "utils/ErrorMapper";
+import ErrorMapper from "utils/ErrorMapper";
 import creepNumberListener from "modules/creepController/creepNumberListener";
-import { doing } from "utils/doing";
-import { generatePixel } from "utils/generatePixel";
+import doing from "utils/doing";
+import generatePixel from "utils/generatePixel";
 import mountWork from "mount";
-import { stateScanner } from "utils/stateScanner";
+import stateScanner from "utils/stateScanner";
 
 export const loop = ErrorMapper.wrapLoop(() => {
   if (Memory.showCost) console.log(`-------------------------- [${Game.time}] -------------------------- `);

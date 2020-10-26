@@ -1,7 +1,7 @@
 import { TRANSFER_DEATH_LIMIT, bodyConfigs } from "setting";
 import { getRoomTransferTask, transferTaskOperations } from "utils/roomTransferTask";
-import { createBodyGetter } from "utils/createBodyGetter";
-import { deathPrepare } from "utils/deathPrepare";
+import createBodyGetter from "utils/createBodyGetter";
+import deathPrepare from "utils/deathPrepare";
 
 /**
  * 房间物流运输者

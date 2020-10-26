@@ -4,7 +4,7 @@
  *
  * @param bodySet 身体部件配置对象
  */
-export function calcBodyPart(bodySet: BodySet): BodyPartConstant[] {
+export default function calcBodyPart(bodySet: BodySet): BodyPartConstant[] {
   // 把身体配置项拓展成如下形式的二维数组
   // [ [ TOUGH ], [ WORK, WORK ], [ MOVE, MOVE, MOVE ] ]
   const bodys = Object.keys(bodySet).map(type => Array(bodySet[type]).fill(type) as BodySet[]);

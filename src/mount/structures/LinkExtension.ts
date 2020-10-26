@@ -1,5 +1,5 @@
 // Link 原型拓展
-export class LinkExtension extends StructureLink {
+export default class LinkExtension extends StructureLink {
   /**
    * link 主要工作
    */

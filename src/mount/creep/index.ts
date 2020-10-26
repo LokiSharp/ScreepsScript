@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import CreepExtension from "./CreepExtension";
-import { assignPrototype } from "utils/prototype";
+import assignPrototype from "utils/assignPrototype";
 
 /**
  * 给指定方法包装“站定”功能

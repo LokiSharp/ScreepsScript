@@ -7,7 +7,7 @@ import { log } from "./log";
  * @param showCpu [可选] 传入指定字符串来启动该 Map 的数量统计
  */
 // eslint-disable-next-line @typescript-eslint/ban-types
-export function doing(...hashMaps: Object[]): void {
+export default function doing(...hashMaps: Object[]): void {
   hashMaps.forEach((obj, index) => {
     const startCost = Game.cpu.getUsed();
 

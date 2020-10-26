@@ -1,6 +1,6 @@
 import { bodyConfigs } from "setting";
-import { createBodyGetter } from "utils/createBodyGetter";
-import { remoteHelperIsNeed } from "utils/remoteHelperIsNeed";
+import createBodyGetter from "utils/createBodyGetter";
+import remoteHelperIsNeed from "utils/remoteHelperIsNeed";
 
 /**
  * 支援建造者

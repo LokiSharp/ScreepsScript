@@ -1,4 +1,4 @@
-import { colorful } from "./colorful";
+import colorful from "./colorful";
 
 /**
  * 全局日志

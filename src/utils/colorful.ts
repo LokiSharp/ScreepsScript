@@ -15,7 +15,7 @@ const colors: { [name in Colors]: string } = {
  * @param colorName 要添加的颜色常量字符串
  * @param bolder 是否加粗
  */
-export function colorful(content: string, colorName: Colors = null, bolder = false): string {
+export default function colorful(content: string, colorName: Colors = null, bolder = false): string {
   const colorStyle = colorName ? `color: ${colors[colorName]};` : "";
   const bolderStyle = bolder ? "font-weight: bolder;" : "";
 
