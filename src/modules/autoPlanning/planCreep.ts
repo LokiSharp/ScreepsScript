@@ -195,7 +195,7 @@ const releasePlans: CreepReleasePlans = {
       // 兜底，从 sourceContainer 中获取能量
       ({ room, sourceContainerIds }: UpgraderPlanStats) => {
         // 有援建单位，每个 container 少发布一个 upgrader
-        const upgraderIndexs = creepApi.has(`${room.name} RemoteUpgrader`) ? [0, 1] : [0, 1, 2];
+        const upgraderIndexs = creepApi.has(`${room.name} RemoteUpgrader`) ? [0] : [0, 1];
 
         // 遍历所有 container，发布对应数量的 upgrader
         sourceContainerIds.forEach((containerId, index) => {
@@ -361,19 +361,27 @@ function releaseBuilder(room: Room, releaseNumber = 2): OK {
  * @param room 要发布角色的房间
  * @param releaseNumber 要发布的角色数量
  */
-function releaseRepairer(room: Room, releaseNumber = 1): OK {
-  Array(releaseNumber)
-    .fill(undefined)
-    .forEach((_, index) => {
-      creepApi.add(
-        `${room.name} repair${index}`,
-        "repairer",
-        {
-          sourceId: room.storage ? room.storage.id : ""
-        },
-        room.name
-      );
-    });
+function releaseRepairer(room: Room, releaseNumber = 1): OK | ERR_NOT_ENOUGH_ENERGY {
+  let sources: string[];
+
+  // 优先使用 container 中的能量
+  if (!sources && room.sourceContainers.length > 0) sources = room.sourceContainers.map(c => c.id);
+  // container 没有再去找 storage 或 terminal
+  else if (!sources && room.storage) sources = [room.storage.id];
+  else if (!sources && room.terminal && room.terminal.store[RESOURCE_ENERGY] > 0) sources = [room.terminal.id];
+  // 都没有就没有能量来源了，拒绝发布
+  else return ERR_NOT_ENOUGH_ENERGY;
+
+  for (let i = 0; i < releaseNumber; i++) {
+    creepApi.add(
+      `${room.name} repair${i}`,
+      "repairer",
+      {
+        sourceId: sources[i % sources.length]
+      },
+      room.name
+    );
+  }
 
   return OK;
 }
@@ -382,7 +390,10 @@ function releaseRepairer(room: Room, releaseNumber = 1): OK {
  * 房间运营角色名对应的发布逻辑
  */
 export const roleToRelease: {
-  [role in BaseRoleConstant | AdvancedRoleConstant]: (room: Room, releaseNumber: number) => OK | ERR_NOT_FOUND;
+  [role in BaseRoleConstant | AdvancedRoleConstant]: (
+    room: Room,
+    releaseNumber: number
+  ) => OK | ERR_NOT_FOUND | ERR_NOT_ENOUGH_ENERGY;
 } = {
   harvester: releaseHarvester,
   collector: releaseHarvester,

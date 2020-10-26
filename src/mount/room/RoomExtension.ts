@@ -37,6 +37,8 @@ export default class RoomExtension extends Room {
     // 触发对应的 creep 发布规划
     this.releaseCreep("filler");
     this.releaseCreep("upgrader");
+    // 有几个 container 就发布几个 repairer
+    this.releaseCreep("repairer", this.memory.sourceContainersIds.length);
 
     return OK;
   }
