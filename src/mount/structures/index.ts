@@ -1,4 +1,5 @@
 import ControllerExtension from "./controller";
+import LabExtension from "./lab";
 import { LinkExtension } from "./link";
 import SpawnExtension from "./spawn";
 import StorageExtension from "./storage";
@@ -17,5 +18,6 @@ export default function (): void {
   assignPrototype(Spawn, SpawnExtension);
   assignPrototype(StructureStorage, StorageExtension);
   assignPrototype(StructureLink, LinkExtension);
+  assignPrototype(StructureLab, LabExtension);
   mountTerminal();
 }

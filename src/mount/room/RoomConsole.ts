@@ -3,7 +3,9 @@
  *
  * 本文件包含了 Room 中用于控制台交互的方法
  */
+import { LAB_STATE, labTarget } from "setting";
 import RoomExtension from "./RoomExtension";
+import { colorful } from "utils/colorful";
 import { getName } from "utils/getName";
 import { manageStructure } from "modules/autoPlanning";
 import { setBaseCenter } from "modules/autoPlanning/planBasePos";
@@ -78,5 +80,96 @@ export default class RoomConsole extends RoomExtension {
     // 设置好了之后自动运行布局规划
     manageStructure(this);
     return `[${this.name}] 已将 ${flagName} 设置为中心点，controller 升级时自动执行布局规划`;
+  }
+
+  /**
+   * 用户操作：初始化 lab 集群
+   * 要提前放好名字为 lab1 和 lab2 的两个旗帜（放在集群中间的两个 lab 上）
+   */
+  public linit(): string {
+    /**
+     * 获取旗帜及兜底
+     * @danger 这里包含魔法常量，若有需要应改写成数组形式
+     */
+    const lab1Flag = Game.flags.lab1;
+    const lab2Flag = Game.flags.lab2;
+    if (!lab1Flag || !lab2Flag) return `[lab 集群] 初始化失败，请新建名为 [lab1] 和 [lab2] 的旗帜`;
+    if (lab1Flag.pos.roomName !== this.name || lab2Flag.pos.roomName !== this.name)
+      return `[lab 集群] 初始化失败，旗帜不在本房间内，请进行检查`;
+
+    // 初始化内存, 之前有就刷新 id 缓存，没有就新建
+    if (this.memory.lab) {
+      this.memory.lab.inLab = [];
+      this.memory.lab.outLab = {};
+    } else {
+      this.memory.lab = {
+        state: "getTarget",
+        targetIndex: 1,
+        inLab: [],
+        outLab: {},
+        pause: false
+      };
+    }
+
+    // 获取并分配 lab
+    const labs = this.find(FIND_MY_STRUCTURES, {
+      filter: s => s.structureType === STRUCTURE_LAB
+    });
+    labs.forEach(lab => {
+      if (lab.pos.isEqualTo(lab1Flag.pos) || lab.pos.isEqualTo(lab2Flag.pos)) this.memory.lab.inLab.push(lab.id);
+      else this.memory.lab.outLab[lab.id] = 0;
+    });
+
+    lab1Flag.remove();
+    lab2Flag.remove();
+
+    return `[${this.name} lab] 初始化成功`;
+  }
+
+  /**
+   * 用户操作：暂停 lab 集群
+   */
+  public loff(): string {
+    if (!this.memory.lab) return `[${this.name} lab] 集群尚未初始化`;
+    this.memory.lab.pause = true;
+    return `[${this.name} lab] 已暂停工作`;
+  }
+
+  /**
+   * 用户操作：重启 lab 集群
+   */
+  public lon(): string {
+    if (!this.memory.lab) return `[${this.name} lab] 集群尚未初始化`;
+    this.memory.lab.pause = false;
+    return `[${this.name} lab] 已恢复工作`;
+  }
+
+  /**
+   * 用户操作：显示当前 lab 状态
+   */
+  public lshow(): string {
+    const memory = this.memory.lab;
+    if (!memory) return `[${this.name}] 未启用 lab 集群`;
+    const logs = [`[${this.name}]`];
+
+    if (memory.pause) logs.push(colorful("暂停中", "yellow"));
+    logs.push(`[状态] ${memory.state}`);
+
+    // 获取当前目标产物以及 terminal 中的数量
+    const res = labTarget[memory.targetIndex];
+    const currentAmount = this.terminal ? this.terminal.store[res.target] : colorful("无法访问 terminal", "red");
+
+    // 在工作就显示工作状态
+    if (memory.state === LAB_STATE.WORKING) {
+      logs.push(
+        `[工作进程] 目标 ${res.target} 剩余生产/当前存量/目标存量 ${memory.targetAmount}/${currentAmount}/${res.targetNumber}`
+      );
+    }
+    // 做完了就显示总数
+    else if (memory.state === LAB_STATE.PUT_RESOURCE) {
+      logs.push(`正在将 ${res.target} 转移至 terminal，数量：${Object.values(memory.outLab).reduce((p, n) => p + n)}`);
+    }
+
+    return logs.join(" ");
   }
 }

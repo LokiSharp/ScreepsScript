@@ -1,4 +1,6 @@
 import { ROOM_TRANSFER_TASK } from "setting";
+import { clearCarryingEnergy } from "./clearCarryingEnergy";
+import { getNotClearLab } from "./getNotClearLab";
 
 /**
  * manager 在应对不同类型的任务时执行的操作
@@ -114,6 +116,132 @@ export const transferTaskOperations: { [taskType: string]: transferTaskOperation
       creep.goTo(target.pos);
       const result = creep.transfer(target, RESOURCE_ENERGY);
       if (result !== OK && result !== ERR_NOT_IN_RANGE) creep.say(`塔填充 ${result}`);
+      return false;
+    }
+  },
+  /**
+   * lab 资源移入任务
+   * 在 lab 集群的 getResource 阶段发布
+   * 在 inLab 中填充两种底物
+   * 并不会填满，而是根据自己最大的存储量进行填充，保证在取出产物时可以一次搬完
+   */
+  [ROOM_TRANSFER_TASK.LAB_IN]: {
+    source: (creep: Creep, task: ILabIn): boolean => {
+      // 获取 terminal
+      const terminal = creep.room.terminal;
+      if (!terminal) {
+        creep.room.deleteCurrentRoomTransferTask();
+        creep.log(`labin, 未找到 terminal，任务已移除`);
+        return false;
+      }
+
+      if (!clearCarryingEnergy(creep)) return false;
+
+      // 找到第一个需要从终端取出的底物
+      const targetResource = task.resource.find(res => res.amount > 0);
+
+      // 找不到了就说明都成功转移了
+      if (!targetResource) {
+        creep.room.deleteCurrentRoomTransferTask();
+        return false;
+      }
+
+      // 获取能拿取的数量
+      const getAmount = Math.min(targetResource.amount, creep.store.getFreeCapacity());
+
+      creep.goTo(terminal.pos);
+      const result = creep.withdraw(terminal, targetResource.type, getAmount);
+      if (result === OK) return true;
+      else if (result === ERR_NOT_ENOUGH_RESOURCES) {
+        creep.room.deleteCurrentRoomTransferTask();
+      } else if (result !== ERR_NOT_IN_RANGE) creep.say(`labInA ${result}`);
+      return false;
+    },
+    target: (creep: Creep, task: ILabIn): boolean => {
+      const targetResource = task.resource.find(res => res.amount > 0);
+      // 找不到了就说明都成功转移了
+      if (!targetResource) {
+        creep.room.deleteCurrentRoomTransferTask();
+        return true;
+      }
+
+      const targetLab = Game.getObjectById(targetResource.id as Id<StructureLab>);
+
+      // 转移资源
+      creep.goTo(targetLab.pos);
+      const result = creep.transfer(targetLab, targetResource.type);
+      // 正常转移资源则更新任务
+      if (result === OK) {
+        // 这里直接更新到 0 的原因是因为这样可以最大化运载效率
+        // 保证在产物移出的时候可以一次就拿完
+        creep.room.handleLabInTask(targetResource.type, 0);
+        return true;
+      } else if (result !== ERR_NOT_IN_RANGE) creep.say(`labInB ${result}`);
+      return false;
+    }
+  },
+
+  /**
+   * lab 产物移出任务
+   * 将 lab 的反应产物统一从 outLab 中移动到 terminal 中
+   */
+  [ROOM_TRANSFER_TASK.LAB_OUT]: {
+    source: (creep: Creep): boolean => {
+      const labMemory = creep.room.memory.lab;
+
+      // 获取还有资源的 lab
+      const targetLab = getNotClearLab(labMemory);
+
+      // 还找不到或者目标里没有化合物了，说明已经搬空，执行 target
+      if (!targetLab || !targetLab.mineralType) return true;
+
+      if (!clearCarryingEnergy(creep)) return false;
+
+      // 转移资源
+      creep.goTo(targetLab.pos);
+      const result = creep.withdraw(targetLab, targetLab.mineralType);
+
+      // 正常转移资源则更新 memory 数量信息
+      if (result === OK) {
+        if (targetLab.id in labMemory.outLab)
+          creep.room.memory.lab.outLab[targetLab.id] = targetLab.mineralType
+            ? targetLab.store[targetLab.mineralType]
+            : 0;
+        if (creep.store.getFreeCapacity() === 0) return true;
+      }
+      // 满了也先去转移资源
+      else if (result === ERR_FULL) return true;
+      else if (result !== ERR_NOT_IN_RANGE) creep.say(`draw ${result}`);
+      return false;
+    },
+    target: (creep: Creep, task: ILabOut): boolean => {
+      const terminal = creep.room.terminal;
+
+      if (!terminal) {
+        creep.room.deleteCurrentRoomTransferTask();
+        creep.log(`labout, 未找到 terminal，任务已移除`);
+        return false;
+      }
+
+      // 指定资源类型及目标
+      let resourceType = task.resourceType;
+      let target: StructureTerminal | StructureStorage = terminal;
+
+      // 如果是能量就优先放到 storage 里
+      if (creep.store[RESOURCE_ENERGY] > 0) {
+        resourceType = RESOURCE_ENERGY;
+        target = creep.room.storage || terminal;
+      }
+
+      // 转移资源
+      creep.goTo(terminal.pos);
+      const result = creep.transfer(target, resourceType);
+
+      if (result === OK || result === ERR_NOT_ENOUGH_RESOURCES) {
+        // 转移完之后就检查下还有没有没搬空的 lab，没有的话就完成任务
+        if (getNotClearLab(creep.room.memory.lab) === undefined) creep.room.deleteCurrentRoomTransferTask();
+        return true;
+      } else if (result !== ERR_NOT_IN_RANGE) creep.say(`labout ${result}`);
       return false;
     }
   }

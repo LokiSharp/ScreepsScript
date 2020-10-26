@@ -499,6 +499,7 @@ interface Room {
   // 外矿房间特有，外矿单位维护
   // 一旦该字段为 true 就告诉出生点暂时禁止自己重生直到 1500 tick 之后
   hasEnemy: boolean;
+  hasRunLab: boolean;
 
   // 焦点墙，维修单位总是倾向于优先修复该墙体
   importantWall: StructureWall | StructureRampart;
@@ -594,6 +595,37 @@ interface RoomMemory {
 
   // 该房间要执行的资源共享任务
   shareTask: IRoomShareTask;
+
+  /**
+   * lab 集群所需的信息
+   * @see doc/lab设计案
+   */
+  lab?: LabMemory;
+
+  /**
+   * boost 强化任务
+   * @see doc/boost设计案
+   */
+  boost?: BoostTask;
+}
+
+interface LabMemory {
+  // 当前集群的工作状态
+  state: string;
+  // 当前生产的目标产物索引
+  targetIndex: number;
+  // 当前要生产的数量
+  targetAmount?: number;
+  // 底物存放 lab 的 id
+  inLab: string[];
+  // 产物存放 lab 的 id
+  outLab: {
+    [labId: string]: number;
+  };
+  // 反应进行后下次反应进行的时间，值为 Game.time + cooldown
+  reactionRunTime?: number;
+  // lab 是否暂停运行
+  pause: boolean;
 }
 
 // 房间要执行的资源共享任务
@@ -636,7 +668,7 @@ interface RoomPosition {
   getFreeSpace(): RoomPosition[];
 }
 
-type RoomTransferTasks = IFillExtension | IFillTower;
+type RoomTransferTasks = IFillExtension | IFillTower | ILabIn | ILabOut;
 
 // 房间物流任务 - 填充拓展
 interface IFillExtension {
@@ -647,6 +679,22 @@ interface IFillExtension {
 interface IFillTower {
   type: string;
   id: string;
+}
+
+// 房间物流任务 - lab 底物填充
+interface ILabIn {
+  type: string;
+  resource: {
+    id: string;
+    type: ResourceConstant;
+    amount: number;
+  }[];
+}
+
+// 房间物流任务 - lab 产物移出
+interface ILabOut {
+  type: string;
+  resourceType: ResourceConstant;
 }
 
 interface StructureController {
@@ -1067,4 +1115,53 @@ interface ConstructionPos<StructureType extends BuildableStructureConstant = Bui
   pos: RoomPosition;
   // 要建造的建筑类型
   type: StructureType;
+}
+
+// 反应底物表接口
+interface IReactionSource {
+  [targetResourceName: string]: string[];
+}
+
+/**
+ * boost 任务阶段
+ * 仅在房间的 LAB_STATE 为 boost 时有效
+ *
+ * @type boostGet 获取资源, boost 进程的默认阶段
+ * @type labGetEnergy 获取能量, 有 lab 能量不足时触发
+ * @type waitBoost 等待强化，lab 在该阶段会一直等待直到 creep 调用强化
+ * @type boostClear 清除资源，在强化完成后打扫 lab
+ */
+type BoostStats = "boostGet" | "labGetEnergy" | "waitBoost" | "boostClear";
+
+/**
+ * boost 资源配置类型
+ *
+ * @type WAR 对外战争
+ * @type DEFENSE 主动防御
+ */
+type BoostType = "WAR" | "DEFENSE";
+
+/**
+ * boost 资源配置表
+ * 规定了不同模式下需要往 lab 装填的资源类型
+ */
+type BoostResourceConfig = {
+  [type in BoostType]: ResourceConstant[];
+};
+
+/**
+ * 强化任务
+ * 存放了房间进行 boost 所需的数据
+ */
+interface BoostTask {
+  // 当前任务的所处状态
+  state: BoostStats;
+  // 进行 boost 强化的位置
+  pos: number[];
+  // 要进行强化的材料以及执行强化的 lab
+  lab: {
+    [resourceType: string]: string;
+  };
+  // 本次强化任务所用的类型
+  type: BoostType;
 }

@@ -1,6 +1,6 @@
+import { ENERGY_SHARE_LIMIT, ROOM_TRANSFER_TASK } from "setting";
 import { confirmBasePos, findBaseCenterPos, setBaseCenter } from "modules/autoPlanning/planBasePos";
 import { manageStructure, releaseCreep } from "modules/autoPlanning";
-import { ENERGY_SHARE_LIMIT } from "setting";
 import { createRoomLink } from "utils/createRoomLink";
 import { creepApi } from "modules/creepController/creepApi";
 import { log } from "utils/log";
@@ -173,6 +173,30 @@ export default class RoomExtension extends Room {
     } else {
       return this.memory.transferTasks[0];
     }
+  }
+
+  /**
+   * 更新 labIn 任务信息
+   * @param resourceType 要更新的资源 id
+   * @param amount 要更新成的数量
+   */
+  public handleLabInTask(resourceType: ResourceConstant, amount: number): boolean {
+    const currentTask = this.getRoomTransferTask() as ILabIn;
+    // 判断当前任务为 labin
+    if (currentTask.type === ROOM_TRANSFER_TASK.LAB_IN) {
+      // 找到对应的底物
+
+      for (const resource of currentTask.resource) {
+        if (resource.type === resourceType) {
+          // 更新底物数量
+          resource.amount = amount;
+          break;
+        }
+      }
+      // 更新对应的任务
+      this.memory.transferTasks.splice(0, 1, currentTask);
+      return true;
+    } else return false;
   }
 
   /**
