@@ -410,7 +410,7 @@ type RemoteRoleConstant =
   | "moveTester";
 
 // 战斗单位
-type WarRoleConstant = "soldier";
+type WarRoleConstant = "soldier" | "defender";
 
 /**
  * creep 工作逻辑集合
@@ -1212,4 +1212,11 @@ interface BoostTask {
   };
   // 本次强化任务所用的类型
   type: BoostType;
+}
+
+interface IBoostPrepare {
+  /**
+   * 准备阶段
+   */
+  prepare?: (creep: Creep) => boolean;
 }

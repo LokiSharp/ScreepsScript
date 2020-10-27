@@ -107,10 +107,45 @@ export default class TowerExtension extends StructureTower {
 
       // 没有防御单位的情况下当能量大于 700 才攻击敌方单位，省下能量来之后治疗防御单位
       if (this.store[RESOURCE_ENERGY] > 700) this.fire(enemys);
+
+      // 没有防御单位时才准备 boost
+      this.prepareBoost(defenderName);
     }
 
     this.wallCheck();
     this.requireEnergy(700);
+  }
+
+  /**
+   * 准备主动防御需要的 boost 并发布防御单位
+   *
+   * @param defenderName 要发布的防御单位名称
+   */
+  private prepareBoost(defenderName: string): void {
+    if (!this.room.memory.boost) {
+      this.log("正在准备 boost 主动防御");
+      const result = this.room.startWar("DEFENSE");
+
+      if (result === ERR_NOT_FOUND)
+        this.log(`未找到名为 [${this.room.name}Boost] 的旗帜，请保证其周围有足够数量的 lab（至少 5 个）`, "yellow");
+      else if (result === ERR_INVALID_TARGET) this.log("旗帜周围的 lab 数量不足，请移动旗帜位置", "yellow");
+
+      return;
+    }
+
+    // 已经有主动防御任务了
+    if (this.room.memory.boost.type === "DEFENSE") {
+      // 强化准备完成，发布防御单位
+      if (this.room.memory.boost.state === "waitBoost" && !creepApi.has(defenderName)) {
+        const result = creepApi.add(defenderName, "defender", {}, this.room.name);
+        this.log(`已发布主动防御单位，返回值：${result}`, "green");
+      }
+    }
+    // 房间处于其他 boost 任务时结束其任务并切换至主动防御 boost 任务
+    else if (this.room.memory.boost.state !== "boostClear") {
+      this.log(`当前正处于战争状态，正在切换至主动防御模式，请稍后...`);
+      this.room.stopWar();
+    }
   }
 
   /**

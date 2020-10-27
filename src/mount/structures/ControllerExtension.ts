@@ -77,7 +77,7 @@ export default class ControllerExtension extends StructureController {
     if (enemy && enemy.length <= 0) return false;
 
     // 如果来的都是入侵者的话，就算撑破天了也不管
-    if (!enemy.find(creep => creep.owner.username !== "Invader")) return false;
+    // if (!enemy.find(creep => creep.owner.username !== "Invader")) return false;
 
     const bodyNum = enemy
       .map(creep => {

@@ -1,6 +1,7 @@
 import builder from "./base/builder";
 import claimer from "./remote/claimer";
 import collector from "./base/collector";
+import defender from "./war/defender";
 import filler from "./base/filler";
 import harvester from "./base/harvester";
 import manager from "./advanced/manager";
@@ -31,7 +32,8 @@ const roles: CreepWork = {
   remoteBuilder,
   remoteUpgrader,
   moveTester,
-  soldier
+  soldier,
+  defender
 };
 
 /**
