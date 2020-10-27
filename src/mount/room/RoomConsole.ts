@@ -172,4 +172,33 @@ export default class RoomConsole extends RoomExtension {
 
     return logs.join(" ");
   }
+
+  /**
+   * 用户操作 - 启动战争状态
+   */
+  public war(): string {
+    let stats = `[${this.name}] `;
+    const result = this.startWar("WAR");
+
+    if (result === OK) stats += `已启动战争状态，正在准备 boost 材料，请在准备完成后再发布角色组`;
+    else if (result === ERR_NAME_EXISTS) stats += "已处于战争状态";
+    else if (result === ERR_NOT_FOUND)
+      stats += `未找到名为 [${this.name}Boost] 的旗帜，请保证其周围有足够数量的 lab（至少 5 个）`;
+    else if (result === ERR_INVALID_TARGET) stats += "旗帜周围的 lab 数量不足，请移动旗帜位置";
+
+    return stats;
+  }
+
+  /**
+   * 用户操作 - 取消战争状态
+   */
+  public nowar(): string {
+    let stats = `[${this.name}] `;
+    const result = this.stopWar();
+
+    if (result === OK) stats += `已解除战争状态，boost 强化材料会依次运回 Terminal`;
+    else if (result === ERR_NOT_FOUND) stats += `未启动战争状态`;
+
+    return stats;
+  }
 }

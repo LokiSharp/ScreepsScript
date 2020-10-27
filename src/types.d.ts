@@ -348,6 +348,8 @@ interface CreepMemory {
     // 缓存路径的目标，该目标发生变化时刷新路径, 形如"14/4E14S1"
     targetPos?: string;
   };
+  // manager 特有，当前任务正在转移的资源类型
+  taskResource?: ResourceConstant;
 }
 
 /**
@@ -467,6 +469,17 @@ interface Room {
   shareAddSource(resourceType: ResourceConstant): boolean;
   shareRemoveSource(resourceType: ResourceConstant): void;
   shareAdd(targetRoom: string, resourceType: ResourceConstant, amount: number): boolean;
+
+  // boost api
+  boost(
+    boostType: string,
+    boostConfig: IBoostConfig
+  ): OK | ERR_NAME_EXISTS | ERR_NOT_FOUND | ERR_INVALID_ARGS | ERR_NOT_ENOUGH_RESOURCES;
+  boostCreep(creep: Creep): OK | ERR_NOT_FOUND | ERR_BUSY | ERR_NOT_IN_RANGE;
+
+  // 战争相关
+  startWar(boostType: BoostType): OK | ERR_NAME_EXISTS | ERR_NOT_FOUND | ERR_INVALID_TARGET;
+  stopWar(): OK | ERR_NOT_FOUND;
 
   // 房间基础服务
   factory?: StructureFactory;
@@ -603,6 +616,11 @@ interface RoomMemory {
   lab?: LabMemory;
 
   /**
+   * 战争状态
+   */
+  war?: Record<string, unknown>;
+
+  /**
    * boost 强化任务
    * @see doc/boost设计案
    */
@@ -668,7 +686,14 @@ interface RoomPosition {
   getFreeSpace(): RoomPosition[];
 }
 
-type RoomTransferTasks = IFillExtension | IFillTower | ILabIn | ILabOut;
+type RoomTransferTasks =
+  | IFillExtension
+  | IFillTower
+  | ILabIn
+  | ILabOut
+  | IBoostGetResource
+  | IBoostGetEnergy
+  | IBoostClear;
 
 // 房间物流任务 - 填充拓展
 interface IFillExtension {
@@ -695,6 +720,21 @@ interface ILabIn {
 interface ILabOut {
   type: string;
   resourceType: ResourceConstant;
+}
+
+// 房间物流任务 - boost 资源填充
+interface IBoostGetResource {
+  type: string;
+}
+
+// 房间物流任务 - boost 能量填充
+interface IBoostGetEnergy {
+  type: string;
+}
+
+// 房间物流任务 - boost 资源清理
+interface IBoostClear {
+  type: string;
 }
 
 interface StructureController {
@@ -1120,6 +1160,14 @@ interface ConstructionPos<StructureType extends BuildableStructureConstant = Bui
 // 反应底物表接口
 interface IReactionSource {
   [targetResourceName: string]: string[];
+}
+
+/**
+ * 强化配置项
+ * 详情 doc/boost 强化案
+ */
+interface IBoostConfig {
+  [resourceType: string]: number;
 }
 
 /**

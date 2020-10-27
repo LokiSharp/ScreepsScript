@@ -112,3 +112,8 @@ export const BOOST_RESOURCE: BoostResourceConfig = {
     RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE
   ]
 };
+
+/**
+ * 当 lab 强化过 creep 之后会检查资源的剩余容量，如果低于下面这个值就会重新装填
+ */
+export const boostResourceReloadLimit = 900;
