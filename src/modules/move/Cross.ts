@@ -24,7 +24,7 @@ export class Cross {
       creep.say("👌");
       const moveResult = creep.move(direction);
       if (moveResult === OK && creep.memory.moveInfo?.path?.length > 0) {
-        // 如果移动的方向就是
+        // 如果移动的方向不是路径中的方向的话，就重新寻路
         if ((Number(creep.memory.moveInfo.path[0]) as DirectionConstant) !== direction) {
           delete creep.memory.moveInfo.path;
         }

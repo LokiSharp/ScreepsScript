@@ -1,4 +1,4 @@
-import { LEVEL_BUILD_ROAD, LEVEL_START_BUILD_RAMPART } from "setting";
+import { LEVEL_BUILD_RAMPART, LEVEL_BUILD_ROAD } from "setting";
 import planBase from "./planBase";
 import planRoad from "./planRoad";
 import planWall from "./planWall";
@@ -121,9 +121,9 @@ const planStaticStructure = function (room: Room): ERR_NOT_FOUND | StructurePlan
   const wallsPos = planWall(room, centerPos);
 
   wallsPos.forEach((walls, index) => {
-    // 要放置外墙的等级，默认情况下是 RCL 3、5、7 级时放置三层外墙
-    let placeLevel = index + LEVEL_START_BUILD_RAMPART;
-    // 如果 LEVEL_START_BUILD_RAMPART 设置的太高会导致超过 8 级，这里检查下
+    // 获取要放置 rampart 的等级
+    let placeLevel = LEVEL_BUILD_RAMPART[index] || LEVEL_BUILD_RAMPART[LEVEL_BUILD_RAMPART.length - 1];
+    // 如果 LEVEL_BUILD_RAMPART 设置的太高会导致超过 8 级，这里检查下
     if (placeLevel > 8) placeLevel = 8;
 
     mergeStructurePlan(result, walls, placeLevel as AvailableLevel, STRUCTURE_RAMPART);

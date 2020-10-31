@@ -1,6 +1,3 @@
-// RCL 几级时开始放置外墙
-export const LEVEL_START_BUILD_RAMPART = 6;
-
 // RCL 几级的时候开始放置通向 [ source, controller, mineral ] 的道路
 // 注意这个顺序要和 src\modules\autoPlanning\planRoad.ts 的默认方法返回值保持一致
 export const LEVEL_BUILD_ROAD = [3, 4, 6];

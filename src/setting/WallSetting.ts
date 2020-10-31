@@ -1,3 +1,9 @@
+/**
+ * RCL 分别在几级时放置外墙
+ * 例如 [ 3, 7, 8 ] 代表分别在弟 3、7、8 级时放置第 1（最外层）、2、3 层 rampart
+ */
+export const LEVEL_BUILD_RAMPART = [3, 7, 8];
+
 // tower 将在几级之后参与刷墙
 export const TOWER_FILL_WALL_LEVEL = 6;
 

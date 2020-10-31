@@ -25,7 +25,12 @@ export default (data: HarvesterData): ICreepConfig => ({
       });
 
       // 找到了就把 container 当做目标
-      if (containers.length > 0) target = containers[0];
+      if (containers.length > 0)
+        target = containers.find(container => {
+          const stoodCreep = container.pos.lookFor(LOOK_CREEPS);
+          // 如果两个 source 离得比较近的话，harvesterA 可能会获取到 harvesterB 的 container，然后就一直往上撞，这里筛选一下
+          return !(stoodCreep.length > 0 && stoodCreep[0].memory && stoodCreep[0].memory.role === "harvester");
+        });
     }
 
     // 还没找到就找 container 的工地
