@@ -4,7 +4,7 @@
  *
  * @param boostType BOOST.TYPE 类型之一
  */
-export const boostPrepare = (): IBoostPrepare => ({
+export const boostPrepare = (): ICreepStage => ({
   /**
    * 移动至强化位置并执行强化
    * @danger 该位置是 Room.memory.boost.pos 中定义的，并不是旗帜的实时位置，该逻辑有可能会导致迷惑

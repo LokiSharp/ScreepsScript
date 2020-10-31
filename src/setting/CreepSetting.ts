@@ -147,8 +147,36 @@ export const bodyConfigs: BodyConfigs = {
     { [MOVE]: 5, [ATTACK]: 5 },
     { [MOVE]: 6, [ATTACK]: 6 },
     { [MOVE]: 7, [ATTACK]: 7 },
-    { [MOVE]: 8, [ATTACK]: 8 },
-    { [MOVE]: 9, [ATTACK]: 9 }
+    { [MOVE]: 16, [ATTACK]: 16 },
+    { [MOVE]: 25, [ATTACK]: 25 }
+  ),
+
+  /**
+   * 基础治疗单位
+   */
+  healer: getBodyConfig(
+    { [MOVE]: 1, [HEAL]: 1 },
+    { [MOVE]: 1, [HEAL]: 1 },
+    { [MOVE]: 2, [HEAL]: 2 },
+    { [MOVE]: 4, [HEAL]: 4 },
+    { [MOVE]: 6, [HEAL]: 6 },
+    { [MOVE]: 7, [HEAL]: 7 },
+    { [MOVE]: 16, [HEAL]: 16 },
+    { [MOVE]: 25, [HEAL]: 25 }
+  ),
+
+  /**
+   * 拆除者身体
+   */
+  dismantler: getBodyConfig(
+    { [WORK]: 1, [MOVE]: 2 },
+    { [WORK]: 2, [MOVE]: 4 },
+    { [WORK]: 4, [MOVE]: 4 },
+    { [WORK]: 6, [MOVE]: 6 },
+    { [WORK]: 10, [MOVE]: 10 },
+    { [WORK]: 15, [MOVE]: 15 },
+    { [WORK]: 25, [MOVE]: 25 },
+    { [WORK]: 25, [MOVE]: 25 }
   )
 };
 

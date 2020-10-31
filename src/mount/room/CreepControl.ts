@@ -129,7 +129,7 @@ export default class CreepControl extends RoomConsole {
 
     for (let i = 0; i < num; i++) {
       creepApi.add(
-        `${this.name} dismantler ${Game.time}-${i}`,
+        `${this.name} soldier ${Game.time}-${i}`,
         "soldier",
         {
           targetFlagName: targetFlagName || DEFAULT_FLAG_NAME.ATTACK,
@@ -140,5 +140,212 @@ export default class CreepControl extends RoomConsole {
     }
 
     return `已发布 soldier*${num}，正在孵化`;
+  }
+
+  /**
+   * 孵化基础拆除单位
+   * 一般用于清除中立房间中挡路的墙壁
+   *
+   * @param targetFlagName 进攻旗帜名称
+   * @param num 要孵化的数量
+   * @param keepSpawn 是否持续生成
+   */
+  public spwanDismantler(targetFlagName = "", num = 2, keepSpawn = false): string {
+    if (num <= 0 || num > 10) num = 1;
+
+    for (let i = 0; i < num; i++) {
+      creepApi.add(
+        `${this.name} dismantler ${Game.time}-${i}`,
+        "dismantler",
+        {
+          targetFlagName: targetFlagName || DEFAULT_FLAG_NAME.ATTACK,
+          keepSpawn
+        },
+        this.name
+      );
+    }
+
+    return `已发布 dismantler*${num}，正在孵化`;
+  }
+
+  /**
+   * 孵化拆墙小组
+   *
+   * @param targetFlagName 进攻旗帜名称
+   * @param keepSpawn 是否持续生成
+   */
+  public spawnDismantleGroup(targetFlagName = "", keepSpawn = false): string {
+    const dismantlerName = `${this.name} dismantler ${Game.time}`;
+    const healerName = `${this.name} healer ${Game.time}`;
+    creepApi.add(
+      dismantlerName,
+      "dismantler",
+      {
+        targetFlagName: targetFlagName || DEFAULT_FLAG_NAME.ATTACK,
+        healerName,
+        keepSpawn
+      },
+      this.name
+    );
+    creepApi.add(
+      healerName,
+      "healer",
+      {
+        creepName: dismantlerName,
+        keepSpawn
+      },
+      this.name
+    );
+
+    return `已发布拆墙小组，正在孵化，GoodLuck Commander`;
+  }
+
+  /**
+   * 孵化攻击小组
+   *
+   * @param targetFlagName 进攻旗帜名称
+   * @param keepSpawn 是否持续生成
+   */
+  public spawnAttackGroup(targetFlagName = "", keepSpawn = false): string {
+    const soldierName = `${this.name} soldier ${Game.time}`;
+    const healerName = `${this.name} healer ${Game.time}`;
+    creepApi.add(
+      soldierName,
+      "soldier",
+      {
+        targetFlagName: targetFlagName || DEFAULT_FLAG_NAME.ATTACK,
+        healerName,
+        keepSpawn
+      },
+      this.name
+    );
+    creepApi.add(
+      healerName,
+      "healer",
+      {
+        creepName: soldierName,
+        keepSpawn
+      },
+      this.name
+    );
+
+    return `已发布攻击小组，正在孵化，GoodLuck Commander`;
+  }
+
+  /**
+   * 孵化强化拆墙小组
+   *
+   * @param targetFlagName 进攻旗帜名称
+   * @param keepSpawn 是否持续生成
+   */
+  public spawnBoostDismantleGroup(targetFlagName = "", keepSpawn = false): string {
+    if (!this.memory.boost) return `发布失败，未启动 Boost 进程，执行 ${this.name}.war() 来启动战争状态`;
+    if (this.memory.boost.state !== "waitBoost") return `无法发布，Boost 材料未准备就绪`;
+
+    const dismantlerName = `${this.name} dismantler ${Game.time}`;
+    const healerName = `${this.name} healer ${Game.time}`;
+    creepApi.add(
+      dismantlerName,
+      "boostDismantler",
+      {
+        targetFlagName: targetFlagName || DEFAULT_FLAG_NAME.ATTACK,
+        healerName,
+        keepSpawn
+      },
+      this.name
+    );
+    creepApi.add(
+      healerName,
+      "boostHealer",
+      {
+        creepName: dismantlerName,
+        keepSpawn
+      },
+      this.name
+    );
+
+    return `已发布强化拆墙小组，正在孵化，GoodLuck Commander`;
+  }
+
+  /**
+   * 孵化强化攻击小组
+   *
+   * @param targetFlagName 进攻旗帜名称
+   * @param keepSpawn 是否持续生成
+   */
+  public spawnBoostAttackGroup(targetFlagName = "", keepSpawn = false): string {
+    if (!this.memory.boost) return `发布失败，未启动 Boost 进程，执行 ${this.name}.war() 来启动战争状态`;
+    if (this.memory.boost.state !== "waitBoost") return `无法发布，Boost 材料未准备就绪`;
+
+    const soldierName = `${this.name} soldier ${Game.time}`;
+    const healerName = `${this.name} healer ${Game.time}`;
+    creepApi.add(
+      soldierName,
+      "boostSoldier",
+      {
+        targetFlagName: targetFlagName || DEFAULT_FLAG_NAME.ATTACK,
+        healerName,
+        keepSpawn
+      },
+      this.name
+    );
+    creepApi.add(
+      healerName,
+      "boostHealer",
+      {
+        creepName: soldierName,
+        keepSpawn
+      },
+      this.name
+    );
+
+    return `已发布强化攻击小组，正在孵化，GoodLuck Commander`;
+  }
+  /**
+   * 孵化强化拆墙小组
+   *
+   * @param targetFlagName 进攻旗帜名称
+   * @param keepSpawn 是否持续生成
+   */
+  public spawnBoostDismantler(targetFlagName = "", keepSpawn = false): string {
+    if (!this.memory.boost) return `发布失败，未启动 Boost 进程，执行 ${this.name}.war() 来启动战争状态`;
+    if (this.memory.boost.state !== "waitBoost") return `无法发布，Boost 材料未准备就绪`;
+
+    const dismantlerName = `${this.name} dismantler ${Game.time}`;
+    creepApi.add(
+      dismantlerName,
+      "boostDismantler",
+      {
+        targetFlagName: targetFlagName || DEFAULT_FLAG_NAME.ATTACK,
+        keepSpawn
+      },
+      this.name
+    );
+
+    return `已发布强化拆墙单位，正在孵化，GoodLuck Commander`;
+  }
+
+  /**
+   * 孵化强化攻击小组
+   *
+   * @param targetFlagName 进攻旗帜名称
+   * @param keepSpawn 是否持续生成
+   */
+  public spawnBoostAttacker(targetFlagName = "", keepSpawn = false): string {
+    if (!this.memory.boost) return `发布失败，未启动 Boost 进程，执行 ${this.name}.war() 来启动战争状态`;
+    if (this.memory.boost.state !== "waitBoost") return `无法发布，Boost 材料未准备就绪`;
+
+    const soldierName = `${this.name} soldier ${Game.time}`;
+    creepApi.add(
+      soldierName,
+      "boostSoldier",
+      {
+        targetFlagName: targetFlagName || DEFAULT_FLAG_NAME.ATTACK,
+        keepSpawn
+      },
+      this.name
+    );
+
+    return `已发布强化攻击单位，正在孵化，GoodLuck Commander`;
   }
 }

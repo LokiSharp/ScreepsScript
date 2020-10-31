@@ -1,9 +1,14 @@
+import boostDismantler from "./war/boostDismantler";
+import boostHealer from "./war/boostHealer";
+import boostSoldier from "./war/boostSoldier";
 import builder from "./base/builder";
 import claimer from "./remote/claimer";
 import collector from "./base/collector";
 import defender from "./war/defender";
+import dismantler from "./war/dismantler";
 import filler from "./base/filler";
 import harvester from "./base/harvester";
+import healer from "./war/healer";
 import manager from "./advanced/manager";
 import moveTester from "./remote/moveTester";
 import processor from "./advanced/processor";
@@ -33,7 +38,12 @@ const roles: CreepWork = {
   remoteUpgrader,
   moveTester,
   soldier,
-  defender
+  defender,
+  healer,
+  dismantler,
+  boostDismantler,
+  boostHealer,
+  boostSoldier
 };
 
 /**

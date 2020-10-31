@@ -334,4 +334,107 @@ export default class CreepExtension extends Creep {
 
     return true;
   }
+
+  /**
+   * 治疗指定目标
+   * 比较给定目标生命(包括自己)生命损失的百分比, 谁血最低治疗谁
+   * @param creep 要治疗的目标
+   */
+  public healTo(creep: Creep): void {
+    if (!creep) {
+      this.heal(this);
+      return;
+    }
+
+    // 获取治疗目标，目标生命值损失大于等于自己的话，就治疗目标
+    // 否则治疗自己
+    let target: Creep = null;
+    if (creep.hitsMax - creep.hits >= this.hitsMax - this.hits) target = creep;
+    else target = this;
+
+    // 进行治疗，如果失败就远程治疗
+    const healResult = this.heal(target);
+    if (healResult === ERR_NOT_IN_RANGE) this.rangedHeal(target);
+
+    // 一直朝着目标移动，在友方领土上移动时会无视 creep
+    if (
+      !this.room.controller ||
+      !this.room.controller.owner ||
+      this.room.controller.owner.username !== this.owner.username
+    )
+      this.moveTo(creep);
+    else this.goTo(creep.pos);
+
+    // 检查自己是不是在骑墙
+    if (this.onEnter()) {
+      const safePosFinder = i => i !== 0 && i !== 49;
+      // 遍历找到目标 creep 身边的不骑墙位置
+      const x = [creep.pos.x - 1, creep.pos.x + 1].find(safePosFinder);
+      const y = [creep.pos.y - 1, creep.pos.y + 1].find(safePosFinder);
+
+      // 移动到不骑墙位置
+      this.moveTo(new RoomPosition(x, y, creep.pos.roomName));
+    }
+  }
+
+  /**
+   * 判断当前是否在入口处（是否骑墙）
+   */
+  private onEnter(): boolean {
+    return this.pos.x === 0 || this.pos.x === 49 || this.pos.y === 0 || this.pos.y === 49;
+  }
+
+  /**
+   * 是否可以和指定 Creep 一起移动
+   * 并不会执行移动，本方法只是进行查询，返回 true 时说明当前两者状态可以一起移动
+   * 当目标 creep 不存在时本方法将永远返回 false
+   *
+   * @param creep 要一起移动的 creep
+   * @returns 可以移动时返回 true，否则返回 false
+   */
+  private canMoveWith(creep: Creep): boolean {
+    if (creep && this.pos.isNearTo(creep) && creep.fatigue === 0) return true;
+    return false;
+  }
+
+  /**
+   * 拆除旗帜下的建筑
+   * 向指定旗帜发起进攻并拆除旗帜下的建筑
+   *
+   * @param flagName 要进攻的旗帜名称
+   */
+  public dismantleFlag(flagName: string, healerName = ""): boolean {
+    // 获取旗帜
+    const attackFlag = this.getFlag(flagName);
+    if (!attackFlag) return false;
+    // 治疗单位
+    const healer = Game.creeps[healerName];
+
+    // 如果 creep 不在房间里 则一直向旗帜移动
+    if (!attackFlag.room || (attackFlag.room && this.room.name !== attackFlag.room.name)) {
+      // 如果 healer 存在则只会在 healer 相邻且可以移动时才进行移动
+      if (!healer || (healer && this.canMoveWith(healer)))
+        this.goTo(attackFlag.pos, {
+          checkTarget: true
+        });
+      return true;
+    }
+
+    // 如果到旗帜所在房间了
+    const structures = attackFlag.pos.lookFor(LOOK_STRUCTURES);
+    if (structures.length === 0) this.say("干谁?");
+
+    // healer 不存在（自己行动）或者 healer 可以和自己同时移动时才允许自己移动
+    if (!healer || (healer && this.canMoveWith(healer))) {
+      this.moveTo(attackFlag);
+
+      // 如果之前在拆墙则移除刚才所在的禁止通行点位
+      if (this.memory.stand) {
+        delete this.memory.stand;
+      }
+    }
+
+    this.dismantle(structures[0]);
+    return false;
+  }
 }

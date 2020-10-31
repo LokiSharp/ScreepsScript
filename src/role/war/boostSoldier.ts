@@ -1,13 +1,13 @@
-import { bodyConfigs } from "setting";
-import createBodyGetter from "utils/createBodyGetter";
+import { boostPrepare } from "utils/boostPrepare";
+import calcBodyPart from "utils/calcBodyPart";
 
 /**
- * 士兵
- * 会一直向旗帜发起进攻,
- * 优先攻击旗帜 3*3 范围内的 creep, 没有的话会攻击旗帜所在位置的建筑
+ * 强化 - 士兵
+ * 7 级以上可用, 12TOUGH 28ATTACK 10MOVE
  */
 export default (data: WarUnitData): ICreepConfig => ({
   isNeed: () => data.keepSpawn,
+  ...boostPrepare(),
   target: creep => {
     creep.attackFlag(data.targetFlagName);
 
@@ -22,5 +22,5 @@ export default (data: WarUnitData): ICreepConfig => ({
     }
     return false;
   },
-  bodys: createBodyGetter(bodyConfigs.attacker)
+  bodys: () => calcBodyPart({ [TOUGH]: 12, [ATTACK]: 28, [MOVE]: 10 })
 });

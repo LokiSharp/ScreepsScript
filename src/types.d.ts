@@ -172,7 +172,9 @@ type BodyAutoConfigConstant =
   | "reserver"
   | "remoteHarvester"
   | "attacker"
-  | "remoteHelper";
+  | "healer"
+  | "remoteHelper"
+  | "dismantler";
 
 /**
  * 所有 creep 角色的 data
@@ -185,7 +187,8 @@ type CreepData =
   | RemoteHarvesterData
   | ProcessorData
   | ReiverData
-  | WarUnitData;
+  | WarUnitData
+  | HealUnitData;
 
 /**
  * 有些角色不需要 data
@@ -274,6 +277,18 @@ interface WarUnitData {
 }
 
 /**
+ * 治疗单位的 data
+ */
+interface HealUnitData {
+  // 要治疗的旗帜名
+  creepName: string;
+  // 待命位置旗帜名
+  standByFlagName?: string;
+  // 是否持续孵化
+  keepSpawn?: boolean;
+}
+
+/**
  * Creep 拓展
  * 来自于 mount.creep.ts
  */
@@ -293,6 +308,8 @@ interface Creep {
 
   getFlag(flagName: string): Flag | null;
   attackFlag(flagName: string): boolean;
+  healTo(creep: Creep): void;
+  dismantleFlag(flagName: string, healerName?: string): boolean;
 }
 
 /**
@@ -416,7 +433,14 @@ type RemoteRoleConstant =
   | "moveTester";
 
 // 战斗单位
-type WarRoleConstant = "soldier" | "defender";
+type WarRoleConstant =
+  | "soldier"
+  | "defender"
+  | "healer"
+  | "dismantler"
+  | "boostSoldier"
+  | "boostHealer"
+  | "boostDismantler";
 
 /**
  * creep 工作逻辑集合
@@ -1220,9 +1244,9 @@ interface BoostTask {
   type: BoostType;
 }
 
-interface IBoostPrepare {
-  /**
-   * 准备阶段
-   */
+interface ICreepStage {
+  isNeed?: (room: Room, creepName: string, preMemory: CreepMemory) => boolean;
   prepare?: (creep: Creep) => boolean;
+  source?: (creep: Creep) => boolean;
+  target?: (creep: Creep) => boolean;
 }
