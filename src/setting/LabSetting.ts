@@ -91,6 +91,8 @@ export const labTarget = [
 export const BOOST_RESOURCE: BoostResourceConfig = {
   // 对外战争所需的资源
   WAR: [
+    // ATTACK
+    RESOURCE_CATALYZED_UTRIUM_ACID,
     // DISMANTLE
     RESOURCE_CATALYZED_ZYNTHIUM_ACID,
     // RANGED_ATTACK
@@ -106,6 +108,8 @@ export const BOOST_RESOURCE: BoostResourceConfig = {
   DEFENSE: [
     // ATTACK
     RESOURCE_CATALYZED_UTRIUM_ACID,
+    // RANGED_ATTACK
+    RESOURCE_CATALYZED_KEANIUM_ALKALIDE,
     // TOUGH
     RESOURCE_CATALYZED_GHODIUM_ALKALIDE,
     // MOVE
