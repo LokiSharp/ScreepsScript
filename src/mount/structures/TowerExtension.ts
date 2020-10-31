@@ -1,5 +1,6 @@
 import { MAX_WALL_HITS, ROOM_TRANSFER_TASK, repairSetting } from "setting";
 import { creepApi } from "modules/creepController/creepApi";
+import { whiteListFilter } from "utils/whiteListFilter";
 
 // Tower 原型拓展
 export default class TowerExtension extends StructureTower {
@@ -321,7 +322,14 @@ export default class TowerExtension extends StructureTower {
   private findEnemy(searchInterval = 1): (Creep | PowerCreep)[] {
     if (Game.time % searchInterval) return [];
     // 有其他 tower 搜索好的缓存就直接返回
-    if (this.room.enemys) return this.room.enemys;
+    // 搜索白名单之外的玩家
+    this.room.enemys = this.room.find(FIND_HOSTILE_CREEPS, {
+      filter: whiteListFilter
+    });
+    if (this.room.enemys.length <= 0)
+      this.room.enemys = this.room.find(FIND_HOSTILE_POWER_CREEPS, {
+        filter: whiteListFilter
+      });
 
     this.room.enemys = this.room.find(FIND_HOSTILE_CREEPS);
 

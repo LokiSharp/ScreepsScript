@@ -181,6 +181,56 @@ export default {
       return `当前仅会掠夺如下资源：${Memory.reiveList.join(" ")}`;
     }
   },
+
+  /**
+   * 白名单控制 api
+   * 挂载在全局，由玩家手动调用
+   * 白名单仅应用于房间 tower 的防御目标，不会自动关闭 rempart，也不会因为进攻对象在白名单中而不攻击
+   */
+  whitelist: {
+    /**
+     * 添加用户到白名单
+     * 重复添加会清空监控记录
+     *
+     * @param userName 要加入白名单的用户名
+     */
+    add(userName: string): string {
+      if (!Memory.whiteList) Memory.whiteList = {};
+
+      Memory.whiteList[userName] = 0;
+
+      return `[白名单] 玩家 ${userName} 已加入白名单`;
+    },
+
+    /**
+     * 从白名单中移除玩家
+     *
+     * @param userName 要移除的用户名
+     */
+    remove(userName: string): string {
+      if (!(userName in Memory.whiteList)) return `[白名单] 该玩家未加入白名单`;
+
+      const enterTicks = Memory.whiteList[userName];
+      delete Memory.whiteList[userName];
+      // 如果玩家都删完了就直接移除白名单
+      if (Object.keys(Memory.whiteList).length <= 0) delete Memory.whiteList;
+
+      return `[白名单] 玩家 ${userName} 已移出白名单，已记录的活跃时长为 ${enterTicks}`;
+    },
+
+    /**
+     * 显示所有白名单玩家及其活跃时长
+     */
+    show(): string {
+      if (!Memory.whiteList) return `[白名单] 未发现玩家`;
+      const logs = [`[白名单] 玩家名称 > 该玩家的单位在自己房间中的活跃总 tick 时长`];
+
+      // 绘制所有的白名单玩家信息
+      logs.push(...Object.keys(Memory.whiteList).map(userName => `[${userName}] > ${Memory.whiteList[userName]}`));
+
+      return logs.join("\n");
+    }
+  },
   // 将 creepApi 挂载到全局方便手动发布或取消 creep
   creepApi
 };

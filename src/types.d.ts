@@ -63,6 +63,12 @@ interface Memory {
     [resourceType: string]: string[];
   };
 
+  // 白名单，通过全局的 whitelist 对象控制
+  // 键是玩家名，值是该玩家进入自己房间的 tick 时长
+  whiteList: {
+    [userName: string]: number;
+  };
+
   stats: {
     // GCl/GPL 升级百分比
     gcl?: number;

@@ -1,4 +1,5 @@
 import { creepApi } from "modules/creepController/creepApi";
+import { whiteListFilter } from "utils/whiteListFilter";
 
 /**
  * Controller 拓展
@@ -73,11 +74,15 @@ export default class ControllerExtension extends StructureController {
    */
   public checkEnemyThreat(): boolean {
     // 这里并没有搜索 PC，因为 PC 不是敌人主力
-    const enemy = this.room.enemys || this.room.find(FIND_HOSTILE_CREEPS);
+    const enemy =
+      this.room.enemys ||
+      this.room.find(FIND_HOSTILE_CREEPS, {
+        filter: whiteListFilter
+      });
     if (enemy && enemy.length <= 0) return false;
 
     // 如果来的都是入侵者的话，就算撑破天了也不管
-    // if (!enemy.find(creep => creep.owner.username !== "Invader")) return false;
+    if (!enemy.find(creep => creep.owner.username !== "Invader")) return false;
 
     const bodyNum = enemy
       .map(creep => {
