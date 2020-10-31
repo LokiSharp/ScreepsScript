@@ -1,12 +1,12 @@
 import ControllerExtension from "./ControllerExtension";
 import LabExtension from "./LabExtension";
-import LinkExtension from "./LinkExtension";
 import NukerExtension from "./NukerExtension";
 import SpawnExtension from "./SpawnExtension";
 import StorageExtension from "./StorageExtension";
 import StructureExtension from "./StructureExtension";
 import TowerExtension from "./TowerExtension";
 import assignPrototype from "utils/assignPrototype";
+import mountLink from "./link";
 import mountTerminal from "./terminal";
 
 /**
@@ -18,8 +18,8 @@ export default function (): void {
   assignPrototype(StructureTower, TowerExtension);
   assignPrototype(Spawn, SpawnExtension);
   assignPrototype(StructureStorage, StorageExtension);
-  assignPrototype(StructureLink, LinkExtension);
   assignPrototype(StructureLab, LabExtension);
   assignPrototype(StructureNuker, NukerExtension);
   mountTerminal();
+  mountLink();
 }

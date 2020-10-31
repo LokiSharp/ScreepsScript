@@ -13,6 +13,34 @@ export default class CreepControl extends RoomConsole {
   }
 
   /**
+   * 给本房间签名
+   *
+   * @param content 要签名的内容
+   * @param targetRoomName 要签名到的房间名（默认为本房间）
+   */
+  public sign(content: string, targetRoomName: string = undefined): string {
+    const creepName = `${this.name} signer`;
+    const creep = Game.creeps[creepName];
+    // 如果有显存的签名单位就直接签名
+    if (creep) {
+      (creep.memory.data as RemoteDeclarerData).signText = content;
+      return `已将 ${creepName} 的签名内容修改为：${content}`;
+    }
+    // 否则就发布一个
+    creepApi.add(
+      creepName,
+      "signer",
+      {
+        targetRoomName: targetRoomName || this.name,
+        signText: content
+      },
+      this.name
+    );
+
+    return `已发布 ${creepName}, 签名内容为：${content}`;
+  }
+
+  /**
    * 发布外矿角色组
    *
    * @param remoteRoomName 要发布 creep 的外矿房间
@@ -124,7 +152,7 @@ export default class CreepControl extends RoomConsole {
    * @param targetFlagName 进攻旗帜名称
    * @param num 要孵化的数量
    */
-  public spwanSoldier(targetFlagName = "", num = 1): string {
+  public spwanSoldier(targetFlagName = "", num = 1, keepSpawn = false): string {
     if (num <= 0 || num > 10) num = 1;
 
     for (let i = 0; i < num; i++) {
@@ -133,7 +161,7 @@ export default class CreepControl extends RoomConsole {
         "soldier",
         {
           targetFlagName: targetFlagName || DEFAULT_FLAG_NAME.ATTACK,
-          keepSpawn: false
+          keepSpawn
         },
         this.name
       );
@@ -268,7 +296,7 @@ export default class CreepControl extends RoomConsole {
   }
 
   /**
-   * 孵化强化攻击小组
+   * 孵化强化进攻小组
    *
    * @param targetFlagName 进攻旗帜名称
    * @param keepSpawn 是否持续生成
@@ -302,7 +330,7 @@ export default class CreepControl extends RoomConsole {
     return `已发布强化攻击小组，正在孵化，GoodLuck Commander`;
   }
   /**
-   * 孵化强化拆墙小组
+   * 孵化强化拆墙单位
    *
    * @param targetFlagName 进攻旗帜名称
    * @param keepSpawn 是否持续生成
@@ -326,7 +354,7 @@ export default class CreepControl extends RoomConsole {
   }
 
   /**
-   * 孵化强化攻击小组
+   * 孵化强化进攻单位
    *
    * @param targetFlagName 进攻旗帜名称
    * @param keepSpawn 是否持续生成

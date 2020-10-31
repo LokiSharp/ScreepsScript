@@ -651,4 +651,43 @@ export default class RoomExtension extends Room {
 
     return OK;
   }
+
+  /**
+   * 危险操作：执行本 api 将会直接将本房间彻底移除
+   */
+  public dangerousRemove(): string {
+    // 移除建筑
+    this.find(FIND_STRUCTURES).forEach(s => {
+      if (
+        s.structureType === STRUCTURE_STORAGE ||
+        s.structureType === STRUCTURE_TERMINAL ||
+        s.structureType === STRUCTURE_WALL ||
+        s.structureType === STRUCTURE_RAMPART
+      )
+        return;
+
+      s.destroy();
+    });
+
+    // 移除 creep config
+    creepApi.batchRemove(this.name);
+
+    // 移除 creep
+    for (const name in Game.creeps) {
+      const creep = Game.creeps[name];
+      if (creep.name.includes(this.name)) {
+        creep.suicide();
+        delete creep.memory;
+      }
+    }
+
+    // 移除内存
+    delete this.memory;
+    delete Memory.stats.rooms[this.name];
+
+    // 放弃房间
+    this.controller.unclaim();
+
+    return this.name + " 房间已移除";
+  }
 }

@@ -10,7 +10,7 @@ export class Move {
    * 会缓存房间内的静态地形、道路、建筑等短时间内不会移动的对象
    * 如果出现了撞墙等情况，说明缓存过期，会在撞墙时移除缓存以便下次重新搜索
    */
-  private static costCache: { [roomName: string]: CostMatrix } = {};
+  public static costCache: { [roomName: string]: CostMatrix } = {};
 
   /**
    * 路径缓存
@@ -18,7 +18,7 @@ export class Move {
    * Creep 在执行远程寻路时会优先检查该缓存
    * 键为路径的起点和终点名，例如："12/32/W1N1 23/12/W2N2"，值是使用 serializeFarPath 序列化后的路径
    */
-  private static routeCache: { [routeKey: string]: string } = {};
+  public static routeCache: { [routeKey: string]: string } = {};
 
   /**
    * 压缩 PathFinder 返回的路径数组
@@ -197,7 +197,7 @@ export class Move {
    * @param target 要移动到的目标位置
    * @param moveOpt 移动参数
    */
-  public static goTo(creep: Creep, targetPos: RoomPosition | undefined, moveOpt: MoveOpt = {}): ScreepsReturnCode {
+  public static goToInner(creep: Creep, targetPos: RoomPosition | undefined, moveOpt: MoveOpt = {}): ScreepsReturnCode {
     if (!creep.memory.moveInfo) creep.memory.moveInfo = {};
 
     const moveMemory = creep.memory.moveInfo;
@@ -349,5 +349,14 @@ export class Move {
     else if (goResult !== ERR_TIRED) creep.say(`寻路 ${goResult}`);
 
     return goResult;
+  }
+
+  public static goTo(creep: Creep, targetPos: RoomPosition | undefined, moveOpt: MoveOpt = {}): ScreepsReturnCode {
+    const costBeforeGo = Game.cpu.getUsed();
+    const result = this.goToInner(creep, targetPos, moveOpt);
+    Memory.moveUseCpu = Memory.moveUseCpu === undefined ? 0 : Memory.moveUseCpu + Game.cpu.getUsed() - costBeforeGo;
+    Memory.moveNumber = Memory.moveNumber === undefined ? 0 : Memory.moveNumber + 1;
+
+    return result;
   }
 }
