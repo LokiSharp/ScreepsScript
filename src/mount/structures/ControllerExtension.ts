@@ -103,7 +103,7 @@ export default class ControllerExtension extends StructureController {
     let hasRuins = false;
 
     const ruins = this.room.find(FIND_RUINS);
-    const ruinsTmp: string[] = [];
+    const ruinsTmp: Id<Ruin>[] = [];
     if (ruins.length > 0) {
       Object.values(ruins).forEach(ruin => {
         if (ruin.store.getUsedCapacity() > 0) {
@@ -127,7 +127,7 @@ export default class ControllerExtension extends StructureController {
     let hasConstructionSites = false;
     const constructionSites = this.room.find(FIND_CONSTRUCTION_SITES);
 
-    const constructionSiteIds: string[] = [];
+    const constructionSiteIds: Id<ConstructionSite<BuildableStructureConstant>>[] = [];
     const constructionSiteNums: { [structureName: string]: number } = {};
 
     if (constructionSites.length > 0) {

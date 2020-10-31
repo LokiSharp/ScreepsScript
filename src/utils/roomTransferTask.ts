@@ -412,6 +412,71 @@ export const transferTaskOperations: { [taskType: string]: transferTaskOperation
       else if (result !== ERR_NOT_IN_RANGE) creep.say(`强化清理 ${result}`);
       return false;
     }
+  },
+
+  /**
+   * nuker 填充任务
+   * 由 nuker 在 Nuker.work 中发布
+   * 任务的搬运量取决于 manager 的最大存储量，搬一次就算任务完成
+   */
+  [ROOM_TRANSFER_TASK.FILL_NUKER]: {
+    source: (creep: Creep, task: IFillNuker, sourceId: Id<Source>): boolean => {
+      // 如果身上有对应资源的话就直接去填充
+      if (creep.store[task.resourceType] > 0) return true;
+
+      // 获取资源存储建筑
+      let sourceStructure: StructureStorage | StructureTerminal;
+      if (task.resourceType === RESOURCE_ENERGY) sourceStructure = creep.room.storage;
+      else sourceStructure = creep.room.terminal;
+      // 获取 nuker
+      const nuker = Game.getObjectById(task.id);
+
+      // 兜底
+      if (!sourceStructure || !nuker) {
+        creep.room.deleteCurrentRoomTransferTask();
+        creep.log(`nuker 填充任务，未找到 Storage 或者 Nuker`);
+        return false;
+      }
+
+      if (!clearCarryingEnergy(creep)) return false;
+
+      // 获取应拿取的数量（能拿取的最小值）
+      const getAmount = Math.min(
+        creep.store.getFreeCapacity(task.resourceType),
+        sourceStructure.store[task.resourceType],
+        nuker.store.getFreeCapacity(task.resourceType)
+      );
+
+      if (getAmount <= 0) {
+        creep.room.deleteCurrentRoomTransferTask();
+        creep.log(`nuker 填充任务，资源不足`);
+        return false;
+      }
+
+      // 拿取资源
+      creep.goTo(sourceStructure.pos);
+      const result = creep.withdraw(sourceStructure, task.resourceType, getAmount);
+      if (result === OK) return true;
+      else if (result !== ERR_NOT_IN_RANGE) creep.log(`nuker 填充任务，withdraw ${result}`, "red");
+      return false;
+    },
+    target: (creep: Creep, task: IFillNuker): boolean => {
+      // 获取 nuker 及兜底
+      const target = Game.getObjectById(task.id);
+      if (!target) {
+        creep.room.deleteCurrentRoomTransferTask();
+        return false;
+      }
+
+      // 转移资源
+      creep.goTo(target.pos);
+      const result = creep.transfer(target, task.resourceType);
+      if (result === OK) {
+        creep.room.deleteCurrentRoomTransferTask();
+        return true;
+      } else if (result !== ERR_NOT_IN_RANGE) creep.say(`核弹填充 ${result}`);
+      return false;
+    }
   }
 };
 

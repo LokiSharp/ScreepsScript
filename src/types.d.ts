@@ -92,6 +92,12 @@ interface Memory {
       [roomName: string]: {
         // storage 中的能量剩余量
         energy?: number;
+        // 终端中的 power 数量
+        power?: number;
+        // nuker 的资源存储量
+        nukerEnergy?: number;
+        nukerG?: number;
+        nukerCooldown?: number;
         // 控制器升级进度，只包含没有到 8 级的
         controllerRatio?: number;
         controllerLevel?: number;
@@ -572,13 +578,14 @@ interface RoomMemory {
   delayCSList: string[];
 
   // 房间内的资源和建筑 id
-  mineralId: string;
-  factoryId: string;
-  extractorId: string;
-  sourceIds: string[];
-  sourceContainersIds: string[];
-  ruinIds: string[];
-  constructionSiteIds: string[];
+  mineralId: Id<Mineral>;
+  factoryId: Id<StructureFactory>;
+  extractorId: Id<StructureExtractor>;
+  nukerId: Id<StructureNuker>;
+  sourceIds: Id<Source>[];
+  sourceContainersIds: Id<StructureContainer>[];
+  ruinIds: Id<Ruin>[];
+  constructionSiteIds: Id<ConstructionSite>[];
 
   // 中央 link 的 id
   centerLinkId?: string;
@@ -723,7 +730,8 @@ type RoomTransferTasks =
   | ILabOut
   | IBoostGetResource
   | IBoostGetEnergy
-  | IBoostClear;
+  | IBoostClear
+  | IFillNuker;
 
 // 房间物流任务 - 填充拓展
 interface IFillExtension {
@@ -765,6 +773,13 @@ interface IBoostGetEnergy {
 // 房间物流任务 - boost 资源清理
 interface IBoostClear {
   type: string;
+}
+
+// 房间物流任务 - 填充核弹
+interface IFillNuker {
+  type: string;
+  id: Id<StructureNuker>;
+  resourceType: ResourceConstant;
 }
 
 interface StructureController {
