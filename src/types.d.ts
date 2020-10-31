@@ -510,11 +510,11 @@ type RemoteRoleConstant =
 
 // 战斗单位
 type WarRoleConstant =
-  | "soldier"
+  | "attacker"
   | "defender"
   | "healer"
   | "dismantler"
-  | "boostSoldier"
+  | "boostAttacker"
   | "boostHealer"
   | "boostDismantler";
 

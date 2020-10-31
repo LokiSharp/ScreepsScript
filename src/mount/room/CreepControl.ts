@@ -152,13 +152,13 @@ export default class CreepControl extends RoomConsole {
    * @param targetFlagName 进攻旗帜名称
    * @param num 要孵化的数量
    */
-  public spwanSoldier(targetFlagName = "", num = 1, keepSpawn = false): string {
+  public spawnAttacker(targetFlagName = "", num = 1, keepSpawn = false): string {
     if (num <= 0 || num > 10) num = 1;
 
     for (let i = 0; i < num; i++) {
       creepApi.add(
-        `${this.name} soldier ${Game.time}-${i}`,
-        "soldier",
+        `${this.name} attacker ${Game.time}-${i}`,
+        "attacker",
         {
           targetFlagName: targetFlagName || DEFAULT_FLAG_NAME.ATTACK,
           keepSpawn
@@ -167,7 +167,7 @@ export default class CreepControl extends RoomConsole {
       );
     }
 
-    return `已发布 soldier*${num}，正在孵化`;
+    return `已发布 attacker*${num}，正在孵化`;
   }
 
   /**
@@ -178,7 +178,7 @@ export default class CreepControl extends RoomConsole {
    * @param num 要孵化的数量
    * @param keepSpawn 是否持续生成
    */
-  public spwanDismantler(targetFlagName = "", num = 2, keepSpawn = false): string {
+  public spawnDismantler(targetFlagName = "", num = 2, keepSpawn = false): string {
     if (num <= 0 || num > 10) num = 1;
 
     for (let i = 0; i < num; i++) {
@@ -239,7 +239,7 @@ export default class CreepControl extends RoomConsole {
     const healerName = `${this.name} healer ${Game.time}`;
     creepApi.add(
       soldierName,
-      "soldier",
+      "attacker",
       {
         targetFlagName: targetFlagName || DEFAULT_FLAG_NAME.ATTACK,
         healerName,
@@ -309,7 +309,7 @@ export default class CreepControl extends RoomConsole {
     const healerName = `${this.name} healer ${Game.time}`;
     creepApi.add(
       soldierName,
-      "boostSoldier",
+      "boostAttacker",
       {
         targetFlagName: targetFlagName || DEFAULT_FLAG_NAME.ATTACK,
         healerName,
@@ -366,7 +366,7 @@ export default class CreepControl extends RoomConsole {
     const soldierName = `${this.name} soldier ${Game.time}`;
     creepApi.add(
       soldierName,
-      "boostSoldier",
+      "boostAttacker",
       {
         targetFlagName: targetFlagName || DEFAULT_FLAG_NAME.ATTACK,
         keepSpawn

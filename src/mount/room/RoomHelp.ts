@@ -230,7 +230,7 @@ export default class RoomHelp extends RoomExtension {
                   '[可选] 是否持续生成，置为 true 时可以执行 creepApi.remove("creepName") 来终止持续生成，默认为 false'
               }
             ],
-            functionName: "spwanSoldier"
+            functionName: "spawnAttacker"
           },
           {
             title: "孵化拆除单位",
@@ -244,7 +244,7 @@ export default class RoomHelp extends RoomExtension {
                   '[可选] 是否持续生成，置为 true 时可以执行 creepApi.remove("creepName") 来终止持续生成，默认为 false'
               }
             ],
-            functionName: "spwanDismantler"
+            functionName: "spawnDismantler"
           },
           {
             title: "孵化强化进攻单位",
