@@ -320,9 +320,9 @@ export default class RoomExtension extends Room {
    * @returns ERR_INVALID_TARGET targetId 找不到对应的建筑
    * @returns ERR_NOT_FOUND 没有找到足够的 source 旗帜
    */
-  public addRemote(remoteRoomName: string, targetId: string): OK | ERR_INVALID_TARGET | ERR_NOT_FOUND {
+  public addRemote(remoteRoomName: string, targetId: Id<StructureWithStore>): OK | ERR_INVALID_TARGET | ERR_NOT_FOUND {
     // target 建筑一定要有
-    if (!Game.getObjectById(targetId as Id<Room>)) return ERR_INVALID_TARGET;
+    if (!Game.getObjectById(targetId)) return ERR_INVALID_TARGET;
     // 目标 source 也至少要有一个
     const sourceFlagsName = [`${remoteRoomName} source0`, `${remoteRoomName} source1`];
     if (!(sourceFlagsName[0] in Game.flags)) return ERR_NOT_FOUND;
@@ -614,7 +614,7 @@ export default class RoomExtension extends Room {
     // 获取全部 lab
     const executiveLab: StructureLab[] = [];
     for (const resourceType in this.memory.boost.lab) {
-      const lab = Game.getObjectById(this.memory.boost.lab[resourceType] as Id<StructureLab>);
+      const lab = Game.getObjectById(this.memory.boost.lab[resourceType]);
       // 这里没有直接终止进程是为了避免 lab 集群已经部分被摧毁而导致整个 boost 进程无法执行
       if (lab) executiveLab.push(lab);
     }

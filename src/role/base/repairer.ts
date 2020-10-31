@@ -10,7 +10,7 @@ import createBodyGetter from "utils/createBodyGetter";
 export default (data: WorkerData): ICreepConfig => ({
   // 根据敌人威胁决定是否继续生成
   isNeed: room => {
-    const source = Game.getObjectById(data.sourceId as Id<StructureContainer>);
+    const source = Game.getObjectById(data.sourceId);
 
     // 如果能量来源没了就删除自己
     if (!source) return false;
@@ -21,8 +21,7 @@ export default (data: WorkerData): ICreepConfig => ({
     return room.controller.checkEnemyThreat();
   },
   source: creep => {
-    const source =
-      Game.getObjectById(data.sourceId as Id<StructureContainer>) || creep.room.storage || creep.room.terminal;
+    const source = Game.getObjectById(data.sourceId) || creep.room.storage || creep.room.terminal;
 
     // 能量不足就先等待，优先满足 filler 需求
     if (source.store[RESOURCE_ENERGY] < 500) {
@@ -39,8 +38,7 @@ export default (data: WorkerData): ICreepConfig => ({
     let importantWall = creep.room.importantWall;
     // 先尝试获取焦点墙，有最新的就更新缓存，没有就用缓存中的墙
     if (importantWall) creep.memory.fillWallId = importantWall.id;
-    else if (creep.memory.fillWallId)
-      importantWall = Game.getObjectById(creep.memory.fillWallId as Id<StructureWall | StructureRampart>);
+    else if (creep.memory.fillWallId) importantWall = Game.getObjectById(creep.memory.fillWallId);
 
     // 有焦点墙就优先刷
     if (importantWall) {

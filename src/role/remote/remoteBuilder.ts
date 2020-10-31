@@ -43,7 +43,7 @@ export default (data: RemoteDeclarerData): ICreepConfig => ({
     if (creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) return true;
 
     // 获取有效的能量来源
-    let source: StructureStorage | StructureTerminal | StructureContainer | Source;
+    let source: AllEnergySource;
     if (!creep.memory.sourceId) {
       source = creep.room.getAvailableSource();
       if (!source) {
@@ -52,10 +52,7 @@ export default (data: RemoteDeclarerData): ICreepConfig => ({
       }
 
       creep.memory.sourceId = source.id;
-    } else
-      source = Game.getObjectById(
-        creep.memory.sourceId as Id<StructureTerminal | StructureStorage | StructureContainer | Source>
-      );
+    } else source = Game.getObjectById(creep.memory.sourceId);
     // 之前的来源建筑里能量不够了就更新来源
     if (
       !source ||

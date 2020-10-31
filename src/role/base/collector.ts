@@ -8,17 +8,17 @@ import createBodyGetter from "utils/createBodyGetter";
 export default (data: HarvesterData): ICreepConfig => ({
   prepare: creep => {
     // 已经到附近了就准备完成
-    if (creep.pos.isNearTo(Game.getObjectById(data.sourceId as Id<Source>).pos)) return true;
+    if (creep.pos.isNearTo(Game.getObjectById(data.sourceId).pos)) return true;
     // 否则就继续移动
     else {
-      creep.goTo(Game.getObjectById(data.sourceId as Id<Source>).pos);
+      creep.goTo(Game.getObjectById(data.sourceId).pos);
       return false;
     }
   },
   source: creep => {
     if (creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) return true;
 
-    const source = Game.getObjectById(data.sourceId as Id<Source>);
+    const source = Game.getObjectById(data.sourceId);
     if (!source) {
       creep.say("目标找不到!");
       return false;
@@ -33,7 +33,7 @@ export default (data: HarvesterData): ICreepConfig => ({
     return false;
   },
   target: creep => {
-    const target: Structure = Game.getObjectById(data.targetId as Id<Structure>);
+    const target: Structure = Game.getObjectById(data.targetId);
     // 找不到目标了，自杀并重新运行发布规划
     if (!target) {
       creep.say("目标找不到!");

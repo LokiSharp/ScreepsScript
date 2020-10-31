@@ -104,7 +104,7 @@ export default (data: ReiverData): ICreepConfig => ({
     return false;
   },
   target: creep => {
-    const targetStructure = Game.getObjectById(data.targetId as Id<StructureWithStore>);
+    const targetStructure = Game.getObjectById(data.targetId);
     if (!targetStructure) {
       creep.log(`找不到要存放资源的建筑 ${data.targetId}`, "yellow");
       creep.say("搬到哪？");

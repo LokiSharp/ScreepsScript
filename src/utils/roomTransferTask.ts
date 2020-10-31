@@ -13,9 +13,9 @@ export const transferTaskOperations: { [taskType: string]: transferTaskOperation
    * 维持正常孵化的任务
    */
   [ROOM_TRANSFER_TASK.FILL_EXTENSION]: {
-    source: (creep: Creep, task: IFillExtension, sourceId: string): boolean => {
+    source: (creep: Creep, task: IFillExtension, sourceId: Id<StructureWithStore>): boolean => {
       if (creep.store[RESOURCE_ENERGY] > 0) return true;
-      const result = creep.getEngryFrom(sourceId ? Game.getObjectById(sourceId as Id<Source>) : creep.room.storage);
+      const result = creep.getEngryFrom(sourceId ? Game.getObjectById(sourceId) : creep.room.storage);
       return result === OK;
     },
     target: (creep: Creep): boolean => {
@@ -70,11 +70,9 @@ export const transferTaskOperations: { [taskType: string]: transferTaskOperation
    * 维持房间内所有 tower 的能量
    */
   [ROOM_TRANSFER_TASK.FILL_TOWER]: {
-    source: (creep: Creep, task: IFillExtension, sourceId: string): boolean => {
+    source: (creep: Creep, task: IFillExtension, sourceId: Id<StructureWithStore>): boolean => {
       if (creep.store[RESOURCE_ENERGY] > 0) return true;
-      const result = creep.getEngryFrom(
-        sourceId ? Game.getObjectById(sourceId as Id<Structure | Source>) : creep.room.storage
-      );
+      const result = creep.getEngryFrom(sourceId ? Game.getObjectById(sourceId) : creep.room.storage);
       return result === OK;
     },
     target: (creep: Creep, task: IFillTower): boolean => {
@@ -95,7 +93,7 @@ export const transferTaskOperations: { [taskType: string]: transferTaskOperation
       // 有缓存的话
       if (!target) {
         // 先检查下任务发布 tower 能量是否足够
-        target = Game.getObjectById(task.id as Id<StructureTower>);
+        target = Game.getObjectById(task.id);
         if (!target || target.store[RESOURCE_ENERGY] > 900) {
           // 然后再检查下还有没有其他 tower 没填充
           const towers = creep.room.find(FIND_MY_STRUCTURES, {
@@ -167,7 +165,7 @@ export const transferTaskOperations: { [taskType: string]: transferTaskOperation
         return true;
       }
 
-      const targetLab = Game.getObjectById(targetResource.id as Id<StructureLab>);
+      const targetLab = Game.getObjectById(targetResource.id);
 
       // 转移资源
       creep.goTo(targetLab.pos);
@@ -273,7 +271,7 @@ export const transferTaskOperations: { [taskType: string]: transferTaskOperation
         resource = Object.keys(boostConfig.lab).find((res, index) => {
           // 如果这个材料已经用完了就检查下一个
           if (!terminal.store[res] || terminal.store[res] === 0) return false;
-          const lab = Game.getObjectById(boostConfig.lab[res] as Id<StructureLab>);
+          const lab = Game.getObjectById(boostConfig.lab[res]);
           // lab 里的资源不达标就进行运输
           if (lab && lab.store[res] < boostResourceReloadLimit) return true;
 
@@ -302,7 +300,7 @@ export const transferTaskOperations: { [taskType: string]: transferTaskOperation
     target: (creep: Creep): boolean => {
       // 找到要转移的资源以及目标 lab
       const targetResource = creep.memory.taskResource;
-      const targetLab = Game.getObjectById(creep.room.memory.boost.lab[targetResource] as Id<StructureLab>);
+      const targetLab = Game.getObjectById(creep.room.memory.boost.lab[targetResource]);
 
       // 转移资源
       creep.goTo(targetLab.pos);
@@ -326,7 +324,7 @@ export const transferTaskOperations: { [taskType: string]: transferTaskOperation
    * 将给指定的 lab 填满能量
    */
   [ROOM_TRANSFER_TASK.BOOST_GET_ENERGY]: {
-    source: (creep: Creep, task: IBoostGetEnergy, sourceId: Id<Source>): boolean => {
+    source: (creep: Creep, task: IBoostGetEnergy, sourceId: Id<StructureWithStore>): boolean => {
       if (creep.store[RESOURCE_ENERGY] > 0) return true;
       creep.getEngryFrom(sourceId ? Game.getObjectById(sourceId) : creep.room.storage);
       return false;
@@ -337,7 +335,7 @@ export const transferTaskOperations: { [taskType: string]: transferTaskOperation
       // 获取能量为空的 lab
       let targetLab: StructureLab;
       for (const labId of boostLabs) {
-        const lab = Game.getObjectById(labId as Id<StructureLab>);
+        const lab = Game.getObjectById(labId);
         if (lab && lab.store[RESOURCE_ENERGY] !== LAB_ENERGY_CAPACITY) {
           targetLab = lab;
           break;
@@ -365,13 +363,13 @@ export const transferTaskOperations: { [taskType: string]: transferTaskOperation
    * 将 boost 强化没用完的材料再搬回 terminal
    */
   [ROOM_TRANSFER_TASK.BOOST_CLEAR]: {
-    source: (creep: Creep, task: IBoostClear, sourceId: string): boolean => {
+    source: (creep: Creep, task: IBoostClear, sourceId: Id<StructureWithStore>): boolean => {
       const boostLabs = Object.values(creep.room.memory.boost.lab);
 
       // 获取能量为空的 lab
       let targetLab: StructureLab;
       for (const labId of boostLabs) {
-        const lab = Game.getObjectById(labId as Id<StructureLab>);
+        const lab = Game.getObjectById(labId);
         if (lab && lab.mineralType) {
           targetLab = lab;
           break;
@@ -420,7 +418,7 @@ export const transferTaskOperations: { [taskType: string]: transferTaskOperation
    * 任务的搬运量取决于 manager 的最大存储量，搬一次就算任务完成
    */
   [ROOM_TRANSFER_TASK.FILL_NUKER]: {
-    source: (creep: Creep, task: IFillNuker, sourceId: Id<Source>): boolean => {
+    source: (creep: Creep, task: IFillNuker, sourceId: Id<StructureWithStore>): boolean => {
       // 如果身上有对应资源的话就直接去填充
       if (creep.store[task.resourceType] > 0) return true;
 

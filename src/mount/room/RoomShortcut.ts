@@ -46,7 +46,7 @@ export default class RoomShortcut extends Room {
     // 如果内存中存有 id 的话就读取并返回
     // mineral 不会过期，所以不需要进行处理
     if (this.memory.mineralId) {
-      this.mineralCache = Game.getObjectById(this.memory.mineralId as Id<Mineral>);
+      this.mineralCache = Game.getObjectById(this.memory.mineralId);
       return this.mineralCache;
     }
 
@@ -74,7 +74,7 @@ export default class RoomShortcut extends Room {
     // 如果内存中存有 id 的话就读取并返回
     // source 不会过期，所以不需要进行处理
     if (this.memory.sourceIds) {
-      this.sourcesCache = this.memory.sourceIds.map(id => Game.getObjectById(id as Id<Source>));
+      this.sourcesCache = this.memory.sourceIds.map(id => Game.getObjectById(id));
       return this.sourcesCache;
     }
 
@@ -108,7 +108,7 @@ export default class RoomShortcut extends Room {
     const targets = this.memory.sourceContainersIds
       // 遍历 id，获取 container 实例
       .map((containerId, index) => {
-        const container = Game.getObjectById<StructureContainer>(containerId as Id<StructureContainer>);
+        const container = Game.getObjectById(containerId);
         if (container) return container;
 
         abandonedIdIndex.push(index);

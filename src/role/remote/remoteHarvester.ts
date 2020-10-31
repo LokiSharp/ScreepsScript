@@ -142,7 +142,7 @@ export default (data: RemoteHarvesterData): ICreepConfig => ({
       if (road.hits < road.hitsMax) creep.repair(road);
     }
 
-    const target = Game.getObjectById(data.targetId as Id<Structure>);
+    const target = Game.getObjectById(data.targetId);
     if (!target) {
       creep.log(`找不到存放建筑 ${data.targetId}`, "yellow");
       return false;

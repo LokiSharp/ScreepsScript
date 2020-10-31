@@ -2,20 +2,17 @@ import { bodyConfigs } from "setting";
 import createBodyGetter from "utils/createBodyGetter";
 
 /**
- * 采矿者
- * 从指定矿中挖矿 > 将矿转移到 spawn 和 extension 中
+ * 采集者
+ * 从指定 source 中获取能量 > 将能量存放到身下的 container 中
  *
  */
 export default (data: HarvesterData): ICreepConfig => ({
   prepare: creep => {
-    let target: StructureContainer | Source | ConstructionSite;
+    let target: Source | StructureWithStore | ConstructionSite;
     // 如果有缓存的话就获取缓存
-    if (creep.memory.targetId)
-      target = Game.getObjectById<StructureContainer | Source>(
-        creep.memory.sourceId as Id<StructureContainer | Source>
-      );
+    if (creep.memory.targetId) target = Game.getObjectById(creep.memory.targetId);
 
-    const source = Game.getObjectById<Source>(data.sourceId as Id<Source>);
+    const source = Game.getObjectById(data.sourceId);
 
     // 没有缓存或者缓存失效了就重新获取
     if (!target) {
@@ -59,13 +56,11 @@ export default (data: HarvesterData): ICreepConfig => ({
 
     // 没有能量就进行采集，因为是维护阶段，所以允许采集一下工作一下
     if (creep.store[RESOURCE_ENERGY] <= 0) {
-      creep.getEngryFrom(Game.getObjectById(data.sourceId as Id<StructureContainer | Source>));
+      creep.getEngryFrom(Game.getObjectById(data.sourceId));
       return false;
     }
     // 获取 prepare 阶段中保存的 targetId
-    const target = Game.getObjectById<StructureContainer | Source>(
-      creep.memory.targetId as Id<StructureContainer | Source>
-    );
+    const target = Game.getObjectById(creep.memory.targetId);
 
     // 存在 container，把血量修满
     if (target && target instanceof StructureContainer) {
@@ -77,8 +72,7 @@ export default (data: HarvesterData): ICreepConfig => ({
     // 不存在 container，开始新建，首先尝试获取工地缓存，没有缓存就新建工地
     let constructionSite: ConstructionSite;
     if (!creep.memory.constructionSiteId) creep.pos.createConstructionSite(STRUCTURE_CONTAINER);
-    else
-      constructionSite = Game.getObjectById<ConstructionSite>(creep.memory.constructionSiteId as Id<ConstructionSite>);
+    else constructionSite = Game.getObjectById(creep.memory.constructionSiteId);
 
     // 没找到工地缓存或者工地没了，重新搜索
     if (!constructionSite)
@@ -104,7 +98,7 @@ export default (data: HarvesterData): ICreepConfig => ({
     return false;
   },
   target: creep => {
-    creep.getEngryFrom(Game.getObjectById(data.sourceId as Id<Structure | Source>));
+    creep.getEngryFrom(Game.getObjectById(data.sourceId));
 
     // 快死了就把身上的能量丢出去，这样就会存到下面的 container 里，否则变成墓碑后能量无法被 container 自动回收
     if (creep.ticksToLive < 2) creep.drop(RESOURCE_ENERGY);

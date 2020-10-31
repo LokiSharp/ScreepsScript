@@ -12,9 +12,7 @@ export default (data: WorkerData): ICreepConfig => ({
     // 因为只会从建筑里拿，所以只要拿到了就去升级
     if (creep.store[RESOURCE_ENERGY] > 0) return true;
 
-    const source: StructureTerminal | StructureStorage | StructureContainer = Game.getObjectById(
-      data.sourceId as Id<StructureTerminal | StructureStorage | StructureContainer>
-    );
+    const source = Game.getObjectById(data.sourceId);
 
     // 如果能量来源是 container
     if (source && source.structureType === STRUCTURE_CONTAINER) {

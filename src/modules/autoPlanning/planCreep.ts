@@ -255,7 +255,7 @@ const releasePlans: CreepReleasePlans = {
       // storage 修建完成
       ({ room, storageId }: TransporterPlanStats) => {
         if (!storageId) return true;
-        if (!Game.getObjectById(storageId as Id<StructureStorage>).my) return true;
+        if (!Game.getObjectById(storageId).my) return true;
 
         // 发布房间物流管理单位
         creepApi.add(

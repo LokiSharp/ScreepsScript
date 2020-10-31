@@ -6,16 +6,16 @@
  * @param creep manager
  * @param sourceId 能量存放处
  */
-export default function deathPrepare(creep: Creep, sourceId: string): false {
+export default function deathPrepare(creep: Creep, sourceId: Id<StructureWithStore>): false {
   if (creep.store.getUsedCapacity() > 0) {
     for (const resourceType in creep.store) {
-      let target: StructureStorage | StructureTerminal;
+      let target: StructureWithStore;
       // 不是能量就放到 terminal 里
       if (resourceType !== RESOURCE_ENERGY && resourceType !== RESOURCE_POWER && creep.room.terminal) {
         target = creep.room.terminal;
       }
       // 否则就放到 storage 或者玩家指定的地方
-      else target = sourceId ? Game.getObjectById(sourceId as Id<StructureStorage>) : creep.room.storage;
+      else target = sourceId ? Game.getObjectById(sourceId) : creep.room.storage;
 
       // 转移资源
       creep.goTo(target.pos);

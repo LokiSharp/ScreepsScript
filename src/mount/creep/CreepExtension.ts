@@ -141,7 +141,7 @@ export default class CreepExtension extends Creep {
     let target: ConstructionSite;
     // 检查是否有缓存
     if (this.room.memory.constructionSiteId) {
-      target = Game.getObjectById(this.room.memory.constructionSiteId as Id<ConstructionSite>);
+      target = Game.getObjectById(this.room.memory.constructionSiteId);
       // 如果缓存中的工地不存在则说明建筑完成
       if (!target) {
         // 获取曾经工地的位置
@@ -161,7 +161,7 @@ export default class CreepExtension extends Creep {
 
           // 如果刚修好的是墙的话就记住该墙的 id，然后把血量刷高一点（相关逻辑见 builder.target()）
           if (structure.structureType === STRUCTURE_WALL || structure.structureType === STRUCTURE_RAMPART) {
-            this.memory.fillWallId = structure.id;
+            this.memory.fillWallId = structure.id as Id<StructureWall | StructureRampart>;
           }
           // 如果修好的是 source container 的话，就执行注册
           else if (structure instanceof StructureContainer && this.room.sources.find(s => structure.pos.isNearTo(s))) {
@@ -192,9 +192,7 @@ export default class CreepExtension extends Creep {
    * 会把内存中 fillWallId 标注的墙声明值刷到定值以上
    */
   public steadyWall(): OK | ERR_NOT_FOUND {
-    const wall = Game.getObjectById<StructureWall | StructureRampart>(
-      this.memory.fillWallId as Id<StructureWall | StructureRampart>
-    );
+    const wall = Game.getObjectById(this.memory.fillWallId);
     if (!wall) return ERR_NOT_FOUND;
 
     if (wall.hits < MIN_WALL_HITS) {
@@ -269,7 +267,7 @@ export default class CreepExtension extends Creep {
     }
 
     // 获取墙壁
-    if (!targetWall) targetWall = Game.getObjectById(focusWall.id as Id<StructureWall | StructureRampart>);
+    if (!targetWall) targetWall = Game.getObjectById(focusWall.id);
     // 如果缓存里的 id 找不到墙壁，就清除缓存下次再找
     if (!targetWall) {
       delete this.room.memory.focusWall;

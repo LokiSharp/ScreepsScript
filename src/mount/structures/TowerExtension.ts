@@ -299,7 +299,7 @@ export default class TowerExtension extends StructureTower {
     }
 
     // 获取墙壁
-    if (!targetWall) targetWall = Game.getObjectById(focusWall.id as Id<StructureRampart | StructureWall>);
+    if (!targetWall) targetWall = Game.getObjectById(focusWall.id);
     // 如果缓存里的 id 找不到墙壁，就清除缓存下次再找
     if (!targetWall) {
       delete this.room.memory.focusWall;

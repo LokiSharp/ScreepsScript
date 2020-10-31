@@ -18,9 +18,7 @@ export default (data: WorkerData): ICreepConfig => ({
     if (creep.store[RESOURCE_ENERGY] > 0) return true;
 
     // 获取源 container
-    let source: StructureContainer | StructureStorage = Game.getObjectById<StructureContainer>(
-      data.sourceId as Id<StructureContainer>
-    );
+    let source = Game.getObjectById(data.sourceId);
     // container 没能量了就尝试从 storage 里获取能量执行任务
     // 原因是有了 sourceLink 之后 container 会有很长一段时间没人维护（直到 container 耐久掉光）
     // 如果没有这个判断的话 filler 会在停止孵化之前有好几辈子都呆在空 container 前啥都不干
@@ -41,7 +39,7 @@ export default (data: WorkerData): ICreepConfig => ({
     // 空闲时间会尝试把能量存放到 storage 里
     if (!creep.room.storage) return false;
 
-    const source = Game.getObjectById<StructureContainer>(data.sourceId as Id<StructureContainer>);
+    const source = Game.getObjectById(data.sourceId);
     // source container 还有 harvester 维护时才会把能量转移至 storage
     // 否则结合 source 阶段，filler 会在 container 等待老化时在 storage 旁边无意义举重
     if (source && source.store[RESOURCE_ENERGY] > 0) creep.transferTo(creep.room.storage, RESOURCE_ENERGY);

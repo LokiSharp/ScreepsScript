@@ -13,7 +13,7 @@ export function getNotClearLab(labMemory: LabMemory): StructureLab {
   // 找不到的话就检查下 inLab 是否净空
   for (const labId of labMemory.inLab) {
     // 获取 inLab
-    const inLab = Game.getObjectById(labId as Id<StructureLab>);
+    const inLab = Game.getObjectById(labId);
     // manager 并非 lab 集群内部成员，所以不会对 inLab 的缺失做出响应
     if (!inLab) continue;
 
