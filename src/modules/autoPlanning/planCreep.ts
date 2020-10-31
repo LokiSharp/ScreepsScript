@@ -258,13 +258,15 @@ const releasePlans: CreepReleasePlans = {
         if (!Game.getObjectById(storageId as Id<StructureStorage>).my) return true;
 
         // 发布房间物流管理单位
-        creepApi.add(
-          `${room.name} manager`,
-          "manager",
-          {
-            sourceId: storageId
-          },
-          room.name
+        [0, 1].forEach(index =>
+          creepApi.add(
+            `${room.name} manager${index}`,
+            "manager",
+            {
+              sourceId: storageId
+            },
+            room.name
+          )
         );
 
         room.log(`发布 manager`, "transporter", "green");
