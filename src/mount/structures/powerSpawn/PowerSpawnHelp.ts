@@ -1,8 +1,8 @@
-import { PowerSpawnExtension } from "./PowerSpawnExtension";
+import PowerSpawnExtension from "./PowerSpawnExtension";
 import colorful from "utils/colorful";
 import { createHelp } from "modules/help";
 
-export class PowerSpawnHelp extends PowerSpawnExtension {
+export default class PowerSpawnHelp extends PowerSpawnExtension {
   /**
    * 用户操作 - 帮助信息
    */

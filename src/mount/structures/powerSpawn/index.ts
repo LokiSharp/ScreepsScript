@@ -1,6 +1,6 @@
-import { PowerSpawnConsole } from "./PowerSpawnConsole";
-import { PowerSpawnExtension } from "./PowerSpawnExtension";
-import { PowerSpawnHelp } from "./PowerSpawnHelp";
+import PowerSpawnConsole from "./PowerSpawnConsole";
+import PowerSpawnExtension from "./PowerSpawnExtension";
+import PowerSpawnHelp from "./PowerSpawnHelp";
 import assignPrototype from "utils/assignPrototype";
 
 // 定义好挂载顺序

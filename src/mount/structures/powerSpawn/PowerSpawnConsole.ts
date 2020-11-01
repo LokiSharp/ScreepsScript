@@ -1,8 +1,8 @@
-import { PowerSpawnExtension } from "./PowerSpawnExtension";
+import PowerSpawnExtension from "./PowerSpawnExtension";
 import colorful from "utils/colorful";
 import createRoomLink from "utils/createRoomLink";
 
-export class PowerSpawnConsole extends PowerSpawnExtension {
+export default class PowerSpawnConsole extends PowerSpawnExtension {
   /**
    * 用户操作 - 启动 powerSpawn
    * 虽然默认情况下 ps 就是会自动消化 power 的，但是执行了本方法之后，本 ps 就可以从其他房间中自动的调配 power 进行消化。

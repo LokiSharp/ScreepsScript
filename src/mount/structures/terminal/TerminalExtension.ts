@@ -595,4 +595,52 @@ export default class TerminalExtension extends StructureTerminal {
       return true;
     });
   }
+
+  /**
+   * 平衡 power
+   * 将自己存储的多余 power 转移至其他房间
+   * 只会平衡到执行了 powerSpawn.on() 的房间
+   *
+   * @returns ERR_NOT_ENOUGH_RESOURCES power 的资源不足
+   * @returns ERR_NAME_EXISTS 房间内已经存在 shareTask
+   * @returns ERR_NOT_FOUND 未找到有效的目标房间
+   */
+  public balancePower(): OK | ERR_NOT_ENOUGH_RESOURCES | ERR_NAME_EXISTS | ERR_NOT_FOUND {
+    // 已经有共享任务了也不会执行
+    if (this.room.memory.shareTask) return ERR_NAME_EXISTS;
+
+    // 允许共享的下限
+    const SHARE_LIMIE = 10000;
+    // power 足够才能共享
+    if (this.store[RESOURCE_POWER] < SHARE_LIMIE) return ERR_NOT_ENOUGH_RESOURCES;
+
+    if (!Memory.psRooms || Memory.psRooms.length <= 0) return ERR_NOT_FOUND;
+
+    // 找到 power 数量最少的已启用 ps 房间的信息
+    const targetRoomInfo = Memory.psRooms
+      // 统计出所有目标房间的 power 数量
+      .map(roomName => {
+        const room = Game.rooms[roomName];
+        // 无法正常接收的不参与计算
+        if (!room || !room.terminal) return { room: roomName, num: null };
+
+        return {
+          room: roomName,
+          num: room.terminal.store[RESOURCE_POWER]
+        };
+      })
+      // 移除掉所有不参与计算的房间
+      .filter(info => info.num !== null)
+      // 找到 power 数量最小的房间
+      .reduce((prev, next) => {
+        if (prev.num > next.num) return next;
+        else return prev;
+      });
+
+    // 添加共享任务
+    if (!targetRoomInfo || !targetRoomInfo.room) return ERR_NOT_FOUND;
+    this.room.shareAdd(targetRoomInfo.room, RESOURCE_POWER, SHARE_LIMIE);
+
+    return OK;
+  }
 }

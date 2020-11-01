@@ -6,12 +6,16 @@ import builder from "./base/builder";
 import claimer from "./remote/claimer";
 import collector from "./base/collector";
 import defender from "./war/defender";
+import depositHarvester from "./remote/depositHarvester";
 import dismantler from "./war/dismantler";
 import filler from "./base/filler";
 import harvester from "./base/harvester";
 import healer from "./war/healer";
 import manager from "./advanced/manager";
 import moveTester from "./remote/moveTester";
+import pbAttacker from "./remote/pbAttacker";
+import pbCarrier from "./remote/pbCarrier";
+import pbHealer from "./remote/pbHealer";
 import processor from "./advanced/processor";
 import reiver from "./remote/reiver";
 import remoteBuilder from "./remote/remoteBuilder";
@@ -45,7 +49,11 @@ const roles: CreepWork = {
   boostDismantler,
   boostHealer,
   boostAttacker,
-  signer
+  signer,
+  pbAttacker,
+  pbCarrier,
+  pbHealer,
+  depositHarvester
 };
 
 /**

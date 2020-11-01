@@ -7,7 +7,7 @@ import { ROOM_TRANSFER_TASK, powerSettings } from "setting";
  *
  * 可以随时通过原型上的指定方法来暂停/重启 ps，详见 .help()
  */
-export class PowerSpawnExtension extends StructurePowerSpawn {
+export default class PowerSpawnExtension extends StructurePowerSpawn {
   public work(): void {
     // ps 未启用或者被暂停了就跳过
     if (this.room.memory.pausePS) return;

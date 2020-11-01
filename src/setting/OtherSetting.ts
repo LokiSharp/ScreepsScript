@@ -28,3 +28,30 @@ export const powerSettings = {
   // 当前房间 storage 内存量低于limit时自动停止 process
   processEnergyLimit: 500000
 };
+
+/**
+ * deposit 最大的采集冷却时长
+ * 超过该时长则不会再进行挖掘
+ */
+export const DEPOSIT_MAX_COOLDOWN = 100;
+
+/**
+ * observer 房间扫描间隔
+ */
+export const observerInterval = 10;
+
+// 每个 observer 同时允许采集的 pb 和 depo 的最大数量
+export const OBSERVER_POWERBANK_MAX = 1;
+export const OBSERVER_DEPOSIT_MAX = 2;
+
+/**
+ * powerbank 的采集阶段
+ * @property {} ATTACK 正在拆除
+ * @property {} PREPARE 快拆完了，carrier 准备过来
+ * @property {} TRANSFE 拆除完成，正在搬运
+ */
+export const PB_HARVESTE_STATE = {
+  ATTACK: "attack",
+  PREPARE: "prepare",
+  TRANSFER: "transfer"
+};

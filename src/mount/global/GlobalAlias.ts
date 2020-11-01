@@ -174,6 +174,43 @@ export default [
       return stats;
     }
   },
+  {
+    alias: "ob",
+    exec(): string {
+      // 获取旗帜所在房间的访问链接
+      const getFlagRoomLink = (flagName: string) => createRoomLink(Game.flags[flagName].pos.roomName);
+
+      const stats = Object.values(Game.rooms)
+        .map(room => {
+          if (!room.observer) return false;
+
+          const memory = room.memory.observer;
+          const obName = createRoomLink(room.name);
+          if (!memory) return `${colorful("●", "red", true)} ${obName} 未启用`;
+          if (memory.pause) return `${colorful("●", "yellow", true)} ${obName} 暂停中`;
+
+          // 更新旗帜列表，保证显示最新数据
+          room.observer.updateFlagList();
+
+          // 正在采集的两种资源数量
+          const pbNumber = memory.pbList.length;
+          const depoNumber = memory.depoList.length;
+          // 开采资源的所处房间
+          const pbPos = memory.pbList.map(getFlagRoomLink).join(" ");
+          const depoPos = memory.depoList.map(getFlagRoomLink).join(" ");
+
+          const statsResult = [colorful("●", "green", true), obName];
+          statsResult.push(`[开采中 PB] ${pbNumber ? pbPos : "无"}`);
+          statsResult.push(`[开采中 DEPO] ${depoNumber ? depoPos : "无"}`);
+
+          return statsResult.join(" ");
+        })
+        .filter(statsResult => statsResult)
+        .join("\n");
+
+      return stats;
+    }
+  },
   // 统计当前所有房间的存储状态
   {
     alias: "storage",

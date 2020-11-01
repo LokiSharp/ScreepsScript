@@ -266,7 +266,8 @@ type CreepData =
   | ProcessorData
   | ReiverData
   | WarUnitData
-  | HealUnitData;
+  | HealUnitData
+  | pbAttackerData;
 
 /**
  * 有些角色不需要 data
@@ -328,6 +329,14 @@ interface RemoteHarvesterData {
   targetId?: Id<StructureWithStore>;
   // 出生房名称，资源会被运输到该房间中
   spawnRoom?: string;
+}
+interface pbAttackerData {
+  // 要采集的资源旗帜名称
+  sourceFlagName: string;
+  // 资源要存放到哪个建筑里，外矿采集者必须指定该参数
+  healerCreepName: string;
+  // 出生房名称，资源会被运输到该房间中
+  spawnRoom: string;
 }
 
 /**
@@ -431,6 +440,9 @@ interface CreepMemory {
   sourceId?: Id<AllEnergySource>;
   // 要存放到的目标建筑
   targetId?: Id<Source | StructureWithStore | ConstructionSite>;
+  // deposit 采集者特有，deposit 的类型
+  depositType?: DepositConstant;
+  // 要填充的墙 id
   fillWallId?: Id<StructureWall | StructureRampart>;
   // manager 特有 要填充能量的建筑 id
   fillStructureId?: Id<StructureWithStore>;
@@ -509,7 +521,11 @@ type RemoteRoleConstant =
   | "remoteUpgrader"
   | "remoteBuilder"
   | "moveTester"
-  | "signer";
+  | "signer"
+  | "pbAttacker"
+  | "pbCarrier"
+  | "pbHealer"
+  | "depositHarvester";
 
 // 战斗单位
 type WarRoleConstant =
@@ -542,7 +558,8 @@ interface Room {
   addRemoteHelper(remoteRoomName: string, wayPointFlagName?: string): void;
   addRemoteReserver(remoteRoomName: string, single?: boolean): void;
   addRemoteCreepGroup(remoteRoomName: string): void;
-  spwanSoldier(targetFlagName: string, num?: number): string;
+  removePbHarvesteGroup(attackerName: string, healerName: string): void;
+  spawnPbCarrierGroup(flagName: string, releaseNumber: number): void;
 
   /**
    * 下述方法在 @see /src/mount.room.ts 中定义
@@ -659,6 +676,7 @@ interface RoomMemory {
   extractorId: Id<StructureExtractor>;
   powerSpawnId: Id<StructurePowerSpawn>;
   nukerId: Id<StructureNuker>;
+  observerId: Id<StructureObserver>;
   sourceIds: Id<Source>[];
   sourceContainersIds: Id<StructureContainer>[];
   ruinIds: Id<Ruin>[];
@@ -675,6 +693,21 @@ interface RoomMemory {
   centerCandidates?: [number, number][];
   // 是否关闭自动布局，该值为 true 时将不会对本房间运行自动布局
   noLayout: boolean;
+
+  // observer 内存
+  observer: {
+    // 上个 tick 已经 ob 过的房间名
+    checkRoomName?: string;
+    // 遍历 watchRooms 所使用的索引
+    watchIndex: number;
+    // 监听的房间列表
+    watchRooms: string[];
+    // 当前已经找到的 powerBank 和 deposit 旗帜名数组，会自动进行检查来移除消失的旗帜信息
+    pbList: string[];
+    depoList: string[];
+    // 是否暂停，为 true 时暂停
+    pause?: boolean;
+  };
 
   // 建筑工的当前工地目标，用于保证多个建筑工的工作统一以及建筑工死后不会寻找新的工地
   constructionSiteId: Id<ConstructionSite>;
@@ -1386,4 +1419,14 @@ interface ButtonDetail {
   content: string;
   // 按钮会执行的命令（可以访问游戏对象）
   command: string;
+}
+
+interface StructureTerminal {
+  // 平衡 power
+  balancePower(): OK | ERR_NOT_ENOUGH_RESOURCES | ERR_NAME_EXISTS | ERR_NOT_FOUND;
+}
+
+// ob 拓展
+interface StructureObserver {
+  updateFlagList(): OK | ERR_NOT_FOUND;
 }

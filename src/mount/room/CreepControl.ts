@@ -147,15 +147,49 @@ export default class CreepControl extends RoomConsole {
   }
 
   /**
+   * 发布 pbCarrier 小组
+   * 由 pbAttacker 调用
+   *
+   * @param flagName powerBank 上的旗帜名
+   * @param releaseNumber 孵化几个 carrier
+   */
+  public spawnPbCarrierGroup(flagName: string, releaseNumber: number): void {
+    // 如果已经有人发布过了就不再费事了
+    if (creepApi.has(`${flagName} carrier0`)) return;
+
+    for (let i = 0; i < releaseNumber; i++) {
+      creepApi.add(
+        `${flagName} carrier${i}`,
+        "pbCarrier",
+        {
+          sourceFlagName: flagName,
+          spawnRoom: this.name
+        },
+        this.name
+      );
+    }
+  }
+
+  /**
+   * 移除 pb 采集小组配置项
+   * @param attackerName 攻击单位名称
+   * @param healerName 治疗单位名称
+   */
+  public removePbHarvesteGroup(attackerName: string, healerName: string): void {
+    creepApi.remove(attackerName);
+    creepApi.remove(healerName);
+  }
+
+  /**
    * 孵化基础进攻单位
    *
    * @param targetFlagName 进攻旗帜名称
-   * @param num 要孵化的数量
+   * @param releaseNumber 要孵化的数量
    */
-  public spawnAttacker(targetFlagName = "", num = 1, keepSpawn = false): string {
-    if (num <= 0 || num > 10) num = 1;
+  public spawnAttacker(targetFlagName = "", releaseNumber = 1, keepSpawn = false): string {
+    if (releaseNumber <= 0 || releaseNumber > 10) releaseNumber = 1;
 
-    for (let i = 0; i < num; i++) {
+    for (let i = 0; i < releaseNumber; i++) {
       creepApi.add(
         `${this.name} attacker ${Game.time}-${i}`,
         "attacker",
@@ -167,7 +201,7 @@ export default class CreepControl extends RoomConsole {
       );
     }
 
-    return `已发布 attacker*${num}，正在孵化`;
+    return `已发布 attacker*${releaseNumber}，正在孵化`;
   }
 
   /**
@@ -175,13 +209,13 @@ export default class CreepControl extends RoomConsole {
    * 一般用于清除中立房间中挡路的墙壁
    *
    * @param targetFlagName 进攻旗帜名称
-   * @param num 要孵化的数量
+   * @param releaseNumber 要孵化的数量
    * @param keepSpawn 是否持续生成
    */
-  public spawnDismantler(targetFlagName = "", num = 2, keepSpawn = false): string {
-    if (num <= 0 || num > 10) num = 1;
+  public spawnDismantler(targetFlagName = "", releaseNumber = 2, keepSpawn = false): string {
+    if (releaseNumber <= 0 || releaseNumber > 10) releaseNumber = 1;
 
-    for (let i = 0; i < num; i++) {
+    for (let i = 0; i < releaseNumber; i++) {
       creepApi.add(
         `${this.name} dismantler ${Game.time}-${i}`,
         "dismantler",
@@ -193,7 +227,7 @@ export default class CreepControl extends RoomConsole {
       );
     }
 
-    return `已发布 dismantler*${num}，正在孵化`;
+    return `已发布 dismantler*${releaseNumber}，正在孵化`;
   }
 
   /**
