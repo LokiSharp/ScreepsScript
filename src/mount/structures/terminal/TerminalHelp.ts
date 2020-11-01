@@ -4,7 +4,7 @@ import { createHelp } from "modules/help";
 /**
  * Terminal 上的用户控制接口
  */
-export default class Terminalhelp extends TerminalExtension {
+export default class TerminalHelp extends TerminalExtension {
   public help(): string {
     return createHelp({
       name: "Terminal 控制台",

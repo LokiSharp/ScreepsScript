@@ -20,3 +20,11 @@ export const ROOM_REMOVE_INTERVAL = 30;
  * 当增加了新 shard 时需要在该数组中添加其名称后才会启用和新 shard 的通讯
  */
 export const ALL_SHARD_NAME: ShardName[] = ["shard0", "shard1", "shard2", "shard3"];
+
+/**
+ * powerProcess 的设置
+ */
+export const powerSettings = {
+  // 当前房间 storage 内存量低于limit时自动停止 process
+  processEnergyLimit: 500000
+};

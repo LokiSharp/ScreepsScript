@@ -475,6 +475,74 @@ export const transferTaskOperations: { [taskType: string]: transferTaskOperation
       } else if (result !== ERR_NOT_IN_RANGE) creep.say(`核弹填充 ${result}`);
       return false;
     }
+  },
+
+  /**
+   * powerspawn 填充任务
+   * 由 powerSpawn 在 powerSpawn.work 中发布
+   * 任务的搬运量取决于 manager 的最大存储量，搬一次就算任务完成
+   */
+  [ROOM_TRANSFER_TASK.FILL_POWERSPAWN]: {
+    source: (creep: Creep, task: IFillPowerSpawn, sourceId: Id<StructureStorage | StructureTerminal>): boolean => {
+      // 如果身上有对应资源的话就直接去填充
+      if (creep.store[task.resourceType] > 0) return true;
+
+      // 获取资源存储建筑
+      let sourceStructure: StructureStorage | StructureTerminal;
+      if (task.resourceType === RESOURCE_ENERGY)
+        sourceStructure = sourceId ? Game.getObjectById(sourceId) : creep.room.storage;
+      else sourceStructure = creep.room.terminal;
+      // 获取 powerspawn
+      const powerspawn = Game.getObjectById(task.id);
+
+      // 兜底
+      if (!sourceStructure || !powerspawn) {
+        creep.room.deleteCurrentRoomTransferTask();
+        creep.log(`powerSpawn 填充任务，未找到 storage/terminal 或者 powerSpawn`);
+        return false;
+      }
+
+      if (!clearCarryingEnergy(creep)) return false;
+
+      // 获取应拿取的数量
+      const getAmount = Math.min(
+        creep.store.getFreeCapacity(task.resourceType),
+        sourceStructure.store[task.resourceType],
+        powerspawn.store.getFreeCapacity(task.resourceType)
+      );
+
+      if (getAmount <= 0) {
+        creep.room.deleteCurrentRoomTransferTask();
+        creep.log(`powerSpawn 填充任务，${task.resourceType} 资源不足`);
+        return false;
+      }
+
+      // 拿取资源
+      creep.goTo(sourceStructure.pos);
+      const result = creep.withdraw(sourceStructure, task.resourceType, getAmount);
+      if (result === OK) return true;
+      else if (result !== ERR_NOT_IN_RANGE) creep.log(`powerSpawn 填充任务，withdraw ${result}`, "red");
+      return false;
+    },
+    target: (creep: Creep, task: IFillPowerSpawn): boolean => {
+      // 获取 powerSpawn 及兜底
+      const target = Game.getObjectById(task.id);
+      if (!target) {
+        creep.room.deleteCurrentRoomTransferTask();
+        return true;
+      }
+
+      // 转移资源
+      creep.goTo(target.pos);
+      const result = creep.transfer(target, task.resourceType);
+
+      if (result === OK) {
+        creep.room.deleteCurrentRoomTransferTask();
+        return true;
+      } else if (result === ERR_NOT_ENOUGH_RESOURCES) return true;
+      else if (result !== ERR_NOT_IN_RANGE) creep.say(`ps 填充错误 ${result}`);
+      return false;
+    }
   }
 };
 

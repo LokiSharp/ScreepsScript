@@ -176,6 +176,9 @@ interface Memory {
     };
   };
 
+  // 启动 powerSpawn 的房间名列表
+  psRooms: string[];
+
   // 在模拟器中调试布局时才会使用到该字段，在正式服务器中不会用到该字段
   layoutInfo?: BaseLayout;
   // 用于标记布局获取到了那一等级
@@ -654,6 +657,7 @@ interface RoomMemory {
   mineralId: Id<Mineral>;
   factoryId: Id<StructureFactory>;
   extractorId: Id<StructureExtractor>;
+  powerSpawnId: Id<StructurePowerSpawn>;
   nukerId: Id<StructureNuker>;
   sourceIds: Id<Source>[];
   sourceContainersIds: Id<StructureContainer>[];
@@ -735,6 +739,9 @@ interface RoomMemory {
    * @see doc/boost设计案
    */
   boost?: BoostTask;
+
+  // powerSpawn 是否暂停
+  pausePS?: boolean;
 }
 
 interface LabMemory {
@@ -804,7 +811,8 @@ type RoomTransferTasks =
   | IBoostGetResource
   | IBoostGetEnergy
   | IBoostClear
-  | IFillNuker;
+  | IFillNuker
+  | IFillPowerSpawn;
 
 // 房间物流任务 - 填充拓展
 interface IFillExtension {
@@ -815,6 +823,13 @@ interface IFillExtension {
 interface IFillTower {
   type: string;
   id: Id<StructureTower>;
+}
+
+// 房间物流任务 - 填充 PowerSpawn
+interface IFillPowerSpawn {
+  type: string;
+  id: Id<StructurePowerSpawn>;
+  resourceType: ResourceConstant;
 }
 
 // 房间物流任务 - lab 底物填充
@@ -999,6 +1014,11 @@ interface StructureTerminal {
   removeByType(type: ResourceConstant, mod: TerminalModes, channel: TerminalChannels): void;
   remove(index: number): string;
   show(): string;
+}
+
+interface StructurePowerSpawn {
+  // 查看状态
+  stats(): string;
 }
 
 /**

@@ -1,6 +1,7 @@
 import { Move } from "modules/move";
 import colorful from "utils/colorful";
 import { createHelp } from "modules/help";
+import createRoomLink from "utils/createRoomLink";
 import { resourcesHelp } from "./resourcesHelp";
 
 /**
@@ -145,6 +146,32 @@ export default [
       } else return `暂无路径缓存`;
 
       return logs.join("\n");
+    }
+  },
+  // 查看当前启用的 powerSpawn 工作状态
+  {
+    alias: "ps",
+    exec(): string {
+      if (!Memory.psRooms || Memory.psRooms.length <= 0)
+        return `没有正在工作的 powerSpawn，在 powerSpawn 对象实例上执行 .on() 方法来进行激活。`;
+      // 下面遍历是会把正常的房间名放在这里面
+      const workingPowerSpawn: string[] = [];
+
+      // 遍历保存的所有房间，统计 ps 状态
+      const stats = Memory.psRooms
+        .map(roomName => {
+          const room = Game.rooms[roomName];
+          if (!room || !room.powerSpawn)
+            return `${colorful("●", "red", true)} ${createRoomLink(roomName)} 无法访问该房间中的 powerSpawn，已移除。`;
+          workingPowerSpawn.push(roomName);
+
+          return room.powerSpawn.stats();
+        })
+        .join("\n");
+
+      // 更新可用的房间名
+      Memory.psRooms = workingPowerSpawn;
+      return stats;
     }
   },
   // 统计当前所有房间的存储状态
