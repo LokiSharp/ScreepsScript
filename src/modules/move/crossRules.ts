@@ -28,9 +28,7 @@ const crossRules: CrossRules = {
   // 填充单位无论什么时候都会允许对穿，因为其不会长时间停在一个位置上工作
   filler: () => true,
   manager: () => true,
-
-  // 中央处理单位在携带有资源时不允许对穿
-  processor: creep => !creep.memory.working,
+  processor: () => true,
 
   // 采集单位在工作时不允许任何 creep 对穿
   harvester: noCrossWithWork,
