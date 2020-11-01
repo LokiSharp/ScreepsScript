@@ -5,6 +5,11 @@ import calcBodyPart from "utils/calcBodyPart";
  * 移动并治疗 pbAttacker, 请在 8 级时生成
  */
 export default (data: HealUnitData): ICreepConfig => ({
+  prepare: creep => {
+    // 治疗单位不允许发起对穿
+    creep.memory.disableCross = true;
+    return true;
+  },
   target: creep => {
     const targetCreep = Game.creeps[data.creepName];
     // 对象没了就殉情
