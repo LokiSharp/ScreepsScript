@@ -525,7 +525,8 @@ type RemoteRoleConstant =
   | "pbAttacker"
   | "pbCarrier"
   | "pbHealer"
-  | "depositHarvester";
+  | "depositHarvester"
+  | "buildHelper";
 
 // 战斗单位
 type WarRoleConstant =

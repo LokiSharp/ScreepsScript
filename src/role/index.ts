@@ -2,6 +2,7 @@ import attacker from "./war/attacker";
 import boostAttacker from "./war/boostAttacker";
 import boostDismantler from "./war/boostDismantler";
 import boostHealer from "./war/boostHealer";
+import buildHelper from "./remote/buildHelper";
 import builder from "./base/builder";
 import claimer from "./remote/claimer";
 import collector from "./base/collector";
@@ -53,7 +54,8 @@ const roles: CreepWork = {
   pbAttacker,
   pbCarrier,
   pbHealer,
-  depositHarvester
+  depositHarvester,
+  buildHelper
 };
 
 /**
