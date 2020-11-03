@@ -1,7 +1,9 @@
 import { Move } from "modules/move";
+import { clearFlag } from "utils/clearFlag";
 import colorful from "utils/colorful";
 import { createHelp } from "modules/help";
 import createRoomLink from "utils/createRoomLink";
+import { getRoomFactoryState } from "utils/getRoomFactoryState";
 import { resourcesHelp } from "./resourcesHelp";
 
 /**
@@ -40,6 +42,21 @@ export default [
                 title: "查看资源常量",
                 commandType: true,
                 functionName: "res"
+              },
+              {
+                title: "查看 powerSpawn 状态汇总",
+                commandType: true,
+                functionName: "ps"
+              },
+              {
+                title: "查看 observer 状态汇总",
+                commandType: true,
+                functionName: "ob"
+              },
+              {
+                title: "查看商品生产线",
+                commandType: true,
+                functionName: "comm"
               },
               {
                 title: "列出所有路径缓存",
@@ -271,6 +288,44 @@ export default [
       return logs.join("\n");
     }
   },
+  // 显示当前商品生产状态
+  {
+    alias: "comm",
+    exec(): string {
+      if (!Memory.commodities) return "未启动商品生产线";
+
+      const statsStr = [];
+      // 遍历所有等级的房间
+      for (const level in Memory.commodities) {
+        statsStr.push(`[${level} 级工厂]`);
+        const nodeNames = Memory.commodities[level as "1" | "2" | "3" | "4" | "5"];
+        if (nodeNames.length <= 0) {
+          statsStr.push("    - 无");
+          continue;
+        }
+
+        // 遍历所有房间
+        // 这里返回的是筛选过的房间名
+        // 所有访问不到的房间会被替换成 false
+        const currentRoomNames = nodeNames.map(roomName => {
+          if (!Game.rooms[roomName] || !Game.rooms[roomName].factory) {
+            statsStr.push(`    - [${roomName}] 房间无视野或无工厂，已移除`);
+            return false;
+          }
+
+          statsStr.push(getRoomFactoryState(Game.rooms[roomName]));
+          return roomName;
+        });
+
+        // 剔除所有 false 并回填
+        Memory.commodities[level] = currentRoomNames.filter(roomName => !_.isUndefined(roomName));
+      }
+
+      return statsStr.join("\n");
+    }
+  },
+  // 移除过期旗帜
+  { alias: "clearflag", exec: clearFlag },
   {
     alias: "nuker",
     exec(): string {

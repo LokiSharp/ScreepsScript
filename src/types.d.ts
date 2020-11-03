@@ -126,6 +126,16 @@ interface Memory {
   // 掠夺资源列表，如果存在的话 reiver 将只会掠夺该名单中存在的资源
   reiveList: ResourceConstant[];
 
+  // 商品生产线配置
+  commodities: {
+    // 键为工厂等级，值为被设置成对应等级的工厂所在房间名
+    1: string[];
+    2: string[];
+    3: string[];
+    4: string[];
+    5: string[];
+  };
+
   // 资源来源表
   resourceSourceMap: {
     // 资源类型为键，房间名列表为值
@@ -604,6 +614,12 @@ interface Room {
   ): OK | ERR_NAME_EXISTS | ERR_NOT_FOUND | ERR_INVALID_ARGS | ERR_NOT_ENOUGH_RESOURCES;
   boostCreep(creep: Creep): OK | ERR_NOT_FOUND | ERR_BUSY | ERR_NOT_IN_RANGE;
 
+  // power 任务 api
+  addPowerTask(task: PowerConstant, priority?: number): OK | ERR_NAME_EXISTS | ERR_INVALID_TARGET;
+  deleteCurrentPowerTask(): void;
+  getPowerTask(): PowerConstant | undefined;
+  hangPowerTask(): void;
+
   // 战争相关
   startWar(boostType: BoostType): OK | ERR_NAME_EXISTS | ERR_NOT_FOUND | ERR_INVALID_TARGET;
   stopWar(): OK | ERR_NOT_FOUND;
@@ -776,6 +792,38 @@ interface RoomMemory {
 
   // powerSpawn 是否暂停
   pausePS?: boolean;
+
+  // power 任务请求队列
+  // 由建筑物发布，powerCreep 查找任务时会优先读取该队列
+  powerTasks: PowerConstant[];
+
+  // 工厂内存
+  factory: {
+    // 当前房间的等级，由用户指定
+    level?: 1 | 2 | 3 | 4 | 5;
+    // 下个顶级产物索引
+    targetIndex: number;
+    // 本工厂参与的生产线类型
+    depositTypes?: DepositConstant[];
+    // 当该字段为真并且工厂在冷却时，就会执行一次底物是否充足的检查，执行完就会直接将该值移除
+    produceCheck?: boolean;
+    // 当前工厂所处的阶段
+    state: string;
+    // 工厂生产队列
+    taskList: IFactoryTask[];
+    // 工厂是否即将移除
+    // 在该字段存在时，工厂会搬出所有材料，并在净空后移除 room.factory 内存
+    // 在净空前手动删除该字段可以终止移除进程
+    remove?: true;
+    // 工厂是否暂停，该属性优先级高于 sleep，也就是说 sleep 结束的时候如果有 pause，则工厂依旧不会工作
+    pause?: true;
+    // 工厂休眠时间，如果该时间存在的话则工厂将会待机
+    sleep?: number;
+    // 休眠的原因
+    sleepReason?: string;
+    // 玩家手动指定的目标，工厂将一直合成该目标
+    specialTraget?: CommodityConstant;
+  };
 }
 
 interface LabMemory {
@@ -1430,4 +1478,38 @@ interface StructureTerminal {
 // ob 拓展
 interface StructureObserver {
   updateFlagList(): OK | ERR_NOT_FOUND;
+}
+
+// Factory 拓展
+interface StructureFactory {
+  // 查看工厂状态，在 room 的 fshow 中调用
+  stats(): string;
+}
+
+/**
+ * 工厂 1-5 级能生产的顶级商品
+ */
+interface ITopTargetConfig {
+  1: CommodityConstant[];
+  2: CommodityConstant[];
+  3: CommodityConstant[];
+  4: CommodityConstant[];
+  5: CommodityConstant[];
+}
+
+/**
+ * 工厂的任务队列中的具体任务配置
+ */
+interface IFactoryTask {
+  // 任务目标
+  target: CommodityConstant;
+  // 该任务要生成的数量
+  amount: number;
+}
+
+interface IFactoryLockAmount {
+  [resourceType: string]: {
+    sub: ResourceConstant;
+    limit: number;
+  };
 }

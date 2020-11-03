@@ -6,6 +6,7 @@ import StorageExtension from "./StorageExtension";
 import StructureExtension from "./StructureExtension";
 import TowerExtension from "./TowerExtension";
 import assignPrototype from "utils/assignPrototype";
+import mountFactory from "./factory";
 import mountLink from "./link";
 import mountObserver from "./observer";
 import mountPowerSpawn from "./powerSpawn";
@@ -26,4 +27,5 @@ export default function (): void {
   mountLink();
   mountPowerSpawn();
   mountObserver();
+  mountFactory();
 }
