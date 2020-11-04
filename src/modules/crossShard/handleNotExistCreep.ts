@@ -10,7 +10,7 @@ import roles from "role";
  * @param creepMemory creep 死时的内存
  */
 
-export const handleNotExistCreep = function (creepName: string, creepMemory: CreepMemory): void {
+export const handleNotExistCreep = function (creepName: string, creepMemory: CreepMemory | PowerCreepMemory): void {
   const creepConfig = Memory.creepConfigs[creepName];
   // 获取配置项
   if (!creepConfig) {

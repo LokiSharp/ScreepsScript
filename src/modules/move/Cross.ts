@@ -10,7 +10,11 @@ export class Cross {
    * @param direction 请求该 creep 进行对穿
    * @param requireCreep 发起请求的 creep
    */
-  private static requireCross(creep: Creep, direction: DirectionConstant, requireCreep: Creep): ScreepsReturnCode {
+  private static requireCross(
+    creep: Creep | PowerCreep,
+    direction: DirectionConstant,
+    requireCreep: Creep | PowerCreep
+  ): ScreepsReturnCode {
     // creep 下没有 memory 说明 creep 已经凉了，直接移动即可
     if (!creep.memory) return OK;
 
@@ -44,9 +48,9 @@ export class Cross {
    * @returns ERR_INVALID_TARGET 前方没有 creep
    */
   public static mutualCross(
-    creep: Creep,
+    creep: Creep | PowerCreep,
     direction: DirectionConstant,
-    fontCreep: Creep
+    fontCreep: Creep | PowerCreep
   ): OK | ERR_BUSY | ERR_INVALID_TARGET {
     creep.say(`👉`);
 

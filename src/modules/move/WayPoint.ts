@@ -14,7 +14,7 @@ export class WayPoint {
    *
    * 当抵达当前路径点后就需要更新内存数据以移动到下一个路径点
    */
-  public static updateWayPoint(creep: Creep): void {
+  public static updateWayPoint(creep: Creep | PowerCreep): void {
     if (!creep.memory.moveInfo) creep.memory.moveInfo = {};
     const memory = creep.memory.moveInfo;
 
@@ -53,7 +53,7 @@ export class WayPoint {
    * @param target 路径点目标
    */
 
-  public static setWayPoint(creep: Creep, target: string[] | string): CreepMoveReturnCode {
+  public static setWayPoint(creep: Creep | PowerCreep, target: string[] | string): CreepMoveReturnCode {
     if (!creep.memory.moveInfo) creep.memory.moveInfo = {};
     delete this.wayPointCache[creep.name];
 

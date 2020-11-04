@@ -206,7 +206,7 @@ export const addCrossShardRequest = function (
  *
  * @param creepName 要取出内存的 creep 名字
  */
-export const getMemoryFromCrossShard = function (creepName: string): CreepMemory {
+export const getMemoryFromCrossShard = function (creepName: string): CreepMemory | PowerCreepMemory {
   if (!Memory.crossShardCreeps) return undefined;
 
   // 取出并清空暂存区
@@ -215,6 +215,7 @@ export const getMemoryFromCrossShard = function (creepName: string): CreepMemory
 
   // 返回并设置到 Memory.creeps
   if (!Memory.creeps) Memory.creeps = {};
+  if (!Memory.powerCreeps) Memory.powerCreeps = {};
   return (Memory.creeps[creepName] = creepMemory);
 };
 

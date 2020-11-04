@@ -26,7 +26,7 @@ export class Move {
    * @param positions 房间位置对象数组，必须连续
    * @returns 压缩好的路径
    */
-  private static serializeFarPath(creep: Creep, positions: RoomPosition[]): string {
+  private static serializeFarPath(creep: Creep | PowerCreep, positions: RoomPosition[]): string {
     if (positions.length === 0) return "";
     // 确保路径的第一个位置是自己的当前位置
     if (!positions[0].isEqualTo(creep.pos)) positions.splice(0, 0, creep.pos);
@@ -50,7 +50,7 @@ export class Move {
    * @param range 搜索范围 默认为 1
    * @returns PathFinder.search 的返回值
    */
-  private static findPath(creep: Creep, target: RoomPosition, moveOpt: MoveOpt = {}): string | undefined {
+  private static findPath(creep: Creep | PowerCreep, target: RoomPosition, moveOpt: MoveOpt = {}): string | undefined {
     // 先查询下缓存里有没有值
     const routeKey = `${creep.room.serializePos(creep.pos)} ${creep.room.serializePos(target)}`;
 
@@ -161,7 +161,7 @@ export class Move {
    * 会进行缓存
    * 如果内存中没有设置的话则返回 undefined
    */
-  private static getTarget(creep: Creep): RoomPosition {
+  private static getTarget(creep: Creep | PowerCreep): RoomPosition {
     // 检查缓存
     let target = WayPoint.wayPointCache[creep.name];
     if (target) return target;
@@ -197,7 +197,11 @@ export class Move {
    * @param target 要移动到的目标位置
    * @param moveOpt 移动参数
    */
-  public static goToInner(creep: Creep, targetPos: RoomPosition | undefined, moveOpt: MoveOpt = {}): ScreepsReturnCode {
+  public static goToInner(
+    creep: Creep | PowerCreep,
+    targetPos: RoomPosition | undefined,
+    moveOpt: MoveOpt = {}
+  ): ScreepsReturnCode {
     if (!creep.memory.moveInfo) creep.memory.moveInfo = {};
 
     const moveMemory = creep.memory.moveInfo;
@@ -238,7 +242,7 @@ export class Move {
           return ERR_INVALID_TARGET;
         }
 
-        const fontCreep = fontPos.lookFor(LOOK_CREEPS)[0];
+        const fontCreep = fontPos.lookFor(LOOK_CREEPS)[0] || fontPos.lookFor(LOOK_POWER_CREEPS)[0];
 
         // 前方不是 creep 或者不是自己的 creep 或者内存被清空（正在跨越 shard）的话就不会发起对穿
         if (!fontCreep || !fontCreep.my || Object.keys(fontCreep.memory).length <= 0) {
@@ -351,7 +355,11 @@ export class Move {
     return goResult;
   }
 
-  public static goTo(creep: Creep, targetPos: RoomPosition | undefined, moveOpt: MoveOpt = {}): ScreepsReturnCode {
+  public static goTo(
+    creep: Creep | PowerCreep,
+    targetPos: RoomPosition | undefined,
+    moveOpt: MoveOpt = {}
+  ): ScreepsReturnCode {
     const costBeforeGo = Game.cpu.getUsed();
     const result = this.goToInner(creep, targetPos, moveOpt);
     Memory.moveUseCpu = Memory.moveUseCpu === undefined ? 0 : Memory.moveUseCpu + Game.cpu.getUsed() - costBeforeGo;

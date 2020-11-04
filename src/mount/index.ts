@@ -1,6 +1,7 @@
 import { manageStructure } from "modules/autoPlanning";
 import mountCreep from "./creep";
 import mountGlobal from "./global";
+import mountPowerCreep from "./powerCreep";
 import mountRoom from "./room";
 import mountRoomPostio from "./roomPosition";
 import mountStructure from "./structures";
@@ -19,6 +20,7 @@ export default function (): void {
     mountRoom();
     mountRoomPostio();
     mountCreep();
+    mountPowerCreep();
     mountStructure();
     global.hasExtension = true;
 
@@ -43,5 +45,11 @@ function workAfterMount() {
   Object.values(Game.rooms).forEach(room => {
     if (!room.controller || !room.controller.my) return;
     manageStructure(room);
+  });
+
+  // 把已经孵化的 pc 能力注册到其所在的房间上，方便房间内其他 RoomObject 查询并决定是否发布 power 任务
+  Object.values(Game.powerCreeps).forEach(pc => {
+    if (!pc.room) return;
+    pc.updatePowerToRoom();
   });
 }

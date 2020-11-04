@@ -118,7 +118,7 @@ interface Memory {
    * 因为有可能出现内存到了但是 creep 还没到的情况，这时候 creepController 就会以为这个 creep 死掉了从而直接把内存回收掉
    */
   crossShardCreeps: {
-    [creepName: string]: CreepMemory;
+    [creepName: string]: CreepMemory | PowerCreepMemory;
   };
 
   // 要绕过的房间名列表，由全局模块 bypass 负责。
@@ -244,7 +244,7 @@ type BodyConfigs = {
  * @property target creep工作时执行的方法
  */
 interface ICreepConfig {
-  isNeed?: (room: Room, creepName: string, preMemory: CreepMemory) => boolean;
+  isNeed?: (room: Room, creepName: string, preMemory: CreepMemory | PowerCreepMemory) => boolean;
   prepare?: (creep: Creep) => boolean;
   source?: (creep: Creep) => boolean;
   target?: (creep: Creep) => boolean;
@@ -492,6 +492,8 @@ interface PowerCreepMemory {
 
   // pc 暂时没有角色
   role: undefined;
+  // creep 是否已经准备好可以工作了
+  ready: boolean;
   // 为 true 时执行 target，否则执行 source
   working: boolean;
   // 接下来要检查哪个 power
@@ -799,6 +801,10 @@ interface RoomMemory {
   // power 任务请求队列
   // 由建筑物发布，powerCreep 查找任务时会优先读取该队列
   powerTasks: PowerConstant[];
+
+  // 由驻守在房间中的 pc 发布，包含了 pc 拥有对应的能力
+  // 形如: "1 3 13 14"，数字即为对应的 PWR_* 常量
+  powers?: string;
 
   // 工厂内存
   factory: {
@@ -1264,7 +1270,7 @@ interface SendCreepData {
   // 要发送 creep 的名字
   name: string;
   // 要发送 creep 的内存
-  memory: CreepMemory;
+  memory: CreepMemory | PowerCreepMemory;
 }
 
 /**
@@ -1275,7 +1281,7 @@ interface SendRespawnData {
   // 要重新孵化的 creep 的名字
   name: string;
   // 要重新孵化的 creep 的内存
-  memory: CreepMemory;
+  memory: CreepMemory | PowerCreepMemory;
 }
 
 // 构造所有的跨 shard 请求
@@ -1519,4 +1525,60 @@ interface IFactoryLockAmount {
     sub: ResourceConstant;
     limit: number;
   };
+}
+
+/**
+ * Creep 拓展
+ * 来自于 mount.powerCreep.ts
+ */
+interface PowerCreep {
+  /**
+   * 发送日志
+   *
+   * @param content 日志内容
+   * @param instanceName 发送日志的实例名
+   * @param color 日志前缀颜色
+   * @param notify 是否发送邮件
+   */
+  log(content: string, color?: Colors, notify?: boolean): void;
+
+  updatePowerToRoom(): void;
+  _move(direction: DirectionConstant | Creep): CreepMoveReturnCode | ERR_NOT_IN_RANGE | ERR_INVALID_TARGET;
+  goTo(target?: RoomPosition, moveOpt?: MoveOpt): ScreepsReturnCode;
+  setWayPoint(target: string[] | string): ScreepsReturnCode;
+  requireCross(direction: DirectionConstant): boolean;
+  enablePower(): OK | ERR_BUSY;
+  getOps(opsNumber: number): OK | ERR_NOT_ENOUGH_RESOURCES | ERR_BUSY;
+}
+
+/**
+ * 每种 power 所对应的的任务配置项
+ *
+ * @property {} needExecute 该 power 的检查方法
+ * @property {} run power 的具体工作内容
+ */
+interface IPowerTaskConfig {
+  /**
+   * power 的资源获取逻辑
+   *
+   * @returns OK 任务完成，将会执行下面的 target 方法
+   * @returns ERR_NOT_ENOUGH_RESOURCES 资源不足，将会强制切入 ops 生成任务
+   * @returns ERR_BUSY 任务未完成，保留工作状态，后续继续执行
+   */
+  source?: (creep: PowerCreep) => OK | ERR_NOT_ENOUGH_RESOURCES | ERR_BUSY;
+  /**
+   * power 的具体工作逻辑
+   *
+   * @returns OK 任务完成，将会继续检查后续 power
+   * @returns ERR_NOT_ENOUGH_RESOURCES 资源不足，将会执行上面的 source 方法，如果没有 source 的话就强制切入 ops 生成任务
+   * @returns ERR_BUSY 任务未完成，保留工作状态，后续继续执行
+   */
+  target: (creep: PowerCreep) => OK | ERR_NOT_ENOUGH_RESOURCES | ERR_BUSY;
+}
+
+/**
+ * 所有 power 的任务配置列表
+ */
+interface IPowerTaskConfigs {
+  [powerType: string]: IPowerTaskConfig;
 }

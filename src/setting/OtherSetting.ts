@@ -61,3 +61,6 @@ export const PB_HARVESTE_STATE = {
  * 当 terminal 中的资源多余这个值时，miner 将不再继续采矿
  */
 export const minerHervesteLimit = 200000;
+
+// pc 空闲时会搓 ops，下面是搓的上限
+export const maxOps = 50000;
