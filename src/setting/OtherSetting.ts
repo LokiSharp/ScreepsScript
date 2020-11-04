@@ -55,3 +55,9 @@ export const PB_HARVESTE_STATE = {
   PREPARE: "prepare",
   TRANSFER: "transfer"
 };
+
+/**
+ * miner 的矿物采集上限
+ * 当 terminal 中的资源多余这个值时，miner 将不再继续采矿
+ */
+export const minerHervesteLimit = 200000;

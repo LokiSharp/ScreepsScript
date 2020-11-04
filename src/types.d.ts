@@ -471,6 +471,9 @@ interface CreepMemory {
     // 缓存路径的目标，该目标发生变化时刷新路径, 形如"14/4E14S1"
     targetPos?: string;
   };
+  // 移动到某位置需要的时间
+  // 例如：miner 会用它来保存移动到 mineral 的时间
+  travelTime?: number;
   // manager 特有，当前任务正在转移的资源类型
   taskResource?: ResourceConstant;
 }
@@ -518,7 +521,7 @@ interface PowerCreepMemory {
 type CreepRoleConstant = BaseRoleConstant | AdvancedRoleConstant | RemoteRoleConstant | WarRoleConstant;
 
 // 房间基础运营
-type BaseRoleConstant = "harvester" | "filler" | "upgrader" | "builder" | "repairer" | "collector";
+type BaseRoleConstant = "harvester" | "filler" | "upgrader" | "builder" | "repairer" | "collector" | "miner";
 
 type AdvancedRoleConstant = "manager" | "processor";
 
@@ -824,6 +827,10 @@ interface RoomMemory {
     // 玩家手动指定的目标，工厂将一直合成该目标
     specialTraget?: CommodityConstant;
   };
+
+  // 一个游戏时间，标注了 mineral 什么时候会回满
+  // 由 miner 发布，Extractor 会监听这个字段，并在适当的时间重新发布 mineral
+  mineralCooldown: number;
 }
 
 interface LabMemory {

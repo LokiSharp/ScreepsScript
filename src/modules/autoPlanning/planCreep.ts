@@ -387,6 +387,26 @@ function releaseRepairer(room: Room, releaseNumber = 1): OK | ERR_NOT_ENOUGH_ENE
 }
 
 /**
+ * 发布矿工
+ * @param room 要发布角色的房间
+ */
+function releaseMiner(room: Room): OK | ERR_NOT_FOUND {
+  if (!room.terminal) return ERR_NOT_FOUND;
+
+  creepApi.add(
+    `${room.name} miner`,
+    "miner",
+    {
+      sourceId: room.mineral.id,
+      targetId: room.terminal.id
+    },
+    room.name
+  );
+
+  return OK;
+}
+
+/**
  * 房间运营角色名对应的发布逻辑
  */
 export const roleToRelease: {
@@ -402,5 +422,6 @@ export const roleToRelease: {
   processor: releaseTransporter,
   upgrader: releaseUpgrader,
   builder: releaseBuilder,
-  repairer: releaseRepairer
+  repairer: releaseRepairer,
+  miner: releaseMiner
 };

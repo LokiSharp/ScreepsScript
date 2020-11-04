@@ -13,6 +13,7 @@ import filler from "./base/filler";
 import harvester from "./base/harvester";
 import healer from "./war/healer";
 import manager from "./advanced/manager";
+import miner from "./base/miner";
 import moveTester from "./remote/moveTester";
 import pbAttacker from "./remote/pbAttacker";
 import pbCarrier from "./remote/pbCarrier";
@@ -55,7 +56,8 @@ const roles: CreepWork = {
   pbCarrier,
   pbHealer,
   depositHarvester,
-  buildHelper
+  buildHelper,
+  miner
 };
 
 /**

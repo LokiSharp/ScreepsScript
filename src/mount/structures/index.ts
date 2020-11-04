@@ -1,4 +1,5 @@
 import ControllerExtension from "./ControllerExtension";
+import ExtractorExtension from "./ExtractorExtension";
 import LabExtension from "./LabExtension";
 import NukerExtension from "./NukerExtension";
 import SpawnExtension from "./SpawnExtension";
@@ -23,6 +24,7 @@ export default function (): void {
   assignPrototype(StructureStorage, StorageExtension);
   assignPrototype(StructureLab, LabExtension);
   assignPrototype(StructureNuker, NukerExtension);
+  assignPrototype(StructureExtractor, ExtractorExtension);
   mountTerminal();
   mountLink();
   mountPowerSpawn();
