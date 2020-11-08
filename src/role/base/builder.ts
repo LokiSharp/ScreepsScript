@@ -35,8 +35,8 @@ export default (data: HarvesterData): ICreepConfig => ({
     } else source = Game.getObjectById(creep.memory.sourceId);
 
     // 之前用的能量来源没能量了就更新来源（如果来源已经是 source 的话就不改了）
-    if (creep.getEngryFrom(source) === ERR_NOT_ENOUGH_RESOURCES && source instanceof Structure)
-      delete creep.memory.sourceId;
+    const result = creep.getEngryFrom(source);
+    if (result === ERR_NOT_ENOUGH_RESOURCES || result === ERR_INVALID_TARGET) delete creep.memory.sourceId;
     return false;
   },
   target: creep => {
