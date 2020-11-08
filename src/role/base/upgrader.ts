@@ -33,10 +33,12 @@ export default (data: WorkerData): ICreepConfig => ({
     }
     // 获取能量
     const result = creep.getEngryFrom(source);
+
     // 但如果是 Container 或者 Link 里获取能量的话，就不会重新运行规划
     if (
-      (result === ERR_NOT_ENOUGH_RESOURCES || result === ERR_INVALID_TARGET) &&
-      (source instanceof StructureTerminal || source instanceof StructureStorage)
+      (result === ERR_NOT_ENOUGH_RESOURCES &&
+        (source instanceof StructureTerminal || source instanceof StructureStorage)) ||
+      result === ERR_INVALID_TARGET
     ) {
       // 如果发现能量来源（建筑）里没有能量了，就自杀并重新运行 upgrader 发布规划
       creep.room.releaseCreep("upgrader");
