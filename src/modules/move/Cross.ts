@@ -59,6 +59,10 @@ export class Cross {
     const fontMoveResult = this.requireCross(fontCreep, reverseDirection, creep);
     if (fontMoveResult !== OK) {
       creep.say(`👉 ${fontMoveResult}`);
+      // 如果前面的 creep 拒绝了，就重新寻路
+      if (fontMoveResult === ERR_BUSY) {
+        delete creep.memory.moveInfo.path;
+      }
       return ERR_BUSY;
     }
     const selfMoveResult = creep.move(direction);
