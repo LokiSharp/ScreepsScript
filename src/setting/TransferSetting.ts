@@ -67,3 +67,13 @@ export const DEAL_RATIO: DealRatios = {
   [RESOURCE_ZYNTHIUM]: { MAX: 2.5, MIN: 0.3 },
   [RESOURCE_CATALYST]: { MAX: 2.5, MIN: 0.3 }
 };
+
+/**
+ * storage 填充到其他建筑的能量填充设置的下限默认值
+ */
+export const DEFAULT_ENERGY_KEEP_LIMIT = 900000;
+
+/**
+ * storage 填充到其他建筑的能量填充设置的填充量默认值
+ */
+export const DEFAULT_ENERGY_KEEP_AMOUNT = 50000;
