@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ROOM_TRANSFER_TASK, boostResourceReloadLimit } from "setting";
-import { clearCarryingEnergy } from "./clearCarryingEnergy";
+import { clearCarryingResource } from "./clearCarryingEnergy";
 import { getNotClearLab } from "./getNotClearLab";
 
 /**
@@ -135,7 +135,7 @@ export const transferTaskOperations: { [taskType: string]: transferTaskOperation
         return false;
       }
 
-      if (!clearCarryingEnergy(creep)) return false;
+      if (!clearCarryingResource(creep)) return false;
 
       // 找到第一个需要从终端取出的底物
       const targetResource = task.resource.find(res => res.amount > 0);
@@ -195,7 +195,7 @@ export const transferTaskOperations: { [taskType: string]: transferTaskOperation
       // 还找不到或者目标里没有化合物了，说明已经搬空，执行 target
       if (!targetLab || !targetLab.mineralType) return true;
 
-      if (!clearCarryingEnergy(creep)) return false;
+      if (!clearCarryingResource(creep)) return false;
 
       // 转移资源
       creep.goTo(targetLab.pos);
@@ -260,7 +260,7 @@ export const transferTaskOperations: { [taskType: string]: transferTaskOperation
         return false;
       }
 
-      if (!clearCarryingEnergy(creep)) return false;
+      if (!clearCarryingResource(creep)) return false;
 
       const boostConfig = creep.room.memory.boost;
 
@@ -382,7 +382,7 @@ export const transferTaskOperations: { [taskType: string]: transferTaskOperation
         return false;
       }
 
-      if (!clearCarryingEnergy(creep)) return false;
+      if (!clearCarryingResource(creep)) return false;
 
       // 转移资源
       creep.goTo(targetLab.pos);
@@ -436,7 +436,7 @@ export const transferTaskOperations: { [taskType: string]: transferTaskOperation
         return false;
       }
 
-      if (!clearCarryingEnergy(creep)) return false;
+      if (!clearCarryingResource(creep)) return false;
 
       // 获取应拿取的数量（能拿取的最小值）
       const getAmount = Math.min(
@@ -502,7 +502,7 @@ export const transferTaskOperations: { [taskType: string]: transferTaskOperation
         return false;
       }
 
-      if (!clearCarryingEnergy(creep)) return false;
+      if (!clearCarryingResource(creep)) return false;
 
       // 获取应拿取的数量
       const getAmount = Math.min(
