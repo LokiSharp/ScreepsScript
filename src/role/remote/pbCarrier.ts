@@ -49,6 +49,7 @@ export default (data: RemoteHarvesterData): ICreepConfig => ({
       }
       // 地上也没了那就上天堂
       else creep.suicide();
+      targetFlag.remove();
     }
     return false;
   },
@@ -64,10 +65,12 @@ export default (data: RemoteHarvesterData): ICreepConfig => ({
     const result = creep.transfer(room.terminal, RESOURCE_POWER);
     // 存好了就直接自杀并移除旗帜
     if (result === OK) {
-      const targetFlag = Game.flags[data.sourceFlagName];
-      if (targetFlag) targetFlag.remove();
       creep.suicide();
 
+      const targetFlag = Game.flags[data.sourceFlagName];
+      if (!targetFlag) return false;
+
+      targetFlag.remove();
       // 通知 terminal 进行 power 平衡
       room.terminal.balancePower();
 
