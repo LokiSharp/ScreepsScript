@@ -6,21 +6,23 @@ import createBodyGetter from "utils/createBodyGetter";
  * 会一直向旗帜发起进攻,
  * 优先攻击旗帜 3*3 范围内的 creep, 没有的话会攻击旗帜所在位置的建筑
  */
-export default (data: WarUnitData): ICreepConfig => ({
-  isNeed: () => data.keepSpawn,
-  target: creep => {
-    creep.attackFlag(data.targetFlagName);
+export default function attacker(data: WarUnitData): ICreepConfig {
+  return {
+    isNeed: () => data.keepSpawn,
+    target: creep => {
+      creep.attackFlag(data.targetFlagName);
 
-    const targetFlag = creep.getFlag(data.targetFlagName);
-    if (!targetFlag) {
-      creep.say("旗呢?");
+      const targetFlag = creep.getFlag(data.targetFlagName);
+      if (!targetFlag) {
+        creep.say("旗呢?");
+        return false;
+      }
+
+      if (creep.room.name !== targetFlag.pos.roomName) {
+        return true;
+      }
       return false;
-    }
-
-    if (creep.room.name !== targetFlag.pos.roomName) {
-      return true;
-    }
-    return false;
-  },
-  bodys: createBodyGetter(bodyConfigs.attacker)
-});
+    },
+    bodys: createBodyGetter(bodyConfigs.attacker)
+  };
+}

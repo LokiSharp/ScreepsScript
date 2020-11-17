@@ -8,25 +8,27 @@ import deathPrepare from "utils/deathPrepare";
  * 执行 ROOM_TRANSFER_TASK 中定义的任务
  * 任务处理逻辑定义在 transferTaskOperations 中
  */
-export default (data: WorkerData): ICreepConfig => ({
-  source: creep => {
-    if (creep.ticksToLive <= TRANSFER_DEATH_LIMIT) return deathPrepare(creep, data.sourceId);
+export default function manager(data: WorkerData): ICreepConfig {
+  return {
+    source: creep => {
+      if (creep.ticksToLive <= TRANSFER_DEATH_LIMIT) return deathPrepare(creep, data.sourceId);
 
-    const task = getRoomTransferTask(creep.room);
+      const task = getRoomTransferTask(creep.room);
 
-    // 有任务就执行
-    if (task) return transferTaskOperations[task.type].source(creep, task, data.sourceId);
-    else {
-      creep.say("💤");
-      return false;
-    }
-  },
-  target: creep => {
-    const task = getRoomTransferTask(creep.room);
+      // 有任务就执行
+      if (task) return transferTaskOperations[task.type].source(creep, task, data.sourceId);
+      else {
+        creep.say("💤");
+        return false;
+      }
+    },
+    target: creep => {
+      const task = getRoomTransferTask(creep.room);
 
-    // 有任务就执行
-    if (task) return transferTaskOperations[task.type].target(creep, task);
-    else return true;
-  },
-  bodys: createBodyGetter(bodyConfigs.transporter)
-});
+      // 有任务就执行
+      if (task) return transferTaskOperations[task.type].target(creep, task);
+      else return true;
+    },
+    bodys: createBodyGetter(bodyConfigs.transporter)
+  };
+}
