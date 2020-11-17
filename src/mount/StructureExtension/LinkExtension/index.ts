@@ -8,4 +8,6 @@ const plugins = [LinkExtension, LinkHelp];
 /**
  * 依次挂载所有的 Room 拓展
  */
-export default (): void => plugins.forEach(plugin => assignPrototype(StructureLink, plugin));
+export default function mountLink(): void {
+  plugins.forEach(plugin => assignPrototype(StructureLink, plugin));
+}

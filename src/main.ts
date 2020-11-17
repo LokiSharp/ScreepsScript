@@ -3,14 +3,14 @@ import ErrorMapper from "utils/ErrorMapper";
 import creepNumberListener from "modules/creepController/creepNumberListener";
 import doing from "utils/doing";
 import generatePixel from "utils/generatePixel";
-import mountWork from "mount";
+import mountExtension from "mount";
 import stateScanner from "utils/stateScanner";
 
 export const loop = ErrorMapper.wrapLoop(() => {
   if (Memory.showCost) console.log(`-------------------------- [${Game.time}] -------------------------- `);
 
   // 挂载所有拓展
-  mountWork();
+  mountExtension();
 
   // 检查跨 shard 请求
   execShard();

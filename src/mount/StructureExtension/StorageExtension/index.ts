@@ -8,4 +8,6 @@ const plugins = [StorageExtension, StorageConsole];
 /**
  * 依次挂载所有的 Room 拓展
  */
-export default (): void => plugins.forEach(plugin => assignPrototype(StructureStorage, plugin));
+export default function mountStorage(): void {
+  plugins.forEach(plugin => assignPrototype(StructureStorage, plugin));
+}

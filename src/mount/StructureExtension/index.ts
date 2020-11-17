@@ -6,17 +6,17 @@ import SpawnExtension from "./SpawnExtension";
 import StructureExtension from "./StructureExtension";
 import TowerExtension from "./TowerExtension";
 import assignPrototype from "utils/assignPrototype";
-import mountFactory from "./factory";
-import mountLink from "./link";
-import mountObserver from "./observer";
-import mountPowerSpawn from "./powerSpawn";
-import mountStorage from "./storage";
-import mountTerminal from "./terminal";
+import mountFactoryExtension from "./FactoryExtension";
+import mountLinkExtension from "./LinkExtension";
+import mountObserverExtension from "./ObserverExtension";
+import mountPowerSpawnExtension from "./PowerSpawnExtension";
+import mountStorageExtension from "./StorageExtension";
+import mountTerminalExtension from "./TerminalExtension";
 
 /**
  * 挂载所有的额外属性和方法
  */
-export default function (): void {
+export default function mountStructure(): void {
   assignPrototype(Structure, StructureExtension);
   assignPrototype(StructureController, ControllerExtension);
   assignPrototype(StructureTower, TowerExtension);
@@ -24,10 +24,10 @@ export default function (): void {
   assignPrototype(StructureLab, LabExtension);
   assignPrototype(StructureNuker, NukerExtension);
   assignPrototype(StructureExtractor, ExtractorExtension);
-  mountTerminal();
-  mountLink();
-  mountPowerSpawn();
-  mountStorage();
-  mountObserver();
-  mountFactory();
+  mountTerminalExtension();
+  mountLinkExtension();
+  mountPowerSpawnExtension();
+  mountStorageExtension();
+  mountObserverExtension();
+  mountFactoryExtension();
 }

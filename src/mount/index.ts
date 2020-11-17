@@ -1,27 +1,27 @@
 import { manageStructure } from "modules/autoPlanning";
-import mountCreep from "./creep";
-import mountGlobal from "./global";
-import mountPowerCreep from "./powerCreep";
-import mountRoom from "./room";
-import mountRoomPostio from "./roomPosition";
-import mountStructure from "./structures";
+import mountCreepExtension from "./CreepExtension";
+import mountGlobalExtension from "./GlobalExtension";
+import mountPowerCreepExtension from "./PowerCreepExtension";
+import mountRoomExtension from "./RoomExtension";
+import mountRoomPositionExtension from "./RoomPostionExtension";
+import mountStructureExtension from "./StructureExtension";
 
 /**
  * 挂载所有的额外属性和方法
  */
-export default function (): void {
+export default function mountExtension(): void {
   if (!global.hasExtension) {
     console.log("[mount] 重新挂载拓展");
 
     // 存储的兜底工作
     initStorage();
 
-    mountGlobal();
-    mountRoom();
-    mountRoomPostio();
-    mountCreep();
-    mountPowerCreep();
-    mountStructure();
+    mountGlobalExtension();
+    mountRoomExtension();
+    mountRoomPositionExtension();
+    mountCreepExtension();
+    mountPowerCreepExtension();
+    mountStructureExtension();
     global.hasExtension = true;
 
     workAfterMount();

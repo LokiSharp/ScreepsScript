@@ -9,4 +9,6 @@ const plugins = [TerminalExtension, TerminalConsole, TerminalHelp];
 /**
  * 依次挂载所有的 Room 拓展
  */
-export default (): void => plugins.forEach(plugin => assignPrototype(StructureTerminal, plugin));
+export default function mountTerminal(): void {
+  plugins.forEach(plugin => assignPrototype(StructureTerminal, plugin));
+}

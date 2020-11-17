@@ -4,4 +4,6 @@ import assignPrototype from "utils/assignPrototype";
 /**
  * 挂载 RoomPosition 拓展
  */
-export default (): void => assignPrototype(RoomPosition, RoomPostionExtension);
+export default function mountRoomPosition(): void {
+  assignPrototype(RoomPosition, RoomPostionExtension);
+}

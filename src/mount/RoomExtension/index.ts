@@ -11,4 +11,6 @@ const plugins = [RoomShortcut, RoomExtension, RoomConsole, CreepControl, RoomHel
 /**
  * 依次挂载所有的 Room 拓展
  */
-export default (): void => plugins.forEach(plugin => assignPrototype(Room, plugin));
+export default function mountRoom(): void {
+  plugins.forEach(plugin => assignPrototype(Room, plugin));
+}

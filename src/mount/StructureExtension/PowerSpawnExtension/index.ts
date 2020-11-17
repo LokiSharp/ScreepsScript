@@ -9,4 +9,6 @@ const plugins = [PowerSpawnExtension, PowerSpawnConsole, PowerSpawnHelp];
 /**
  * 依次挂载所有的 Room 拓展
  */
-export default (): void => plugins.forEach(plugin => assignPrototype(StructurePowerSpawn, plugin));
+export default function mountPowerSpawn(): void {
+  plugins.forEach(plugin => assignPrototype(StructurePowerSpawn, plugin));
+}

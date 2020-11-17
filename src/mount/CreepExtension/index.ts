@@ -37,7 +37,7 @@ const standWrapper = function (funcNames: string[]) {
 /**
  * 挂载 creep 拓展
  */
-export default (): void => {
+export default function mountCreep(): void {
   standWrapper(["harvest", "build", "dismantle", "repair", "upgradeController"]);
   assignPrototype(Creep, CreepExtension);
-};
+}
