@@ -1,5 +1,5 @@
 import { bodyConfigs, minerHervesteLimit } from "setting";
-import createBodyGetter from "utils/createBodyGetter";
+import createBodyGetter from "utils/creep/createBodyGetter";
 
 /**
  * 矿工

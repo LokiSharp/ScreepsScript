@@ -1,7 +1,7 @@
 import ObserverConsole from "./ObserverConsole";
 import ObserverExtension from "./ObserverExtension";
 import ObserverHelp from "./ObserverHelp";
-import assignPrototype from "utils/assignPrototype";
+import assignPrototype from "utils/global/assignPrototype";
 
 // 定义好挂载顺序
 const plugins = [ObserverExtension, ObserverConsole, ObserverHelp];

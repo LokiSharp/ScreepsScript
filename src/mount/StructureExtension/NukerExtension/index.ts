@@ -1,5 +1,5 @@
 import NukerExtension from "./NukerExtension";
-import assignPrototype from "utils/assignPrototype";
+import assignPrototype from "utils/global/assignPrototype";
 
 // 定义好挂载顺序
 const plugins = [NukerExtension];

@@ -1,6 +1,6 @@
-import { battleBase } from "utils/battleBase";
-import { boostPrepare } from "utils/boostPrepare";
-import calcBodyPart from "utils/calcBodyPart";
+import { battleBase } from "utils/creep/battleBase";
+import { boostPrepare } from "utils/creep/boostPrepare";
+import calcBodyPart from "utils/creep/calcBodyPart";
 
 /**
  * 强化 - 拆除者

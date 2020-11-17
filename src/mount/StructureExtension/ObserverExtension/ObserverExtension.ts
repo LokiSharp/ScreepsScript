@@ -1,5 +1,5 @@
 import { DEPOSIT_MAX_COOLDOWN, OBSERVER_DEPOSIT_MAX, OBSERVER_POWERBANK_MAX, observerInterval } from "setting";
-import { checkAliveFlag } from "utils/checkAliveFlag";
+import { checkAliveFlag } from "utils/global/checkAliveFlag";
 import { creepApi } from "modules/creepController/creepApi";
 
 /**

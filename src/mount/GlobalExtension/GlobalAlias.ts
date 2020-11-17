@@ -1,9 +1,9 @@
 import { Move } from "modules/move";
-import { clearFlag } from "utils/clearFlag";
-import colorful from "utils/colorful";
+import { clearFlag } from "utils/global/clearFlag";
+import colorful from "utils/console/colorful";
 import { createHelp } from "modules/help";
-import createRoomLink from "utils/createRoomLink";
-import { getRoomFactoryState } from "utils/getRoomFactoryState";
+import createRoomLink from "utils/console/createRoomLink";
+import { getRoomFactoryState } from "utils/global/getRoomFactoryState";
 import { resourcesHelp } from "./resourcesHelp";
 
 /**

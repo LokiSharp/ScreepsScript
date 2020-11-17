@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ROOM_TRANSFER_TASK, boostResourceReloadLimit } from "setting";
 import { clearCarryingResource } from "./clearCarryingResource";
-import { getNotClearLab } from "./getNotClearLab";
+import { getNotClearLab } from "../global/getNotClearLab";
 
 /**
  * manager 在应对不同类型的任务时执行的操作
  * 该对象的属性名即为任务类型
  */
+
 export const transferTaskOperations: { [taskType: string]: transferTaskOperation } = {
   /**
    * extension 填充任务
@@ -209,6 +210,7 @@ export const transferTaskOperations: { [taskType: string]: transferTaskOperation
             : 0;
         if (creep.store.getFreeCapacity() === 0) return true;
       }
+
       // 满了也先去转移资源
       else if (result === ERR_FULL) return true;
       else if (result !== ERR_NOT_IN_RANGE) creep.say(`draw ${result}`);
@@ -311,6 +313,7 @@ export const transferTaskOperations: { [taskType: string]: transferTaskOperation
         delete creep.memory.taskResource;
         return true;
       }
+
       // resource 有问题的话就再返回 source 阶段处理
       else if (result === ERR_INVALID_ARGS) return true;
       else if (result !== ERR_NOT_IN_RANGE) creep.say(`boostTarget 错误! ${result}`);
@@ -544,23 +547,4 @@ export const transferTaskOperations: { [taskType: string]: transferTaskOperation
       return false;
     }
   }
-};
-
-/**
- * 获取指定房间的物流任务
- *
- * @param room 要获取物流任务的房间名
- */
-export const getRoomTransferTask = function (room: Room): RoomTransferTasks | null {
-  const task = room.getRoomTransferTask();
-  if (!task) return null;
-
-  // 如果任务类型不对就移除任务并报错退出
-  if (!Object.prototype.hasOwnProperty.call(transferTaskOperations, task.type)) {
-    room.deleteCurrentRoomTransferTask();
-    room.log(`发现未定义的房间物流任务 ${task.type}, 已移除`, "manager", "yellow");
-    return null;
-  }
-
-  return task;
 };

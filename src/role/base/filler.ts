@@ -1,6 +1,7 @@
 import { ROOM_TRANSFER_TASK, bodyConfigs } from "setting";
-import { getRoomTransferTask, transferTaskOperations } from "../../utils/roomTransferTask";
-import createBodyGetter from "utils/createBodyGetter";
+import createBodyGetter from "utils/creep/createBodyGetter";
+import { getRoomTransferTask } from "utils/creep/getRoomTransferTask";
+import { transferTaskOperations } from "../../utils/creep/transferTaskOperations";
 
 /**
  * 填充单位

@@ -1,7 +1,7 @@
 import FactoryConsole from "./FactoryConsole";
 import FactoryExtension from "./FactoryExtension";
 import FactoryHelp from "./FactoryHelp";
-import assignPrototype from "utils/assignPrototype";
+import assignPrototype from "utils/global/assignPrototype";
 
 // 定义好挂载顺序
 const plugins = [FactoryExtension, FactoryConsole, FactoryHelp];

@@ -1,5 +1,5 @@
-import colorful from "./colorful";
-import createRoomLink from "./createRoomLink";
+import colorful from "../console/colorful";
+import createRoomLink from "../console/createRoomLink";
 import { factoryTopTargets } from "setting";
 
 /**

@@ -1,6 +1,6 @@
-import { CARRY, MOVE, WORK } from "../mock";
+import { CARRY, MOVE, WORK } from "../../mock";
 import { assert } from "chai";
-import getBodyConfig from "../../../src/utils/getBodyConfig";
+import getBodyConfig from "../../../../src/utils/creep/getBodyConfig";
 
 describe("getBodyConfig", () => {
   it("可以解析 bodySets", () => {

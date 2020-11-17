@@ -1,5 +1,5 @@
 import TowerExtension from "./TowerExtension";
-import assignPrototype from "utils/assignPrototype";
+import assignPrototype from "utils/global/assignPrototype";
 
 // 定义好挂载顺序
 const plugins = [TowerExtension];

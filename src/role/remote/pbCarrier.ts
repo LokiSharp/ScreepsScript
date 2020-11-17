@@ -1,5 +1,5 @@
 import { PB_HARVESTE_STATE } from "setting";
-import calcBodyPart from "utils/calcBodyPart";
+import calcBodyPart from "utils/creep/calcBodyPart";
 
 /**
  * 外矿采集者

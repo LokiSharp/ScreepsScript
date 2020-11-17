@@ -1,7 +1,8 @@
 import { TRANSFER_DEATH_LIMIT, bodyConfigs } from "setting";
-import { getRoomTransferTask, transferTaskOperations } from "utils/roomTransferTask";
-import createBodyGetter from "utils/createBodyGetter";
-import deathPrepare from "utils/deathPrepare";
+import createBodyGetter from "utils/creep/createBodyGetter";
+import deathPrepare from "utils/creep/deathPrepare";
+import { getRoomTransferTask } from "utils/creep/getRoomTransferTask";
+import { transferTaskOperations } from "utils/creep/transferTaskOperations";
 
 /**
  * 房间物流运输者

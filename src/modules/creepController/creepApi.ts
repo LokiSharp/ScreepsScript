@@ -1,4 +1,4 @@
-import colorful from "utils/colorful";
+import colorful from "utils/console/colorful";
 import roles from "role";
 
 /**

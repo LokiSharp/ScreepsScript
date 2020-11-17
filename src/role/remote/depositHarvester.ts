@@ -1,5 +1,5 @@
 import { DEPOSIT_MAX_COOLDOWN, bodyConfigs } from "setting";
-import createBodyGetter from "utils/createBodyGetter";
+import createBodyGetter from "utils/creep/createBodyGetter";
 
 /**
  * deposit 采集者

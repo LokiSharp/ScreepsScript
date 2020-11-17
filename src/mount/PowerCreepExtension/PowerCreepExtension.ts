@@ -1,6 +1,6 @@
 import { Move, WayPoint } from "modules/move";
 import { PowerTasks } from "./PowerTasks";
-import { log } from "utils/log";
+import { log } from "utils/console/log";
 import { maxOps } from "setting";
 
 /**

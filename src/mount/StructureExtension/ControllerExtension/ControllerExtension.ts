@@ -1,5 +1,5 @@
 import { creepApi } from "modules/creepController/creepApi";
-import { whiteListFilter } from "utils/whiteListFilter";
+import { whiteListFilter } from "utils/global/whiteListFilter";
 
 /**
  * Controller 拓展

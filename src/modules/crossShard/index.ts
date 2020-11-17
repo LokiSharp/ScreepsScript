@@ -5,7 +5,7 @@
  */
 
 import { ALL_SHARD_NAME } from "setting";
-import { log } from "utils/log";
+import { log } from "utils/console/log";
 import requestHandleStrategies from "./handleStrategies";
 
 // 其他 shard 的数据

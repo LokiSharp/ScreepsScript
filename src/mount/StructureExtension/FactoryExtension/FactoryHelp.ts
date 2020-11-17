@@ -1,5 +1,5 @@
 import FactoryExtension from "./FactoryExtension";
-import colorful from "utils/colorful";
+import colorful from "utils/console/colorful";
 import { createHelp } from "modules/help";
 
 export default class FactoryHelp extends FactoryExtension {

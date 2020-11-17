@@ -3,7 +3,7 @@ import RoomConsole from "./RoomConsole";
 import RoomExtension from "./RoomExtension";
 import RoomHelp from "./RoomHelp";
 import RoomShortcut from "./RoomShortcut";
-import assignPrototype from "utils/assignPrototype";
+import assignPrototype from "utils/global/assignPrototype";
 
 // 定义好挂载顺序
 const plugins = [RoomShortcut, RoomExtension, RoomConsole, CreepControl, RoomHelp];

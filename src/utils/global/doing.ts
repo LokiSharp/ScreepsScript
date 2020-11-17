@@ -1,4 +1,4 @@
-import { log } from "./log";
+import { log } from "../console/log";
 
 /**
  * 执行 Hash Map 中子元素对象的 work 方法

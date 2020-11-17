@@ -1,5 +1,4 @@
 import crossRules from "./crossRules";
-import { getOppositeDirection } from "utils/getOppositeDirection";
 
 export class Cross {
   /**
@@ -55,7 +54,7 @@ export class Cross {
     creep.say(`👉`);
 
     // 如果前面的 creep 同意对穿了，自己就朝前移动
-    const reverseDirection = getOppositeDirection(direction);
+    const reverseDirection = this.getOppositeDirection(direction);
     const fontMoveResult = this.requireCross(fontCreep, reverseDirection, creep);
     if (fontMoveResult !== OK) {
       creep.say(`👉 ${fontMoveResult}`);
@@ -67,5 +66,14 @@ export class Cross {
     }
     const selfMoveResult = creep.move(direction);
     return selfMoveResult === OK && fontMoveResult === OK ? OK : ERR_BUSY;
+  }
+
+  /**
+   * 获取指定方向的相反方向
+   *
+   * @param direction 目标方向
+   */
+  private static getOppositeDirection(direction: DirectionConstant): DirectionConstant {
+    return (((direction + 3) % 8) + 1) as DirectionConstant;
   }
 }

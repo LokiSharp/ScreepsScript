@@ -5,9 +5,9 @@
  */
 import { LAB_STATE, ROOM_REMOVE_INTERVAL, labTarget } from "setting";
 import RoomExtension from "./RoomExtension";
-import colorful from "utils/colorful";
-import { createElement } from "utils/createElement";
-import { getName } from "utils/getName";
+import colorful from "utils/console/colorful";
+import { createElement } from "utils/console/createElement";
+import { getName } from "utils/global/getName";
 import { manageStructure } from "modules/autoPlanning";
 import { setBaseCenter } from "modules/autoPlanning/planBasePos";
 

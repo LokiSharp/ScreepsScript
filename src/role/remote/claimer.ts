@@ -1,4 +1,4 @@
-import { getName } from "utils/getName";
+import { getName } from "utils/global/getName";
 
 /**
  * 占领者

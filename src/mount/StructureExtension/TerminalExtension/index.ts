@@ -1,7 +1,7 @@
 import TerminalConsole from "./TerminalConsole";
 import TerminalExtension from "./TerminalExtension";
 import TerminalHelp from "./TerminalHelp";
-import assignPrototype from "utils/assignPrototype";
+import assignPrototype from "utils/global/assignPrototype";
 
 // 定义好挂载顺序
 const plugins = [TerminalExtension, TerminalConsole, TerminalHelp];

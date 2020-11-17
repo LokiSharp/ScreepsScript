@@ -1,6 +1,6 @@
 import { MAX_WALL_HITS, ROOM_TRANSFER_TASK, repairSetting } from "setting";
 import { creepApi } from "modules/creepController/creepApi";
-import { whiteListFilter } from "utils/whiteListFilter";
+import { whiteListFilter } from "utils/global/whiteListFilter";
 
 // Tower 原型拓展
 export default class TowerExtension extends StructureTower {

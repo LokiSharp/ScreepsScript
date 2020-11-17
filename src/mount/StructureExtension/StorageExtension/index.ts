@@ -1,6 +1,6 @@
 import StorageConsole from "./StorageConsole";
 import StorageExtension from "./StorageExtension";
-import assignPrototype from "utils/assignPrototype";
+import assignPrototype from "utils/global/assignPrototype";
 
 // 定义好挂载顺序
 const plugins = [StorageExtension, StorageConsole];

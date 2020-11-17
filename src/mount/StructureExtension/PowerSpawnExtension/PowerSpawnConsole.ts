@@ -1,6 +1,6 @@
 import PowerSpawnExtension from "./PowerSpawnExtension";
-import colorful from "utils/colorful";
-import createRoomLink from "utils/createRoomLink";
+import colorful from "utils/console/colorful";
+import createRoomLink from "utils/console/createRoomLink";
 
 export default class PowerSpawnConsole extends PowerSpawnExtension {
   /**

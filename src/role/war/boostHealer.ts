@@ -1,5 +1,5 @@
-import { boostPrepare } from "utils/boostPrepare";
-import calcBodyPart from "utils/calcBodyPart";
+import { boostPrepare } from "utils/creep/boostPrepare";
+import calcBodyPart from "utils/creep/calcBodyPart";
 
 /**
  * 强化 - HEAL
