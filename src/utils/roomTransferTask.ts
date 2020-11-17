@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ROOM_TRANSFER_TASK, boostResourceReloadLimit } from "setting";
-import { clearCarryingResource } from "./clearCarryingEnergy";
+import { clearCarryingResource } from "./clearCarryingResource";
 import { getNotClearLab } from "./getNotClearLab";
 
 /**

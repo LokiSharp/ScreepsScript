@@ -9,8 +9,13 @@ export function clearCarryingResource(creep: Creep): boolean {
   if (creep.store.getUsedCapacity() > 0) {
     // 能放下就放，放不下说明资源太多了，直接扔掉
     if (creep.room.storage && creep.room.storage.store.getFreeCapacity() >= creep.store.getUsedCapacity()) {
-      Object.keys(creep.store).forEach(key => {
-        if (creep.store[key] > 0) creep.transferTo(creep.room.storage, key as ResourceConstant);
+      Object.keys(creep.store).forEach(resourceType => {
+        if (creep.store[resourceType] > 0) {
+          // 默认放到 Terminal ，如果是能量，就放到 Storage
+          let target: StructureTerminal | StructureStorage = creep.room.terminal;
+          if (resourceType === RESOURCE_ENERGY) target = creep.room.storage;
+          creep.transferTo(target, resourceType as ResourceConstant);
+        }
       });
     } else creep.drop(Object.keys(creep.store)[0] as ResourceConstant);
 
