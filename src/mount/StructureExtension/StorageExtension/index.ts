@@ -6,7 +6,7 @@ import assignPrototype from "utils/assignPrototype";
 const plugins = [StorageExtension, StorageConsole];
 
 /**
- * 依次挂载所有的 Room 拓展
+ * 依次挂载所有拓展
  */
 export default function mountStorage(): void {
   plugins.forEach(plugin => assignPrototype(StructureStorage, plugin));

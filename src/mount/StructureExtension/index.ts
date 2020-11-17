@@ -1,29 +1,28 @@
-import ControllerExtension from "./ControllerExtension";
-import ExtractorExtension from "./ExtractorExtension";
-import LabExtension from "./LabExtension";
-import NukerExtension from "./NukerExtension";
-import SpawnExtension from "./SpawnExtension";
-import StructureExtension from "./StructureExtension";
-import TowerExtension from "./TowerExtension";
-import assignPrototype from "utils/assignPrototype";
+import mountControllerExtension from "./ControllerExtension";
+import mountExtractorExtension from "./ExtractorExtension";
 import mountFactoryExtension from "./FactoryExtension";
+import mountLabExtension from "./LabExtension";
 import mountLinkExtension from "./LinkExtension";
+import mountNukerExtension from "./NukerExtension";
 import mountObserverExtension from "./ObserverExtension";
 import mountPowerSpawnExtension from "./PowerSpawnExtension";
+import mountSpawnExtension from "./SpawnExtension";
 import mountStorageExtension from "./StorageExtension";
+import mountStructureExtension from "./StructureExtension";
 import mountTerminalExtension from "./TerminalExtension";
+import mountTowerExtension from "./TowerExtension";
 
 /**
  * 挂载所有的额外属性和方法
  */
 export default function mountStructure(): void {
-  assignPrototype(Structure, StructureExtension);
-  assignPrototype(StructureController, ControllerExtension);
-  assignPrototype(StructureTower, TowerExtension);
-  assignPrototype(Spawn, SpawnExtension);
-  assignPrototype(StructureLab, LabExtension);
-  assignPrototype(StructureNuker, NukerExtension);
-  assignPrototype(StructureExtractor, ExtractorExtension);
+  mountStructureExtension();
+  mountControllerExtension();
+  mountTowerExtension();
+  mountSpawnExtension();
+  mountLabExtension();
+  mountNukerExtension();
+  mountExtractorExtension();
   mountTerminalExtension();
   mountLinkExtension();
   mountPowerSpawnExtension();

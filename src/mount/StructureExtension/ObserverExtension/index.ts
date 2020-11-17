@@ -7,7 +7,7 @@ import assignPrototype from "utils/assignPrototype";
 const plugins = [ObserverExtension, ObserverConsole, ObserverHelp];
 
 /**
- * 依次挂载所有的 Room 拓展
+ * 依次挂载所有拓展
  */
 export default function mountObserver(): void {
   plugins.forEach(plugin => assignPrototype(StructureObserver, plugin));

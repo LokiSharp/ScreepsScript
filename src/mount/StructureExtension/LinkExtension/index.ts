@@ -6,7 +6,7 @@ import assignPrototype from "utils/assignPrototype";
 const plugins = [LinkExtension, LinkHelp];
 
 /**
- * 依次挂载所有的 Room 拓展
+ * 依次挂载所有拓展
  */
 export default function mountLink(): void {
   plugins.forEach(plugin => assignPrototype(StructureLink, plugin));

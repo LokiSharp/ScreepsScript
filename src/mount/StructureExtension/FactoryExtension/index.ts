@@ -7,7 +7,7 @@ import assignPrototype from "utils/assignPrototype";
 const plugins = [FactoryExtension, FactoryConsole, FactoryHelp];
 
 /**
- * 依次挂载所有的 Room 拓展
+ * 依次挂载所有拓展
  */
 export default function mountFactory(): void {
   plugins.forEach(plugin => assignPrototype(StructureFactory, plugin));
