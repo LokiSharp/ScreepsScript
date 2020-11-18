@@ -63,6 +63,39 @@ export default {
   },
 
   /**
+   * 全局发送资源到指定房间
+   * 会检查哪个房间包含指定资源，并调用 Room.giver 方法发送资源
+   *
+   * @param roomName 房间名
+   * @param resourceType 资源类型
+   * @param amount 发送数量
+   */
+  give(roomName: string, resourceType: ResourceConstant, amount: number): string {
+    const logs: string[] = ["已启动全局资源调配"];
+    let sendAmount = 0;
+
+    // 遍历所有房间进行查找
+    for (const currentRoomName in Game.rooms) {
+      if (amount - sendAmount <= 0) break;
+      // 没有对应资源就下个房间
+      const room = Game.rooms[currentRoomName];
+      if (room.name === roomName || !room.terminal || !room.terminal.my || room.terminal.store[resourceType] <= 0)
+        continue;
+
+      // 计算本房间应发送的数量（不超的情况下直接发完）
+      const roomAmount = Math.min(room.terminal.store[resourceType], amount - sendAmount);
+
+      // 发送资源并记录结果
+      logs.push(`[${currentRoomName}]${room.giver(roomName, resourceType, roomAmount)}`);
+      sendAmount += roomAmount;
+    }
+
+    logs.push(`调配完成，向 ${roomName} 发送 ${resourceType} 共计 ${sendAmount}`);
+
+    return logs.join("\n");
+  },
+
+  /**
    * 所有 creep 欢呼
    *
    * @param content 要欢呼的内容
