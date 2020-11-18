@@ -1,7 +1,6 @@
 /**
  * 跨 shard 通讯模块
- * 本模块会发起和处理 shard 之间的需求任务，详情见文档：
- * @see 跨shard设计案.md
+ * 本模块会发起和处理 shard 之间的需求任务
  */
 
 import { ALL_SHARD_NAME } from "setting";
