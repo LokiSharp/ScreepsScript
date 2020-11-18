@@ -4,7 +4,6 @@ import { log } from "../console/log";
  * 执行 Hash Map 中子元素对象的 work 方法
  *
  * @param hashMap 游戏对象的 hash map。如 Game.creeps、Game.spawns 等
- * @param showCpu [可选] 传入指定字符串来启动该 Map 的数量统计
  */
 // eslint-disable-next-line @typescript-eslint/ban-types
 export default function doing(...hashMaps: Object[]): void {

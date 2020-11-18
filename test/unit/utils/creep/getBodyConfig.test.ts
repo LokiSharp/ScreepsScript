@@ -1,4 +1,4 @@
-import { CARRY, MOVE, WORK } from "../../mock";
+import { CARRY, MOVE, WORK } from "../../mock/CreepBodyPartMock";
 import { assert } from "chai";
 import getBodyConfig from "../../../../src/utils/creep/getBodyConfig";
 
