@@ -2,15 +2,16 @@ import CreepControl from "./CreepControl";
 import RoomConsole from "./RoomConsole";
 import RoomExtension from "./RoomExtension";
 import RoomHelp from "./RoomHelp";
-import RoomShortcut from "./RoomShortcut";
 import assignPrototype from "utils/global/assignPrototype";
+import mountShortcut from "modules/shortcut/mountShortcut";
 
 // 定义好挂载顺序
-const plugins = [RoomShortcut, RoomExtension, RoomConsole, CreepControl, RoomHelp];
+const plugins = [RoomExtension, RoomConsole, CreepControl, RoomHelp];
 
 /**
  * 依次挂载所有的 Room 拓展
  */
 export default function mountRoom(): void {
+  mountShortcut();
   plugins.forEach(plugin => assignPrototype(Room, plugin));
 }

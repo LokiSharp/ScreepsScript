@@ -2,6 +2,7 @@ import { MIN_WALL_HITS, repairSetting } from "setting";
 import { Move, WayPoint } from "modules/move";
 import { getMemoryFromCrossShard } from "modules/crossShard";
 import roles from "role";
+import { updateStructure } from "modules/shortcut/updateStructure";
 
 export default class CreepExtension extends Creep {
   /**
@@ -156,6 +157,7 @@ export default class CreepExtension extends Creep {
           s => s.structureType === this.room.memory.constructionSiteType
         );
         if (structure) {
+          updateStructure(this.room.name, structure.structureType, structure.id);
           // 如果有的话就执行回调
           if (structure.onBuildComplete) structure.onBuildComplete();
 
@@ -164,7 +166,7 @@ export default class CreepExtension extends Creep {
             this.memory.fillWallId = structure.id as Id<StructureWall | StructureRampart>;
           }
           // 如果修好的是 source container 的话，就执行注册
-          else if (structure instanceof StructureContainer && this.room.sources.find(s => structure.pos.isNearTo(s))) {
+          else if (structure instanceof StructureContainer && this.room.source.find(s => structure.pos.isNearTo(s))) {
             this.room.registerContainer(structure);
           }
         }

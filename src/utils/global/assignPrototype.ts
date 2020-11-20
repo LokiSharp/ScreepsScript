@@ -4,7 +4,7 @@
  * @param obj1 要挂载到的对象
  * @param obj2 要进行挂载的对象
  */
-export default function assignPrototype(obj1: { [key: string]: any }, obj2: { [key: string]: any }): void {
+export default function assignPrototype(obj1: AnyObject, obj2: AnyObject): void {
   Object.getOwnPropertyNames(obj2.prototype).forEach(key => {
     if (key.includes("Getter")) {
       Object.defineProperty(obj1.prototype, key.split("Getter")[0], {

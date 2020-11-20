@@ -49,9 +49,4 @@ export default class PowerSpawnExtension extends StructurePowerSpawn {
 
     return false;
   }
-
-  // 建造完成时注册自己的 id 到房间
-  public onBuildComplete(): void {
-    this.room.memory.powerSpawnId = this.id;
-  }
 }

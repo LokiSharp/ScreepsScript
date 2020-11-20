@@ -10,14 +10,6 @@ interface RoomMemory {
   // 需要放置的工地（CS）队列
   delayCSList: string[];
 
-  // 房间内的资源和建筑 id
-  mineralId: Id<Mineral>;
-  factoryId: Id<StructureFactory>;
-  extractorId: Id<StructureExtractor>;
-  powerSpawnId: Id<StructurePowerSpawn>;
-  nukerId: Id<StructureNuker>;
-  observerId: Id<StructureObserver>;
-  sourceIds: Id<Source>[];
   sourceContainersIds: Id<StructureContainer>[];
   ruinIds: Id<Ruin>[];
   constructionSiteIds: Id<ConstructionSite>[];

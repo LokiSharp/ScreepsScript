@@ -129,7 +129,7 @@ export default class CreepControl extends RoomConsole {
         targetRoomName: remoteRoomName,
         spawnRoom: this.name,
         wayPoint: wayPointFlagName,
-        sourceId: room.sources[0].id
+        sourceId: room.source[0].id
       },
       this.name
     );
@@ -140,7 +140,7 @@ export default class CreepControl extends RoomConsole {
         targetRoomName: remoteRoomName,
         spawnRoom: this.name,
         wayPoint: wayPointFlagName,
-        sourceId: room.sources.length >= 2 ? room.sources[1].id : room.sources[0].id
+        sourceId: room.source.length >= 2 ? room.source[1].id : room.source[0].id
       },
       this.name
     );

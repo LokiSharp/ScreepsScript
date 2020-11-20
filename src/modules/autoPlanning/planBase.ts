@@ -29,7 +29,7 @@ function canPosStand(pos: RoomPosition): boolean {
  */
 function getOutLinkPos(room: Room): RoomPosition[] {
   // 给 source 和 controller 旁边造 link
-  const targets = [...room.sources, room.controller];
+  const targets = [...room.source, room.controller];
   const result = [] as RoomPosition[];
 
   for (const target of targets) {

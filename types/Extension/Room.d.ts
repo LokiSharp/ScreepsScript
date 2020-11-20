@@ -67,25 +67,32 @@ interface Room {
   stopWar(): OK | ERR_NOT_FOUND;
 
   // 房间基础服务
-  factory?: StructureFactory;
-  powerSpawn: StructurePowerSpawn;
-  nuker: StructureNuker;
-  observer: StructureObserver;
-  centerLink: StructureLink;
-  extractor: StructureExtractor;
-  mineral: Mineral;
-  sources: Source[];
-  sourceContainers: StructureContainer[];
+  [STRUCTURE_FACTORY]?: StructureFactory;
+  [STRUCTURE_POWER_SPAWN]?: StructurePowerSpawn;
+  [STRUCTURE_NUKER]?: StructureNuker;
+  [STRUCTURE_OBSERVER]?: StructureObserver;
+  [STRUCTURE_EXTRACTOR]?: StructureExtractor;
 
-  // 房间基础服务缓存
-  factoryCache: StructureFactory;
+  [STRUCTURE_SPAWN]?: StructureSpawn[];
+  [STRUCTURE_EXTENSION]?: StructureExtension[];
+  [STRUCTURE_ROAD]?: StructureRoad[];
+  [STRUCTURE_WALL]?: StructureWall[];
+  [STRUCTURE_RAMPART]?: StructureRampart[];
+  [STRUCTURE_KEEPER_LAIR]?: StructureKeeperLair[];
+  [STRUCTURE_PORTAL]?: StructurePortal[];
+  [STRUCTURE_LINK]?: StructureLink[];
+  [STRUCTURE_TOWER]?: StructureTower[];
+  [STRUCTURE_LAB]?: StructureLab[];
+  [STRUCTURE_CONTAINER]?: StructureContainer[];
+
+  mineral?: Mineral;
+  source?: Source[];
+  centerLink?: StructureLink;
+  sourceContainers?: StructureContainer[];
+
   mineralCache: Mineral;
-  powerSpawnCache: StructurePowerSpawn;
-  nukerCache: StructureNuker;
   sourcesCache: Source[];
   centerLinkCache: StructureLink;
-  observerCache: StructureObserver;
-  extractorCache: StructureExtractor;
   sourceContainersCache: StructureContainer[];
 
   // 已拥有的房间特有，tower 负责维护
