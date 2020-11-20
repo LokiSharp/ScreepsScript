@@ -17,7 +17,8 @@ export default function repairer(data: WorkerData): ICreepConfig {
       if (!source) return false;
       // 如果能量来源是 container 的话说明还在发展期，只要 container 在就一直孵化
       else if (source && source instanceof StructureContainer) return true;
-
+      // 如果能量来源是 Storage ，只要能量充裕就一直孵化
+      else if (source && source instanceof StructureStorage && source.store.getFreeCapacity() < 100000) return true;
       // 否则就看当前房间里有没有威胁，有的话就继续孵化并刷墙
       return room.controller.checkEnemyThreat();
     },
