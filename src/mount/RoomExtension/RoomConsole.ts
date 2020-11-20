@@ -537,4 +537,18 @@ export default class RoomConsole extends RoomExtension {
   public sell(resourceType: ResourceConstant, price: number, totalAmount: number): string {
     return this.createOrder(ORDER_SELL, resourceType, price, totalAmount);
   }
+
+  /**
+   * 移除所有不属于自己的墙壁
+   */
+  public clearwall(): string {
+    // 找到所有不是自己的墙壁
+    const wall = this.find(FIND_STRUCTURES, {
+      filter: s => s.structureType === STRUCTURE_WALL || (s.structureType === STRUCTURE_RAMPART && !s.my)
+    });
+    if (wall.length <= 0) return `[${this.name}] 未找到墙壁`;
+
+    wall.forEach(w => w.destroy());
+    return `[${this.name}] 墙壁清理完成`;
+  }
 }
