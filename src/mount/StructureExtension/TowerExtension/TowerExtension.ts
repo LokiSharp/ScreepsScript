@@ -280,14 +280,13 @@ export default class TowerExtension extends StructureTower {
     // 该属性不存在 或者 当前时间已经大于关注时间 就刷新
     if (!focusWall || (focusWall && Game.time >= focusWall.endTime)) {
       // 获取所有没填满的墙
-      const walls = this.room.find(FIND_STRUCTURES, {
-        filter: s => s.hits < s.hitsMax && (s.structureType === STRUCTURE_WALL || s.structureType === STRUCTURE_RAMPART)
-      });
+      const walls = [...this.room[STRUCTURE_WALL], ...this.room[STRUCTURE_RAMPART]].filter(s => s.hits < s.hitsMax);
+
       // 没有目标就啥都不干
       if (walls.length <= 0) return false;
 
       // 找到血量最小的墙
-      targetWall = walls.sort((a, b) => a.hits - b.hits)[0] as StructureRampart | StructureWall;
+      targetWall = walls.sort((a, b) => a.hits - b.hits)[0];
 
       if (targetWall.hits > MAX_WALL_HITS) return false;
 

@@ -27,7 +27,7 @@ export function getStructureWithCache<TargetStructure extends RoomObject>(
     ids = getCacheId(room.name, type);
   }
   // 还没有的话就是真没有，直接返回空
-  if (!ids || ids.length === 0) return undefined;
+  if (!ids || ids.length === 0) return [];
 
   // 从 id 获取建筑并更新缓存
   const target: TargetStructure[] = [];

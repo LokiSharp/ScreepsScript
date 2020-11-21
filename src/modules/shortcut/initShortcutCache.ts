@@ -20,9 +20,9 @@ export function initShortcutCache(room: Room): void {
   });
 
   // 把需要的建筑 id 存入全局缓存，并直接初始化 room 缓存
-  [...MULTIPLE_STRUCTURES, ...SINGLE_STRUCTURES].forEach(type => {
+  for (const type of [...MULTIPLE_STRUCTURES, ...SINGLE_STRUCTURES]) {
     // 如果房间内某种建筑还没有的话就填充为空数组
     structureIdCache[room.name][type] = (structureGroup[type] || []).map(s => s.id);
     room[getPrivateKey(type)] = structureGroup[type] || [];
-  });
+  }
 }
