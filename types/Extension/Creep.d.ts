@@ -3,8 +3,6 @@
  * 来自于 mount.creep.ts
  */
 interface Creep {
-  _id: Id<Creep>;
-
   log(content: string, color?: Colors, notify?: boolean): void;
   work(): void;
   goTo(target?: RoomPosition, moveOpt?: MoveOpt): ScreepsReturnCode;
