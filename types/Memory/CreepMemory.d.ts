@@ -65,4 +65,7 @@ interface CreepMemory {
   travelTime?: number;
   // manager 特有，当前任务正在转移的资源类型
   taskResource?: ResourceConstant;
+
+  // rangeSoldier 特有，是否启用 massAttack
+  massMode?: boolean;
 }

@@ -26,4 +26,5 @@ type WarRoleConstant =
   | "dismantler"
   | "boostAttacker"
   | "boostHealer"
-  | "boostDismantler";
+  | "boostDismantler"
+  | "rangedAttacker";

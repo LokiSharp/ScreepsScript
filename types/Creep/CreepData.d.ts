@@ -99,6 +99,7 @@ interface WarUnitData {
   // 是否持续孵化
   keepSpawn: boolean;
 }
+
 /**
  * 治疗单位的 data
  */
@@ -109,4 +110,16 @@ interface HealUnitData {
   standByFlagName?: string;
   // 是否持续孵化
   keepSpawn?: boolean;
+}
+
+/**
+ * 一体机战斗单位的 data
+ */
+interface RangedAttackerData {
+  // 要攻击的旗帜名
+  targetFlagName: string;
+  // 抗几个塔的伤害，由这个参数决定其身体部件组成
+  bearTowerNum: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+  // 是否持续孵化
+  keepSpawn: boolean;
 }

@@ -19,6 +19,7 @@ import pbAttacker from "./remote/pbAttacker";
 import pbCarrier from "./remote/pbCarrier";
 import pbHealer from "./remote/pbHealer";
 import processor from "./advanced/processor";
+import rangedAttacker from "./war/rangedAttacker";
 import reiver from "./remote/reiver";
 import remoteBuilder from "./remote/remoteBuilder";
 import remoteHarvester from "./remote/remoteHarvester";
@@ -57,7 +58,8 @@ const roles: CreepWork = {
   pbHealer,
   depositHarvester,
   buildHelper,
-  miner
+  miner,
+  rangedAttacker
 };
 
 /**
