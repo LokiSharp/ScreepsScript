@@ -422,19 +422,33 @@ export default class CreepExtension extends Creep {
 
     // 如果到旗帜所在房间了
     const structures = attackFlag.pos.lookFor(LOOK_STRUCTURES);
-    if (structures.length === 0) this.say("干谁?");
 
     // healer 不存在（自己行动）或者 healer 可以和自己同时移动时才允许自己移动
     if (!healer || (healer && this.canMoveWith(healer))) {
-      this.moveTo(attackFlag);
+      if (structures.length > 0) {
+        if (this.dismantle(structures[0]) === ERR_NOT_IN_RANGE) this.moveTo(structures[0]);
+      } else {
+        let target;
+        const targetStructureTypes = [STRUCTURE_TOWER, STRUCTURE_NUKER, STRUCTURE_SPAWN, STRUCTURE_EXTENSION];
 
+        for (const structureType of targetStructureTypes) {
+          const targetCache = this.pos.findClosestByPath(FIND_HOSTILE_STRUCTURES, {
+            filter: { structureType }
+          });
+          if (targetCache) {
+            target = targetCache;
+            break;
+          }
+        }
+
+        if (target && this.dismantle(target) === ERR_NOT_IN_RANGE) this.moveTo(target);
+      }
       // 如果之前在拆墙则移除刚才所在的禁止通行点位
       if (this.memory.stand) {
         delete this.memory.stand;
       }
     }
 
-    this.dismantle(structures[0]);
     return false;
   }
 }

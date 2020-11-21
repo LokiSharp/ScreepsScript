@@ -42,15 +42,43 @@ export default function rangedAttacker(data: RangedAttackerData): ICreepConfig {
       // 因为本 tick 受到的伤害只有在下个 tick 才能发现，两个 tick 累计的伤害足以击穿 tough。
       if (creep.getActiveBodyparts(HEAL)) creep.heal(creep);
 
-      // 无脑移动
-      creep.moveTo(targetFlag);
+      // 如果 creep 不在房间里 则一直向旗帜移动
+      if (!targetFlag.room || (targetFlag.room && creep.room.name !== targetFlag.room.name)) {
+        // 如果 healer 存在则只会在 healer 相邻且可以移动时才进行移动
+        creep.goTo(targetFlag.pos, {
+          checkTarget: true
+        });
+      }
 
       if (creep.room.name === targetFlag.pos.roomName) {
+        const rangedMassAttackAbleEnemys = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 2);
+        const rangedAttackAbleEnemys = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 6);
+
+        creep.memory.massMode = rangedMassAttackAbleEnemys.length > 1;
         // 根据 massMode 选择不同给攻击模式
         if (creep.memory.massMode) creep.rangedMassAttack();
         else {
           const structures = targetFlag.pos.lookFor(LOOK_STRUCTURES);
-          if (structures.length > 0) creep.rangedAttack(structures[0]);
+
+          if (structures.length > 0) {
+            if (creep.rangedAttack(structures[0]) === ERR_NOT_IN_RANGE) creep.moveTo(structures[0]);
+          } else if (rangedAttackAbleEnemys.length > 0) creep.rangedAttack(rangedMassAttackAbleEnemys[0]);
+          else {
+            let target;
+            const targetStructureTypes = [STRUCTURE_TOWER, STRUCTURE_NUKER, STRUCTURE_SPAWN, STRUCTURE_EXTENSION];
+
+            for (const structureType of targetStructureTypes) {
+              const targetCache = creep.pos.findClosestByPath(FIND_HOSTILE_STRUCTURES, {
+                filter: { structureType }
+              });
+              if (targetCache) {
+                target = targetCache;
+                break;
+              }
+            }
+
+            if (target && creep.rangedAttack(target) === ERR_NOT_IN_RANGE) creep.moveTo(target);
+          }
         }
       } else {
         creep.log(`不在指定房间，切入迁徙模式`);
