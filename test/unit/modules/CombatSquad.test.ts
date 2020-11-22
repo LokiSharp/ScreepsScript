@@ -1,4 +1,4 @@
-import { CombatSquad } from "../../../src/modules/CombatSquad";
+import { CombatSquad } from "../../../src/modules/CombatSquad/CombatSquad";
 import { ConstantsMock } from "../mock/ConstantsMock";
 import CreepMock from "../mock/CreepMock";
 import { assert } from "chai";
