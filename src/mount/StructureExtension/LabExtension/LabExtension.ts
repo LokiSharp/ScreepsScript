@@ -142,7 +142,7 @@ export default class LabExtension extends StructureLab {
 
     // 能循环完说明能量都填好了
     this.room.memory.boost.state = "waitBoost";
-    this.log(`能量填充完成，boost 准备就绪，等待强化，键入 ${this.room.name}.whelp() 来查看如何孵化战斗单位`, "green");
+    this.log(`能量填充完成，boost 准备就绪，等待强化，键入 ${this.room.name}.help() 来查看如何孵化战斗单位`, "green");
   }
 
   /**

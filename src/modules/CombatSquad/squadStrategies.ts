@@ -85,12 +85,12 @@ export const squadStrategies: {
 
           if (range === 1) creep.rangedMassAttack();
           else if (range <= 3) creep.rangedAttack(creep);
-          else rangedAttackNearHostile(creep, hostileCreeps);
+          else creep.rangedAttackNearestHostileCreeps(hostileCreeps);
         });
         return OK;
       }
       // 没找到目标就自行攻击
-      else Object.values(squad).forEach(creep => rangedAttackNearHostile(creep, hostileCreeps));
+      else Object.values(squad).forEach(creep => creep.rangedAttackNearestHostileCreeps(hostileCreeps));
       return ERR_NOT_FOUND;
     },
 
@@ -160,18 +160,3 @@ export const squadStrategies: {
     }
   }
 };
-
-/**
- * RA 攻击最近的敌方单位
- *
- * @param creep 执行攻击的 creep
- * @param hostils 敌方目标
- */
-function rangedAttackNearHostile(creep: Creep, hostils: Creep[]): OK {
-  const targets = creep.pos.findInRange(hostils, 3);
-
-  if (targets.length > 0) creep.rangedAttack(targets[0]);
-  else creep.rangedMassAttack();
-
-  return OK;
-}

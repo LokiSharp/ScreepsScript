@@ -18,4 +18,12 @@ interface Creep {
   attackFlag(flagName: string): boolean;
   healTo(creep: Creep): void;
   dismantleFlag(flagName: string, healerName?: string): boolean;
+
+  rangedAttackLowestHitsHostileCreeps(hostils?: AnyCreep[]): OK | ERR_NOT_FOUND;
+  rangedAttackNearestHostileCreeps(hostils?: AnyCreep[]): OK | ERR_NOT_FOUND;
+  rangedAttackLowestHitsHostileStructures(): OK | ERR_NOT_FOUND;
+  rangedAttackNearHostileStructures(): OK | ERR_NOT_FOUND;
+
+  getHostileCreepsWithCache(hard?: boolean): AnyCreep[];
+  getHostileStructuresWithCache(hard?: boolean): Structure<StructureConstant>[];
 }

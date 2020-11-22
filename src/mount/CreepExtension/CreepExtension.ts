@@ -317,20 +317,52 @@ export default class CreepExtension extends Creep {
 
     // 如果到旗帜所在房间了
     // 优先攻击 creep
-    let target: Creep | PowerCreep | Structure | Flag;
-    const enemys = attackFlag.pos.findInRange(FIND_HOSTILE_CREEPS, 2);
-    if (enemys.length > 0) target = enemys[0];
-    else {
+    let target: AnyCreep | Structure;
+
+    const hostils = this.getHostileCreepsWithCache();
+    if (hostils.length > 0) {
+      // 找到血量最低的 creep
+      target = _.min(hostils, creep => {
+        // 该 creep 是否在 rampart 中
+        const inRampart = creep.pos
+          .lookFor(LOOK_STRUCTURES)
+          .find(rampart => rampart.structureType === STRUCTURE_RAMPART);
+
+        // 在 rampart 里就不会作为进攻目标
+        if (inRampart) return creep.hits + inRampart.hits;
+        // 找到血量最低的
+        else return creep.hits;
+      });
+    } else {
       // 没有的话再攻击 structure
       const structures = attackFlag.pos.lookFor(LOOK_STRUCTURES);
-      if (structures.length === 0) {
-        this.say("干谁？");
-        target = attackFlag;
-      } else target = structures[0];
+      if (structures.length > 0) {
+        target = structures[0];
+      } else {
+        const targets = this.getHostileStructuresWithCache().filter(
+          structure =>
+            structure.structureType === STRUCTURE_TOWER ||
+            structure.structureType === STRUCTURE_NUKER ||
+            structure.structureType === STRUCTURE_SPAWN ||
+            structure.structureType === STRUCTURE_EXTENSION
+        );
+
+        // 找到血量最低的建筑
+        target = _.min(targets, structure => {
+          // 该 creep 是否在 rampart 中
+          const inRampart = structure.pos
+            .lookFor(LOOK_STRUCTURES)
+            .find(rampart => rampart.structureType === STRUCTURE_RAMPART);
+
+          // 在 rampart 里就不会作为进攻目标
+          if (inRampart) return structure.hits + inRampart.hits;
+          // 找到血量最低的
+          else return structure.hits;
+        });
+      }
     }
 
-    this.moveTo(target);
-    this.attack(target as Creep);
+    if (target && this.attack(target) === ERR_NOT_IN_RANGE) this.moveTo(target);
 
     return true;
   }
@@ -420,26 +452,35 @@ export default class CreepExtension extends Creep {
       return true;
     }
 
+    let target: Structure;
     // 如果到旗帜所在房间了
     const structures = attackFlag.pos.lookFor(LOOK_STRUCTURES);
 
     // healer 不存在（自己行动）或者 healer 可以和自己同时移动时才允许自己移动
     if (!healer || (healer && this.canMoveWith(healer))) {
       if (structures.length > 0) {
-        if (this.dismantle(structures[0]) === ERR_NOT_IN_RANGE) this.moveTo(structures[0]);
+        target = structures[0];
       } else {
-        let target;
-        const targetStructureTypes = [STRUCTURE_TOWER, STRUCTURE_NUKER, STRUCTURE_SPAWN, STRUCTURE_EXTENSION];
+        const targets = this.getHostileStructuresWithCache().filter(
+          structure =>
+            structure.structureType === STRUCTURE_TOWER ||
+            structure.structureType === STRUCTURE_NUKER ||
+            structure.structureType === STRUCTURE_SPAWN ||
+            structure.structureType === STRUCTURE_EXTENSION
+        );
 
-        for (const structureType of targetStructureTypes) {
-          const targetCache = this.pos.findClosestByPath(FIND_HOSTILE_STRUCTURES, {
-            filter: { structureType }
-          });
-          if (targetCache) {
-            target = targetCache;
-            break;
-          }
-        }
+        // 找到血量最低的建筑
+        target = _.min(targets, structure => {
+          // 该 creep 是否在 rampart 中
+          const inRampart = structure.pos
+            .lookFor(LOOK_STRUCTURES)
+            .find(rampart => rampart.structureType === STRUCTURE_RAMPART);
+
+          // 在 rampart 里就不会作为进攻目标
+          if (inRampart) return structure.hits + inRampart.hits;
+          // 找到血量最低的
+          else return structure.hits;
+        });
 
         if (target && this.dismantle(target) === ERR_NOT_IN_RANGE) this.moveTo(target);
       }
@@ -450,5 +491,145 @@ export default class CreepExtension extends Creep {
     }
 
     return false;
+  }
+
+  /**
+   * RA 攻击血量最低的敌方单位
+   *
+   * @param hostils 敌方目标
+   */
+  public rangedAttackLowestHitsHostileCreeps(hostils?: AnyCreep[]): OK | ERR_NOT_FOUND {
+    if (!hostils) hostils = this.getHostileCreepsWithCache();
+    const targets = this.pos.findInRange(hostils, 3);
+    if (targets.length > 0) {
+      // 找到血量最低的 creep
+      const target = _.min(targets, creep => {
+        // 该 creep 是否在 rampart 中
+        const inRampart = creep.pos
+          .lookFor(LOOK_STRUCTURES)
+          .find(rampart => rampart.structureType === STRUCTURE_RAMPART);
+
+        // 在 rampart 里就不会作为进攻目标
+        if (inRampart) return creep.hits + inRampart.hits;
+        // 找到血量最低的
+        else return creep.hits;
+      });
+
+      this.rangedAttack(target);
+      return OK;
+    }
+
+    return ERR_NOT_FOUND;
+  }
+
+  /**
+   * RA 攻击最近的敌方单位
+   *
+   * @param hostils 敌方目标
+   */
+  public rangedAttackNearestHostileCreeps(hostils?: AnyCreep[]): OK | ERR_NOT_FOUND {
+    if (!hostils) hostils = this.getHostileCreepsWithCache();
+    const targets = this.pos.findInRange(hostils, 3);
+
+    if (targets.length > 0) this.rangedAttack(targets[0]);
+    else return ERR_NOT_FOUND;
+
+    return OK;
+  }
+
+  /**
+   * RA 攻击血量最低的敌方建筑
+   */
+  public rangedAttackLowestHitsHostileStructures(): OK | ERR_NOT_FOUND {
+    const targets = this.getHostileStructuresWithCache().filter(
+      structure =>
+        structure.structureType === STRUCTURE_TOWER ||
+        structure.structureType === STRUCTURE_NUKER ||
+        structure.structureType === STRUCTURE_SPAWN ||
+        structure.structureType === STRUCTURE_EXTENSION
+    );
+
+    if (targets.length <= 0) return ERR_NOT_FOUND;
+
+    // 找到血量最低的建筑
+    const target = _.min(targets, structure => {
+      // 该 creep 是否在 rampart 中
+      const inRampart = structure.pos
+        .lookFor(LOOK_STRUCTURES)
+        .find(rampart => rampart.structureType === STRUCTURE_RAMPART);
+
+      // 在 rampart 里就不会作为进攻目标
+      if (inRampart) return structure.hits + inRampart.hits;
+      // 找到血量最低的
+      else return structure.hits;
+    });
+
+    if (target && this.rangedAttack(target) === ERR_NOT_IN_RANGE) this.moveTo(target);
+
+    return OK;
+  }
+
+  /**
+   * RA 攻击最近的敌方建筑
+   */
+  public rangedAttackNearHostileStructures(): OK | ERR_NOT_FOUND {
+    const targets = this.getHostileStructuresWithCache().filter(
+      structure =>
+        structure.structureType === STRUCTURE_TOWER ||
+        structure.structureType === STRUCTURE_NUKER ||
+        structure.structureType === STRUCTURE_SPAWN ||
+        structure.structureType === STRUCTURE_EXTENSION
+    );
+
+    if (targets.length <= 0) return ERR_NOT_FOUND;
+
+    // 找到最近的敌方建筑
+    const target = this.pos.findClosestByRange(targets);
+
+    if (target && this.rangedAttack(target) === ERR_NOT_IN_RANGE) this.moveTo(target);
+
+    return OK;
+  }
+
+  /**
+   * 从缓存获取敌方建筑物
+   */
+  public getHostileStructuresWithCache(hard?: boolean): Structure<StructureConstant>[] {
+    const expireTime = 100;
+    if (!this.room.memory.targetHostileStructuresCache) {
+      this.room.memory.targetHostileStructuresCache = [];
+    }
+
+    let targets = this.room.memory.targetHostileStructuresCache.map(id => Game.getObjectById(id));
+    targets = targets.filter(target => target);
+
+    if (targets.length <= 0 || hard || Game.time >= this.room.memory.targetHostileStructuresCacheExpireTime) {
+      targets = this.room.find(FIND_HOSTILE_STRUCTURES);
+      this.room.memory.targetHostileStructuresCache = targets.map(target => target.id);
+      this.room.memory.targetHostileStructuresCacheExpireTime = Game.time + expireTime;
+    }
+
+    return targets;
+  }
+
+  /**
+   * 从缓存获取敌方 Creep
+   */
+  public getHostileCreepsWithCache(hard?: boolean): AnyCreep[] {
+    const expireTime = 20;
+    if (!this.room.memory.targetHostileCreepsCache) {
+      this.room.memory.targetHostileCreepsCache = [];
+    }
+
+    let targets = this.room.memory.targetHostileCreepsCache.map(id => Game.getObjectById(id));
+    targets = targets.filter(target => target);
+
+    if (targets.length <= 0 || hard || Game.time >= this.room.memory.targetHostileCreepsCacheExpireTime) {
+      targets = this.room.find(FIND_HOSTILE_CREEPS);
+      this.room.memory.targetHostileCreepsCache = targets.map(target => target.id);
+      this.room.memory.targetHostileCreepsCacheExpireTime = Game.time + expireTime;
+    }
+
+    return targets;
   }
 }

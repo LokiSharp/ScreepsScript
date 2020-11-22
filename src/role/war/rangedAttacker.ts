@@ -51,35 +51,13 @@ export default function rangedAttacker(data: RangedAttackerData): ICreepConfig {
       }
 
       if (creep.room.name === targetFlag.pos.roomName) {
-        const rangedMassAttackAbleEnemys = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 2);
-        const rangedAttackAbleEnemys = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 6);
+        const hostileCreeps = creep.getHostileCreepsWithCache();
+        const structures = targetFlag.pos.lookFor(LOOK_STRUCTURES);
 
-        creep.memory.massMode = rangedMassAttackAbleEnemys.length > 1;
-        // 根据 massMode 选择不同给攻击模式
-        if (creep.memory.massMode) creep.rangedMassAttack();
-        else {
-          const structures = targetFlag.pos.lookFor(LOOK_STRUCTURES);
-
-          if (structures.length > 0) {
-            if (creep.rangedAttack(structures[0]) === ERR_NOT_IN_RANGE) creep.moveTo(structures[0]);
-          } else if (rangedAttackAbleEnemys.length > 0) creep.rangedAttack(rangedMassAttackAbleEnemys[0]);
-          else {
-            let target;
-            const targetStructureTypes = [STRUCTURE_TOWER, STRUCTURE_NUKER, STRUCTURE_SPAWN, STRUCTURE_EXTENSION];
-
-            for (const structureType of targetStructureTypes) {
-              const targetCache = creep.pos.findClosestByPath(FIND_HOSTILE_STRUCTURES, {
-                filter: { structureType }
-              });
-              if (targetCache) {
-                target = targetCache;
-                break;
-              }
-            }
-
-            if (target && creep.rangedAttack(target) === ERR_NOT_IN_RANGE) creep.moveTo(target);
-          }
-        }
+        if (creep.rangedAttackLowestHitsHostileCreeps(hostileCreeps) === OK) return false;
+        else if (structures.length > 0) {
+          if (creep.rangedAttack(structures[0]) === ERR_NOT_IN_RANGE) creep.moveTo(structures[0]);
+        } else if (creep.rangedAttackNearHostileStructures() === OK) return false;
       } else {
         creep.log(`不在指定房间，切入迁徙模式`);
         return true;

@@ -155,4 +155,11 @@ interface RoomMemory {
   resourceKeepInfo?: {
     terminal?: IResourceKeepInfo;
   };
+
+  // 目标敌方建筑缓存
+  targetHostileStructuresCache: Id<Structure>[];
+  targetHostileStructuresCacheExpireTime: number;
+  // 目标敌方 creep 缓存
+  targetHostileCreepsCache: Id<AnyCreep>[];
+  targetHostileCreepsCacheExpireTime: number;
 }
