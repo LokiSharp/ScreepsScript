@@ -222,7 +222,7 @@ export default [
 
           return statsResult.join(" ");
         })
-        .filter(statsResult => statsResult)
+        .filter(Boolean)
         .join("\n");
 
       return stats;
@@ -282,7 +282,7 @@ export default [
 
             return log;
           })
-          .filter(log => log)
+          .filter(Boolean)
       ];
 
       return logs.join("\n");

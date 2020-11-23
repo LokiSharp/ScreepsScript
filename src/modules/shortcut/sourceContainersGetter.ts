@@ -22,7 +22,7 @@ export function sourceContainersGetter(): StructureContainer[] {
       return false;
     })
     // 去除所有为 false 的结果
-    .filter(s => s);
+    .filter(Boolean);
 
   // 移除失效的 id
   abandonedIdIndex.forEach(index => (this as Room).memory.sourceContainersIds.splice(index, 1));

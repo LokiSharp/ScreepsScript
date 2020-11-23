@@ -55,7 +55,7 @@ export default {
         if (room[source] && amount > 0) return `${room.name} => ${amount}`;
         else return false;
       })
-      .filter(res => res)
+      .filter(Boolean)
       .join("\n");
 
     log += `\n共计: ${total}`;
