@@ -29,10 +29,6 @@ export default class LabExtension extends StructureLab {
       this.runLab();
       this.room.hasRunLab = true;
     }
-
-    // 如果是 outLab 就更新下自己的库存到 memory
-    if (this.id in this.room.memory.lab.outLab)
-      this.room.memory.lab.outLab[this.id] = this.store[this.mineralType] || 0;
   }
 
   /**
@@ -267,24 +263,17 @@ export default class LabExtension extends StructureLab {
     if (labMemory.reactionRunTime && Game.time < labMemory.reactionRunTime) return;
 
     // 获取 inLab
-    const inLabs: StructureLab[] = [];
-    labMemory.inLab.forEach(labId => {
-      const lab = Game.getObjectById(labId);
-      if (!lab) this.log(`错误! 找不到 inLab ${labId}`, "red");
-      else inLabs.push(lab);
-    });
-    if (inLabs.length < 2) return;
+    const inLabs = labMemory.inLab.map(labId => Game.getObjectById(labId)).filter(Boolean);
+    // inLab 不够了，直接移除过期存储并等待用户处理
+    if (inLabs.length < 2) {
+      delete this.room.memory.lab;
+      Game.notify(`[${this.room.name}] 输入 Lab 不足两个，无法进行反应，请重新执行 linit 以继续生产化合物。`);
+      return;
+    }
 
-    // 遍历 outLab 执行反应
-    for (const labId in labMemory.outLab) {
-      const outLab = Game.getObjectById(labId as Id<StructureLab>);
-      // 兜底
-      if (!outLab) {
-        this.log(`错误! 找不到 outLab ${labId}, 已将其移除`, "red");
-        delete this.room.memory.lab.outLab[labId];
-        continue;
-      }
-
+    // 遍历 lab 执行反应
+    // 这里也会遍历到 inLab，但是问题不大，将其剔除出去会带来更高的代码成本
+    for (const outLab of this.room[STRUCTURE_LAB]) {
       const runResult = outLab.runReaction(inLabs[0], inLabs[1]);
 
       // 由于 runReaction 之后要等到下个 tick 才能获取到 cooldown 信息
@@ -292,12 +281,12 @@ export default class LabExtension extends StructureLab {
       if (runResult === ERR_TIRED) {
         this.room.memory.lab.reactionRunTime = Game.time + outLab.cooldown;
         return;
-      }
-      // 底物不足的话就进入下个阶段
+      } // 底物不足的话就进入下个阶段
       else if (runResult === ERR_NOT_ENOUGH_RESOURCES) {
         this.room.memory.lab.state = LAB_STATE.PUT_RESOURCE;
         return;
-      } else if (runResult !== OK) {
+      } // 上面说的会遍历到 inLab 导致的问题就是返回 ERR_INVALID_TARGET，这里不显示
+      else if (runResult !== OK && runResult !== ERR_INVALID_TARGET) {
         this.log(`runReaction 异常，错误码 ${runResult}`, "red");
       }
     }
@@ -311,8 +300,8 @@ export default class LabExtension extends StructureLab {
     if (this.room.hasRoomTransferTask(ROOM_TRANSFER_TASK.LAB_OUT)) return;
 
     // 检查资源有没有全部转移出去
-    for (const labId in this.room.memory.lab.outLab) {
-      if (this.room.memory.lab.outLab[labId] > 0) {
+    for (const lab of this.room[STRUCTURE_LAB]) {
+      if (lab.mineralType) {
         // 没有的话就发布移出任务
         this.addTransferTask(ROOM_TRANSFER_TASK.LAB_OUT);
         return;
@@ -368,7 +357,6 @@ export default class LabExtension extends StructureLab {
    * @returns 是否成功添加了物流任务
    */
   private addTransferTask(taskType: string): boolean {
-    const labMemory = this.room.memory.lab;
     // 底物移入任务
     if (taskType === ROOM_TRANSFER_TASK.LAB_IN) {
       // 获取目标产物
@@ -390,20 +378,9 @@ export default class LabExtension extends StructureLab {
     }
     // 产物移出任务
     else if (taskType === ROOM_TRANSFER_TASK.LAB_OUT) {
-      // 获取还有资源的 lab, 将其内容物类型作为任务的资源类型
-      let targetLab: StructureLab;
-      for (const outLabId in labMemory.outLab) {
-        if (labMemory.outLab[outLabId] > 0) {
-          targetLab = Game.getObjectById(outLabId as Id<StructureLab>);
-          break;
-        }
-      }
-      if (!targetLab) return false;
-
       // 发布任务
       return this.room.addRoomTransferTask({
-        type: ROOM_TRANSFER_TASK.LAB_OUT,
-        resourceType: targetLab.mineralType
+        type: ROOM_TRANSFER_TASK.LAB_OUT
       }) === -1
         ? false
         : true;

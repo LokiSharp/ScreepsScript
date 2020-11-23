@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ROOM_TRANSFER_TASK, boostResourceReloadLimit } from "setting";
 import { clearCarryingResource } from "./clearCarryingResource";
-import { getNotClearLab } from "../global/getNotClearLab";
 
 /**
  * manager 在应对不同类型的任务时执行的操作
@@ -182,14 +181,12 @@ export const transferTaskOperations: { [taskType: string]: transferTaskOperation
 
   /**
    * lab 产物移出任务
-   * 将 lab 的反应产物统一从 outLab 中移动到 terminal 中
+   * 把 lab 中所有的资源都转移到 terminal 中
    */
   [ROOM_TRANSFER_TASK.LAB_OUT]: {
     source: (creep: Creep, task: ILabOut): boolean => {
-      const labMemory = creep.room.memory.lab;
-
-      // 获取还有资源的 lab
-      const targetLab = getNotClearLab(labMemory);
+      // 获取还有资源的 lab（mineralType 有值就代表其中还有资源）
+      const targetLab = creep.room[STRUCTURE_LAB].find(lab => lab.mineralType);
 
       // 还找不到或者目标里没有化合物了，说明已经搬空，执行 target
       if (!targetLab || !targetLab.mineralType) return true;
@@ -200,12 +197,8 @@ export const transferTaskOperations: { [taskType: string]: transferTaskOperation
       creep.goTo(targetLab.pos);
       const result = creep.withdraw(targetLab, targetLab.mineralType);
 
-      // 正常转移资源则更新 memory 数量信息
+      // 拿到资源了就看下有没有拿满，满了就开始往回运
       if (result === OK) {
-        if (targetLab.id in labMemory.outLab)
-          creep.room.memory.lab.outLab[targetLab.id] = targetLab.mineralType
-            ? targetLab.store[targetLab.mineralType]
-            : 0;
         if (creep.store.getFreeCapacity() === 0) return true;
       }
 
@@ -224,24 +217,21 @@ export const transferTaskOperations: { [taskType: string]: transferTaskOperation
       }
 
       // 指定资源类型及目标
-      let resourceType = task.resourceType;
-      let target: StructureTerminal | StructureStorage = terminal;
-
-      // 如果是能量就优先放到 storage 里
-      if (creep.store[RESOURCE_ENERGY] > 0) {
-        resourceType = RESOURCE_ENERGY;
-        target = creep.room.storage || terminal;
+      // 因为在 source 阶段已经清空身上的能量了，所以这里不会是能量
+      const resourceType = Object.keys(creep.store)[0] as ResourceConstant;
+      // 没值了就说明自己身上已经空了，检查下还有没有没搬空的 lab，没有的话就完成任务
+      if (!resourceType) {
+        if (creep.room[STRUCTURE_LAB].find(lab => lab.mineralType) === undefined) {
+          creep.room.deleteCurrentRoomTransferTask();
+        }
+        return true;
       }
 
       // 转移资源
       creep.goTo(terminal.pos);
-      const result = creep.transfer(target, resourceType);
+      const result = creep.transfer(terminal, resourceType);
 
-      if (result === OK || result === ERR_NOT_ENOUGH_RESOURCES) {
-        // 转移完之后就检查下还有没有没搬空的 lab，没有的话就完成任务
-        if (getNotClearLab(creep.room.memory.lab) === undefined) creep.room.deleteCurrentRoomTransferTask();
-        return true;
-      } else if (result !== ERR_NOT_IN_RANGE) creep.say(`labout ${result}`);
+      if (result !== ERR_NOT_IN_RANGE && result !== OK) creep.say(`labout ${result}`);
       return false;
     }
   },
