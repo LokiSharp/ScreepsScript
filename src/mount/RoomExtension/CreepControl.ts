@@ -24,7 +24,8 @@ export default class CreepControl extends RoomConsole {
     // 如果有显存的签名单位就直接签名
     if (creep) {
       (creep.memory.data as RemoteDeclarerData).signText = content;
-      return `已将 ${creepName} 的签名内容修改为：${content}`;
+      if (targetRoomName) (creep.memory.data as RemoteDeclarerData).targetRoomName = targetRoomName;
+      return `已将 ${creepName} 的签名内容修改为：${content} 目标房间为：` + targetRoomName || this.name;
     }
     // 否则就发布一个
     creepApi.add(
@@ -37,7 +38,7 @@ export default class CreepControl extends RoomConsole {
       this.name
     );
 
-    return `已发布 ${creepName}, 签名内容为：${content}`;
+    return `已发布 ${creepName}, 签名内容为：${content} 目标房间为：` + targetRoomName || this.name;
   }
 
   /**
