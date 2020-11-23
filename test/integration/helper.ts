@@ -13,12 +13,22 @@ export class IntegrationTestHelper {
 
   private mockedUser;
 
-  public get player(): MockedUser {
+  public get user(): MockedUser {
     return this.mockedUser as MockedUser;
   }
 
-  public set player(player: MockedUser) {
-    this.mockedUser = player;
+  public set user(user: MockedUser) {
+    this.mockedUser = user;
+  }
+
+  private mockedTarget;
+
+  public get target(): MockedUser {
+    return this.mockedTarget as MockedUser;
+  }
+
+  public set target(user: MockedUser) {
+    this.mockedTarget = user;
   }
 
   public async beforeEach(): Promise<void> {

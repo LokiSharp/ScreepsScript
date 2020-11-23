@@ -1,13 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { assert } from "chai";
-import { helper } from "./helper";
+import { runBattleTest } from "./utils/runBattleTest";
 
-describe("main", () => {
-  it("测试服务器的 tick 是否匹配", async () => {
-    for (let i = 1; i < 10; i += 1) {
-      assert.equal(await helper.server.world.gameTime, i);
-      await helper.server.tick();
-    }
+describe("战斗场景", () => {
+  it("Attacker * 1 vs Attacker * 1", async () => {
+    await runBattleTest();
   });
 });

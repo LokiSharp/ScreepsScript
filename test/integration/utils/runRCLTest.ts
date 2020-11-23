@@ -11,7 +11,7 @@ export async function runRCLTest(RCL: number, _RCL: number, tickNum: number): Pr
   for (let gameTime = 1; gameTime < tickNum; gameTime += 1) {
     await helper.server.tick();
     if (gameTime % 20) continue;
-    const memory: Memory = JSON.parse(await helper.player.memory);
+    const memory: Memory = JSON.parse(await helper.user.memory);
     printDebugInfo(memory, gameTime);
 
     const controllerLevel = memory.stats.rooms.W0N0.controllerLevel;
@@ -21,12 +21,10 @@ export async function runRCLTest(RCL: number, _RCL: number, tickNum: number): Pr
     }
 
     const { db } = helper.server.common.storage;
-    await Promise.all([
-      db["rooms.objects"].update({ room: "W0N0", type: "constructionSite" }, { $set: { progress: 99999 } }),
-      db["rooms.objects"].update({ room: "W0N0", type: "rampart" }, { $set: { hits: 3000000 } }),
-      db["rooms.objects"].update({ room: "W0N0", type: "storage" }, { $set: { store: { energy: 950000 } } })
-    ]);
+    await db["rooms.objects"].update({ room: "W0N0", type: "constructionSite" }, { $set: { progress: 99999 } });
+    await db["rooms.objects"].update({ room: "W0N0", type: "rampart" }, { $set: { hits: 3000000 } });
+    await db["rooms.objects"].update({ room: "W0N0", type: "storage" }, { $set: { store: { energy: 950000 } } });
 
-    _.each(await helper.player.newNotifications, ({ message }) => console.log("[notification]", message));
+    _.each(await helper.user.newNotifications, ({ message }) => console.log("[notification]", message));
   }
 }
