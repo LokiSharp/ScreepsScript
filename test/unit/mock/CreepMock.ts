@@ -1,5 +1,5 @@
 import RoomObjectMock from "./RoomObjectMock";
-
+import { pushMethodNameToCalled } from "./pushMethodNameToCalled";
 export default class CreepMock extends RoomObjectMock {
   public constructor(id: Id<CreepMock>, x: number, y: number) {
     super(x, y);
@@ -23,188 +23,172 @@ export default class CreepMock extends RoomObjectMock {
   public store: StoreDefinition;
   public ticksToLive: number | undefined;
 
-  public isDoing: string;
-
-  public attack(target: AnyCreep | Structure): CreepActionReturnCode {
-    this.isDoing = `log ${target.toString()}`;
+  @pushMethodNameToCalled
+  public attack(): CreepActionReturnCode {
     return OK;
   }
-  public attackController(target: StructureController): CreepActionReturnCode {
-    this.isDoing = `attackController ${target.toString()}`;
+  @pushMethodNameToCalled
+  public attackController(): CreepActionReturnCode {
     return OK;
   }
-  public build(target: ConstructionSite): CreepActionReturnCode | ERR_NOT_ENOUGH_RESOURCES | ERR_RCL_NOT_ENOUGH {
-    this.isDoing = `build ${target.toString()}`;
+  @pushMethodNameToCalled
+  public build(): CreepActionReturnCode | ERR_NOT_ENOUGH_RESOURCES | ERR_RCL_NOT_ENOUGH {
     return OK;
   }
-  public cancelOrder(methodName: string): OK | ERR_NOT_FOUND {
-    this.isDoing = `cancelOrder ${methodName.toString()}`;
+  @pushMethodNameToCalled
+  public cancelOrder(): OK | ERR_NOT_FOUND {
     return OK;
   }
-  public claimController(target: StructureController): CreepActionReturnCode | ERR_FULL | ERR_GCL_NOT_ENOUGH {
-    this.isDoing = `claimController ${target.toString()}`;
+  @pushMethodNameToCalled
+  public claimController(): CreepActionReturnCode | ERR_FULL | ERR_GCL_NOT_ENOUGH {
     return OK;
   }
-  public dismantle(target: Structure): CreepActionReturnCode {
-    this.isDoing = `dismantle ${target.toString()}`;
+  @pushMethodNameToCalled
+  public dismantle(): CreepActionReturnCode {
     return OK;
   }
-  public drop(
-    resourceType: ResourceConstant,
-    amount?: number
-  ): OK | ERR_NOT_OWNER | ERR_BUSY | ERR_NOT_ENOUGH_RESOURCES {
-    this.isDoing = `drop ${resourceType.toString()} ${amount.toString()}`;
+  @pushMethodNameToCalled
+  public drop(): OK | ERR_NOT_OWNER | ERR_BUSY | ERR_NOT_ENOUGH_RESOURCES {
     return OK;
   }
-  public generateSafeMode(target: StructureController): CreepActionReturnCode {
-    this.isDoing = `generateSafeMode ${target.toString()}`;
+  @pushMethodNameToCalled
+  public generateSafeMode(): CreepActionReturnCode {
     return OK;
   }
-  public getActiveBodyparts(type: BodyPartConstant): number {
-    this.isDoing = `getActiveBodyparts ${type.toString()}`;
+  @pushMethodNameToCalled
+  public getActiveBodyparts(): number {
     return OK;
   }
-  public harvest(target: Source | Mineral | Deposit): CreepActionReturnCode | ERR_NOT_FOUND | ERR_NOT_ENOUGH_RESOURCES {
-    this.isDoing = `harvest ${target.toString()}`;
+  @pushMethodNameToCalled
+  public harvest(): CreepActionReturnCode | ERR_NOT_FOUND | ERR_NOT_ENOUGH_RESOURCES {
     return OK;
   }
-  public heal(target: AnyCreep): CreepActionReturnCode {
-    this.isDoing = `heal ${target.toString()}`;
+  @pushMethodNameToCalled
+  public heal(): CreepActionReturnCode {
     return OK;
   }
-  public move(direction: DirectionConstant): CreepMoveReturnCode {
-    this.isDoing = `move ${direction.toString()}`;
+  @pushMethodNameToCalled
+  public move(): CreepMoveReturnCode {
     return OK;
   }
-  public moveByPath(
-    path: PathStep[] | RoomPosition[] | string
-  ): CreepMoveReturnCode | ERR_NOT_FOUND | ERR_INVALID_ARGS {
-    this.isDoing = `moveByPath ${path.toString()}`;
+  @pushMethodNameToCalled
+  public moveByPath(): CreepMoveReturnCode | ERR_NOT_FOUND | ERR_INVALID_ARGS {
     return OK;
   }
-  public moveTo(
-    target: RoomPosition | { pos: RoomPosition },
-    opts?: MoveToOpts
-  ): CreepMoveReturnCode | ERR_NO_PATH | ERR_INVALID_TARGET | ERR_NOT_FOUND {
-    this.isDoing = `moveTo ${target.toString()} ${opts.toString()}`;
+  @pushMethodNameToCalled
+  public moveTo(): CreepMoveReturnCode | ERR_NO_PATH | ERR_INVALID_TARGET | ERR_NOT_FOUND {
     return OK;
   }
-  public notifyWhenAttacked(enabled: boolean): OK | ERR_NOT_OWNER | ERR_BUSY | ERR_INVALID_ARGS {
-    this.isDoing = `notifyWhenAttacked ${enabled.toString()}`;
+  @pushMethodNameToCalled
+  public notifyWhenAttacked(): OK | ERR_NOT_OWNER | ERR_BUSY | ERR_INVALID_ARGS {
     return OK;
   }
-  public pickup(target: Resource): CreepActionReturnCode | ERR_FULL {
-    this.isDoing = `pickup ${target.toString()}`;
+  @pushMethodNameToCalled
+  public pickup(): CreepActionReturnCode | ERR_FULL {
     return OK;
   }
-  public pull(target: Creep): OK | ERR_NOT_OWNER | ERR_BUSY | ERR_INVALID_TARGET | ERR_NOT_IN_RANGE | ERR_NO_BODYPART {
-    this.isDoing = `pull ${target.toString()}`;
+  @pushMethodNameToCalled
+  public pull(): OK | ERR_NOT_OWNER | ERR_BUSY | ERR_INVALID_TARGET | ERR_NOT_IN_RANGE | ERR_NO_BODYPART {
     return OK;
   }
-  public rangedAttack(target: AnyCreep | Structure): CreepActionReturnCode {
-    this.isDoing = `rangedAttack ${target.toString()}`;
+  @pushMethodNameToCalled
+  public rangedAttack(): CreepActionReturnCode {
     return OK;
   }
-  public rangedHeal(target: AnyCreep): CreepActionReturnCode {
-    this.isDoing = `rangedHeal ${target.toString()}`;
+  @pushMethodNameToCalled
+  public rangedHeal(): CreepActionReturnCode {
     return OK;
   }
+  @pushMethodNameToCalled
   public rangedMassAttack(): OK | ERR_NOT_OWNER | ERR_BUSY | ERR_NO_BODYPART {
-    this.isDoing = `rangedMassAttack`;
     return OK;
   }
-  public repair(target: Structure): CreepActionReturnCode | ERR_NOT_ENOUGH_RESOURCES {
-    this.isDoing = `repair ${target.toString()}`;
+  @pushMethodNameToCalled
+  public repair(): CreepActionReturnCode | ERR_NOT_ENOUGH_RESOURCES {
     return OK;
   }
-  public reserveController(target: StructureController): CreepActionReturnCode {
-    this.isDoing = `reserveController ${target.toString()}`;
+  @pushMethodNameToCalled
+  public reserveController(): CreepActionReturnCode {
     return OK;
   }
-  public say(message: string, toPublic?: boolean): OK | ERR_NOT_OWNER | ERR_BUSY {
-    this.isDoing = `say ${message.toString()} ${toPublic.toString()}`;
+  @pushMethodNameToCalled
+  public say(): OK | ERR_NOT_OWNER | ERR_BUSY {
     return OK;
   }
-  public signController(
-    target: StructureController,
-    text: string
-  ): OK | ERR_BUSY | ERR_INVALID_TARGET | ERR_NOT_IN_RANGE {
-    this.isDoing = `signController ${target.toString()} ${text.toString()}`;
+  @pushMethodNameToCalled
+  public signController(): OK | ERR_BUSY | ERR_INVALID_TARGET | ERR_NOT_IN_RANGE {
     return OK;
   }
+  @pushMethodNameToCalled
   public suicide(): OK | ERR_NOT_OWNER | ERR_BUSY {
-    this.isDoing = `suicide`;
     return OK;
   }
-  public transfer(target: AnyCreep | Structure, resourceType: ResourceConstant, amount?: number): ScreepsReturnCode {
-    this.isDoing = `transfer ${target.toString()} ${resourceType.toString()} ${amount.toString()}`;
+  @pushMethodNameToCalled
+  public transfer(): ScreepsReturnCode {
     return OK;
   }
-  public upgradeController(target: StructureController): ScreepsReturnCode {
-    this.isDoing = `upgradeController ${target.toString()}`;
+  @pushMethodNameToCalled
+  public upgradeController(): ScreepsReturnCode {
     return OK;
   }
-  public withdraw(
-    target: Structure | Tombstone | Ruin,
-    resourceType: ResourceConstant,
-    amount?: number
-  ): ScreepsReturnCode {
-    this.isDoing = `move ${target.toString()} ${resourceType.toString()} ${amount.toString()}`;
+  @pushMethodNameToCalled
+  public withdraw(): ScreepsReturnCode {
     return OK;
   }
-
-  public log(content: string, color?: Colors, notify?: boolean): void {
-    this.isDoing = `log ${content} ${color} ${notify.toString()}`;
+  @pushMethodNameToCalled
+  public log(): void {
+    // PASS
   }
+  @pushMethodNameToCalled
   public work(): void {
-    this.isDoing = "work";
+    // PASS
   }
-  public goTo(target?: RoomPosition, moveOpt?: MoveOpt): ScreepsReturnCode {
-    this.isDoing = `goTo ${target.toString()} ${moveOpt.toString()}`;
+  @pushMethodNameToCalled
+  public goTo(): ScreepsReturnCode {
     return OK;
   }
-  public setWayPoint(target: string[] | string): ScreepsReturnCode {
-    this.isDoing = `setWayPoint ${target.toString()}`;
+  @pushMethodNameToCalled
+  public setWayPoint(): ScreepsReturnCode {
     return OK;
   }
-  public getEngryFrom(target: Structure | Source): ScreepsReturnCode {
-    this.isDoing = `getEngryFrom ${target.toString()}}`;
+  @pushMethodNameToCalled
+  public getEngryFrom(): ScreepsReturnCode {
     return OK;
   }
-  public transferTo(target: Structure, RESOURCE: ResourceConstant): ScreepsReturnCode {
-    this.isDoing = `transferTo ${target.toString()} ${RESOURCE.toString()}`;
+  @pushMethodNameToCalled
+  public transferTo(): ScreepsReturnCode {
     return OK;
   }
+  @pushMethodNameToCalled
   public upgrade(): ScreepsReturnCode {
-    this.isDoing = `upgrade`;
     return OK;
   }
+  @pushMethodNameToCalled
   public buildStructure(): CreepActionReturnCode | ERR_NOT_ENOUGH_RESOURCES | ERR_RCL_NOT_ENOUGH | ERR_NOT_FOUND {
-    this.isDoing = `buildStructure`;
     return OK;
   }
+  @pushMethodNameToCalled
   public steadyWall(): OK | ERR_NOT_FOUND {
-    this.isDoing = `steadyWall`;
     return OK;
   }
-  public fillDefenseStructure(expectHits?: number): boolean {
-    this.isDoing = `fillDefenseStructure ${expectHits.toString()}`;
+  @pushMethodNameToCalled
+  public fillDefenseStructure(): boolean {
     return true;
   }
-
-  public getFlag(flagName: string): Flag | null {
-    this.isDoing = `getFlag ${flagName.toString()}`;
+  @pushMethodNameToCalled
+  public getFlag(): Flag | null {
     return null;
   }
-  public attackFlag(flagName: string): boolean {
-    this.isDoing = `attackFlag ${flagName.toString()}`;
+  @pushMethodNameToCalled
+  public attackFlag(): boolean {
     return true;
   }
-  public healTo(creep: Creep): void {
-    this.isDoing = `healTo ${creep.toString()}`;
+  @pushMethodNameToCalled
+  public healTo(): void {
+    // PASS
   }
-  public dismantleFlag(flagName: string, healerName?: string): boolean {
-    this.isDoing = `dismantleFlag ${flagName.toString()} ${healerName.toString()}`;
+  @pushMethodNameToCalled
+  public dismantleFlag(): boolean {
     return true;
   }
 }

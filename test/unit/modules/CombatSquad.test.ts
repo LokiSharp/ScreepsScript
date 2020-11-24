@@ -55,8 +55,8 @@ describe("regroup", () => {
     const result = CombatSquad.regroup((squad as unknown) as SquadMember);
 
     assert.isFalse(result);
-    assert.equal(((squad["↗"] as unknown) as CreepMock).isDoing, "moveTo 1 0");
-    assert.equal(((squad["↙"] as unknown) as CreepMock).isDoing, "moveTo 0 1");
-    assert.equal(((squad["↘"] as unknown) as CreepMock).isDoing, "moveTo 1 1");
+    assert.deepEqual(((squad["↗"] as unknown) as CreepMock).called, [{ moveTo: [1, 0, { reusePath: 1 }] }]);
+    assert.deepEqual(((squad["↙"] as unknown) as CreepMock).called, [{ moveTo: [0, 1, { reusePath: 1 }] }]);
+    assert.deepEqual(((squad["↘"] as unknown) as CreepMock).called, [{ moveTo: [1, 1, { reusePath: 1 }] }]);
   });
 });

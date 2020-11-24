@@ -1,4 +1,6 @@
-export default class RoomPositionMock {
+import BaseMock from "./BaseMock";
+
+export default class RoomPositionMock extends BaseMock {
   public roomName: string;
   public x: number;
   public y: number;
@@ -6,6 +8,7 @@ export default class RoomPositionMock {
     return x === this.x && y === this.y ? true : false;
   }
   public constructor(x: number, y: number) {
+    super();
     this.x = x;
     this.y = y;
   }

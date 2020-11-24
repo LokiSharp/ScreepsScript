@@ -1,4 +1,6 @@
-export default class CPUMock {
+import BaseMock from "./BaseMock";
+
+export default class CPUMock extends BaseMock {
   public cpuUsed: number;
   public getUsed(): number {
     if (!this.cpuUsed) {

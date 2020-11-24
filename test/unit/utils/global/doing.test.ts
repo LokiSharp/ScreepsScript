@@ -19,6 +19,6 @@ describe("doing", () => {
   it("可以运行 Creep", () => {
     const testCreep = new CreepMock("" as Id<CreepMock>, 0, 0);
     doing({ testCreep });
-    assert.equal(testCreep.isDoing, "work");
+    assert.deepEqual(testCreep.called, [{ work: [] }]);
   });
 });
