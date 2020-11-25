@@ -3,7 +3,7 @@ import { ConstantsMock } from "../mock/ConstantsMock";
 import CreepMock from "../mock/CreepMock";
 import { assert } from "chai";
 
-describe("CombatSquad", () => {
+describe("checkFormation", () => {
   it("检查阵型正确时返回 False", () => {
     const squad: SquadMember = {
       "↖": (new CreepMock("" as Id<CreepMock>, 0, 0) as unknown) as Creep,
@@ -43,6 +43,10 @@ describe("regroup", () => {
     const result = CombatSquad.regroup((squad as unknown) as SquadMember);
 
     assert.isTrue(result);
+    assert.deepEqual(((squad["↖"] as unknown) as CreepMock).called, []);
+    assert.deepEqual(((squad["↗"] as unknown) as CreepMock).called, []);
+    assert.deepEqual(((squad["↙"] as unknown) as CreepMock).called, []);
+    assert.deepEqual(((squad["↘"] as unknown) as CreepMock).called, []);
   });
 
   it("位置不对时返回 False", () => {
@@ -55,6 +59,7 @@ describe("regroup", () => {
     const result = CombatSquad.regroup((squad as unknown) as SquadMember);
 
     assert.isFalse(result);
+    assert.deepEqual(((squad["↖"] as unknown) as CreepMock).called, []);
     assert.deepEqual(((squad["↗"] as unknown) as CreepMock).called, [{ moveTo: [1, 0, { reusePath: 1 }] }]);
     assert.deepEqual(((squad["↙"] as unknown) as CreepMock).called, [{ moveTo: [0, 1, { reusePath: 1 }] }]);
     assert.deepEqual(((squad["↘"] as unknown) as CreepMock).called, [{ moveTo: [1, 1, { reusePath: 1 }] }]);
