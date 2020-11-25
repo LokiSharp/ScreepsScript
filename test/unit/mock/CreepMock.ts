@@ -1,5 +1,5 @@
 import RoomObjectMock from "./RoomObjectMock";
-import { pushMethodNameToCalled } from "./pushMethodNameToCalled";
+import { pushMethodCallInfoToCalled } from "./pushMethodCallInfoToCalled";
 export default class CreepMock extends RoomObjectMock {
   public constructor(id: Id<CreepMock>, x: number, y: number) {
     super(x, y);
@@ -23,171 +23,171 @@ export default class CreepMock extends RoomObjectMock {
   public store: StoreDefinition;
   public ticksToLive: number | undefined;
 
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public attack(): CreepActionReturnCode {
     return OK;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public attackController(): CreepActionReturnCode {
     return OK;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public build(): CreepActionReturnCode | ERR_NOT_ENOUGH_RESOURCES | ERR_RCL_NOT_ENOUGH {
     return OK;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public cancelOrder(): OK | ERR_NOT_FOUND {
     return OK;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public claimController(): CreepActionReturnCode | ERR_FULL | ERR_GCL_NOT_ENOUGH {
     return OK;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public dismantle(): CreepActionReturnCode {
     return OK;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public drop(): OK | ERR_NOT_OWNER | ERR_BUSY | ERR_NOT_ENOUGH_RESOURCES {
     return OK;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public generateSafeMode(): CreepActionReturnCode {
     return OK;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public getActiveBodyparts(): number {
     return OK;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public harvest(): CreepActionReturnCode | ERR_NOT_FOUND | ERR_NOT_ENOUGH_RESOURCES {
     return OK;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public heal(): CreepActionReturnCode {
     return OK;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public move(): CreepMoveReturnCode {
     return OK;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public moveByPath(): CreepMoveReturnCode | ERR_NOT_FOUND | ERR_INVALID_ARGS {
     return OK;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public moveTo(): CreepMoveReturnCode | ERR_NO_PATH | ERR_INVALID_TARGET | ERR_NOT_FOUND {
     return OK;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public notifyWhenAttacked(): OK | ERR_NOT_OWNER | ERR_BUSY | ERR_INVALID_ARGS {
     return OK;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public pickup(): CreepActionReturnCode | ERR_FULL {
     return OK;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public pull(): OK | ERR_NOT_OWNER | ERR_BUSY | ERR_INVALID_TARGET | ERR_NOT_IN_RANGE | ERR_NO_BODYPART {
     return OK;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public rangedAttack(): CreepActionReturnCode {
     return OK;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public rangedHeal(): CreepActionReturnCode {
     return OK;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public rangedMassAttack(): OK | ERR_NOT_OWNER | ERR_BUSY | ERR_NO_BODYPART {
     return OK;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public repair(): CreepActionReturnCode | ERR_NOT_ENOUGH_RESOURCES {
     return OK;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public reserveController(): CreepActionReturnCode {
     return OK;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public say(): OK | ERR_NOT_OWNER | ERR_BUSY {
     return OK;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public signController(): OK | ERR_BUSY | ERR_INVALID_TARGET | ERR_NOT_IN_RANGE {
     return OK;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public suicide(): OK | ERR_NOT_OWNER | ERR_BUSY {
     return OK;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public transfer(): ScreepsReturnCode {
     return OK;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public upgradeController(): ScreepsReturnCode {
     return OK;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public withdraw(): ScreepsReturnCode {
     return OK;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public log(): void {
     // PASS
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public work(): void {
     // PASS
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public goTo(): ScreepsReturnCode {
     return OK;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public setWayPoint(): ScreepsReturnCode {
     return OK;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public getEngryFrom(): ScreepsReturnCode {
     return OK;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public transferTo(): ScreepsReturnCode {
     return OK;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public upgrade(): ScreepsReturnCode {
     return OK;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public buildStructure(): CreepActionReturnCode | ERR_NOT_ENOUGH_RESOURCES | ERR_RCL_NOT_ENOUGH | ERR_NOT_FOUND {
     return OK;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public steadyWall(): OK | ERR_NOT_FOUND {
     return OK;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public fillDefenseStructure(): boolean {
     return true;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public getFlag(): Flag | null {
     return null;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public attackFlag(): boolean {
     return true;
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public healTo(): void {
     // PASS
   }
-  @pushMethodNameToCalled
+  @pushMethodCallInfoToCalled
   public dismantleFlag(): boolean {
     return true;
   }

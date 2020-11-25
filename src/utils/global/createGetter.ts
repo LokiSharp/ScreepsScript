@@ -5,10 +5,10 @@
  * @param name 访问器的名字
  * @param getter 访问器方法
  */
-export const createGetter = function (target: AnyObject, name: string, getter: () => any): void {
+export default function createGetter(target: AnyObject, name: string, getter: () => any): void {
   Object.defineProperty(target.prototype, name, {
     get: getter,
     enumerable: false,
     configurable: true
   });
-};
+}

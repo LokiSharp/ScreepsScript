@@ -1,6 +1,6 @@
 import BaseMock from "./BaseMock";
 
-export function pushMethodNameToCalled(
+export function pushMethodCallInfoToCalled(
   target: BaseMock,
   propertyKey: string,
   // eslint-disable-next-line @typescript-eslint/ban-types
