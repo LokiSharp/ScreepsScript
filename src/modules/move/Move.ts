@@ -254,7 +254,7 @@ export class Move {
         const crossResult = moveOpt.disableCross ? ERR_BUSY : Cross.mutualCross(creep, moveMemory.lastMove, fontCreep);
 
         // 对穿失败说明撞墙上了或者前面的 creep 拒绝对穿，重新寻路
-        if (crossRules === ERR_BUSY) {
+        if (crossResult === ERR_BUSY) {
           moveMemory.path = this.findPath(creep, targetPos, { disableRouteCache: true });
           delete moveMemory.prePos;
         } else if (crossResult !== OK) {
