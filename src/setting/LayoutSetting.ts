@@ -149,7 +149,7 @@ export const baseLayout: BaseLayout = [
     [STRUCTURE_LAB]: [
       [3, -2],
       [2, -4],
-      [3, -5]
+      [4, -2]
     ],
     [STRUCTURE_LINK]: [null],
     [STRUCTURE_ROAD]: [
@@ -177,17 +177,16 @@ export const baseLayout: BaseLayout = [
       [2, -1]
     ],
     [STRUCTURE_LAB]: [
-      [4, -2],
       [5, -3],
       [5, -4],
-      [4, -5]
+      [4, -5],
+      [3, -5]
     ],
     [STRUCTURE_SPAWN]: [[2, 3]],
     [STRUCTURE_OBSERVER]: [[2, -5]],
     [STRUCTURE_NUKER]: [[5, -5]],
     [STRUCTURE_POWER_SPAWN]: [[3, 2]],
     [STRUCTURE_ROAD]: [
-      [3, -4],
       [0, -4],
       [0, 4]
     ],
