@@ -1,26 +1,43 @@
+import { addDelayCallback, addDelayTask } from "modules/delayQueue";
 import { bodyConfigs } from "setting";
 import createBodyGetter from "utils/creep/createBodyGetter";
 
 /**
- * 维修者
- * 从指定结构中获取能量 > 维修房间内的建筑
- * 注：目前维修者只会在敌人攻城时使用
+ * 刷墙者
+ * 从指定结构中获取能量 > 维修房间内的墙壁
  *
+ * 在低等级时从 container 中拿能量刷墙
+ * 在敌人进攻时孵化并针对性刷墙
+ * 8 级之后每 5000t 孵化一次进行刷墙
  */
 export default function repairer(data: WorkerData): ICreepConfig {
   return {
     // 根据敌人威胁决定是否继续生成
     isNeed: room => {
-      const source = Game.getObjectById(data.sourceId);
+      // cpu 快吃完了就不孵化
+      if (Game.cpu.bucket < 700) {
+        addSpawnRepairerTask(room.name);
+        return false;
+      }
 
-      // 如果能量来源没了就删除自己
-      if (!source) return false;
-      // 如果能量来源是 container 的话说明还在发展期，只要 container 在就一直孵化
-      else if (source && source instanceof StructureContainer) return true;
-      // 如果能量来源是 Storage ，只要能量充裕就一直孵化
-      else if (source && source instanceof StructureStorage && source.store.getFreeCapacity() < 100000) return true;
-      // 否则就看当前房间里有没有威胁，有的话就继续孵化并刷墙
-      return room.controller.checkEnemyThreat();
+      // 房间里有威胁就孵化
+      if (room.controller.checkEnemyThreat()) return true;
+
+      // RCL 到 7 就不孵化了，因为要拿能量去升级（到 8 时会有其他模块重新发布 repairer）
+      if (room.controller.level === 7) return false;
+      // RCL 8 之后 5000 tick 孵化一次
+      else if (room.controller.level >= 8) {
+        addSpawnRepairerTask(room.name);
+        return false;
+      }
+
+      // 如果能量来源没了就重新规划
+      if (!Game.getObjectById(data.sourceId)) {
+        room.releaseCreep("repairer");
+        return false;
+      }
+
+      return true;
     },
     source: creep => {
       const source = Game.getObjectById(data.sourceId) || creep.room.storage || creep.room.terminal;
@@ -59,3 +76,21 @@ export default function repairer(data: WorkerData): ICreepConfig {
     bodys: createBodyGetter(bodyConfigs.worker)
   };
 }
+
+/**
+ * 给指定房间添加 repairer 的延迟孵化任务
+ *
+ * @param roomName 添加到的房间名
+ */
+function addSpawnRepairerTask(roomName: string): void {
+  addDelayTask("spawnRepairer", { roomName }, Game.time + 5000);
+}
+
+/**
+ * 注册 repairer 的延迟孵化任务
+ */
+addDelayCallback("spawnRepairer", room => {
+  // cpu 还是不够的话就延迟发布
+  if (Game.cpu.bucket < 700) return addSpawnRepairerTask(room.name);
+  if (room) room.releaseCreep("repairer");
+});
