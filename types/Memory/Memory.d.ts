@@ -111,4 +111,9 @@ interface Memory {
   layoutInfo?: BaseLayout;
   // 用于标记布局获取到了那一等级
   layoutLevel?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+
+  /**
+   * 延迟任务存储
+   */
+  delayTasks: DelayTaskMemory[];
 }
