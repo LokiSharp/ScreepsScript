@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { helper } from "../helper";
 import { initRCLTestRoom } from "../init/initRCLTestRoom";
-import { printDebugInfo } from "../utils/printDebugInfo";
+import { printDebugInfo } from "./printDebugInfo";
 
 export async function runRCLTest(RCL: number, _RCL: number, tickNum: number): Promise<void> {
   await initRCLTestRoom(helper, RCL);
