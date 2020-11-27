@@ -248,6 +248,7 @@ export class Move {
         if (!fontCreep || !fontCreep.my || Object.keys(fontCreep.memory).length <= 0) {
           delete moveMemory.path;
           delete moveMemory.prePos;
+          delete this.costCache[creep.room.name];
           return ERR_INVALID_TARGET;
         }
         // 尝试对穿，如果自己禁用了对穿的话则直接重新寻路
