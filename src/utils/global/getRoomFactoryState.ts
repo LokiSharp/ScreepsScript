@@ -9,7 +9,7 @@ import { factoryTopTargets } from "setting";
  *
  * @param room 要获取工厂状态的房间
  */
-export function getRoomFactoryState(room: Room): string {
+export default function getRoomFactoryState(room: Room): string {
   const memory = room.memory.factory;
   // 给房间名添加跳转链接
   const prefix = colorful(`  - [${createRoomLink(room.name)}] `, null, true);

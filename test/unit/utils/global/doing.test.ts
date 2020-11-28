@@ -1,4 +1,3 @@
-import { ConstantsMock } from "../../mock/ConstantsMock";
 import CreepMock from "../../mock/CreepMock";
 import GameMock from "../../mock/GameMock";
 import MemoryMock from "../../mock/MemoryMock";
@@ -13,7 +12,6 @@ describe("doing", () => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore : allow adding Game to global
     global.Memory = _.clone(new MemoryMock());
-    ConstantsMock();
   });
 
   it("可以运行 Creep", () => {

@@ -1,5 +1,4 @@
 import CPUMock from "../../mock/CPUMock";
-import { ConstantsMock } from "../../mock/ConstantsMock";
 import GameMock from "../../mock/GameMock";
 import { assert } from "chai";
 import generatePixel from "../../../../src/utils/global/generatePixel";
@@ -9,7 +8,6 @@ describe("generatePixel", () => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore : allow adding Game to global
     global.Game = _.clone(new GameMock());
-    ConstantsMock();
   });
 
   it("当 bucket 足够时生成 Pixel", () => {

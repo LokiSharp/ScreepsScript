@@ -3,7 +3,7 @@ import { clearFlag } from "utils/global/clearFlag";
 import colorful from "utils/console/colorful";
 import { createHelp } from "modules/help";
 import createRoomLink from "utils/console/createRoomLink";
-import { getRoomFactoryState } from "utils/global/getRoomFactoryState";
+import getRoomFactoryState from "utils/global/getRoomFactoryState";
 import { resourcesHelp } from "./resourcesHelp";
 
 /**

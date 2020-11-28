@@ -1,4 +1,3 @@
-import { ConstantsMock } from "../../mock/ConstantsMock";
 import FlagMock from "../../mock/FlagMock";
 import GameMock from "../../mock/GameMock";
 import MemoryMock from "../../mock/MemoryMock";
@@ -13,7 +12,6 @@ describe("checkAliveFlag", () => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore : allow adding Game to global
     global.Memory = _.clone(new MemoryMock());
-    ConstantsMock();
   });
 
   it("旗帜存在时返回 True", () => {
