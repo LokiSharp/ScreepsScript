@@ -481,9 +481,10 @@ export default class CreepExtension extends Creep {
           // 找到血量最低的
           else return structure.hits;
         });
-
-        if (target && this.dismantle(target) === ERR_NOT_IN_RANGE) this.moveTo(target);
       }
+
+      if (target && this.dismantle(target) === ERR_NOT_IN_RANGE) this.moveTo(target);
+
       // 如果之前在拆墙则移除刚才所在的禁止通行点位
       if (this.memory.stand) {
         delete this.memory.stand;
