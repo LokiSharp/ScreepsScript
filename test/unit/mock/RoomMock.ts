@@ -1,57 +1,69 @@
 import BaseMock from "./BaseMock";
-import { pushMethodCallInfoToCalled } from "./pushMethodCallInfoToCalled";
 import RoomMemoryMock from "./RoomMemoryMock";
+import StructureTerminalMock from "./StructureTerminalMock";
+import { pushMethodCallInfoToCalled } from "./pushMethodCallInfoToCalled";
 
 export default class RoomMock extends BaseMock {
+  public controller?: StructureController;
+  public energyAvailable: number;
+  public energyCapacityAvailable: number;
+  public memory: RoomMemory;
+  public mode: string;
+  public readonly name: string;
+  public storage?: StructureStorage;
+  public terminal?: StructureTerminalMock;
+  public visual: RoomVisual;
+
   public constructor(name: string) {
     super();
     this.name = name;
     Memory.rooms[name] = new RoomMemoryMock();
     this.memory = Memory.rooms[name];
   }
-  public controller?: StructureController;
 
-  public energyAvailable: number;
-
-  public energyCapacityAvailable: number;
-
-  public memory: RoomMemory;
-
-  public mode: string;
-
-  public readonly name: string;
-
-  public storage?: StructureStorage;
-
-  public terminal?: StructureTerminal;
-
-  public visual: RoomVisual;
   @pushMethodCallInfoToCalled
   public createConstructionSite(): ScreepsReturnCode {
-    return OK;
+    return undefined;
   }
+
   @pushMethodCallInfoToCalled
   public createFlag(): ERR_NAME_EXISTS | ERR_INVALID_ARGS | string {
-    return "";
+    return undefined;
   }
 
-  //   public find(): FindTypes[] {
-  //     return [];
-  //   }
+  public find(): FindTypes[] {
+    return undefined;
+  }
 
-  //   public findExitTo(): ExitConstant | ERR_NO_PATH | ERR_INVALID_ARGS;
+  public findExitTo(): ExitConstant | ERR_NO_PATH | ERR_INVALID_ARGS {
+    return undefined;
+  }
 
-  //   public findPath(): PathStep[];
+  public findPath(): PathStep[] {
+    return undefined;
+  }
 
-  //   public getPositionAt(): RoomPosition | null;
+  public getPositionAt(): RoomPosition | null {
+    return undefined;
+  }
 
-  //   public getTerrain(): RoomTerrain;
+  public getTerrain(): RoomTerrain {
+    return undefined;
+  }
 
-  //   public lookAt(): LookAtResult[];
+  public lookAt(): LookAtResult[] {
+    return undefined;
+  }
 
-  //   public lookAtArea(): LookAtResultWithPos[];
+  public lookAtArea(): LookAtResultWithPos[] {
+    return undefined;
+  }
 
-  //   public lookForAt(): AllLookAtTypes[T][];
+  public lookForAt(): AllLookAtTypes[][] {
+    return undefined;
+  }
 
-  //   public lookForAtArea(): LookForAtAreaResultArray<AllLookAtTypes[T], T>;
+  public lookForAtArea(): LookForAtAreaResultArray<AllLookAtTypes, any> {
+    return undefined;
+  }
 }

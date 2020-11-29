@@ -16,14 +16,14 @@ export default class FlagMock extends RoomObjectMock {
 
   @pushMethodCallInfoToCalled
   public remove(): OK {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public setColor(): OK | ERR_INVALID_ARGS {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public setPosition(): OK | ERR_INVALID_ARGS {
-    return OK;
+    return undefined;
   }
 }

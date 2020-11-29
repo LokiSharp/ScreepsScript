@@ -25,115 +25,115 @@ export default class CreepMock extends RoomObjectMock {
 
   @pushMethodCallInfoToCalled
   public attack(): CreepActionReturnCode {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public attackController(): CreepActionReturnCode {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public build(): CreepActionReturnCode | ERR_NOT_ENOUGH_RESOURCES | ERR_RCL_NOT_ENOUGH {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public cancelOrder(): OK | ERR_NOT_FOUND {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public claimController(): CreepActionReturnCode | ERR_FULL | ERR_GCL_NOT_ENOUGH {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public dismantle(): CreepActionReturnCode {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public drop(): OK | ERR_NOT_OWNER | ERR_BUSY | ERR_NOT_ENOUGH_RESOURCES {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public generateSafeMode(): CreepActionReturnCode {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public getActiveBodyparts(): number {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public harvest(): CreepActionReturnCode | ERR_NOT_FOUND | ERR_NOT_ENOUGH_RESOURCES {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public heal(): CreepActionReturnCode {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public move(): CreepMoveReturnCode {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public moveByPath(): CreepMoveReturnCode | ERR_NOT_FOUND | ERR_INVALID_ARGS {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public moveTo(): CreepMoveReturnCode | ERR_NO_PATH | ERR_INVALID_TARGET | ERR_NOT_FOUND {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public notifyWhenAttacked(): OK | ERR_NOT_OWNER | ERR_BUSY | ERR_INVALID_ARGS {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public pickup(): CreepActionReturnCode | ERR_FULL {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public pull(): OK | ERR_NOT_OWNER | ERR_BUSY | ERR_INVALID_TARGET | ERR_NOT_IN_RANGE | ERR_NO_BODYPART {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public rangedAttack(): CreepActionReturnCode {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public rangedHeal(): CreepActionReturnCode {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public rangedMassAttack(): OK | ERR_NOT_OWNER | ERR_BUSY | ERR_NO_BODYPART {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public repair(): CreepActionReturnCode | ERR_NOT_ENOUGH_RESOURCES {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public reserveController(): CreepActionReturnCode {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public say(): OK | ERR_NOT_OWNER | ERR_BUSY {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public signController(): OK | ERR_BUSY | ERR_INVALID_TARGET | ERR_NOT_IN_RANGE {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public suicide(): OK | ERR_NOT_OWNER | ERR_BUSY {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public transfer(): ScreepsReturnCode {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public upgradeController(): ScreepsReturnCode {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public withdraw(): ScreepsReturnCode {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public log(): void {
@@ -145,35 +145,35 @@ export default class CreepMock extends RoomObjectMock {
   }
   @pushMethodCallInfoToCalled
   public goTo(): ScreepsReturnCode {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public setWayPoint(): ScreepsReturnCode {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public getEngryFrom(): ScreepsReturnCode {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public transferTo(): ScreepsReturnCode {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public upgrade(): ScreepsReturnCode {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public buildStructure(): CreepActionReturnCode | ERR_NOT_ENOUGH_RESOURCES | ERR_RCL_NOT_ENOUGH | ERR_NOT_FOUND {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public steadyWall(): OK | ERR_NOT_FOUND {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public fillDefenseStructure(): boolean {
-    return true;
+    return false;
   }
   @pushMethodCallInfoToCalled
   public getFlag(): Flag | null {
@@ -181,7 +181,7 @@ export default class CreepMock extends RoomObjectMock {
   }
   @pushMethodCallInfoToCalled
   public attackFlag(): boolean {
-    return true;
+    return false;
   }
   @pushMethodCallInfoToCalled
   public healTo(): void {
@@ -189,6 +189,6 @@ export default class CreepMock extends RoomObjectMock {
   }
   @pushMethodCallInfoToCalled
   public dismantleFlag(): boolean {
-    return true;
+    return false;
   }
 }

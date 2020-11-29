@@ -19,30 +19,44 @@ export default class MarketMock extends BaseMock {
   public calcTransactionCost(): number {
     return 0;
   }
+
   @pushMethodCallInfoToCalled
   public cancelOrder(): ScreepsReturnCode {
-    return OK;
+    return undefined;
   }
+
   @pushMethodCallInfoToCalled
   public changeOrderPrice(): ScreepsReturnCode {
-    return OK;
+    return undefined;
   }
+
   @pushMethodCallInfoToCalled
   public createOrder(): ScreepsReturnCode {
-    return OK;
+    return undefined;
   }
+
   @pushMethodCallInfoToCalled
   public deal(): ScreepsReturnCode {
-    return OK;
+    return undefined;
   }
+
   @pushMethodCallInfoToCalled
   public extendOrder(): ScreepsReturnCode {
-    return OK;
+    return undefined;
   }
-  //   @pushMethodCallInfoToCalled
-  //   public getAllOrders(): Order[];
-  //   @pushMethodCallInfoToCalled
-  //   public getHistory(): PriceHistory[];
-  //   @pushMethodCallInfoToCalled
-  //   public getOrderById(): Order | null;
+
+  @pushMethodCallInfoToCalled
+  public getAllOrders(): Order[] {
+    return undefined;
+  }
+
+  @pushMethodCallInfoToCalled
+  public getHistory(): PriceHistory[] {
+    return undefined;
+  }
+
+  @pushMethodCallInfoToCalled
+  public getOrderById(): Order | null {
+    return undefined;
+  }
 }

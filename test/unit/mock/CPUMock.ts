@@ -24,11 +24,11 @@ export default class CPUMock extends BaseMock {
   }
   @pushMethodCallInfoToCalled
   public setShardLimits(): OK | ERR_BUSY | ERR_INVALID_ARGS {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public getHeapStatistics?(): HeapStatistics {
-    return {} as HeapStatistics;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public halt?(): never {
@@ -36,10 +36,10 @@ export default class CPUMock extends BaseMock {
   }
   @pushMethodCallInfoToCalled
   public generatePixel(): OK | ERR_NOT_ENOUGH_RESOURCES {
-    return OK;
+    return undefined;
   }
   @pushMethodCallInfoToCalled
   public unlock(): OK | ERR_NOT_ENOUGH_RESOURCES | ERR_FULL {
-    return OK;
+    return undefined;
   }
 }
