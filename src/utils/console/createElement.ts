@@ -1,4 +1,4 @@
-import { sendCommandToConsole } from "./sendCommandToConsole";
+import sendCommandToConsole from "./sendCommandToConsole";
 
 /**
  * 在控制台中创建 HTML 元素的方法集合

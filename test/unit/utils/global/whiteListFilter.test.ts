@@ -7,7 +7,7 @@ import { whiteListFilter } from "../../../../src/utils/global/whiteListFilter";
 describe("whiteListFilter", () => {
   beforeEach(() => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore : allow adding Game to global
+    // @ts-ignore : allow adding Memory to global
     global.Memory = _.clone(new MemoryMock());
   });
 

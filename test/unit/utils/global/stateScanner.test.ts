@@ -9,7 +9,7 @@ describe("stateScanner", () => {
     // @ts-ignore : allow adding Game to global
     global.Game = _.clone(new GameMock());
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore : allow adding Game to global
+    // @ts-ignore : allow adding Memory to global
     global.Memory = _.clone(new MemoryMock());
   });
 
