@@ -3,9 +3,8 @@ import sendCommandToConsole from "./sendCommandToConsole";
 /**
  * 在控制台中创建 HTML 元素的方法集合
  */
-export class createElement {
-  public static customStyle(): string {
-    const style = `<style>
+export default class createElement {
+  public static style = `<style>
             input {
                 background-color: #2b2b2b;
                 border: none;
@@ -26,7 +25,8 @@ export class createElement {
             }
         </style>`;
 
-    return style.replace(/\n/g, "");
+  public static customStyle(): string {
+    return this.style.replace(/\n/g, "").replace(/\s\s/g, "");
   }
 
   /**
@@ -90,20 +90,20 @@ export class createElement {
      * 如果直接填 formDatas 而不是 JSON.stringify(formDatas) 的话，会报错找不到 formdatas
      */
     const commandWarp = `(() => {
-            const form = document.forms['${formName}']
-            let formDatas = {}
+            const form = document.forms['${formName}'];
+            let formDatas = {};
             [${details
               .map(detail => `'${detail.name}'`)
-              .toString()}].map(eleName => formDatas[eleName] = form[eleName].value)
+              .toString()}].map(eleName => formDatas[eleName] = form[eleName].value);
             angular.element(document.body).injector().get('Console').sendCommand(\`(${
               buttonDetail.command
-            })(\${JSON.stringify(formDatas)})\`, 1)
+            })(\${JSON.stringify(formDatas)})\`, 1);
         })()`;
     // 添加提交按钮
-    parts.push(`<button type="button" onclick="${commandWarp.replace(/\n/g, ";")}">${buttonDetail.content}</button>`);
+    parts.push(`<button type="button" onclick="${commandWarp.replace(/\n/g, "")}">${buttonDetail.content}</button>`);
     parts.push(`</form>`);
 
     // 压缩成一行
-    return parts.join("");
+    return parts.join("").replace(/\n/g, "").replace(/\s\s/g, "");
   }
 }

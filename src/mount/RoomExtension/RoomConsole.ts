@@ -6,7 +6,7 @@
 import { LAB_STATE, ROOM_REMOVE_INTERVAL, labTarget } from "setting";
 import RoomExtension from "./RoomExtension";
 import colorful from "utils/console/colorful";
-import { createElement } from "utils/console/createElement";
+import createElement from "utils/console/createElement";
 import { getName } from "utils/global/getName";
 import { manageStructure } from "modules/autoPlanning";
 import { setBaseCenter } from "modules/autoPlanning/planBasePos";
@@ -38,7 +38,8 @@ export default class RoomConsole extends RoomExtension {
   /**
    * 用户操作 - 移除外矿
    *
-   * @param 同上 removeRemote()
+   * @param remoteRoomName 要移除的外矿
+   * @param removeFlag 是否移除外矿的 source 旗帜
    */
   public rremove(remoteRoomName: string, removeFlag = false): string {
     let stats = `[${this.name} 外矿] `;
@@ -54,7 +55,8 @@ export default class RoomConsole extends RoomExtension {
   /**
    * 用户操作 - 占领新房间
    *
-   * @param 同上 claimRoom()
+   * @param targetRoomName 要占领的目标房间
+   * @param signText 新房间的签名
    */
   public claim(targetRoomName: string, signText = ""): string {
     this.claimRoom(targetRoomName, signText);
@@ -86,8 +88,8 @@ export default class RoomConsole extends RoomExtension {
   /**
    * 用户操作：addCenterTask - 添加中央运输任务
    *
-   * @param targetId 资源存放建筑类型
-   * @param sourceId 资源来源建筑类型
+   * @param target 资源存放建筑类型
+   * @param source 资源来源建筑类型
    * @param resourceType 要转移的资源类型
    * @param amount 资源数量
    */
@@ -496,7 +498,7 @@ export default class RoomConsole extends RoomExtension {
     };
     const createResult = Game.market.createOrder(orderConfig);
 
-    let returnString = "";
+    let returnString: string;
     // 新创建的订单下个 tick 才能看到，所以这里只能让玩家自行查看
     if (createResult === OK)
       returnString = `[${this.name}] ${type} 订单创建成功，使用如下命令来查询新订单:\n   JSON.stringify(_.find(Object.values(Game.market.orders),{type:'${type}',resourceType:'${resourceType}',price:${price},roomName:'${this.name}'}), null, 4)`;
@@ -514,7 +516,7 @@ export default class RoomConsole extends RoomExtension {
    *
    * @param resourceType 资源类型
    * @param price 单价
-   * @param amount 总量
+   * @param totalAmount 总量
    */
   public buy(resourceType: ResourceConstant, price: number, totalAmount: number): string {
     return this.createOrder(ORDER_BUY, resourceType, price, totalAmount);
@@ -525,7 +527,7 @@ export default class RoomConsole extends RoomExtension {
    *
    * @param resourceType 资源类型
    * @param price 单价
-   * @param amount 总量
+   * @param totalAmount 总量
    */
   public sell(resourceType: ResourceConstant, price: number, totalAmount: number): string {
     return this.createOrder(ORDER_SELL, resourceType, price, totalAmount);
