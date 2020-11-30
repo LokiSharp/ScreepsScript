@@ -1,5 +1,5 @@
-import { assert } from "chai";
 import colorful, { colors } from "../../../../src/utils/console/colorful";
+import { assert } from "chai";
 
 describe("colorful", () => {
   it("可以添加颜色", () => {

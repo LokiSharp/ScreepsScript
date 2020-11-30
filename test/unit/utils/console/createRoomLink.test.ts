@@ -1,7 +1,6 @@
+import GameMock from "../../mock/GameMock";
 import { assert } from "chai";
 import createRoomLink from "../../../../src/utils/console/createRoomLink";
-import GameMock from "../../mock/GameMock";
-import MemoryMock from "../../mock/MemoryMock";
 
 describe("createRoomLink", () => {
   beforeEach(() => {

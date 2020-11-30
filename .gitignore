@@ -11,6 +11,7 @@
 /node_modules
 /_book
 /build/*
+/.nyc_output
 
 # TypeScript definitions installed by Typings
 /typings
