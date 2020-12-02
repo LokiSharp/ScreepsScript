@@ -38,6 +38,11 @@ export default class ControllerExtension extends StructureController {
       // 多发布一个 build 协助建造
       this.room.releaseCreep("builder", 1);
     }
+    // 3 级，添加刷墙者
+    if (level === 3) {
+      // 发布 repairer 刷墙
+      this.room.releaseCreep("repairer");
+    }
     // 8 级之后重新规划升级单位
     else if (level === 8) {
       this.room.releaseCreep("upgrader");
