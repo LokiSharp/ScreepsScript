@@ -56,6 +56,7 @@ interface RemoteDeclarerData {
   // 给控制器的签名
   signText?: string;
   wayPoint?: string;
+  keepSpawn?: boolean;
 }
 /**
  * 远程采集单位的 data
@@ -122,4 +123,5 @@ interface RangedAttackerData {
   bearTowerNum: 0 | 1 | 2 | 3 | 4 | 5 | 6;
   // 是否持续孵化
   keepSpawn: boolean;
+  wayPoint?: string;
 }

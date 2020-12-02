@@ -7,6 +7,7 @@
  */
 export default function moveTester(data: RemoteDeclarerData): ICreepConfig {
   return {
+    isNeed: () => data.keepSpawn,
     prepare: creep => {
       creep.setWayPoint(data.wayPoint);
       creep.memory.fromShard = Game.shard.name as ShardName;
@@ -18,11 +19,13 @@ export default function moveTester(data: RemoteDeclarerData): ICreepConfig {
         checkTarget: true,
         range: 0
       });
-      creep.log(`位置 ${creep.memory.prePos}`);
-      // creep.log(`移动消耗 ${Game.cpu.getUsed() - cost1}`);
-      const moveInfo = creep.memory.moveInfo;
-      const path = moveInfo ? moveInfo.path || "" : "";
-      creep.say(`${result.toString()} ${path}`);
+      if (creep.memory.moveInfo) {
+        creep.log(`位置 ${creep.memory.moveInfo.prePos}`);
+        // creep.log(`移动消耗 ${Game.cpu.getUsed() - cost1}`);
+        const moveInfo = creep.memory.moveInfo;
+        const path = moveInfo ? moveInfo.path || "" : "";
+        creep.say(`${result.toString()} ${path}`);
+      }
 
       return false;
     },

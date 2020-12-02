@@ -1,5 +1,5 @@
 // 目前官服存在的所有 shard 的名字
-type ShardName = "shard0" | "shard1" | "shard2" | "shard3" | "shardSeason";
+type ShardName = "shard0" | "shard1" | "shard2" | "shard3";
 // 跨 shard 请求构造器
 interface CrossShardRequestConstructor<RequestType, RequestData> {
   // 要处理请求的 shard

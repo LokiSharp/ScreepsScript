@@ -224,7 +224,7 @@ export const getMemoryFromCrossShard = function (creepName: string): CreepMemory
  * 静默状态（完全没有跨 shard 信息）下的基础消耗为 0.03 - 0.01
  */
 export const execShard = function (): ScreepsReturnCode {
-  if ((Game.shard.name as ShardName) === "shardSeason") return ERR_NOT_FOUND;
+  if (Game.shard.name === "shardSeason") return ERR_NOT_FOUND;
   // 私服不存在该属性
   if (!global.InterShardMemory) return ERR_NOT_FOUND;
 
