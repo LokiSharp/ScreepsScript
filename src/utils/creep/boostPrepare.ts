@@ -12,7 +12,7 @@ export const boostPrepare = (): ICreepStage => ({
   prepare: (creep: Creep) => {
     // 获取强化位置
     const boostTask = creep.room.memory.boost;
-    if (boostTask.state !== "waitBoost") {
+    if (!boostTask.state || boostTask.state !== "waitBoost") {
       creep.say("boost 未准备就绪");
       return false;
     }

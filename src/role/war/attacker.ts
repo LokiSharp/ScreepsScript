@@ -10,6 +10,13 @@ import createBodyGetter from "utils/creep/createBodyGetter";
 export default function attacker(data: WarUnitData): ICreepConfig {
   return {
     ...battleBase(data.targetFlagName, data.keepSpawn),
+    prepare: (creep: Creep) => {
+      if ((creep.memory.data as RangedAttackerData).wayPoint) {
+        creep.setWayPoint((creep.memory.data as RangedAttackerData).wayPoint);
+        creep.memory.fromShard = Game.shard.name as ShardName;
+      }
+      return true;
+    },
     target: creep => {
       creep.attackFlag(data.targetFlagName);
 

@@ -321,18 +321,8 @@ export default class CreepExtension extends Creep {
 
     const hostils = this.getHostileCreepsWithCache();
     if (hostils.length > 0) {
-      // 找到血量最低的 creep
-      target = _.min(hostils, creep => {
-        // 该 creep 是否在 rampart 中
-        const inRampart = creep.pos
-          .lookFor(LOOK_STRUCTURES)
-          .find(rampart => rampart.structureType === STRUCTURE_RAMPART);
-
-        // 在 rampart 里就不会作为进攻目标
-        if (inRampart) return creep.hits + inRampart.hits;
-        // 找到血量最低的
-        else return creep.hits;
-      });
+      // 找到最近的 creep
+      target = this.pos.findClosestByRange(hostils);
     } else {
       // 没有的话再攻击 structure
       const structures = attackFlag.pos.lookFor(LOOK_STRUCTURES);
