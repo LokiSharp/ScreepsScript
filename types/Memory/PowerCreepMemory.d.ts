@@ -7,6 +7,11 @@ interface PowerCreepMemory {
    */
   moveInfo?: MoveInfo;
 
+  /**
+   * 是否打印上一步座标
+   */
+  logPrePos?: boolean;
+
   // 等同于 Creep.memory.fromShard
   fromShard?: ShardName;
 

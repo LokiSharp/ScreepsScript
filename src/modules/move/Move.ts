@@ -205,6 +205,8 @@ export class Move {
     if (!creep.memory.moveInfo) creep.memory.moveInfo = {};
 
     const moveMemory = creep.memory.moveInfo;
+    if (creep.memory.logPrePos) creep.log(`位置 ${moveMemory.prePos}`);
+
     // 如果没有指定目标的话则默认为路径模式
     const target: RoomPosition = targetPos || this.getTarget(creep);
     if (!target) return ERR_INVALID_ARGS;

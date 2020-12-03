@@ -57,6 +57,7 @@ interface RemoteDeclarerData {
   signText?: string;
   wayPoint?: string;
   keepSpawn?: boolean;
+  logPrePos?: boolean;
 }
 /**
  * 远程采集单位的 data
