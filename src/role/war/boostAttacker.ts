@@ -1,3 +1,4 @@
+import { battleBase } from "utils/creep/battleBase";
 import { boostPrepare } from "utils/creep/boostPrepare";
 import calcBodyPart from "utils/creep/calcBodyPart";
 
@@ -7,7 +8,7 @@ import calcBodyPart from "utils/creep/calcBodyPart";
  */
 export default function boostAttacker(data: WarUnitData): ICreepConfig {
   return {
-    isNeed: () => data.keepSpawn,
+    ...battleBase(data.targetFlagName, data.keepSpawn),
     ...boostPrepare(),
     target: creep => {
       creep.attackFlag(data.targetFlagName);

@@ -1,3 +1,4 @@
+import { battleBase } from "utils/creep/battleBase";
 import { bodyConfigs } from "setting";
 import createBodyGetter from "utils/creep/createBodyGetter";
 
@@ -8,7 +9,7 @@ import createBodyGetter from "utils/creep/createBodyGetter";
  */
 export default function attacker(data: WarUnitData): ICreepConfig {
   return {
-    isNeed: () => data.keepSpawn,
+    ...battleBase(data.targetFlagName, data.keepSpawn),
     target: creep => {
       creep.attackFlag(data.targetFlagName);
 
