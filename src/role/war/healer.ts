@@ -11,8 +11,8 @@ export default function healer(data: HealUnitData): ICreepConfig {
     prepare: creep => {
       // 治疗单位不允许发起对穿
       creep.memory.disableCross = true;
-      if ((creep.memory.data as RangedAttackerData).wayPoint) {
-        creep.setWayPoint((creep.memory.data as RangedAttackerData).wayPoint);
+      if ((creep.memory.data as HealUnitData).wayPoint) {
+        creep.setWayPoint((creep.memory.data as HealUnitData).wayPoint);
         creep.memory.fromShard = Game.shard.name as ShardName;
       }
       return true;

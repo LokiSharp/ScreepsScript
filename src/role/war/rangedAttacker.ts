@@ -57,7 +57,8 @@ export default function rangedAttacker(data: RangedAttackerData): ICreepConfig {
         if (creep.rangedAttackLowestHitsHostileCreeps(hostileCreeps) === OK) return false;
         else if (structures.length > 0) {
           if (creep.rangedAttack(structures[0]) === ERR_NOT_IN_RANGE) creep.moveTo(structures[0]);
-        } else if (creep.rangedAttackNearHostileStructures() === OK) return false;
+        } else if (creep.rangedAttackNearestHostileCreeps() === OK) return false;
+        else if (creep.rangedAttackNearHostileStructures() === OK) return false;
       } else {
         creep.log(`不在指定房间，切入迁徙模式`);
         return true;

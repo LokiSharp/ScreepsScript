@@ -506,7 +506,7 @@ export default class CreepExtension extends Creep {
         else return creep.hits;
       });
 
-      this.rangedAttack(target);
+      if (target && this.rangedAttack(target) === ERR_NOT_IN_RANGE) this.moveTo(target);
       return OK;
     }
 
@@ -520,9 +520,9 @@ export default class CreepExtension extends Creep {
    */
   public rangedAttackNearestHostileCreeps(hostils?: AnyCreep[]): OK | ERR_NOT_FOUND {
     if (!hostils) hostils = this.getHostileCreepsWithCache();
-    const targets = this.pos.findInRange(hostils, 3);
+    const target = this.pos.findClosestByPath(hostils);
 
-    if (targets.length > 0) this.rangedAttack(targets[0]);
+    if (target && this.rangedAttack(target) === ERR_NOT_IN_RANGE) this.moveTo(target);
     else return ERR_NOT_FOUND;
 
     return OK;

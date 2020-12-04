@@ -10,8 +10,8 @@ export default function dismantler(data: WarUnitData): ICreepConfig {
   return {
     ...battleBase(data.targetFlagName, data.keepSpawn),
     prepare: creep => {
-      if ((creep.memory.data as RangedAttackerData).wayPoint) {
-        creep.setWayPoint((creep.memory.data as RangedAttackerData).wayPoint);
+      if ((creep.memory.data as WarUnitData).wayPoint) {
+        creep.setWayPoint((creep.memory.data as WarUnitData).wayPoint);
         creep.memory.fromShard = Game.shard.name as ShardName;
       }
       return true;

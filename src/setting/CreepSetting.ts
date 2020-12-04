@@ -141,14 +141,14 @@ export const bodyConfigs: BodyConfigs = {
    * 使用 attack 身体部件的攻击单位
    */
   attacker: getBodyConfig(
-    { [MOVE]: 2, [ATTACK]: 2 },
-    { [MOVE]: 3, [ATTACK]: 3 },
-    { [MOVE]: 4, [ATTACK]: 4 },
-    { [MOVE]: 5, [ATTACK]: 5 },
-    { [MOVE]: 6, [ATTACK]: 6 },
-    { [MOVE]: 7, [ATTACK]: 7 },
-    { [MOVE]: 16, [ATTACK]: 16 },
-    { [MOVE]: 25, [ATTACK]: 25 }
+    { [ATTACK]: 2, [MOVE]: 2 },
+    { [ATTACK]: 3, [MOVE]: 3 },
+    { [ATTACK]: 4, [MOVE]: 4 },
+    { [ATTACK]: 5, [MOVE]: 5 },
+    { [ATTACK]: 6, [MOVE]: 6 },
+    { [ATTACK]: 7, [MOVE]: 7 },
+    { [ATTACK]: 16, [MOVE]: 16 },
+    { [ATTACK]: 25, [MOVE]: 25 }
   ),
 
   /**

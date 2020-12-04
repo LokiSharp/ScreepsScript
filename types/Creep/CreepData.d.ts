@@ -100,6 +100,7 @@ interface WarUnitData {
   // standByFlagName: string
   // 是否持续孵化
   keepSpawn: boolean;
+  wayPoint?: string;
 }
 
 /**
@@ -112,6 +113,7 @@ interface HealUnitData {
   standByFlagName?: string;
   // 是否持续孵化
   keepSpawn?: boolean;
+  wayPoint?: string;
 }
 
 /**
