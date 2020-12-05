@@ -1,7 +1,7 @@
 /**
  * 在绘制控制台信息时使用的颜色
  */
-const colors: { [name in Colors]: string } = {
+export const colors: { [name in Colors]: string } = {
   red: "#ef9a9a",
   green: "#6b9955",
   yellow: "#c5c599",

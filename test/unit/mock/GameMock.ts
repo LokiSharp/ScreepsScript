@@ -3,6 +3,7 @@ import CPUMock from "./CPUMock";
 import GlobalControlLevelMock from "./GlobalControlLevelMock";
 import GlobalPowerLevelMock from "./GlobalPowerLevelMock";
 import MarketMock from "./MarketMock";
+import ShardMock from "./ShardMock";
 
 export default class GameMock extends BaseMock {
   public cpu: CPUMock;
@@ -11,6 +12,7 @@ export default class GameMock extends BaseMock {
   public gpl: GlobalPowerLevelMock;
   public market: MarketMock;
   public time: number;
+  public shard: ShardMock;
 
   public constructor() {
     super();
@@ -19,5 +21,6 @@ export default class GameMock extends BaseMock {
     this.gcl = new GlobalControlLevelMock();
     this.gpl = new GlobalPowerLevelMock();
     this.market = new MarketMock();
+    this.shard = new ShardMock();
   }
 }

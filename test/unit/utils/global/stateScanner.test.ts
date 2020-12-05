@@ -1,4 +1,3 @@
-import { ConstantsMock } from "../../mock/ConstantsMock";
 import GameMock from "../../mock/GameMock";
 import MemoryMock from "../../mock/MemoryMock";
 import { assert } from "chai";
@@ -10,9 +9,8 @@ describe("stateScanner", () => {
     // @ts-ignore : allow adding Game to global
     global.Game = _.clone(new GameMock());
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore : allow adding Game to global
+    // @ts-ignore : allow adding Memory to global
     global.Memory = _.clone(new MemoryMock());
-    ConstantsMock();
   });
 
   it("可以运行统计状态", () => {

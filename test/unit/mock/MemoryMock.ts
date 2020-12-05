@@ -1,33 +1,78 @@
 import BaseMock from "./BaseMock";
 
-export default class MemoryMock extends BaseMock {
-  public showCost: boolean;
+export default class MemoryMock extends BaseMock implements Memory {
+  public constructor() {
+    super();
+    this.flags = {};
+    this.whiteList = {};
+    this.stats = {
+      rooms: {}
+    };
+    this.creeps = {};
+    this.powerCreeps = {};
+    this.flags = {};
+    this.rooms = {};
+    this.spawns = {};
+  }
 
-  public flags: { [flagName: string]: FlagMemory };
+  public creeps: { [name: string]: CreepMemory };
+  public powerCreeps: { [name: string]: PowerCreepMemory };
+  public flags: { [name: string]: FlagMemory };
+  public rooms: { [name: string]: RoomMemory };
+  public spawns: { [name: string]: SpawnMemory };
+
+  public moveNumber?: number;
+  public moveUseCpu?: number;
+  public movePathFindUseCpu?: number;
+  public showCost?: boolean;
+
+  public nukerLock?: boolean;
+  public nukerDirective?: {
+    [fireRoomName: string]: string;
+  };
+
+  public creepConfigs: {
+    [creepName: string]: {
+      role: CreepRoleConstant;
+      data: CreepData;
+      spawnRoom: string;
+    };
+  };
+
+  public crossShardCreeps: {
+    [creepName: string]: CreepMemory | PowerCreepMemory;
+  };
+
+  public bypassRooms: string[];
+  public reiveList: ResourceConstant[];
+
+  public commodities: {
+    1: string[];
+    2: string[];
+    3: string[];
+    4: string[];
+    5: string[];
+  };
+
+  public resourceSourceMap: {
+    [resourceType: string]: string[];
+  };
 
   public whiteList: {
     [userName: string]: number;
   };
 
   public stats: {
-    // GCl/GPL 升级百分比
     gcl?: number;
     gclLevel?: number;
     gpl?: number;
     gplLevel?: number;
-    // CPU 当前数值及百分比
     cpu?: number;
-    // bucket 当前数值
     bucket?: number;
-    // 当前还有多少钱
     credit?: number;
 
-    // 已经完成的房间物流任务比例
     roomTaskNumber?: { [roomTransferTaskType: string]: number };
 
-    /**
-     * 房间内的数据统计
-     */
     rooms: {
       [roomName: string]: {
         energy?: number;
@@ -43,12 +88,10 @@ export default class MemoryMock extends BaseMock {
     };
   };
 
-  public constructor() {
-    super();
-    this.flags = {};
-    this.whiteList = {};
-    this.stats = {
-      rooms: {}
-    };
-  }
+  public psRooms: string[];
+
+  public layoutInfo?: BaseLayout;
+  public layoutLevel?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+
+  public delayTasks: DelayTaskMemory[];
 }

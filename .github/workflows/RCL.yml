@@ -32,7 +32,7 @@ jobs:
 
       - run: npm install
       - run: npm run build
-      - run: npx rollup -c rollup.test-integration-config.js -i test/integration/${{ matrix.RCL }}.test.ts
+      - run: npx rollup -c rollup.test-integration-config.ts -i test/integration/${{ matrix.RCL }}.test.ts
       - run: npx mocha dist/test-integration.bundle.js
 
       - name: Update Code Artifact

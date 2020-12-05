@@ -1,4 +1,3 @@
-import { ATTACK, CARRY, CLAIM, HEAL, MOVE, RANGED_ATTACK, TOUGH, WORK } from "../../mock/CreepBodyPartMock";
 import { assert } from "chai";
 import calcBodyPart from "../../../../src/utils/creep/calcBodyPart";
 

@@ -6,6 +6,6 @@ import colorful from "./colorful";
  * @param name 常量简称
  * @param constant 常量名
  */
-export function createConst(name: string, constant: string): string {
+export default function createConst(name: string, constant: string): string {
   return `${colorful(name, "green")} ${colorful(constant, "blue")}`;
 }
