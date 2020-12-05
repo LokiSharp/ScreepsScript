@@ -22,7 +22,7 @@ export default {
   },
   external: ["chai", "it", "describe"],
   plugins: [
-    clear({ targets: ["dist/test.bundle.js"] }),
+    clear({ targets: ["dist"] }),
     resolve(),
     commonjs({
       include: /node_modules/,
