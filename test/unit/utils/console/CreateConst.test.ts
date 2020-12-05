@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import createConst from "../../../../src/utils/console/createConst";
+import createConst from "../../../../src/utils/console/CreateConst";
 
 describe("createConst", () => {
   it("可以生成常量帮助", () => {

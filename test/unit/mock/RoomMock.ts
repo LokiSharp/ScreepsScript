@@ -14,6 +14,24 @@ export default class RoomMock extends BaseMock {
   public terminal?: StructureTerminalMock;
   public visual: RoomVisual;
 
+  public [STRUCTURE_FACTORY]?: StructureFactory;
+  public [STRUCTURE_POWER_SPAWN]?: StructurePowerSpawn;
+  public [STRUCTURE_NUKER]?: StructureNuker;
+  public [STRUCTURE_OBSERVER]?: StructureObserver;
+  public [STRUCTURE_EXTRACTOR]?: StructureExtractor;
+
+  public [STRUCTURE_SPAWN]?: StructureSpawn[];
+  public [STRUCTURE_EXTENSION]?: StructureExtension[];
+  public [STRUCTURE_ROAD]?: StructureRoad[];
+  public [STRUCTURE_WALL]?: StructureWall[];
+  public [STRUCTURE_RAMPART]?: StructureRampart[];
+  public [STRUCTURE_KEEPER_LAIR]?: StructureKeeperLair[];
+  public [STRUCTURE_PORTAL]?: StructurePortal[];
+  public [STRUCTURE_LINK]?: StructureLink[];
+  public [STRUCTURE_TOWER]?: StructureTower[];
+  public [STRUCTURE_LAB]?: StructureLab[];
+  public [STRUCTURE_CONTAINER]?: StructureContainer[];
+
   public constructor(name: string) {
     super();
     this.name = name;
