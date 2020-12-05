@@ -90,11 +90,13 @@ export class Move {
         if (crossResult === ERR_BUSY) {
           moveMemory.path = this.findPath(creep, targetPos, { disableRouteCache: true });
           delete moveMemory.prePos;
+          // 撞地形上了说明房间 cost 过期了
+          delete this.costCache[creep.room.name];
         } else if (crossResult !== OK) {
           // creep.log('撞停！重新寻路！' + crossResult)
           delete moveMemory.path;
           delete moveMemory.prePos;
-          // 撞地形上了说明房间 cost 过期了
+          // 不知道撞到了啥，反正重新加载房间缓存
           delete this.costCache[creep.room.name];
         }
 
@@ -195,8 +197,11 @@ export class Move {
   ): ScreepsReturnCode {
     const costBeforeGo = Game.cpu.getUsed();
     const result = this.goToInner(creep, targetPos, moveOpt);
-    Memory.moveUseCpu = Memory.moveUseCpu === undefined ? 0 : Memory.moveUseCpu + Game.cpu.getUsed() - costBeforeGo;
-    Memory.moveNumber = Memory.moveNumber === undefined ? 0 : Memory.moveNumber + 1;
+    const moveUseCpu = Game.cpu.getUsed() - costBeforeGo;
+    if (moveUseCpu > 0.2) {
+      Memory.moveUseCpu = Memory.moveUseCpu === undefined ? 0 : Memory.moveUseCpu + moveUseCpu;
+      Memory.moveNumber = Memory.moveNumber === undefined ? 0 : Memory.moveNumber + 1;
+    }
 
     return result;
   }
