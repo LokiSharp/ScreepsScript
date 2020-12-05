@@ -6,7 +6,7 @@ export function moduleStyle(): string {
         flex-flow: column nowrap;
     }
     .module-container {
-        padding: 0px 10px 10px 10px;
+        padding: 0 10px 10px 10px;
         display: flex;
         flex-flow: column nowrap;
     }

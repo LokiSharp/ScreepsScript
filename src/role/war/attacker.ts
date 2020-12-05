@@ -26,10 +26,7 @@ export default function attacker(data: WarUnitData): ICreepConfig {
         return false;
       }
 
-      if (creep.room.name !== targetFlag.pos.roomName) {
-        return true;
-      }
-      return false;
+      return creep.room.name !== targetFlag.pos.roomName;
     },
     bodys: createBodyGetter(bodyConfigs.attacker)
   };

@@ -1,5 +1,5 @@
 import { creepApi } from "modules/creepController/creepApi";
-import { minerHervesteLimit } from "setting";
+import { minerHarvestLimit } from "setting";
 
 /**
  * Extractor 拓展
@@ -11,7 +11,7 @@ export default class ExtractorExtension extends StructureExtractor {
   public work(): void {
     // 如果 mineral 冷却好了并且 terminal 还有空间就重新发布 miner
     if (Game.time > this.room.memory.mineralCooldown) {
-      if (this.room.terminal && this.room.terminal.store.getUsedCapacity() < minerHervesteLimit) {
+      if (this.room.terminal && this.room.terminal.store.getUsedCapacity() < minerHarvestLimit) {
         delete this.room.memory.mineralCooldown;
 
         creepApi.add(

@@ -49,8 +49,7 @@ export default function repairer(data: WorkerData): ICreepConfig {
       }
       creep.getEngryFrom(source);
 
-      if (creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) return true;
-      else return false;
+      return creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0;
     },
     // 一直修墙就完事了
     target: creep => {
@@ -70,8 +69,7 @@ export default function repairer(data: WorkerData): ICreepConfig {
       // 否则就按原计划维修
       else creep.fillDefenseStructure();
 
-      if (creep.store.getUsedCapacity() === 0) return true;
-      else return false;
+      return creep.store.getUsedCapacity() === 0;
     },
     bodys: createBodyGetter(bodyConfigs.worker)
   };

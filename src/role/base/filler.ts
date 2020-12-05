@@ -47,8 +47,7 @@ export default function filler(data: WorkerData): ICreepConfig {
       if (source && source.store[RESOURCE_ENERGY] > 0) creep.transferTo(creep.room.storage, RESOURCE_ENERGY);
       else creep.say("💤");
 
-      if (creep.store[RESOURCE_ENERGY] <= 0) return true;
-      else return false;
+      return creep.store[RESOURCE_ENERGY] <= 0;
     },
     bodys: createBodyGetter(bodyConfigs.transporter)
   };

@@ -30,8 +30,7 @@ export default function collector(data: HarvesterData): ICreepConfig {
       if (result === ERR_NOT_IN_RANGE) creep.goTo(source.pos);
 
       // 快死了就把能量移出去
-      if (creep.ticksToLive <= 3) return true;
-      return false;
+      return creep.ticksToLive <= 3;
     },
     target: creep => {
       const target: Structure = Game.getObjectById(data.targetId);
@@ -45,8 +44,7 @@ export default function collector(data: HarvesterData): ICreepConfig {
 
       if (creep.transfer(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) creep.goTo(target.pos);
 
-      if (creep.store.getUsedCapacity() === 0) return true;
-      return false;
+      return creep.store.getUsedCapacity() === 0;
     },
     bodys: createBodyGetter(bodyConfigs.worker)
   };

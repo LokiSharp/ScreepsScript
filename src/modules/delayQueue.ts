@@ -44,7 +44,7 @@ function unserializeTask(taskString: string): [AllDelayTaskName, DelayTaskTypes[
  *
  * @param name 要添加的任务名
  * @param data 该任务调用时接受的数据
- * @param callTime 任务的调用时间（Game.time）
+ * @param call 任务的调用时间（Game.time）
  */
 export function addDelayTask<K extends AllDelayTaskName>(name: K, data: DelayTaskTypes[K], call: number): void {
   Memory.delayTasks.push({ call, data: serializeTask(name, data) });

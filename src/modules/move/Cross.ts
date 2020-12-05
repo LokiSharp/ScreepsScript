@@ -2,6 +2,39 @@ import crossRules from "./crossRules";
 
 export class Cross {
   /**
+   * 向指定方向发起对穿
+   *
+   * @param creep 发起对穿的 creep
+   * @param direction 要进行对穿的方向
+   * @param fontCreep 要被对穿的 creep
+   *
+   * @returns OK 成功对穿
+   * @returns ERR_BUSY 对方拒绝对穿
+   * @returns ERR_INVALID_TARGET 前方没有 creep
+   */
+  public static mutualCross(
+    creep: Creep | PowerCreep,
+    direction: DirectionConstant,
+    fontCreep: Creep | PowerCreep
+  ): OK | ERR_BUSY | ERR_INVALID_TARGET {
+    creep.say(`👉`);
+
+    // 如果前面的 creep 同意对穿了，自己就朝前移动
+    const reverseDirection = this.getOppositeDirection(direction);
+    const fontMoveResult = this.requireCross(fontCreep, reverseDirection, creep);
+    if (fontMoveResult !== OK) {
+      creep.say(`👉 ${fontMoveResult}`);
+      // 如果前面的 creep 拒绝了，就重新寻路
+      if (fontMoveResult === ERR_BUSY) {
+        delete creep.memory.moveInfo.path;
+      }
+      return ERR_BUSY;
+    }
+    const selfMoveResult = creep.move(direction);
+    return selfMoveResult === OK && fontMoveResult === OK ? OK : ERR_BUSY;
+  }
+
+  /**
    * 请求对穿
    * 自己内存中 stand 为 true 时将拒绝对穿
    *
@@ -34,38 +67,6 @@ export class Cross {
       }
       return moveResult;
     }
-  }
-  /**
-   * 向指定方向发起对穿
-   *
-   * @param creep 发起对穿的 creep
-   * @param direction 要进行对穿的方向
-   * @param fontCreep 要被对穿的 creep
-   *
-   * @returns OK 成功对穿
-   * @returns ERR_BUSY 对方拒绝对穿
-   * @returns ERR_INVALID_TARGET 前方没有 creep
-   */
-  public static mutualCross(
-    creep: Creep | PowerCreep,
-    direction: DirectionConstant,
-    fontCreep: Creep | PowerCreep
-  ): OK | ERR_BUSY | ERR_INVALID_TARGET {
-    creep.say(`👉`);
-
-    // 如果前面的 creep 同意对穿了，自己就朝前移动
-    const reverseDirection = this.getOppositeDirection(direction);
-    const fontMoveResult = this.requireCross(fontCreep, reverseDirection, creep);
-    if (fontMoveResult !== OK) {
-      creep.say(`👉 ${fontMoveResult}`);
-      // 如果前面的 creep 拒绝了，就重新寻路
-      if (fontMoveResult === ERR_BUSY) {
-        delete creep.memory.moveInfo.path;
-      }
-      return ERR_BUSY;
-    }
-    const selfMoveResult = creep.move(direction);
-    return selfMoveResult === OK && fontMoveResult === OK ? OK : ERR_BUSY;
   }
 
   /**

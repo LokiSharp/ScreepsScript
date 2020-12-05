@@ -50,6 +50,7 @@ export class WayPoint {
    *
    * target 是一个路径数组或者路径旗帜
    *
+   * @param creep 目标 creep
    * @param target 路径点目标
    */
 

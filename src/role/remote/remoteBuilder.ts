@@ -73,8 +73,7 @@ export default function remoteBuilder(data: RemoteDeclarerData): ICreepConfig {
       // 没有就建其他工地
       else if (creep.buildStructure() === ERR_NOT_FOUND) creep.memory.dontBuild = true;
 
-      if (creep.store.getUsedCapacity() === 0) return true;
-      return false;
+      return creep.store.getUsedCapacity() === 0;
     },
     bodys: createBodyGetter(bodyConfigs.remoteHelper)
   };

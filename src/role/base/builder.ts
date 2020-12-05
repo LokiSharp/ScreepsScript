@@ -12,7 +12,7 @@ export default function builder(data: HarvesterData): ICreepConfig {
     // 工地都建完就就使命完成
     isNeed: room => {
       const targets: ConstructionSite[] = room.find(FIND_MY_CONSTRUCTION_SITES);
-      return targets.length > 0 ? true : false;
+      return targets.length > 0;
     },
     // 把 data 里的 sourceId 挪到外边方便修改
     prepare: creep => {
@@ -54,8 +54,7 @@ export default function builder(data: HarvesterData): ICreepConfig {
           creep.memory.dontBuild = true;
         }
       }
-      if (creep.store.getUsedCapacity() === 0) return true;
-      else return false;
+      return creep.store.getUsedCapacity() === 0;
     },
     bodys: createBodyGetter(bodyConfigs.worker)
   };

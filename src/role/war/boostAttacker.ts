@@ -19,10 +19,7 @@ export default function boostAttacker(data: WarUnitData): ICreepConfig {
         return false;
       }
 
-      if (creep.room.name !== targetFlag.pos.roomName) {
-        return true;
-      }
-      return false;
+      return creep.room.name !== targetFlag.pos.roomName;
     },
     bodys: () => calcBodyPart({ [TOUGH]: 12, [ATTACK]: 28, [MOVE]: 10 })
   };

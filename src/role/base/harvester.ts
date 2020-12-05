@@ -49,8 +49,7 @@ export default function harvester(data: HarvesterData): ICreepConfig {
       creep.goTo(target.pos, { range });
 
       // 抵达位置了就准备完成
-      if (creep.pos.inRangeTo(target.pos, range)) return true;
-      return false;
+      return creep.pos.inRangeTo(target.pos, range);
     },
     source: creep => {
       creep.say("🚧");

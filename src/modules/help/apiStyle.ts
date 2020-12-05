@@ -44,8 +44,8 @@ export function apiStyle(): string {
         overflow: hidden;
         transition: all 0.1s;
         width: auto;
-        max-height: 0px;
-        padding: 0px 10px;
+        max-height: 0;
+        padding: 0 10px;
     }
 
     /* 当 input 被选中时，给所有展开的子菜单设置样式 */

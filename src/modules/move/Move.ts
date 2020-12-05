@@ -21,180 +21,10 @@ export class Move {
   public static routeCache: { [routeKey: string]: string } = {};
 
   /**
-   * 压缩 PathFinder 返回的路径数组
-   *
-   * @param positions 房间位置对象数组，必须连续
-   * @returns 压缩好的路径
-   */
-  private static serializeFarPath(creep: Creep | PowerCreep, positions: RoomPosition[]): string {
-    if (positions.length === 0) return "";
-    // 确保路径的第一个位置是自己的当前位置
-    if (!positions[0].isEqualTo(creep.pos)) positions.splice(0, 0, creep.pos);
-
-    return positions
-      .map((pos, index) => {
-        // 最后一个位置就不用再移动
-        if (index >= positions.length - 1) return null;
-        // 由于房间边缘地块会有重叠，所以这里筛除掉重叠的步骤
-        if (pos.roomName !== positions[index + 1].roomName) return null;
-        // 获取到下个位置的方向
-        return pos.getDirectionTo(positions[index + 1]);
-      })
-      .join("");
-  }
-
-  /**
-   * 远程寻路
-   *
-   * @param target 目标位置
-   * @param range 搜索范围 默认为 1
-   * @returns PathFinder.search 的返回值
-   */
-  private static findPath(creep: Creep | PowerCreep, target: RoomPosition, moveOpt: MoveOpt = {}): string | undefined {
-    // 先查询下缓存里有没有值
-    const routeKey = `${creep.room.serializePos(creep.pos)} ${creep.room.serializePos(target)}`;
-
-    if (!moveOpt.disableRouteCache) {
-      const cachedRoute = this.routeCache[routeKey];
-      // 如果有值则直接返回
-      if (cachedRoute) return cachedRoute;
-    }
-
-    const range = moveOpt.range === undefined ? 1 : moveOpt.range;
-    const result = PathFinder.search(
-      creep.pos,
-      { pos: target, range },
-      {
-        maxOps: moveOpt.maxOps || 4000,
-        roomCallback: roomName => {
-          // 强调了不许走就不走
-          if (Memory.bypassRooms && Memory.bypassRooms.includes(roomName)) return false;
-
-          const room = Game.rooms[roomName];
-          // 房间没有视野
-          if (!room) return undefined;
-
-          // 尝试从缓存中读取，没有缓存就进行查找
-          let costs = roomName in this.costCache ? this.costCache[roomName].clone() : undefined;
-          if (!costs) {
-            costs = new PathFinder.CostMatrix();
-            const terrain = new Room.Terrain(roomName);
-
-            // 设置基础地形 cost
-            for (let x = 0; x < 50; x++)
-              for (let y = 0; y < 50; y++) {
-                const tile = terrain.get(x, y);
-                const weight = tile === TERRAIN_MASK_WALL ? 255 : tile === TERRAIN_MASK_SWAMP ? 10 : 2;
-
-                costs.set(x, y, weight);
-              }
-
-            const addCost = (item: Structure | ConstructionSite) => {
-              // 更倾向走道路
-              if (item.structureType === STRUCTURE_ROAD) {
-                // 造好的路可以走
-                if (item instanceof Structure) costs.set(item.pos.x, item.pos.y, 1);
-                // 路的工地保持原有 cost
-                else return;
-              }
-              // 不能穿过无法行走的建筑
-              else if (
-                item.structureType !== STRUCTURE_CONTAINER &&
-                (item.structureType !== STRUCTURE_RAMPART || !item.my)
-              )
-                costs.set(item.pos.x, item.pos.y, 255);
-            };
-
-            // 给建筑和工地添加 cost
-            room.find(FIND_STRUCTURES).forEach(addCost);
-            room.find(FIND_CONSTRUCTION_SITES).forEach(addCost);
-
-            this.costCache[room.name] = costs.clone();
-          }
-
-          // 躲避房间中的 creep
-          room.find(FIND_CREEPS).forEach(otherCreep => {
-            // 以下情况会躲避
-            if (
-              // 如果禁用对穿了
-              moveOpt.disableCross ||
-              // 或者对方不属于自己
-              !otherCreep.my ||
-              otherCreep.memory.disableCross ||
-              // 或者对穿规则不允许
-              !(crossRules[otherCreep.memory.role] || crossRules.default)(otherCreep, creep)
-            ) {
-              costs.set(otherCreep.pos.x, otherCreep.pos.y, 255);
-            }
-          });
-
-          // 躲避房间中的非己方 powercreep
-          room.find(FIND_POWER_CREEPS).forEach(pc => {
-            if (!pc.my) costs.set(pc.pos.x, pc.pos.y, 255);
-          });
-
-          // 跨 shard creep 需要解除目标 portal 的不可移动性（如果有的话）
-          if (creep.memory.fromShard && target.roomName === roomName) {
-            const portal = target.lookFor(LOOK_STRUCTURES).find(s => s.structureType === STRUCTURE_PORTAL);
-            if (portal) costs.set(portal.pos.x, portal.pos.y, 2);
-          }
-
-          return costs;
-        }
-      }
-    );
-
-    // 没找到就返回空
-    if (result.path.length <= 0) return undefined;
-    // 找到了就进行压缩
-    const route = this.serializeFarPath(creep, result.path);
-    // 保存到全局缓存
-    if (!result.incomplete) this.routeCache[routeKey] = route;
-
-    // 根据玩家指定的重用距离返回缓存
-    return moveOpt.reusePath ? route : route.slice(0, moveOpt.reusePath);
-  }
-
-  /**
-   * 路径模式下获取要移动到的目标
-   *
-   * 会进行缓存
-   * 如果内存中没有设置的话则返回 undefined
-   */
-  private static getTarget(creep: Creep | PowerCreep): RoomPosition {
-    // 检查缓存
-    let target = WayPoint.wayPointCache[creep.name];
-    if (target) return target;
-
-    const memroy = creep.memory.moveInfo;
-    if (!memroy) return undefined;
-
-    // 优先用路径旗帜
-    if (memroy.wayPointFlag) {
-      const flag = Game.flags[memroy.wayPointFlag];
-      target = flag?.pos;
-    }
-    // 没有🚩就找找路径数组
-    else if (memroy.wayPoints && memroy.wayPoints.length > 0) {
-      const [x, y, roomName] = memroy.wayPoints[0].split(" ");
-      if (!x || !y || !roomName) {
-        creep.log(`错误的路径点 ${memroy.wayPoints[0]}`);
-      } else target = new RoomPosition(Number(x), Number(y), roomName);
-    }
-
-    WayPoint.wayPointCache[creep.name] = target;
-
-    // 如果还没有找到目标的话说明路径点失效了，移除整个缓存
-    if (!target) delete creep.memory.moveInfo;
-
-    return target;
-  }
-
-  /**
    * 移动 creep
    *
    * @param creep 要进行移动的 creep
-   * @param target 要移动到的目标位置
+   * @param targetPos 要移动到的目标位置
    * @param moveOpt 移动参数
    */
   public static goToInner(
@@ -369,5 +199,177 @@ export class Move {
     Memory.moveNumber = Memory.moveNumber === undefined ? 0 : Memory.moveNumber + 1;
 
     return result;
+  }
+
+  /**
+   * 压缩 PathFinder 返回的路径数组
+   *
+   * @param creep 目标 creep
+   * @param positions 房间位置对象数组，必须连续
+   * @returns 压缩好的路径
+   */
+  private static serializeFarPath(creep: Creep | PowerCreep, positions: RoomPosition[]): string {
+    if (positions.length === 0) return "";
+    // 确保路径的第一个位置是自己的当前位置
+    if (!positions[0].isEqualTo(creep.pos)) positions.splice(0, 0, creep.pos);
+
+    return positions
+      .map((pos, index) => {
+        // 最后一个位置就不用再移动
+        if (index >= positions.length - 1) return null;
+        // 由于房间边缘地块会有重叠，所以这里筛除掉重叠的步骤
+        if (pos.roomName !== positions[index + 1].roomName) return null;
+        // 获取到下个位置的方向
+        return pos.getDirectionTo(positions[index + 1]);
+      })
+      .join("");
+  }
+
+  /**
+   * 远程寻路
+   *
+   * @param creep 目标 creep
+   * @param target 目标位置
+   * @param moveOpt
+   * @returns PathFinder.search 的返回值
+   */
+  private static findPath(creep: Creep | PowerCreep, target: RoomPosition, moveOpt: MoveOpt = {}): string | undefined {
+    // 先查询下缓存里有没有值
+    const routeKey = `${creep.room.serializePos(creep.pos)} ${creep.room.serializePos(target)}`;
+
+    if (!moveOpt.disableRouteCache) {
+      const cachedRoute = this.routeCache[routeKey];
+      // 如果有值则直接返回
+      if (cachedRoute) return cachedRoute;
+    }
+
+    const range = moveOpt.range === undefined ? 1 : moveOpt.range;
+    const result = PathFinder.search(
+      creep.pos,
+      { pos: target, range },
+      {
+        maxOps: moveOpt.maxOps || 4000,
+        roomCallback: roomName => {
+          // 强调了不许走就不走
+          if (Memory.bypassRooms && Memory.bypassRooms.includes(roomName)) return false;
+
+          const room = Game.rooms[roomName];
+          // 房间没有视野
+          if (!room) return undefined;
+
+          // 尝试从缓存中读取，没有缓存就进行查找
+          let costs = roomName in this.costCache ? this.costCache[roomName].clone() : undefined;
+          if (!costs) {
+            costs = new PathFinder.CostMatrix();
+            const terrain = new Room.Terrain(roomName);
+
+            // 设置基础地形 cost
+            for (let x = 0; x < 50; x++)
+              for (let y = 0; y < 50; y++) {
+                const tile = terrain.get(x, y);
+                const weight = tile === TERRAIN_MASK_WALL ? 255 : tile === TERRAIN_MASK_SWAMP ? 10 : 2;
+
+                costs.set(x, y, weight);
+              }
+
+            const addCost = (item: Structure | ConstructionSite) => {
+              // 更倾向走道路
+              if (item.structureType === STRUCTURE_ROAD) {
+                // 造好的路可以走
+                if (item instanceof Structure) costs.set(item.pos.x, item.pos.y, 1);
+                // 路的工地保持原有 cost
+                else return;
+              }
+              // 不能穿过无法行走的建筑
+              else if (
+                item.structureType !== STRUCTURE_CONTAINER &&
+                (item.structureType !== STRUCTURE_RAMPART || !item.my)
+              )
+                costs.set(item.pos.x, item.pos.y, 255);
+            };
+
+            // 给建筑和工地添加 cost
+            room.find(FIND_STRUCTURES).forEach(addCost);
+            room.find(FIND_CONSTRUCTION_SITES).forEach(addCost);
+
+            this.costCache[room.name] = costs.clone();
+          }
+
+          // 躲避房间中的 creep
+          room.find(FIND_CREEPS).forEach(otherCreep => {
+            // 以下情况会躲避
+            if (
+              // 如果禁用对穿了
+              moveOpt.disableCross ||
+              // 或者对方不属于自己
+              !otherCreep.my ||
+              otherCreep.memory.disableCross ||
+              // 或者对穿规则不允许
+              !(crossRules[otherCreep.memory.role] || crossRules.default)(otherCreep, creep)
+            ) {
+              costs.set(otherCreep.pos.x, otherCreep.pos.y, 255);
+            }
+          });
+
+          // 躲避房间中的非己方 powerCreep
+          room.find(FIND_POWER_CREEPS).forEach(pc => {
+            if (!pc.my) costs.set(pc.pos.x, pc.pos.y, 255);
+          });
+
+          // 跨 shard creep 需要解除目标 portal 的不可移动性（如果有的话）
+          if (creep.memory.fromShard && target.roomName === roomName) {
+            const portal = target.lookFor(LOOK_STRUCTURES).find(s => s.structureType === STRUCTURE_PORTAL);
+            if (portal) costs.set(portal.pos.x, portal.pos.y, 2);
+          }
+
+          return costs;
+        }
+      }
+    );
+
+    // 没找到就返回空
+    if (result.path.length <= 0) return undefined;
+    // 找到了就进行压缩
+    const route = this.serializeFarPath(creep, result.path);
+    // 保存到全局缓存
+    if (!result.incomplete) this.routeCache[routeKey] = route;
+
+    // 根据玩家指定的重用距离返回缓存
+    return moveOpt.reusePath ? route : route.slice(0, moveOpt.reusePath);
+  }
+
+  /**
+   * 路径模式下获取要移动到的目标
+   *
+   * 会进行缓存
+   * 如果内存中没有设置的话则返回 undefined
+   */
+  private static getTarget(creep: Creep | PowerCreep): RoomPosition {
+    // 检查缓存
+    let target = WayPoint.wayPointCache[creep.name];
+    if (target) return target;
+
+    const memory = creep.memory.moveInfo;
+    if (!memory) return undefined;
+
+    // 优先用路径旗帜
+    if (memory.wayPointFlag) {
+      const flag = Game.flags[memory.wayPointFlag];
+      target = flag?.pos;
+    }
+    // 没有🚩就找找路径数组
+    else if (memory.wayPoints && memory.wayPoints.length > 0) {
+      const [x, y, roomName] = memory.wayPoints[0].split(" ");
+      if (!x || !y || !roomName) {
+        creep.log(`错误的路径点 ${memory.wayPoints[0]}`);
+      } else target = new RoomPosition(Number(x), Number(y), roomName);
+    }
+
+    WayPoint.wayPointCache[creep.name] = target;
+
+    // 如果还没有找到目标的话说明路径点失效了，移除整个缓存
+    if (!target) delete creep.memory.moveInfo;
+
+    return target;
   }
 }

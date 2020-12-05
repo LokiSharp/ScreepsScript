@@ -1,4 +1,4 @@
-import { PB_HARVESTE_STATE } from "setting";
+import { PB_HARVEST_STATE } from "setting";
 import calcBodyPart from "utils/creep/calcBodyPart";
 import { removeSelfGroup } from "utils/creep/removeSelfGroup";
 
@@ -84,7 +84,7 @@ export default function pbAttacker(data: pbAttackerData): ICreepConfig {
       if (!powerbank) {
         // 发现废墟，pb 成功摧毁，进入下个阶段
         if (targetFlag.pos.lookFor(LOOK_RUINS).length > 0) {
-          targetFlag.memory.state = PB_HARVESTE_STATE.TRANSFER;
+          targetFlag.memory.state = PB_HARVEST_STATE.TRANSFER;
         }
         // 未能成功在 pb 消失前将其摧毁，任务失败，移除旗帜
         else targetFlag.remove();
@@ -103,7 +103,7 @@ export default function pbAttacker(data: pbAttackerData): ICreepConfig {
          * 下面这个 150 是 pbCarrier 的孵化时间，50 为冗余时间，600 是 attacker 的攻击力，2 代表两组同时攻击
          */
         if (
-          targetFlag.memory.state !== PB_HARVESTE_STATE.PREPARE &&
+          targetFlag.memory.state !== PB_HARVEST_STATE.PREPARE &&
           powerbank.hits <= (targetFlag.memory.travelTime + 150 + 50) * 600 * 2
         ) {
           // 发布运输小组
@@ -117,7 +117,7 @@ export default function pbAttacker(data: pbAttackerData): ICreepConfig {
           spawnRoom.spawnPbCarrierGroup(data.sourceFlagName, Math.ceil(powerbank.power / 1600));
 
           // 设置为新状态
-          targetFlag.memory.state = PB_HARVESTE_STATE.PREPARE;
+          targetFlag.memory.state = PB_HARVEST_STATE.PREPARE;
         }
       } else if (attackResult === ERR_NOT_IN_RANGE) creep.moveTo(powerbank);
       return false;
