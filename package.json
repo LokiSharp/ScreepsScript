@@ -17,6 +17,8 @@
     "test": "npm run test-unit && npm run test-integration ",
     "test-unit": "rollup -c rollup.test-unit-config.ts && mocha dist/test-unit.bundle.js",
     "test-integration": "npm run build && rollup -c rollup.test-integration-config.ts && mocha dist/test-integration.bundle.js",
+    "test-nyc": "nyc npm run test-unit",
+    "test-nyc-report": "nyc --reporter=lcov --reporter=text-summary npm run test-unit",
     "watch-main": "rollup -c rollup.config.ts -w --environment DEST:main",
     "watch-pserver": "rollup -c rollup.config.ts -w --environment DEST:pserver",
     "watch-sim": "rollup -c rollup.config.ts -w --environment DEST:sim",
@@ -76,6 +78,7 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
+    "nyc": "^15.1.0",
     "source-map": "~0.6.1"
   },
   "config": {

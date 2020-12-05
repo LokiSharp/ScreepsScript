@@ -6,7 +6,7 @@ describe("createRoomLink", () => {
   beforeEach(() => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore : allow adding Game to global
-    global.Game = _.clone(new GameMock());
+    global.Game = new GameMock();
   });
 
   it("可以生成房间链接", () => {

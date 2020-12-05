@@ -7,7 +7,7 @@ describe("generatePixel", () => {
   beforeEach(() => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore : allow adding Game to global
-    global.Game = _.clone(new GameMock());
+    global.Game = new GameMock();
   });
 
   it("当 bucket 足够时生成 Pixel", () => {
