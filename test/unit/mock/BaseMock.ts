@@ -1,7 +1,7 @@
 export default class BaseMock {
-  public called: Record<string, any[]>[];
+  public calledRecords: CalledRecord[];
 
   public constructor() {
-    this.called = [];
+    this.calledRecords = [];
   }
 }

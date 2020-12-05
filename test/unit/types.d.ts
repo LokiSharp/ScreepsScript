@@ -3,3 +3,9 @@ interface Object {
 
   getterIsAssignable: boolean;
 }
+
+interface CalledRecord {
+  name: string;
+  arguments: any[];
+  result: any;
+}

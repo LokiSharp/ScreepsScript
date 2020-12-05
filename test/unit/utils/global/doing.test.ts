@@ -18,19 +18,19 @@ describe("doing", () => {
   it("可以运行 Creep", () => {
     const testCreep = new CreepMock("" as Id<CreepMock>, 0, 0);
     doing({ testCreep });
-    assert.deepEqual(testCreep.called, [{ work: [] }]);
+    assert.deepEqual(testCreep.calledRecords, [{ name: "work", arguments: [], result: undefined }]);
   });
 
   it("对象没有 work 时不运行", () => {
     const testObject = new BaseMock();
     doing({ testObject });
-    assert.deepEqual(testObject.called, []);
+    assert.deepEqual(testObject.calledRecords, []);
   });
 
   it("可以 showCost", () => {
     Memory.showCost = true;
     const testObject = new BaseMock();
     doing({ testObject });
-    assert.deepEqual(testObject.called, []);
+    assert.deepEqual(testObject.calledRecords, []);
   });
 });

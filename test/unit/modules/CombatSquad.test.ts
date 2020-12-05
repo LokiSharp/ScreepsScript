@@ -4,7 +4,7 @@ import { assert } from "chai";
 
 describe("checkFormation", () => {
   it("检查阵型正确时返回 False", () => {
-    const squadMembersDef: (string | number[] | Record<string, any[]>[])[][] = [
+    const squadMembersDef: (string | number[] | CalledRecord[])[][] = [
       ["↖", [0, 0], []],
       ["↗", [1, 0], []],
       ["↙", [0, 1], []],
@@ -19,7 +19,7 @@ describe("checkFormation", () => {
   });
 
   it("检查阵型错误时返回 True", () => {
-    const squadMembersDef: (string | number[] | Record<string, any[]>[])[][] = [
+    const squadMembersDef: (string | number[] | CalledRecord[])[][] = [
       ["↖", [2, 2], []],
       ["↗", [1, 0], []],
       ["↙", [0, 1], []],
@@ -36,7 +36,7 @@ describe("checkFormation", () => {
 
 describe("regroup", () => {
   it("都在正确位置时返回 True", () => {
-    const squadMembersDef: (string | number[] | Record<string, any[]>[])[][] = [
+    const squadMembersDef: (string | number[] | CalledRecord[])[][] = [
       ["↖", [0, 0], []],
       ["↗", [1, 0], []],
       ["↙", [0, 1], []],
@@ -52,11 +52,11 @@ describe("regroup", () => {
   });
 
   it("位置不对时返回 False", () => {
-    const squadMembersDef: (string | number[] | Record<string, any[]>[])[][] = [
+    const squadMembersDef: (string | number[] | CalledRecord[])[][] = [
       ["↖", [0, 0], []],
-      ["↗", [1, 1], [{ moveTo: [1, 0, { reusePath: 1 }] }]],
-      ["↙", [2, 2], [{ moveTo: [0, 1, { reusePath: 1 }] }]],
-      ["↘", [3, 3], [{ moveTo: [1, 1, { reusePath: 1 }] }]]
+      ["↗", [1, 1], [{ name: "moveTo", arguments: [1, 0, { reusePath: 1 }], result: undefined }]],
+      ["↙", [2, 2], [{ name: "moveTo", arguments: [0, 1, { reusePath: 1 }], result: undefined }]],
+      ["↘", [3, 3], [{ name: "moveTo", arguments: [1, 1, { reusePath: 1 }], result: undefined }]]
     ];
     const squad: SquadMember = {};
     initSquadMember(squad, squadMembersDef);
@@ -68,10 +68,7 @@ describe("regroup", () => {
   });
 });
 
-function initSquadMember(
-  squad: SquadMember,
-  squadMembersDef: (string | number[] | Record<string, any[]>[])[][]
-): SquadMember {
+function initSquadMember(squad: SquadMember, squadMembersDef: (string | number[] | CalledRecord[])[][]): SquadMember {
   squadMembersDef.forEach(
     item =>
       (squad[item[0] as string] = (new CreepMock(
@@ -83,11 +80,8 @@ function initSquadMember(
   return squad;
 }
 
-function assertSquadMember(
-  squad: SquadMember,
-  squadMembersDef: (string | number[] | Record<string, any[]>[])[][]
-): void {
+function assertSquadMember(squad: SquadMember, squadMembersDef: (string | number[] | CalledRecord[])[][]): void {
   squadMembersDef.forEach(item =>
-    assert.deepEqual(((squad[item[0] as string] as unknown) as CreepMock).called, item[2] as Record<string, any[]>[])
+    assert.deepEqual(((squad[item[0] as string] as unknown) as CreepMock).calledRecords, item[2] as CalledRecord[])
   );
 }
