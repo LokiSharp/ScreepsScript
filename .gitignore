@@ -44,7 +44,6 @@ screeps.json
 nbproject
 *.sublime-project
 *.sublime-workspace
-.idea
 
 # =========================
 # Operating System Files
