@@ -65,7 +65,7 @@ function getRoomCost(room: Room, structurePlacePlan: StructurePlanningResult): C
  * @param structurePlacePlan 房间的静态建筑规划结果
  * @returns 可以通过数组解构出三个 RoomPosition 数组，分别是到 source、到 controller、到 mineral 的道路位置
  */
-export default function (
+export default function planRoad(
   room: Room,
   centerPos: RoomPosition,
   structurePlacePlan: StructurePlanningResult
@@ -76,6 +76,7 @@ export default function (
    * 寻找从基地中心点到目标位置的路
    *
    * @param targetPos 要寻找的目标终点
+   * @param range 要寻找的距离目标终点的距离
    */
   const findPath = (targetPos: RoomPosition, range = 2) => {
     const searchResult = PathFinder.search(

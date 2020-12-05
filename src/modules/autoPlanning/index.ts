@@ -12,7 +12,7 @@ const planningCaches: StructurePlanningCache = {};
  *
  * @param room 要发布 creep 的房间
  * @param role 要发布的角色名
- * @param number 要发布的数量，部分角色将无视该值
+ * @param releaseNumber 要发布的数量，部分角色将无视该值
  */
 export const releaseCreep = function (
   room: Room,
@@ -221,7 +221,7 @@ export const manageStructure = function (room: Room): OK | ERR_NOT_OWNER | ERR_N
   }
 
   // 有需要建造的，发布建造者
-  if (needBuild) releaseCreep(room, "builder", 2);
+  if (needBuild) releaseCreep(room, "builder", 3);
 
   // 存档到房间
   if (delayQueue.length > 0) {

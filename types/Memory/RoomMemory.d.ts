@@ -11,7 +11,6 @@ interface RoomMemory {
   delayCSList: string[];
 
   sourceContainersIds: Id<StructureContainer>[];
-  ruinIds: Id<Ruin>[];
   constructionSiteIds: Id<ConstructionSite>[];
 
   // 中央 link 的 id
