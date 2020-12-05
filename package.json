@@ -63,6 +63,7 @@
     "eslint-plugin-prettier": "^3.1.4",
     "lodash": "^3.10.1",
     "mocha": "^5.2.0",
+    "nyc": "^15.1.0",
     "prettier": "^2.0.4",
     "rollup": "^2.6.1",
     "rollup-plugin-buble": "^0.19.8",
@@ -78,7 +79,6 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
-    "nyc": "^15.1.0",
     "source-map": "~0.6.1"
   },
   "config": {
