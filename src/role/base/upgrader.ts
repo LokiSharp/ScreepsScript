@@ -33,7 +33,15 @@ export default function upgrader(data: WorkerData): ICreepConfig {
         else if (source.store[RESOURCE_ENERGY] <= 500) {
           const nearSource = source.pos.findInRange(FIND_SOURCES, 1)[0];
           // 当目标建筑附近的 Source 剩余能量过半时主动采集
-          if (nearSource?.energy >= nearSource?.energyCapacity / 2) creep.getEngryFrom(nearSource);
+          if (nearSource?.energy >= nearSource?.energyCapacity / 2) {
+            creep.getEngryFrom(nearSource);
+            // 当踩到 container 时自杀
+            creep.pos
+              .lookFor(LOOK_STRUCTURES)
+              .forEach(structure =>
+                structure.structureType === STRUCTURE_CONTAINER ? creep.suicide() : creep.say("⛏️")
+              );
+          }
           return false;
         }
       }
