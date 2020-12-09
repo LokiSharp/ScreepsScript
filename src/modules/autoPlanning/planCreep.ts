@@ -1,4 +1,4 @@
-import { MAX_HARVESTER_NUM, MAX_UPGRADER_NUM, UPGRADE_WITH_STORAGE } from "setting";
+import { FILLER_WITH_CONTAINER_RANGE, MAX_HARVESTER_NUM, MAX_UPGRADER_NUM, UPGRADE_WITH_STORAGE } from "setting";
 import { creepApi } from "modules/creepController/creepApi";
 
 // 在 Function 原型上挂载 setNextPlan 方法来完成 creep 发布的职责链
@@ -235,23 +235,42 @@ const releasePlans: CreepReleasePlans = {
     // 发布计划
     plans: [
       // container 修建完成
-      ({ room, sourceContainerIds }: TransporterPlanStats) => {
+      ({ room, sourceContainerIds, centerPos }: TransporterPlanStats) => {
+        let releaseNumber = 0;
         // 遍历现存的 container，发布填充单位
-        sourceContainerIds.forEach((containerId, index) =>
-          creepApi.add(
-            `${room.name} filler${index}`,
-            "filler",
-            {
-              sourceId: containerId
-            },
-            room.name
-          )
-        );
+        // 会根据 container 到基地的距离决定发布数量
+        sourceContainerIds.forEach((containerId, index) => {
+          const container = Game.getObjectById(containerId);
+          if (!container) return;
 
-        room.log(`发布 filler * ${sourceContainerIds.length}`, "transporter", "green");
+          // 获取 container 到基地中心的距离
+          const range = centerPos
+            ? container.pos.findPathTo(centerPos[0], centerPos[1]).length
+            : // 没有设置基地中心点，使用第一个 spawn 的位置
+              container.pos.findPathTo(room[STRUCTURE_SPAWN][0].pos.x, room[STRUCTURE_SPAWN][0].pos.y).length;
+
+          // 根据获取合适的人数
+          const numberConfig = FILLER_WITH_CONTAINER_RANGE.find(config => range > config.range);
+          releaseNumber += numberConfig.num;
+
+          // 发布对应数量的 filler
+          for (let i = 0; i < numberConfig.num; i++) {
+            creepApi.add(
+              `${room.name} filler${index}${i}`,
+              "filler",
+              {
+                sourceId: containerId
+              },
+              room.name
+            );
+          }
+        });
+
+        room.log(`发布 filler * ${releaseNumber}`, "transporter", "green");
         // 发布并没有完成，继续检查是否可以发布 manager 和 processor
         return false;
       },
+
       // storage 修建完成
       ({ room, storageId }: TransporterPlanStats) => {
         if (!storageId) return true;
