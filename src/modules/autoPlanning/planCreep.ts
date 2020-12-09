@@ -429,10 +429,7 @@ function releaseMiner(room: Room): OK | ERR_NOT_FOUND {
  * 房间运营角色名对应的发布逻辑
  */
 export const roleToRelease: {
-  [role in BaseRoleConstant | AdvancedRoleConstant]: (
-    room: Room,
-    releaseNumber: number
-  ) => OK | ERR_NOT_FOUND | ERR_NOT_ENOUGH_ENERGY;
+  [role in CreepRoleConstant]?: (room: Room, releaseNumber: number) => OK | ERR_NOT_FOUND | ERR_NOT_ENOUGH_ENERGY;
 } = {
   harvester: releaseHarvester,
   collector: releaseHarvester,

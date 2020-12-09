@@ -16,7 +16,7 @@ const planningCaches: StructurePlanningCache = {};
  */
 export const releaseCreep = function (
   room: Room,
-  role: BaseRoleConstant | AdvancedRoleConstant,
+  role: CreepRoleConstant,
   releaseNumber: number
 ): OK | ERR_NOT_FOUND | ERR_NOT_ENOUGH_ENERGY {
   return roleToRelease[role](room, releaseNumber);

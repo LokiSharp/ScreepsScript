@@ -92,7 +92,7 @@ export default class RoomExtension extends Room {
    * @param role 要发布的 creep 角色
    * @param releaseNumber 孵化几个 creep
    */
-  public releaseCreep(role: BaseRoleConstant | AdvancedRoleConstant, releaseNumber = 1): ScreepsReturnCode {
+  public releaseCreep(role: CreepRoleConstant, releaseNumber = 1): ScreepsReturnCode {
     return releaseCreep(this, role, releaseNumber);
   }
 
@@ -225,10 +225,7 @@ export default class RoomExtension extends Room {
   public addCenterTask(task: ITransferTask, priority: number = null): number {
     if (this.hasCenterTask(task.submit)) return -1;
     // 由于这里的目标建筑限制型和非限制型存储都有，这里一律作为非限制性检查来减少代码量
-    if (
-      this[task.target] &&
-      (this[task.target].store as StoreDefinitionUnlimited).getFreeCapacity(task.resourceType) < task.amount
-    )
+    if ((this[task.target]?.store as StoreDefinitionUnlimited)?.getFreeCapacity(task.resourceType) < task.amount)
       return -2;
 
     if (!priority) this.memory.centerTransferTasks.push(task);

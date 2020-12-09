@@ -6,17 +6,19 @@ import createBodyGetter from "utils/creep/createBodyGetter";
  * 拆除者
  * 会一直向旗帜发起进攻，拆除旗帜下的建筑
  */
-export default function dismantler(data: WarUnitData): ICreepConfig {
-  return {
-    ...battleBase(data.targetFlagName, data.keepSpawn),
-    prepare: creep => {
-      if ((creep.memory.data as WarUnitData).wayPoint) {
-        creep.setWayPoint((creep.memory.data as WarUnitData).wayPoint);
-        creep.memory.fromShard = Game.shard.name as ShardName;
-      }
-      return true;
-    },
-    target: creep => creep.dismantleFlag(data.targetFlagName, data.healerName),
-    bodys: createBodyGetter(bodyConfigs.dismantler)
-  };
-}
+export const dismantler: CreepConfig<"dismantler"> = {
+  ...battleBase(),
+  prepare: creep => {
+    const { wayPoint } = creep.memory.data;
+    if (wayPoint) {
+      creep.setWayPoint(wayPoint);
+      creep.memory.fromShard = Game.shard.name as ShardName;
+    }
+    return true;
+  },
+  target: creep => {
+    const { targetFlagName, healerName } = creep.memory.data;
+    return creep.dismantleFlag(targetFlagName, healerName);
+  },
+  bodys: createBodyGetter(bodyConfigs.dismantler)
+};

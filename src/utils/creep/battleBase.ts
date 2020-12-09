@@ -1,17 +1,16 @@
 /**
  * 战斗 creep 基础阶段
  * 本方法抽象出了战斗 Creep 通用的 source 阶段和 switch 阶段
- *
- * @param flagName 目标旗帜名称
  */
-export const battleBase = (flagName: string, keepSpawn: boolean): ICreepStage => ({
+export const battleBase = <Role extends CreepRoleConstant>(): ICreepStage<Role> => ({
   // 根据玩家配置决定是否持续生成
-  isNeed: () => keepSpawn,
+  isNeed: (room, preMemory) => (preMemory.data as WarUnitData).keepSpawn,
   /**
    * 获取旗帜，然后向指定房间移动
    * 同时保证自己的健康状态
    */
-  source: (creep: Creep) => {
+  source: (creep: Creep<Role>) => {
+    const { targetFlagName } = creep.memory.data as WarUnitData;
     if (creep.memory.moveInfo && creep.memory.moveInfo.wayPoints) {
       creep.goTo(undefined, {
         checkTarget: true,
@@ -19,7 +18,7 @@ export const battleBase = (flagName: string, keepSpawn: boolean): ICreepStage =>
       });
 
       if (creep.memory.moveInfo && creep.memory.moveInfo.wayPoints && creep.memory.moveInfo.wayPoints.length <= 1) {
-        const targetFlag = creep.getFlag(flagName);
+        const targetFlag = creep.getFlag(targetFlagName);
 
         if (creep.room.name === targetFlag.pos.roomName) {
           creep.log(`抵达指定房间，切入作战模式`, "green");
@@ -28,7 +27,7 @@ export const battleBase = (flagName: string, keepSpawn: boolean): ICreepStage =>
         }
       }
     } else {
-      const targetFlag = creep.getFlag(flagName);
+      const targetFlag = creep.getFlag(targetFlagName);
       if (!targetFlag) {
         creep.say("旗呢?");
         return false;

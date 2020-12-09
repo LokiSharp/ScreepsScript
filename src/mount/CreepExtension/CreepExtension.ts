@@ -1,7 +1,7 @@
 import { MIN_WALL_HITS, repairSetting } from "setting";
 import { Move, WayPoint } from "modules/move";
+import creepWorks from "role";
 import { getMemoryFromCrossShard } from "modules/crossShard";
-import roles from "role";
 import { updateStructure } from "modules/shortcut/updateStructure";
 
 export default class CreepExtension extends Creep {
@@ -9,7 +9,6 @@ export default class CreepExtension extends Creep {
    * 发送日志
    *
    * @param content 日志内容
-   * @param instanceName 发送日志的实例名
    * @param color 日志前缀颜色
    * @param notify 是否发送邮件
    */
@@ -22,7 +21,7 @@ export default class CreepExtension extends Creep {
    */
   public work(): void {
     // 检查 creep 内存中的角色是否存在
-    if (!(this.memory.role in roles)) {
+    if (!(this.memory.role in creepWorks)) {
       // 没有的话可能是放在跨 shard 暂存区了
       const memory = getMemoryFromCrossShard(this.name);
       // console.log(`${this.name} 从暂存区获取了内存`, memory)
@@ -37,7 +36,7 @@ export default class CreepExtension extends Creep {
     if (this.spawning) return;
 
     // 获取对应配置项
-    const creepConfig: ICreepConfig = roles[this.memory.role](this.memory.data);
+    const creepConfig: CreepConfig<CreepRoleConstant> = creepWorks[this.memory.role];
 
     // 没准备的时候就执行准备阶段
     if (!this.memory.ready) {
@@ -75,6 +74,7 @@ export default class CreepExtension extends Creep {
    * 无视 Creep 的寻路
    *
    * @param target 要移动到的位置
+   * @param moveOpt 移动参数
    */
   public goTo(target?: RoomPosition, moveOpt?: MoveOpt): ScreepsReturnCode {
     return Move.goTo(this, target, moveOpt);
@@ -370,7 +370,7 @@ export default class CreepExtension extends Creep {
 
     // 获取治疗目标，目标生命值损失大于等于自己的话，就治疗目标
     // 否则治疗自己
-    let target: Creep = null;
+    let target: Creep;
     if (creep.hitsMax - creep.hits >= this.hitsMax - this.hits) target = creep;
     else target = this;
 
@@ -415,8 +415,7 @@ export default class CreepExtension extends Creep {
    * @returns 可以移动时返回 true，否则返回 false
    */
   private canMoveWith(creep: Creep): boolean {
-    if (creep && this.pos.isNearTo(creep) && creep.fatigue === 0) return true;
-    return false;
+    return creep && this.pos.isNearTo(creep) && creep.fatigue === 0;
   }
 
   /**
@@ -424,6 +423,7 @@ export default class CreepExtension extends Creep {
    * 向指定旗帜发起进攻并拆除旗帜下的建筑
    *
    * @param flagName 要进攻的旗帜名称
+   * @param healerName 治疗单位名称
    */
   public dismantleFlag(flagName: string, healerName = ""): boolean {
     // 获取旗帜

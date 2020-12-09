@@ -1,7 +1,7 @@
 /**
  * creep 内存拓展
  */
-interface CreepMemory {
+interface CreepMemory<Role extends CreepRoleConstant = CreepRoleConstant> {
   /**
    * 移动缓存
    */
@@ -36,7 +36,7 @@ interface CreepMemory {
   // 是否在工作
   working: boolean;
   // creep 在工作时需要的自定义配置，在孵化时由 spawn 复制
-  data?: CreepData;
+  data?: RoleDatas[Role];
   // 要采集的资源 Id
   sourceId?: Id<AllEnergySource>;
   // 要存放到的目标建筑

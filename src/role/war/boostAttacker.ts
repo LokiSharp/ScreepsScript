@@ -6,21 +6,20 @@ import calcBodyPart from "utils/creep/calcBodyPart";
  * 强化 - 士兵
  * 7 级以上可用, 12TOUGH 28ATTACK 10MOVE
  */
-export default function boostAttacker(data: WarUnitData): ICreepConfig {
-  return {
-    ...battleBase(data.targetFlagName, data.keepSpawn),
-    ...boostPrepare(),
-    target: creep => {
-      creep.attackFlag(data.targetFlagName);
+export const boostAttacker: CreepConfig<"boostAttacker"> = {
+  ...battleBase(),
+  ...boostPrepare(),
+  target: creep => {
+    const { targetFlagName } = creep.memory.data;
+    creep.attackFlag(targetFlagName);
 
-      const targetFlag = creep.getFlag(data.targetFlagName);
-      if (!targetFlag) {
-        creep.say("旗呢?");
-        return false;
-      }
+    const targetFlag = creep.getFlag(targetFlagName);
+    if (!targetFlag) {
+      creep.say("旗呢?");
+      return false;
+    }
 
-      return creep.room.name !== targetFlag.pos.roomName;
-    },
-    bodys: () => calcBodyPart({ [TOUGH]: 12, [ATTACK]: 28, [MOVE]: 10 })
-  };
-}
+    return creep.room.name !== targetFlag.pos.roomName;
+  },
+  bodys: () => calcBodyPart({ [TOUGH]: 12, [ATTACK]: 28, [MOVE]: 10 })
+};
