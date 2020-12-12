@@ -247,6 +247,19 @@ export default class RoomHelp extends RoomExtension {
             functionName: "spawnDismantler"
           },
           {
+            title: "孵化强化进攻一体机",
+            describe: "孵化基础、无 boost 、无 TOUGH 的进攻一体机单位",
+            params: [
+              { name: "targetFlagName", desc: `[可选] 进攻旗帜名称，默认为 ${DEFAULT_FLAG_NAME.ATTACK}` },
+              {
+                name: "keepSpawn",
+                desc:
+                  '[可选] 是否持续生成，置为 true 时可以执行 creepApi.remove("creepName") 来终止持续生成，默认为 false'
+              }
+            ],
+            functionName: "spawnRangedAttacker"
+          },
+          {
             title: "孵化强化进攻单位",
             describe: "<需要战争状态> 孵化完全 boost 的红球单位",
             params: [
@@ -270,7 +283,7 @@ export default class RoomHelp extends RoomExtension {
             functionName: "spawnBoostDismantler"
           },
           {
-            title: "孵化进攻一体机",
+            title: "孵化强化进攻一体机",
             describe: "<需要战争状态> 包含完全 boost 的蓝绿球单位",
             params: [
               { name: "bearTowerNum", desc: "[可选] 抗塔等级 0-6，等级越高扛伤能力越强，伤害越低，默认为 6" },
@@ -281,7 +294,7 @@ export default class RoomHelp extends RoomExtension {
                   '[可选] 是否持续生成，置为 true 时可以执行 creepApi.remove("creepName") 来终止持续生成，默认为 false'
               }
             ],
-            functionName: "spawnRangedAttacker"
+            functionName: "spawnBoostRangedAttacker"
           },
           {
             title: "孵化拆墙小组",

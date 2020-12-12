@@ -186,6 +186,20 @@ export const bodyConfigs: BodyConfigs = {
     { [WORK]: 15, [MOVE]: 15 },
     { [WORK]: 25, [MOVE]: 25 },
     { [WORK]: 25, [MOVE]: 25 }
+  ),
+
+  /**
+   * 远程作战单位身体
+   */
+  rangedAttacker: getBodyConfig(
+    { [RANGED_ATTACK]: 1, [MOVE]: 1 },
+    { [RANGED_ATTACK]: 1, [MOVE]: 2, [HEAL]: 1 },
+    { [RANGED_ATTACK]: 2, [MOVE]: 3, [HEAL]: 1 },
+    { [RANGED_ATTACK]: 3, [MOVE]: 5, [HEAL]: 2 },
+    { [RANGED_ATTACK]: 6, [MOVE]: 8, [HEAL]: 2 },
+    { [RANGED_ATTACK]: 7, [MOVE]: 10, [HEAL]: 3 },
+    { [RANGED_ATTACK]: 12, [MOVE]: 20, [HEAL]: 8 },
+    { [RANGED_ATTACK]: 15, [MOVE]: 25, [HEAL]: 10 }
   )
 };
 

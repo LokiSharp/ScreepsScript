@@ -53,6 +53,7 @@ interface RoleDatas {
   dismantler: WarUnitData;
   boostDismantler: WarUnitData;
   rangedAttacker: RangedAttackerData;
+  boostRangedAttacker: RangedAttackerData;
   defender: EmptyData;
 }
 
@@ -68,8 +69,7 @@ type CreepWork = {
  * 有些角色不需要 data
  */
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface EmptyData {
-}
+interface EmptyData {}
 
 /**
  * 采集单位的 data

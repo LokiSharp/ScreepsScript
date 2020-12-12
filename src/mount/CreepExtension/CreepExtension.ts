@@ -607,7 +607,7 @@ export default class CreepExtension extends Creep {
    * 从缓存获取敌方 Creep
    */
   public getHostileCreepsWithCache(hard?: boolean): AnyCreep[] {
-    const expireTime = 20;
+    const expireTime = 5;
     if (!this.room.memory.targetHostileCreepsCache) {
       this.room.memory.targetHostileCreepsCache = [];
     }

@@ -2,6 +2,7 @@ import { attacker } from "./war/attacker";
 import { boostAttacker } from "./war/boostAttacker";
 import { boostDismantler } from "./war/boostDismantler";
 import { boostHealer } from "./war/boostHealer";
+import { boostRangedAttacker } from "./war/boostRangedAttacker";
 import { buildHelper } from "./remote/buildHelper";
 import { builder } from "./base/builder";
 import { claimer } from "./remote/claimer";
@@ -75,7 +76,8 @@ const creepWorks: CreepWork = {
   dismantler,
   boostDismantler,
   boostHealer,
-  boostAttacker
+  boostAttacker,
+  boostRangedAttacker
 };
 
 /**

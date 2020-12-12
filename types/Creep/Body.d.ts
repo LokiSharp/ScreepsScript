@@ -42,4 +42,5 @@ type BodyAutoConfigConstant =
   | "attacker"
   | "healer"
   | "remoteHelper"
-  | "dismantler";
+  | "dismantler"
+  | "rangedAttacker";
