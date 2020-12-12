@@ -13,9 +13,23 @@ interface CreepConfig<Role extends CreepRoleConstant> {
    * 准备阶段
    *
    * creep 出生后会执行该方法来完成一些需要准备的工作，返回 true 时代表准备完成
-   * 该方法为空则直接进入 source 阶段
+   * 该方法为空则直接进入 wayPoint 阶段
    */
   prepare?: (creep: Creep<Role>) => boolean;
+  /**
+   * 设置座标点阶段
+   *
+   * creep 准备完成后会执行该方法来设置座标点，返回 true 时代表完成
+   * 该方法为空则直接进入 inPlace 阶段
+   */
+  wayPoint?: (creep: Creep<Role>) => boolean;
+  /**
+   * 就位阶段
+   *
+   * creep 准备完成后会执行该方法来到达指定位置，返回 true 时代表完成
+   * 该方法为空则直接进入 source 阶段
+   */
+  inPlace?: (creep: Creep<Role>) => boolean;
   /**
    * 获取工作资源阶段
    *
@@ -39,6 +53,8 @@ interface CreepConfig<Role extends CreepRoleConstant> {
 interface ICreepStage<Role extends CreepRoleConstant> {
   isNeed?: (room: Room, preMemory: CreepMemory<Role>) => boolean;
   prepare?: (creep: Creep<Role>) => boolean;
+  wayPoint?: (creep: Creep<Role>) => boolean;
+  inPlace?: (creep: Creep<Role>) => boolean;
   source?: (creep: Creep<Role>) => boolean;
   target?: (creep: Creep<Role>) => boolean;
 }

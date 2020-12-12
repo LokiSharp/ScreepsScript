@@ -1,6 +1,7 @@
 import { battleBase } from "utils/creep/battleBase";
 import { bodyConfigs } from "../../setting";
 import createBodyGetter from "../../utils/creep/createBodyGetter";
+import { inPlaceBase } from "../../utils/creep/inPlaceBase";
 
 /**
  * 远程作战单位
@@ -8,6 +9,7 @@ import createBodyGetter from "../../utils/creep/createBodyGetter";
 export const rangedAttacker: CreepConfig<"rangedAttacker"> = {
   // 组装 CreepConfig
   ...battleBase(),
+  ...inPlaceBase(),
   target: creep => {
     const { targetFlagName } = creep.memory.data;
     // 获取旗帜

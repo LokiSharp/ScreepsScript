@@ -202,3 +202,7 @@ interface RangedAttackerData {
   keepSpawn: boolean;
   wayPoint?: string;
 }
+
+interface DataWithWayPoint {
+  wayPoint?: string;
+}

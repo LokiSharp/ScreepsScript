@@ -1,5 +1,6 @@
 import { bodyConfigs } from "setting";
 import createBodyGetter from "utils/creep/createBodyGetter";
+import { inPlaceBase } from "../../utils/creep/inPlaceBase";
 
 /**
  * 医生
@@ -17,6 +18,7 @@ export const healer: CreepConfig<"healer"> = {
     }
     return true;
   },
+  ...inPlaceBase(),
   source: creep => {
     const { creepName } = creep.memory.data;
     if (creep.memory.moveInfo && creep.memory.moveInfo.wayPoints) {

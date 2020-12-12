@@ -1,5 +1,6 @@
 import { boostPrepare } from "utils/creep/boostPrepare";
 import calcBodyPart from "utils/creep/calcBodyPart";
+import { inPlaceBase } from "../../utils/creep/inPlaceBase";
 
 /**
  * 强化 - HEAL
@@ -13,6 +14,7 @@ export const boostHealer: CreepConfig<"boostHealer"> = {
 
     return boostPrepare().prepare(creep);
   },
+  ...inPlaceBase(),
   target: creep => {
     const { creepName } = creep.memory.data;
     const target = Game.creeps[creepName];

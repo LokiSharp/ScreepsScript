@@ -1,6 +1,7 @@
 import { battleBase } from "utils/creep/battleBase";
 import { boostPrepare } from "utils/creep/boostPrepare";
 import calcBodyPart from "utils/creep/calcBodyPart";
+import { inPlaceBase } from "../../utils/creep/inPlaceBase";
 
 /**
  * 强化 - 远程作战单位
@@ -11,6 +12,7 @@ export const boostRangedAttacker: CreepConfig<"boostRangedAttacker"> = {
   // 组装 CreepConfig
   ...battleBase(),
   ...boostPrepare(),
+  ...inPlaceBase(),
   target: creep => {
     const { targetFlagName } = creep.memory.data;
     // 获取旗帜

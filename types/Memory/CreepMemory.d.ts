@@ -33,6 +33,10 @@ interface CreepMemory<Role extends CreepRoleConstant = CreepRoleConstant> {
   role: CreepRoleConstant;
   // creep 是否已经准备好可以工作了
   ready: boolean;
+  // 是否设置了路径点
+  setWayPoint: boolean;
+  // 是否抵达了路径点
+  inPlace: boolean;
   // 是否在工作
   working: boolean;
   // creep 在工作时需要的自定义配置，在孵化时由 spawn 复制

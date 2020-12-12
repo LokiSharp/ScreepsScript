@@ -1,3 +1,5 @@
+import { inPlaceBase } from "../../utils/creep/inPlaceBase";
+
 /**
  * 移动测试单位
  *
@@ -7,11 +9,11 @@
  */
 export const moveTester: CreepConfig<"moveTester"> = {
   isNeed: (room, preMemory) => preMemory.data.keepSpawn,
-  prepare: creep => {
+  ...inPlaceBase(),
+  wayPoint: creep => {
     const { wayPoint, logPrePos } = creep.memory.data;
-    creep.setWayPoint(wayPoint);
-    creep.memory.fromShard = Game.shard.name as ShardName;
-    creep.memory.logPrePos = logPrePos;
+    if (wayPoint) creep.setWayPoint(creep.memory.data.wayPoint);
+    if (logPrePos) creep.memory.logPrePos = logPrePos;
     return true;
   },
   target: creep => {

@@ -205,8 +205,10 @@ export const bodyConfigs: BodyConfigs = {
 
 // creep 的默认内存
 export const creepDefaultMemory: CreepMemory = {
-  role: "harvester",
+  role: undefined,
   ready: false,
+  setWayPoint: false,
+  inPlace: false,
   working: false
 };
 

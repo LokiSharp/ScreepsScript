@@ -120,19 +120,12 @@ interface Room {
 
   // 自动规划相关
   findBaseCenterPos(): RoomPosition[];
-
   confirmBaseCenter(targetPos?: RoomPosition[]): RoomPosition | ERR_NOT_FOUND;
-
   setBaseCenter(pos: RoomPosition): OK | ERR_INVALID_ARGS;
-
   planLayout(): string;
-
   clearStructure(): OK | ERR_NOT_FOUND;
-
   addRemote(remoteRoomName: string, targetId: Id<StructureWithStore>): OK | ERR_INVALID_TARGET | ERR_NOT_FOUND;
-
   removeRemote(remoteRoomName: string, removeFlag?: boolean): OK | ERR_NOT_FOUND;
-
   claimRoom(targetRoomName: string, signText?: string): OK;
   registerContainer(container: StructureContainer): OK;
 }

@@ -49,6 +49,28 @@ export default class CreepExtension extends Creep {
     // 如果执行了 prepare 还没有 ready，就返回等下个 tick 再执行
     if (!this.memory.ready) return;
 
+    // 没路径的时候就执行路径阶段
+    if (!this.memory.setWayPoint) {
+      // 有路径阶段配置则执行
+      if (creepConfig.wayPoint) this.memory.setWayPoint = creepConfig.wayPoint(this);
+      // 没有就直接完成
+      else this.memory.setWayPoint = true;
+    }
+
+    // 如果执行了 wayPoint 还没有 ready，就返回等下个 tick 再执行
+    if (!this.memory.setWayPoint) return;
+
+    // 没路径的时候就执行路径阶段
+    if (!this.memory.inPlace) {
+      // 有路径阶段配置则执行
+      if (creepConfig.inPlace) this.memory.inPlace = creepConfig.inPlace(this);
+      // 没有就直接完成
+      else this.memory.inPlace = true;
+    }
+
+    // 如果执行了 wayPoint 还没有 ready，就返回等下个 tick 再执行
+    if (!this.memory.inPlace) return;
+
     // 获取是否工作，没有 source 的话直接执行 target
     const working = creepConfig.source ? this.memory.working : true;
 
@@ -87,6 +109,7 @@ export default class CreepExtension extends Creep {
    * @param target 要进行设置的目标，位置字符串数组或者是路径名前缀
    */
   public setWayPoint(target: string[] | string): ScreepsReturnCode {
+    this.memory.fromShard = Game.shard.name as ShardName;
     return WayPoint.setWayPoint(this, target);
   }
 

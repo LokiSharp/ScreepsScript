@@ -1,6 +1,7 @@
 import { battleBase } from "utils/creep/battleBase";
 import { bodyConfigs } from "setting";
 import createBodyGetter from "utils/creep/createBodyGetter";
+import { inPlaceBase } from "utils/creep/inPlaceBase";
 
 /**
  * 士兵
@@ -9,13 +10,7 @@ import createBodyGetter from "utils/creep/createBodyGetter";
  */
 export const attacker: CreepConfig<"attacker"> = {
   ...battleBase(),
-  prepare: (creep: Creep) => {
-    if ((creep.memory.data as WarUnitData).wayPoint) {
-      creep.setWayPoint((creep.memory.data as WarUnitData).wayPoint);
-      creep.memory.fromShard = Game.shard.name as ShardName;
-    }
-    return true;
-  },
+  ...inPlaceBase(),
   target: creep => {
     const { targetFlagName } = creep.memory.data;
     creep.attackFlag(targetFlagName);
