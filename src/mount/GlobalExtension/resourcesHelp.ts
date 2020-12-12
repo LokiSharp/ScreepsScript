@@ -1,4 +1,4 @@
-import createConst from "utils/console/createConst";
+import createConst from "utils/console/CreateConst";
 
 // 资源常量控制台帮助
 export const resourcesHelp = `

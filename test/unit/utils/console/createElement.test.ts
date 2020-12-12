@@ -1,15 +1,20 @@
+import CreateElement from "../../../../src/utils/console/createElement";
 import GameMock from "../../mock/GameMock";
 import { assert } from "chai";
-import createElement from "../../../../src/utils/console/createElement";
 
-describe("createElement", () => {
+describe("CreateElement", () => {
   beforeEach(() => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore : allow adding Game to global
-    global.Game = _.clone(new GameMock());
+    global.Game = new GameMock();
   });
+  it("CreateElement 可以初始化", () => {
+    const createElement = new CreateElement();
+    assert.isDefined(createElement);
+  });
+
   it("可以生成元素样式", () => {
-    createElement.style = `<style>
+    CreateElement.style = `<style>
     input {
         background-color: #2b2b2b;
         border: none;
@@ -19,14 +24,14 @@ describe("createElement", () => {
     }
 </style>`;
     assert.equal(
-      createElement.customStyle(),
+      CreateElement.customStyle(),
       "<style>input {background-color: #2b2b2b;border: none;border-bottom: 1px solid #888;padding: 3px;color: #ccc;}</style>"
     );
   });
 
   it("可以创建 input 输入框", () => {
     assert.equal(
-      createElement.input({
+      CreateElement.input({
         name: "TestInputName",
         label: "TestInputLabel",
         placeholder: "TestInputPlaceHolder",
@@ -34,11 +39,19 @@ describe("createElement", () => {
       }),
       'TestInputLabel <input name="TestInputName" placeholder="TestInputPlaceHolder"/>'
     );
+
+    assert.equal(
+      CreateElement.input({
+        name: "TestInputName",
+        type: "input"
+      }),
+      ' <input name="TestInputName" placeholder=""/>'
+    );
   });
 
   it("可以创建 select 下拉框", () => {
     assert.equal(
-      createElement.select({
+      CreateElement.select({
         name: "TestSelectName",
         label: "TestSelectLabel",
         options: [{ value: "TestSelectOptionValue", label: "TestSelectOptionLabel" }],
@@ -46,11 +59,20 @@ describe("createElement", () => {
       }),
       'TestSelectLabel <select name="TestSelectName"> <option value="TestSelectOptionValue">TestSelectOptionLabel</option></select>'
     );
+
+    assert.equal(
+      CreateElement.select({
+        name: "TestSelectName",
+        options: [{ value: "TestSelectOptionValue", label: "TestSelectOptionLabel" }],
+        type: "select"
+      }),
+      ' <select name="TestSelectName"> <option value="TestSelectOptionValue">TestSelectOptionLabel</option></select>'
+    );
   });
 
   it("可以创建 button 按钮", () => {
     assert.equal(
-      createElement.button({
+      CreateElement.button({
         content: "TestButtonContent",
         command: "TestButtonCommand"
       }),
@@ -61,7 +83,7 @@ describe("createElement", () => {
   it("可以创建 form 表单", () => {
     Game.time = 0;
     assert.equal(
-      createElement.form(
+      CreateElement.form(
         "TestFormName",
         [
           {

@@ -28,11 +28,11 @@ Function.prototype.setNextPlan = function (nextPlan): PlanNodeFunction {
 /**
  * 快捷发布 upgrader
  * @param roomName 要添加到的房间名
- * @param indexs creep 的名称后缀
+ * @param indexes creep 的名称后缀
  * @param sourceId 能量来源 id
  */
-function addUpgrader(roomName: string, indexs: number[], sourceId: string): void {
-  indexs.forEach(i => creepApi.add(`${roomName} upgrader${i}`, "upgrader", { sourceId }, roomName));
+function addUpgrader(roomName: string, indexes: number[], sourceId: string): void {
+  indexes.forEach(i => creepApi.add(`${roomName} upgrader${i}`, "upgrader", { sourceId }, roomName));
 }
 
 const releasePlans: CreepReleasePlans = {
@@ -195,7 +195,7 @@ const releasePlans: CreepReleasePlans = {
       // 兜底，从 sourceContainer 中获取能量
       ({ room, sourceContainerIds }: UpgraderPlanStats) => {
         // 有援建单位，每个 container 少发布一个 upgrader
-        const upgraderIndexs = creepApi.has(`${room.name} RemoteUpgrader`) ? [0] : [0, 1];
+        const upgraderIndexs = creepApi.has(`${room.name} RemoteUpgrader`) ? [0] : [0, 1, 2, 3];
 
         // 遍历所有 container，发布对应数量的 upgrader
         sourceContainerIds.forEach((containerId, index) => {

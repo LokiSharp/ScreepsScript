@@ -1,4 +1,4 @@
-import { bodyConfigs, minerHervesteLimit } from "setting";
+import { bodyConfigs, minerHarvestLimit } from "setting";
 import createBodyGetter from "utils/creep/createBodyGetter";
 
 /**
@@ -16,7 +16,7 @@ export default function miner(): ICreepConfig {
       }
 
       // 再检查下终端存储是否已经太多了, 如果太多了就休眠一段时间再出来看看
-      if (!room.terminal || room.terminal.store.getUsedCapacity() >= minerHervesteLimit) {
+      if (!room.terminal || room.terminal.store.getUsedCapacity() >= minerHarvestLimit) {
         room.memory.mineralCooldown = Game.time + 10000;
         return false;
       }
@@ -53,8 +53,7 @@ export default function miner(): ICreepConfig {
       if (creep.transfer(target, Object.keys(creep.store)[0] as ResourceConstant) === ERR_NOT_IN_RANGE)
         creep.goTo(target.pos);
 
-      if (creep.store.getUsedCapacity() === 0) return true;
-      return false;
+      return creep.store.getUsedCapacity() === 0;
     },
     bodys: createBodyGetter(bodyConfigs.worker)
   };

@@ -8,10 +8,16 @@ describe("checkAliveFlag", () => {
   beforeEach(() => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore : allow adding Game to global
-    global.Game = _.clone(new GameMock());
+    global.Game = new GameMock();
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore : allow adding Memory to global
-    global.Memory = _.clone(new MemoryMock());
+    global.Memory = new MemoryMock();
+  });
+
+  it("Memory.flags 不存在时直接返回 False", () => {
+    delete Memory.flags;
+    const result = checkAliveFlag("testFlagIsUndefined");
+    assert.isFalse(result);
   });
 
   it("旗帜存在时返回 True", () => {

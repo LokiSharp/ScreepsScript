@@ -1,4 +1,4 @@
-import { PB_HARVESTE_STATE } from "setting";
+import { PB_HARVEST_STATE } from "setting";
 import calcBodyPart from "utils/creep/calcBodyPart";
 
 /**
@@ -28,7 +28,7 @@ export default function pbCarrier(data: RemoteHarvesterData): ICreepConfig {
         return false;
       }
       // 没到搬运的时候就先待命
-      if (targetFlag.memory.state !== PB_HARVESTE_STATE.TRANSFER) return false;
+      if (targetFlag.memory.state !== PB_HARVEST_STATE.TRANSFER) return false;
       // 到行动阶段了就过去
       creep.goTo(targetFlag.pos);
 

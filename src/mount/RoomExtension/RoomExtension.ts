@@ -3,14 +3,14 @@ import { confirmBasePos, findBaseCenterPos, setBaseCenter } from "modules/autoPl
 import { manageStructure, releaseCreep } from "modules/autoPlanning";
 import createRoomLink from "utils/console/createRoomLink";
 import { creepApi } from "modules/creepController/creepApi";
-import { log } from "utils/console/log";
+import log from "utils/console/log";
 
 export default class RoomExtension extends Room {
   /**
    * 全局日志
    *
    * @param content 日志内容
-   * @param prefixes 前缀中包含的内容
+   * @param instanceName 前缀中包含的内容
    * @param color 日志前缀颜色
    * @param notify 是否发送邮件
    */
@@ -37,8 +37,6 @@ export default class RoomExtension extends Room {
     // 触发对应的 creep 发布规划
     this.releaseCreep("filler");
     this.releaseCreep("upgrader");
-    // 有几个 container 就发布几个 repairer
-    this.releaseCreep("repairer", this.memory.sourceContainersIds.length);
 
     return OK;
   }
@@ -92,6 +90,7 @@ export default class RoomExtension extends Room {
   /**
    * 给本房间发布或重新规划指定的 creep 角色
    * @param role 要发布的 creep 角色
+   * @param releaseNumber 孵化几个 creep
    */
   public releaseCreep(role: BaseRoleConstant | AdvancedRoleConstant, releaseNumber = 1): ScreepsReturnCode {
     return releaseCreep(this, role, releaseNumber);
@@ -159,7 +158,7 @@ export default class RoomExtension extends Room {
     if (!this.memory.transferTasks) this.memory.transferTasks = [];
 
     const transferTask = this.memory.transferTasks.find(task => task.type === taskType);
-    return transferTask ? true : false;
+    return !!transferTask;
   }
 
   /**
@@ -248,7 +247,7 @@ export default class RoomExtension extends Room {
     if (!this.memory.centerTransferTasks) this.memory.centerTransferTasks = [];
 
     const task = this.memory.centerTransferTasks.find(_task => _task.submit === submit);
-    return task ? true : false;
+    return !!task;
   }
 
   /**
@@ -282,7 +281,6 @@ export default class RoomExtension extends Room {
   /**
    * 处理任务
    *
-   * @param submitId 提交者的 id
    * @param transferAmount 本次转移的数量
    */
   public handleCenterTask(transferAmount: number): void {
@@ -375,8 +373,7 @@ export default class RoomExtension extends Room {
     const targetRoom = this.shareGetSource(resourceType);
     if (!targetRoom) return false;
 
-    const addResult = targetRoom.shareAdd(this.name, resourceType, amount);
-    return addResult;
+    return targetRoom.shareAdd(this.name, resourceType, amount);
   }
 
   /**
@@ -440,7 +437,6 @@ export default class RoomExtension extends Room {
    * 根据资源类型查找来源房间
    *
    * @param resourceType 要查找的资源类型
-   * @param amount 请求的数量
    * @returns 找到的目标房间，没找到返回 null
    */
   private shareGetSource(resourceType: ResourceConstant): Room | null {
@@ -723,7 +719,7 @@ export default class RoomExtension extends Room {
    * @param task 要检查的 power 任务
    */
   private hasPowerTask(task: PowerConstant): boolean {
-    return this.memory.powerTasks.find(power => power === task) ? true : false;
+    return !!this.memory.powerTasks.find(power => power === task);
   }
 
   /**

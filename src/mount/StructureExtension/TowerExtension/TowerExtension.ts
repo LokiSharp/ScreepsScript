@@ -1,4 +1,4 @@
-import { MAX_WALL_HITS, ROOM_TRANSFER_TASK, repairSetting } from "setting";
+import { MAX_WALL_HITS, ROOM_TRANSFER_TASK, TOWER_FILL_WALL_LEVEL, repairSetting } from "setting";
 import { creepApi } from "modules/creepController/creepApi";
 import { whiteListFilter } from "utils/global/whiteListFilter";
 
@@ -45,7 +45,7 @@ export default class TowerExtension extends StructureTower {
       // PASS
     }
     // 找不到要维修的建筑就刷墙
-    else if (this.commandFillWall()) {
+    else if (this.room.controller.level > TOWER_FILL_WALL_LEVEL && this.commandFillWall()) {
       // PASS
     }
 

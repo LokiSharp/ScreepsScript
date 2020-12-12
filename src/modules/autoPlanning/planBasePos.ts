@@ -45,7 +45,7 @@ function getOtherArea(
  * @param len 正方形的边长
  * @returns [0] 为中央点 x 坐标，[1] 为 y 坐标
  */
-function getCenterBybottomRight(i: number, j: number, len: number): [number, number] {
+function getCenterByBottomRight(i: number, j: number, len: number): [number, number] {
   return [i - len / 2 + 0.5, j - len / 2 + 0.5];
 }
 
@@ -94,7 +94,7 @@ export function findBaseCenterPos(roomName: string, baseSize = 11): RoomPosition
         // 沼泽数量不是最小的
         if (currentSwamp > minSwamp) continue;
 
-        const pos = getCenterBybottomRight(i, j, baseSize);
+        const pos = getCenterByBottomRight(i, j, baseSize);
         const centerPos = new RoomPosition(pos[1], pos[0], roomName);
 
         // 对比沼泽数量并更新结果

@@ -6,10 +6,6 @@ import calcBodyPart from "utils/creep/calcBodyPart";
  * 强化 - 重型作战单位
  * 本角色仅能在 RCL >= 7 时生成
  * 扛塔数量为 0 时依旧会携带 3 个强化 HEAL (144/T 的回复)，但是不会有 TOUGH
- *
- * @param spawnRoom 出生房间名称
- * @param bearTowerNum 可以承受多少 tower 的最大伤害，该数值越少，攻击能力越强，默认为 6 (0~6)
- * @param flagName 要攻击的旗帜名称
  */
 export default function rangedAttacker(data: RangedAttackerData): ICreepConfig {
   // 越界就置为 6
@@ -57,7 +53,8 @@ export default function rangedAttacker(data: RangedAttackerData): ICreepConfig {
         if (creep.rangedAttackLowestHitsHostileCreeps(hostileCreeps) === OK) return false;
         else if (structures.length > 0) {
           if (creep.rangedAttack(structures[0]) === ERR_NOT_IN_RANGE) creep.moveTo(structures[0]);
-        } else if (creep.rangedAttackNearHostileStructures() === OK) return false;
+        } else if (creep.rangedAttackNearestHostileCreeps() === OK) return false;
+        else if (creep.rangedAttackNearHostileStructures() === OK) return false;
       } else {
         creep.log(`不在指定房间，切入迁徙模式`);
         return true;

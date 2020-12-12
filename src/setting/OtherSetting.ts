@@ -48,9 +48,9 @@ export const OBSERVER_DEPOSIT_MAX = 2;
  * powerbank 的采集阶段
  * @property {} ATTACK 正在拆除
  * @property {} PREPARE 快拆完了，carrier 准备过来
- * @property {} TRANSFE 拆除完成，正在搬运
+ * @property {} TRANSFER 拆除完成，正在搬运
  */
-export const PB_HARVESTE_STATE = {
+export const PB_HARVEST_STATE = {
   ATTACK: "attack",
   PREPARE: "prepare",
   TRANSFER: "transfer"
@@ -60,7 +60,7 @@ export const PB_HARVESTE_STATE = {
  * miner 的矿物采集上限
  * 当 terminal 中的资源多余这个值时，miner 将不再继续采矿
  */
-export const minerHervesteLimit = 200000;
+export const minerHarvestLimit = 200000;
 
 // pc 空闲时会搓 ops，下面是搓的上限
 export const maxOps = 50000;

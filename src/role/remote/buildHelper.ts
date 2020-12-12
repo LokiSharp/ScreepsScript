@@ -66,8 +66,7 @@ export default function buildHelper(data: RemoteDeclarerData): ICreepConfig {
         }
       }
 
-      if (creep.store.getUsedCapacity() === 0) return true;
-      return false;
+      return creep.store.getUsedCapacity() === 0;
     },
     bodys: createBodyGetter(bodyConfigs.remoteHelper)
   };

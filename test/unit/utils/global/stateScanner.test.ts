@@ -7,10 +7,27 @@ describe("stateScanner", () => {
   beforeEach(() => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore : allow adding Game to global
-    global.Game = _.clone(new GameMock());
+    global.Game = new GameMock();
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore : allow adding Memory to global
-    global.Memory = _.clone(new MemoryMock());
+    global.Memory = new MemoryMock();
+  });
+
+  it("Memory.stats 不存在时创建并统计", () => {
+    delete Memory.stats;
+
+    stateScanner();
+
+    assert.deepEqual(Memory.stats, {
+      gcl: NaN,
+      gclLevel: 0,
+      gpl: NaN,
+      gplLevel: 0,
+      cpu: 0,
+      bucket: 0,
+      credit: 0,
+      rooms: {}
+    });
   });
 
   it("可以运行统计状态", () => {

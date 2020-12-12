@@ -4,7 +4,7 @@
  */
 
 import { ALL_SHARD_NAME } from "setting";
-import { log } from "utils/console/log";
+import log from "utils/console/log";
 import requestHandleStrategies from "./handleStrategies";
 
 // 其他 shard 的数据
@@ -58,7 +58,8 @@ const getRequestInfo = function (replyName: string): CrossShardRequestInfo {
 /**
  * 获取指定请求的响应名称
  *
- * @param request 要获取响应名的请求
+ * @param requestName 要获取响应名的请求
+ * @param sourceShard 要获取的 Shard
  */
 const getReplyName = function (requestName: string, sourceShard: ShardName): string {
   return `${sourceShard}:${requestName}`;
@@ -106,7 +107,8 @@ const handleSelfMessage = function () {
   // 针对自己负责的消息进行处理
   for (const msgName in selfData) {
     // 如果消息是响应
-    if (isReply(msgName)) {
+    // eslint-disable-next-line no-prototype-builtins
+    if (selfData.hasOwnProperty(msgName) && isReply(msgName)) {
       const requestInfo = getRequestInfo(msgName);
 
       // 自己已经响应了但是请求还在，为了避免之后 handleRequest 重复执行该请求，这里将其移除掉（并没有修改原始请求，下个 tick 依旧会正常重建）
@@ -140,7 +142,8 @@ const handleOtherMessage = function (): ScreepsReturnCode {
     // 遍历该 shard 的所有消息
     for (const msgName in otherShardData[shardName]) {
       // 该信息是响应
-      if (isReply(msgName)) {
+      // eslint-disable-next-line no-prototype-builtins, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      if (otherShardData[shardName].hasOwnProperty(msgName) && isReply(msgName)) {
         const { source, name: requestName } = getRequestInfo(msgName);
 
         // 如果是自己请求的响应的话，关闭对应请求
@@ -170,9 +173,6 @@ const handleOtherMessage = function (): ScreepsReturnCode {
 
 /**
  * 保存消息到 InterShardMemory
- *
- * @param msgName 消息名称
- * @param msgContent 消息内容
  */
 export const saveShardData = function (): void {
   if (!Game.needSaveInterShardData) return;
@@ -224,6 +224,7 @@ export const getMemoryFromCrossShard = function (creepName: string): CreepMemory
  * 静默状态（完全没有跨 shard 信息）下的基础消耗为 0.03 - 0.01
  */
 export const execShard = function (): ScreepsReturnCode {
+  if (Game.shard.name === "shardSeason") return ERR_NOT_FOUND;
   // 私服不存在该属性
   if (!global.InterShardMemory) return ERR_NOT_FOUND;
 

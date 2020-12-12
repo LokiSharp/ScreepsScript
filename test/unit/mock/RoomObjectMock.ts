@@ -6,7 +6,7 @@ export default class RoomObjectMock extends BaseMock {
   public pos: RoomPositionMock;
   public room: Room | undefined;
 
-  public constructor(x: number, y: number) {
+  public constructor(x = 0, y = 0) {
     super();
     this.pos = new RoomPositionMock(x, y);
   }

@@ -8,10 +8,10 @@ describe("clearFlag", () => {
   beforeEach(() => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore : allow adding Game to global
-    global.Game = _.clone(new GameMock());
+    global.Game = new GameMock();
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore : allow adding Memory to global
-    global.Memory = _.clone(new MemoryMock());
+    global.Memory = new MemoryMock();
   });
 
   it("旗帜不存在时返回删除残余内存", () => {

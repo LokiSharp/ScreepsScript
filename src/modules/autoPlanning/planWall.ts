@@ -38,7 +38,7 @@ const spread = function (impassableCostMatrix: CostMatrix, spreadWork: (pos: Roo
 
 /**
  * 获取目标房间中无法通行位置的 CostMatrix
- * 无法通行位置包括 wall，cwall，不属于自己的 rempart
+ * 无法通行位置包括 wall，cwall，不属于自己的 rampart
  *
  * @param room 目标房间
  * @return 无法通行位置的 CostMatrix
@@ -203,7 +203,5 @@ export default function (room: Room, centerPos: RoomPosition, distanceToCenter =
 
   const outWall = getOutWalls(cost, centerPos, distanceToCenter);
   const [neededWall, safeCost] = getNeededWalls(room, cost, outWall);
-  const targetWall = getThickerWalls(safeCost, neededWall, thickness);
-
-  return targetWall;
+  return getThickerWalls(safeCost, neededWall, thickness);
 }

@@ -66,8 +66,7 @@ export default function remoteUpgrader(data: RemoteDeclarerData): ICreepConfig {
     },
     target: creep => {
       creep.upgrade();
-      if (creep.store.getUsedCapacity() === 0) return true;
-      return false;
+      return creep.store.getUsedCapacity() === 0;
     },
     bodys: createBodyGetter(bodyConfigs.remoteHelper)
   };

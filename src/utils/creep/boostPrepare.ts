@@ -12,7 +12,7 @@ export const boostPrepare = (): ICreepStage => ({
   prepare: (creep: Creep) => {
     // 获取强化位置
     const boostTask = creep.room.memory.boost;
-    if (boostTask.state !== "waitBoost") {
+    if (!boostTask.state || boostTask.state !== "waitBoost") {
       creep.say("boost 未准备就绪");
       return false;
     }
@@ -24,6 +24,10 @@ export const boostPrepare = (): ICreepStage => ({
 
       if (boostResult === OK) {
         creep.say("💥 强化完成");
+        if ((creep.memory.data as RangedAttackerData).wayPoint) {
+          creep.setWayPoint((creep.memory.data as RangedAttackerData).wayPoint);
+          creep.memory.fromShard = Game.shard.name as ShardName;
+        }
         return true;
       } else {
         creep.log(`强化失败 ${boostResult}`, "red");

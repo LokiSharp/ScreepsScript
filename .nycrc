@@ -1,0 +1,10 @@
+{
+  "extension": [
+    ".ts"
+  ],
+  "exclude": [
+    "rollup.**.ts",
+    "test/**",
+    "coverage/**"
+  ]
+}

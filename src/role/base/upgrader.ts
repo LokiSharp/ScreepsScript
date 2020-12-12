@@ -11,7 +11,7 @@ export default function upgrader(data: WorkerData): ICreepConfig {
   return {
     source: creep => {
       // 因为只会从建筑里拿，所以只要拿到了就去升级
-      if (creep.store[RESOURCE_ENERGY] > 0) return true;
+      if (creep.store[RESOURCE_ENERGY] >= creep.store.getCapacity()) return true;
 
       const source = Game.getObjectById(data.sourceId);
 
@@ -30,7 +30,12 @@ export default function upgrader(data: WorkerData): ICreepConfig {
           }
         }
         // 有能量但是太少，就等到其中能量大于指定数量再拿（优先满足 filler 的能量需求）
-        else if (source.store[RESOURCE_ENERGY] <= 500) return false;
+        else if (source.store[RESOURCE_ENERGY] <= 500) {
+          const nearSource = source.pos.findInRange(FIND_SOURCES, 1)[0];
+          // 当目标建筑附近的 Source 剩余能量过半时主动采集
+          if (nearSource?.energy >= nearSource?.energyCapacity / 2) creep.getEngryFrom(nearSource);
+          return false;
+        }
       }
       // 获取能量
       const result = creep.getEngryFrom(source);
@@ -48,11 +53,7 @@ export default function upgrader(data: WorkerData): ICreepConfig {
       return false;
     },
     target: creep => {
-      if (creep.upgrade() === ERR_NOT_ENOUGH_RESOURCES) {
-        return true;
-      } else {
-        return false;
-      }
+      return creep.upgrade() === ERR_NOT_ENOUGH_RESOURCES;
     },
     bodys: (room, spawn) => {
       // 7 级和 8 级时要孵化指定尺寸的 body

@@ -22,4 +22,8 @@ describe("colorful", () => {
       )
     );
   });
+
+  it("参数仅有 content 时", () => {
+    assert.equal(colorful("TestString"), `<text style=" ">TestString</text>`);
+  });
 });

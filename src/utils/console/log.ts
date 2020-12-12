@@ -8,7 +8,7 @@ import colorful from "./colorful";
  * @param color 日志前缀颜色
  * @param notify 是否发送邮件
  */
-export function log(content: string, prefixes: string[] = [], color: Colors = null, notify = false): OK {
+export default function log(content: string, prefixes: string[] = [], color: Colors = null, notify = false): OK {
   // 有前缀就组装在一起
   let prefix = prefixes.length > 0 ? `【${prefixes.join(" ")}】 ` : "";
   // 指定了颜色

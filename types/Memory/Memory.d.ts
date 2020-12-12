@@ -3,8 +3,6 @@ interface Memory {
   moveNumber?: number;
   // 移动消耗总用时
   moveUseCpu?: number;
-  // 移动寻路总用时
-  movePathFindUseCpu?: number;
   // 是否显示 cpu 消耗
   showCost?: boolean;
 

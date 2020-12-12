@@ -1,3 +1,4 @@
+import { battleBase } from "utils/creep/battleBase";
 import { bodyConfigs } from "setting";
 import createBodyGetter from "utils/creep/createBodyGetter";
 
@@ -8,7 +9,14 @@ import createBodyGetter from "utils/creep/createBodyGetter";
  */
 export default function attacker(data: WarUnitData): ICreepConfig {
   return {
-    isNeed: () => data.keepSpawn,
+    ...battleBase(data.targetFlagName, data.keepSpawn),
+    prepare: (creep: Creep) => {
+      if ((creep.memory.data as WarUnitData).wayPoint) {
+        creep.setWayPoint((creep.memory.data as WarUnitData).wayPoint);
+        creep.memory.fromShard = Game.shard.name as ShardName;
+      }
+      return true;
+    },
     target: creep => {
       creep.attackFlag(data.targetFlagName);
 
@@ -18,10 +26,7 @@ export default function attacker(data: WarUnitData): ICreepConfig {
         return false;
       }
 
-      if (creep.room.name !== targetFlag.pos.roomName) {
-        return true;
-      }
-      return false;
+      return creep.room.name !== targetFlag.pos.roomName;
     },
     bodys: createBodyGetter(bodyConfigs.attacker)
   };

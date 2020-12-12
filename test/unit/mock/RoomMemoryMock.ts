@@ -6,7 +6,6 @@ export default class RoomMemoryMock extends BaseMock implements RoomMemory {
   public delayCSList: string[];
 
   public sourceContainersIds: Id<StructureContainer>[];
-  public ruinIds: Id<Ruin>[];
   public constructionSiteIds: Id<ConstructionSite>[];
 
   public centerLinkId?: Id<StructureLink>;

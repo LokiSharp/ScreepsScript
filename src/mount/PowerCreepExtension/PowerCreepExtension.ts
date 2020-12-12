@@ -1,6 +1,6 @@
 import { Move, WayPoint } from "modules/move";
 import { PowerTasks } from "./PowerTasks";
-import { log } from "utils/console/log";
+import log from "utils/console/log";
 import { maxOps } from "setting";
 
 /**
@@ -27,7 +27,6 @@ export default class PowerCreepExtension extends PowerCreep {
    * 发送日志
    *
    * @param content 日志内容
-   * @param instanceName 发送日志的实例名
    * @param color 日志前缀颜色
    * @param notify 是否发送邮件
    */

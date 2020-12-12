@@ -4,6 +4,7 @@ import GlobalControlLevelMock from "./GlobalControlLevelMock";
 import GlobalPowerLevelMock from "./GlobalPowerLevelMock";
 import MarketMock from "./MarketMock";
 import ShardMock from "./ShardMock";
+import { pushMethodCallInfoToCalled } from "./pushMethodCallInfoToCalled";
 
 export default class GameMock extends BaseMock {
   public cpu: CPUMock;
@@ -22,5 +23,10 @@ export default class GameMock extends BaseMock {
     this.gpl = new GlobalPowerLevelMock();
     this.market = new MarketMock();
     this.shard = new ShardMock();
+  }
+
+  @pushMethodCallInfoToCalled
+  public notify(): void {
+    // PASS
   }
 }

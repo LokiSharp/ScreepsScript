@@ -98,6 +98,7 @@ export const squadStrategies: {
      * 小队攻击敌方建筑
      *
      * @param squad 小队成员
+     * @param memory 小队 Memory
      * @returns OK 攻击敌方建筑
      * @returns ERR_NOT_FOUND 未找到建筑
      */

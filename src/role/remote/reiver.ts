@@ -75,7 +75,8 @@ export default function reiver(data: ReiverData): ICreepConfig {
 
         // 遍历目标建筑存储并找到可以拿取的资源
         for (const res in targetStructure.store) {
-          if (targetStructure.store[res] > 0) {
+          // eslint-disable-next-line no-prototype-builtins
+          if (targetStructure.store.hasOwnProperty(res) && targetStructure.store[res] > 0) {
             // 如果有指定要搬运的资源，就看 res 是否是指定的资源之一，是则搬运，不是则检查下一个
             if (Memory.reiveList && Memory.reiveList.length > 0) {
               if (!Memory.reiveList.includes(res as ResourceConstant)) continue;
@@ -115,7 +116,8 @@ export default function reiver(data: ReiverData): ICreepConfig {
       if (creep.room.name === targetStructure.room.name) {
         // 遍历目标建筑存储并找到可以拿取的资源
         for (const res in creep.store) {
-          if (creep.store[res] > 0) {
+          // eslint-disable-next-line no-prototype-builtins
+          if (creep.store.hasOwnProperty(res) && creep.store[res] > 0) {
             const result = creep.transfer(targetStructure, res as ResourceConstant);
 
             // 还没到就继续走

@@ -4,8 +4,6 @@ import { handleNotExistCreep } from "../crossShard/handleNotExistCreep";
 /**
  * creep 的数量控制器
  * 负责发现死去的 creep 并检查其是否需要再次孵化
- *
- * @param intrval 搜索间隔
  */
 
 export default function creepNumberListener(): void {

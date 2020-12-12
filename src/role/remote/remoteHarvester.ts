@@ -20,14 +20,7 @@ export default function remoteHarvester(data: RemoteHarvesterData): ICreepConfig
        * 如果有入侵者的话就不再孵化
        * @danger 注意这里并没有 disableTill 和当前进行对比，如果该值释放不及时可能会导致该角色无法正常持续孵化
        */
-      if (
-        room.memory.remote &&
-        room.memory.remote[sourceFlag.pos.roomName] &&
-        room.memory.remote[sourceFlag.pos.roomName].disableTill
-      )
-        return false;
-
-      return true;
+      return !room.memory?.remote[sourceFlag.pos.roomName]?.disableTill;
     },
     // 获取旗帜附近的 source
     prepare: creep => {

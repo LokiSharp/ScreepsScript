@@ -1,3 +1,4 @@
+import { LEVEL_BUILD_RAMPART } from "../../../setting";
 import { creepApi } from "modules/creepController/creepApi";
 import { whiteListFilter } from "utils/global/whiteListFilter";
 
@@ -37,6 +38,11 @@ export default class ControllerExtension extends StructureController {
     if (level === 1) {
       // 多发布一个 build 协助建造
       this.room.releaseCreep("builder", 1);
+    }
+    // 3 级，添加刷墙者
+    if (level === (LEVEL_BUILD_RAMPART[0] || 4)) {
+      // 发布 repairer 刷墙
+      this.room.releaseCreep("repairer", 2);
     }
     // 8 级之后重新规划升级单位
     else if (level === 8) {
@@ -93,30 +99,6 @@ export default class ControllerExtension extends StructureController {
       .reduce((pre, cur) => pre + cur);
     // 满配 creep 数量大于 1，就启动主动防御
     return bodyNum > MAX_CREEP_SIZE;
-  }
-
-  /**
-   * 扫描房间内有资源的废墟
-   *
-   * @returns 为 true 时说明自己房间内有资源的废墟
-   */
-  private ruinScanner(): boolean {
-    let hasRuins = false;
-
-    const ruins = this.room.find(FIND_RUINS);
-    const ruinsTmp: Id<Ruin>[] = [];
-    if (ruins.length > 0) {
-      Object.values(ruins).forEach(ruin => {
-        if (ruin.store.getUsedCapacity() > 0) {
-          hasRuins = true;
-          ruinsTmp.push(ruin.id);
-        }
-      });
-    }
-
-    Memory.rooms[this.room.name].ruinIds = ruinsTmp;
-
-    return hasRuins;
   }
 
   /**

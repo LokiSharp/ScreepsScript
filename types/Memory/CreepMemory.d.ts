@@ -7,8 +7,10 @@ interface CreepMemory {
    */
   moveInfo?: MoveInfo;
 
-  // 上一个位置信息，形如"14/4"，用于在 creep.move 返回 OK 时检查有没有撞墙
-  prePos?: string;
+  /**
+   * 是否打印上一步座标
+   */
+  logPrePos?: boolean;
 
   /**
    * 来自的 shard

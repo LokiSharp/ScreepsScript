@@ -10,10 +10,10 @@ describe("getRoomFactoryState", () => {
   beforeEach(() => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore : allow adding Game to global
-    global.Game = _.clone(new GameMock());
+    global.Game = new GameMock();
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore : allow adding Memory to global
-    global.Memory = _.clone(new MemoryMock());
+    global.Memory = new MemoryMock();
   });
 
   it("可以获取工厂状态 工厂未设置等级", () => {

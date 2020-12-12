@@ -31,7 +31,7 @@ export function getStructureWithCache<TargetStructure extends RoomObject>(
 
   // 从 id 获取建筑并更新缓存
   const target: TargetStructure[] = [];
-  const avaliableId = ids.filter((id: Id<TargetStructure>) => {
+  const availableId = ids.filter((id: Id<TargetStructure>) => {
     const structure = Game.getObjectById(id);
     if (!structure) return false;
 
@@ -39,7 +39,7 @@ export function getStructureWithCache<TargetStructure extends RoomObject>(
     return true;
   });
 
-  setCacheId(room.name, type, avaliableId);
+  setCacheId(room.name, type, availableId);
 
   // 否则就暂存对象并返回
   room[privateKey] = target;
