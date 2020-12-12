@@ -338,17 +338,7 @@ export default class CreepExtension extends Creep {
         );
 
         // 找到血量最低的建筑
-        target = _.min(targets, structure => {
-          // 该 creep 是否在 rampart 中
-          const inRampart = structure.pos
-            .lookFor(LOOK_STRUCTURES)
-            .find(rampart => rampart.structureType === STRUCTURE_RAMPART);
-
-          // 在 rampart 里就不会作为进攻目标
-          if (inRampart) return structure.hits + inRampart.hits;
-          // 找到血量最低的
-          else return structure.hits;
-        });
+        target = this.getMinHitsTarget(targets);
       }
     }
 
@@ -460,17 +450,7 @@ export default class CreepExtension extends Creep {
         );
 
         // 找到血量最低的建筑
-        target = _.min(targets, structure => {
-          // 该 creep 是否在 rampart 中
-          const inRampart = structure.pos
-            .lookFor(LOOK_STRUCTURES)
-            .find(rampart => rampart.structureType === STRUCTURE_RAMPART);
-
-          // 在 rampart 里就不会作为进攻目标
-          if (inRampart) return structure.hits + inRampart.hits;
-          // 找到血量最低的
-          else return structure.hits;
-        });
+        target = this.getMinHitsTarget(targets) as Structure;
       }
 
       if (target && this.dismantle(target) === ERR_NOT_IN_RANGE) this.moveTo(target);
@@ -485,6 +465,27 @@ export default class CreepExtension extends Creep {
   }
 
   /**
+   * 找到血量最低的目标
+   *
+   * @param targets 目标
+   */
+  private getMinHitsTarget(
+    targets: (AnyCreep | Structure<StructureConstant>)[]
+  ): AnyCreep | Structure<StructureConstant> {
+    return _.min(targets, target => {
+      // 该 creep 是否在 rampart 中
+      const inRampart = target.pos
+        .lookFor(LOOK_STRUCTURES)
+        .find(rampart => rampart.structureType === STRUCTURE_RAMPART);
+
+      // 在 rampart 里就不会作为进攻目标
+      if (inRampart) return target.hits + inRampart.hits;
+      // 找到血量最低的
+      else return target.hits;
+    });
+  }
+
+  /**
    * RA 攻击血量最低的敌方单位
    *
    * @param hostils 敌方目标
@@ -494,17 +495,7 @@ export default class CreepExtension extends Creep {
     const targets = this.pos.findInRange(hostils, 3);
     if (targets.length > 0) {
       // 找到血量最低的 creep
-      const target = _.min(targets, creep => {
-        // 该 creep 是否在 rampart 中
-        const inRampart = creep.pos
-          .lookFor(LOOK_STRUCTURES)
-          .find(rampart => rampart.structureType === STRUCTURE_RAMPART);
-
-        // 在 rampart 里就不会作为进攻目标
-        if (inRampart) return creep.hits + inRampart.hits;
-        // 找到血量最低的
-        else return creep.hits;
-      });
+      const target = this.getMinHitsTarget(targets);
 
       if (target && this.rangedAttack(target) === ERR_NOT_IN_RANGE) this.moveTo(target);
       return OK;
@@ -543,17 +534,7 @@ export default class CreepExtension extends Creep {
     if (targets.length <= 0) return ERR_NOT_FOUND;
 
     // 找到血量最低的建筑
-    const target = _.min(targets, structure => {
-      // 该 creep 是否在 rampart 中
-      const inRampart = structure.pos
-        .lookFor(LOOK_STRUCTURES)
-        .find(rampart => rampart.structureType === STRUCTURE_RAMPART);
-
-      // 在 rampart 里就不会作为进攻目标
-      if (inRampart) return structure.hits + inRampart.hits;
-      // 找到血量最低的
-      else return structure.hits;
-    });
+    const target = this.getMinHitsTarget(targets);
 
     if (target && this.rangedAttack(target) === ERR_NOT_IN_RANGE) this.moveTo(target);
 
