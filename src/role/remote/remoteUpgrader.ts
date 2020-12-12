@@ -58,7 +58,8 @@ export const remoteUpgrader: CreepConfig<"remoteUpgrader"> = {
     if (
       !source ||
       (source instanceof Structure && source.store[RESOURCE_ENERGY] < 300) ||
-      (source instanceof Source && source.energy === 0)
+      (source instanceof Source && source.energy === 0) ||
+      (source instanceof Ruin && source.store[RESOURCE_ENERGY] === 0)
     )
       delete creep.memory.sourceId;
 

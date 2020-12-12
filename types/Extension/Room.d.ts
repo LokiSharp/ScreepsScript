@@ -110,16 +110,29 @@ interface Room {
   importantWall: StructureWall | StructureRampart;
 
   // 获取房间中的有效能量来源
-  getAvailableSource(): StructureTerminal | StructureStorage | StructureContainer | Source;
+  getAvailableSource():
+    | StructureTerminal
+    | StructureStorage
+    | StructureContainer
+    | Source
+    | Ruin
+    | Resource<RESOURCE_ENERGY>;
 
   // 自动规划相关
   findBaseCenterPos(): RoomPosition[];
+
   confirmBaseCenter(targetPos?: RoomPosition[]): RoomPosition | ERR_NOT_FOUND;
+
   setBaseCenter(pos: RoomPosition): OK | ERR_INVALID_ARGS;
+
   planLayout(): string;
+
   clearStructure(): OK | ERR_NOT_FOUND;
+
   addRemote(remoteRoomName: string, targetId: Id<StructureWithStore>): OK | ERR_INVALID_TARGET | ERR_NOT_FOUND;
+
   removeRemote(remoteRoomName: string, removeFlag?: boolean): OK | ERR_NOT_FOUND;
+
   claimRoom(targetRoomName: string, signText?: string): OK;
   registerContainer(container: StructureContainer): OK;
 }
