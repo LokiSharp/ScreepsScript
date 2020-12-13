@@ -48,25 +48,29 @@ export default class CreepControl extends RoomConsole {
    * @param remoteRoomName 要发布 creep 的外矿房间
    */
   public addRemoteCreepGroup(remoteRoomName: string): void {
-    const sourceFlagsName = [`${remoteRoomName} source0`, `${remoteRoomName} source1`];
+    this.addRemoteReserver(remoteRoomName);
+  }
 
-    // 添加对应数量的外矿采集者
-    sourceFlagsName.forEach((flagName, index) => {
-      if (!(flagName in Game.flags)) return;
-
+  /**
+   * 发布外矿挖掘单位
+   *
+   * @param remoteRoomName 要发布 creep 的外矿房间
+   */
+  public addRemoteHarvester(remoteRoomName: string): void {
+    Game.rooms[remoteRoomName].source.forEach((targetSource, index) => {
+      const flagName = `${remoteRoomName} source${index}`;
+      targetSource.pos.createFlag(flagName, COLOR_WHITE, COLOR_WHITE);
       creepApi.add(
         `${remoteRoomName} remoteHarvester${index}`,
         "remoteHarvester",
         {
           sourceFlagName: flagName,
           spawnRoom: this.name,
-          targetId: this.memory.remote[remoteRoomName].targetId
+          targetId: this.storage.id
         },
         this.name
       );
     });
-
-    this.addRemoteReserver(remoteRoomName);
   }
 
   /**
@@ -83,7 +87,8 @@ export default class CreepControl extends RoomConsole {
         reserverName,
         "reserver",
         {
-          targetRoomName: remoteRoomName
+          targetRoomName: remoteRoomName,
+          spawnRoom: this.name
         },
         this.name
       );

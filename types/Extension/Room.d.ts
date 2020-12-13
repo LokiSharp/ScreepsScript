@@ -7,11 +7,19 @@ interface Room {
 
   // creep 发布 api
   releaseCreep(role: CreepRoleConstant, releaseNumber?: number): ScreepsReturnCode;
+
   spawnReiver(sourceFlagName: string, targetStructureId: Id<StructureWithStore>): string;
+
   addRemoteHelper(remoteRoomName: string, wayPointFlagName?: string): void;
+
   addRemoteReserver(remoteRoomName: string, single?: boolean): void;
+
   addRemoteCreepGroup(remoteRoomName: string): void;
+
+  addRemoteHarvester(remoteRoomName: string): void;
+
   removePbHarvesteGroup(attackerName: string, healerName: string): void;
+
   spawnPbCarrierGroup(flagName: string, releaseNumber: number): void;
 
   /**
@@ -19,7 +27,9 @@ interface Room {
    */
   // 孵化队列 api
   addSpawnTask(taskName: string): number | ERR_NAME_EXISTS;
+
   hasSpawnTask(taskName: string): boolean;
+
   clearSpawnTask(): void;
   hangSpawnTask(): void;
 

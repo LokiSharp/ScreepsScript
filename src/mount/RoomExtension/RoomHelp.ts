@@ -133,10 +133,7 @@ export default class RoomHelp extends RoomExtension {
         api: [
           {
             title: "拓展新外矿",
-            params: [
-              { name: "remoteRoomName", desc: "要拓展的外矿房间名" },
-              { name: "targetId", desc: "能量应搬运到哪个建筑的 id" }
-            ],
+            params: [{ name: "remoteRoomName", desc: "要拓展的外矿房间名" }],
             functionName: "radd"
           },
           {

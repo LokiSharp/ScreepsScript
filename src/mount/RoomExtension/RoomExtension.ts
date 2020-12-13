@@ -333,21 +333,14 @@ export default class RoomExtension extends Room {
    * 拓展新的外矿
    *
    * @param remoteRoomName 要拓展的外矿房间名
-   * @param targetId 能量搬到哪个建筑里
    * @returns ERR_INVALID_TARGET targetId 找不到对应的建筑
    * @returns ERR_NOT_FOUND 没有找到足够的 source 旗帜
    */
-  public addRemote(remoteRoomName: string, targetId: Id<StructureWithStore>): OK | ERR_INVALID_TARGET | ERR_NOT_FOUND {
-    // target 建筑一定要有
-    if (!Game.getObjectById(targetId)) return ERR_INVALID_TARGET;
-    // 目标 source 也至少要有一个
-    const sourceFlagsName = [`${remoteRoomName} source0`, `${remoteRoomName} source1`];
-    if (!(sourceFlagsName[0] in Game.flags)) return ERR_NOT_FOUND;
-    // 兜底
+  public addRemote(remoteRoomName: string): OK | ERR_INVALID_TARGET | ERR_NOT_FOUND {
     if (!this.memory.remote) this.memory.remote = {};
 
     // 添加对应的键值对
-    this.memory.remote[remoteRoomName] = { targetId };
+    this.memory.remote[remoteRoomName] = { targetId: this.storage.id };
 
     this.addRemoteCreepGroup(remoteRoomName);
     return OK;

@@ -23,11 +23,11 @@ export default class RoomConsole extends RoomExtension {
    * 用户操作 - 拓展新外矿
    *
    */
-  public radd(remoteRoomName: string, targetId: Id<StructureWithStore>): string {
+  public radd(remoteRoomName: string): string {
     let stats = `[${this.name} 外矿] `;
 
-    const actionResult = this.addRemote(remoteRoomName, targetId);
-    if (actionResult === OK) stats += "拓展完成，已发布 remoteHarvester 及 reserver";
+    const actionResult = this.addRemote(remoteRoomName);
+    if (actionResult === OK) stats += "拓展完成，已发布 reserver，remoteHarvester 将在 reserver 插旗后自动发布";
     else if (actionResult === ERR_INVALID_TARGET) stats += "拓展失败，无效的 targetId";
     else if (actionResult === ERR_NOT_FOUND)
       stats += `拓展失败，未找到 source 旗帜，请在外矿房间的 source 上放置名为 [${remoteRoomName} source0] 的旗帜（有多个 source 请依次增加旗帜名最后一位的编号）`;
