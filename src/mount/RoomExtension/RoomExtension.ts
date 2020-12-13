@@ -120,8 +120,13 @@ export default class RoomExtension extends Room {
     if (this.terminal && this.terminal.store[RESOURCE_ENERGY] > 10000) return this.terminal;
     if (this.storage && this.storage.store[RESOURCE_ENERGY] > 100000) return this.storage;
     // 如果有 sourceConainer 的话就挑个多的
-    if (this.sourceContainers.length > 0)
-      return _.max(this.sourceContainers, container => container.store[RESOURCE_ENERGY]);
+    if (this.sourceContainers.length > 0) {
+      // 能量必须够多才会选用
+      const availableContainer = this.sourceContainers.filter(container => container.store[RESOURCE_ENERGY] > 300);
+      // 挑个能量多的 container
+      if (availableContainer.length > 0)
+        return _.max(availableContainer, container => container.store[RESOURCE_ENERGY]);
+    }
 
     // 查找散落的能量，如果能量满足要求就设为目标
     const resources = this.find(FIND_DROPPED_RESOURCES);
@@ -141,10 +146,7 @@ export default class RoomExtension extends Room {
 
     // 没有就选边上有空位的 source
     return this.source.find(source => {
-      const freeCount = source.pos.getFreeSpace().length;
-      const harvestCount = source.pos.findInRange(FIND_CREEPS, 1).length;
-
-      return freeCount - harvestCount > 0;
+      return source.pos.getCanStandPos().length > 1;
     });
   }
 
@@ -446,51 +448,6 @@ export default class RoomExtension extends Room {
   }
 
   /**
-   * 根据资源类型查找来源房间
-   *
-   * @param resourceType 要查找的资源类型
-   * @returns 找到的目标房间，没找到返回 null
-   */
-  private shareGetSource(resourceType: ResourceConstant): Room | null {
-    // 兜底
-    if (!Memory.resourceSourceMap) {
-      Memory.resourceSourceMap = {};
-      return null;
-    }
-    const SourceRoomsName = Memory.resourceSourceMap[resourceType];
-    if (!SourceRoomsName) return null;
-
-    // 寻找合适的房间
-    let targetRoom: Room = null;
-    // 变量房间名数组，注意，这里会把所有无法访问的房间筛选出来
-    const roomWithEmpty = SourceRoomsName.map(roomName => {
-      const room = Game.rooms[roomName];
-
-      if (!room || !room.terminal) return "";
-      // 该房间有任务或者就是自己，不能作为共享来源
-      if (room.memory.shareTask || room.name === this.name) return roomName;
-
-      // 如果请求共享的是能量
-      if (resourceType === RESOURCE_ENERGY) {
-        if (!room.storage) return "";
-        // 该房间 storage 中能量低于要求的话，就从资源提供列表中移除该房间
-        if (room.storage.store[RESOURCE_ENERGY] < ENERGY_SHARE_LIMIT) return "";
-      } else {
-        // 如果请求的资源已经没有的话就暂时跳过（因为无法确定之后是否永远无法提供该资源）
-        if ((room.terminal.store[resourceType] || 0) <= 0) return roomName;
-      }
-
-      // 接受任务的房间就是你了！
-      targetRoom = room;
-      return roomName;
-    });
-
-    // 把上面筛选出来的空字符串元素去除
-    Memory.resourceSourceMap[resourceType] = roomWithEmpty.filter(roomName => roomName);
-    return targetRoom;
-  }
-
-  /**
    * 执行自动建筑规划
    */
   public planLayout(): string {
@@ -701,15 +658,6 @@ export default class RoomExtension extends Room {
   }
 
   /**
-   * 检查是否已经存在指定任务
-   *
-   * @param task 要检查的 power 任务
-   */
-  private hasPowerTask(task: PowerConstant): boolean {
-    return !!this.memory.powerTasks.find(power => power === task);
-  }
-
-  /**
    * 获取当前的 power 任务
    */
   public getPowerTask(): PowerConstant | undefined {
@@ -760,6 +708,60 @@ export default class RoomExtension extends Room {
     delete this.memory.upgrade;
 
     return OK;
+  }
+
+  /**
+   * 根据资源类型查找来源房间
+   *
+   * @param resourceType 要查找的资源类型
+   * @returns 找到的目标房间，没找到返回 null
+   */
+  private shareGetSource(resourceType: ResourceConstant): Room | null {
+    // 兜底
+    if (!Memory.resourceSourceMap) {
+      Memory.resourceSourceMap = {};
+      return null;
+    }
+    const SourceRoomsName = Memory.resourceSourceMap[resourceType];
+    if (!SourceRoomsName) return null;
+
+    // 寻找合适的房间
+    let targetRoom: Room = null;
+    // 变量房间名数组，注意，这里会把所有无法访问的房间筛选出来
+    const roomWithEmpty = SourceRoomsName.map(roomName => {
+      const room = Game.rooms[roomName];
+
+      if (!room || !room.terminal) return "";
+      // 该房间有任务或者就是自己，不能作为共享来源
+      if (room.memory.shareTask || room.name === this.name) return roomName;
+
+      // 如果请求共享的是能量
+      if (resourceType === RESOURCE_ENERGY) {
+        if (!room.storage) return "";
+        // 该房间 storage 中能量低于要求的话，就从资源提供列表中移除该房间
+        if (room.storage.store[RESOURCE_ENERGY] < ENERGY_SHARE_LIMIT) return "";
+      } else {
+        // 如果请求的资源已经没有的话就暂时跳过（因为无法确定之后是否永远无法提供该资源）
+        if ((room.terminal.store[resourceType] || 0) <= 0) return roomName;
+      }
+
+      // 接受任务的房间就是你了！
+      targetRoom = room;
+      return roomName;
+    });
+
+    // 把上面筛选出来的空字符串元素去除
+    Memory.resourceSourceMap[resourceType] = roomWithEmpty.filter(roomName => roomName);
+    return targetRoom;
+  }
+
+  /**
+   * 检查是否已经存在指定任务
+   *
+   * @param task 要检查的 power 任务
+   */
+  private hasPowerTask(task: PowerConstant): boolean {
+    return !!this.memory.powerTasks.find(power => power === task);
   }
 
   /**

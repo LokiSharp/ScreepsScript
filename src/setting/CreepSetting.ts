@@ -127,7 +127,7 @@ export const bodyConfigs: BodyConfigs = {
     { [WORK]: 5, [CARRY]: 9, [MOVE]: 7 },
     { [WORK]: 6, [CARRY]: 10, [MOVE]: 8 },
     { [WORK]: 7, [CARRY]: 15, [MOVE]: 11 },
-    { [WORK]: 11, [CARRY]: 15, [MOVE]: 19 }
+    { [WORK]: 11, [CARRY]: 15, [MOVE]: 13 }
   ),
 
   /**

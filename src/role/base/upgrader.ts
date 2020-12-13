@@ -31,17 +31,7 @@ export const upgrader: CreepConfig<"upgrader"> = {
       }
       // 有能量但是太少，就等到其中能量大于指定数量再拿（优先满足 filler 的能量需求）
       else if (source.store[RESOURCE_ENERGY] <= 500) {
-        const nearSource = source.pos.findInRange(FIND_SOURCES, 1)[0];
-        // 当目标建筑附近的 Source 剩余能量足够时主动采集
-        if (nearSource?.energy >= nearSource?.energyCapacity - 500) {
-          creep.getEngryFrom(nearSource);
-          // 当踩到 container 时自杀
-          creep.pos
-            .lookFor(LOOK_STRUCTURES)
-            .forEach(structure =>
-              structure.structureType === STRUCTURE_CONTAINER ? creep.suicide() : creep.say("⛏️")
-            );
-        }
+        creep.say("🎲");
         return false;
       }
     }

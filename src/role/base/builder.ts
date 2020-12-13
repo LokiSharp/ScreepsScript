@@ -35,9 +35,16 @@ export const builder: CreepConfig<"builder"> = {
       creep.memory.sourceId = source.id;
     } else source = Game.getObjectById(creep.memory.sourceId);
 
-    // 之前用的能量来源没能量了就更新来源（如果来源已经是 source 的话就不改了）
-    const result = creep.getEngryFrom(source);
-    if (result === ERR_NOT_ENOUGH_RESOURCES || result === ERR_INVALID_TARGET) delete creep.memory.sourceId;
+    // 之前的来源建筑里能量不够了就更新来源
+    if (
+      !source ||
+      (source instanceof Structure && source.store[RESOURCE_ENERGY] < 300) ||
+      (source instanceof Source && source.energy === 0) ||
+      (source instanceof Ruin && source.store[RESOURCE_ENERGY] === 0)
+    )
+      delete creep.memory.sourceId;
+    creep.getEngryFrom(source);
+
     return false;
   },
   target: creep => {
