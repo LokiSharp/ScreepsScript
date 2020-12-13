@@ -46,9 +46,9 @@ export const bodyConfigs: BodyConfigs = {
    * 诸如 builder 之类的
    */
   worker: getBodyConfig(
-    { [WORK]: 1, [CARRY]: 1, [MOVE]: 1 },
-    { [WORK]: 2, [CARRY]: 2, [MOVE]: 2 },
-    { [WORK]: 3, [CARRY]: 3, [MOVE]: 3 },
+    { [WORK]: 1, [CARRY]: 1, [MOVE]: 2 },
+    { [WORK]: 2, [CARRY]: 2, [MOVE]: 4 },
+    { [WORK]: 3, [CARRY]: 3, [MOVE]: 6 },
     { [WORK]: 5, [CARRY]: 5, [MOVE]: 5 },
     { [WORK]: 8, [CARRY]: 8, [MOVE]: 8 },
     { [WORK]: 10, [CARRY]: 10, [MOVE]: 10 },
@@ -61,9 +61,9 @@ export const bodyConfigs: BodyConfigs = {
    * 最大的身体部件只包含 12 个 WORK
    */
   upgrader: getBodyConfig(
-    { [WORK]: 1, [CARRY]: 1, [MOVE]: 1 },
-    { [WORK]: 2, [CARRY]: 2, [MOVE]: 2 },
-    { [WORK]: 3, [CARRY]: 3, [MOVE]: 3 },
+    { [WORK]: 1, [CARRY]: 1, [MOVE]: 2 },
+    { [WORK]: 2, [CARRY]: 2, [MOVE]: 4 },
+    { [WORK]: 3, [CARRY]: 3, [MOVE]: 6 },
     { [WORK]: 5, [CARRY]: 5, [MOVE]: 5 },
     { [WORK]: 8, [CARRY]: 8, [MOVE]: 8 },
     { [WORK]: 10, [CARRY]: 10, [MOVE]: 10 },
