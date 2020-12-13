@@ -161,8 +161,8 @@ export default class LinkExtension extends StructureLink {
     // 能量填满再发送
     if (this.store.getUsedCapacity(RESOURCE_ENERGY) < 700) return;
 
-    // 优先响应 upgrade，在 8 级后这个检查用处不大，暂时注释了
-    // if (this.supportUpgradeLink()) return
+    if (this.room.controller?.progressTotal && this.room.storage?.store?.energy > 500000 && this.supportUpgradeLink())
+      return;
 
     // 发送给 center link
     if (this.room.memory.centerLinkId) {
