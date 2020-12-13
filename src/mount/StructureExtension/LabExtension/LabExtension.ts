@@ -69,19 +69,19 @@ export default class LabExtension extends StructureLab {
   private boostController(): void {
     switch (this.room.memory.boost.state) {
       case "boostGet":
-        this.boostGetResource();
+        this.boostGet();
         break;
       case "labGetEnergy":
-        this.boostGetEnergy();
+        this.labGetEnergy();
         break;
       case "waitBoost":
-        // 感受宁静
+        this.waitBoost();
         break;
       case "boostClear":
         this.boostClear();
         break;
       default:
-        this.boostGetResource();
+        this.boostGet();
         break;
     }
   }
@@ -89,7 +89,7 @@ export default class LabExtension extends StructureLab {
   /**
    * boost 阶段：获取强化材料
    */
-  private boostGetResource(): void {
+  private boostGet(): void {
     // 获取 boost 任务
     const boostTask = this.room.memory.boost;
 
@@ -117,9 +117,16 @@ export default class LabExtension extends StructureLab {
   }
 
   /**
+   * boost 阶段: 等待强化
+   */
+  private waitBoost(): void {
+    // PASS
+  }
+
+  /**
    * boost 阶段：获取能量
    */
-  private boostGetEnergy(): void {
+  private labGetEnergy(): void {
     const boostTask = this.room.memory.boost;
 
     // 遍历所有执行强化的 lab
@@ -162,7 +169,7 @@ export default class LabExtension extends StructureLab {
       }
     }
 
-    // 检查是否有 boostGetResource 任务存在
+    // 检查是否有 boostGet 任务存在
     // 这里检查它的目的是防止 manager 还在执行 BOOST_GET_RESOURCE 任务，如果过早的完成 boost 进程的话
     // 就会出现 lab 集群已经回到了 GET_TARGET 阶段但是 lab 里还有材料存在
     if (this.room.hasRoomTransferTask(ROOM_TRANSFER_TASK.BOOST_GET_RESOURCE)) return;
@@ -369,21 +376,21 @@ export default class LabExtension extends StructureLab {
       }));
 
       // 发布任务
-      return this.room.addRoomTransferTask({
-        type: ROOM_TRANSFER_TASK.LAB_IN,
-        resource
-      } as RoomTransferTasks) === -1
-        ? false
-        : true;
+      return (
+        this.room.addRoomTransferTask({
+          type: ROOM_TRANSFER_TASK.LAB_IN,
+          resource
+        } as RoomTransferTasks) !== -1
+      );
     }
     // 产物移出任务
     else if (taskType === ROOM_TRANSFER_TASK.LAB_OUT) {
       // 发布任务
-      return this.room.addRoomTransferTask({
-        type: ROOM_TRANSFER_TASK.LAB_OUT
-      }) === -1
-        ? false
-        : true;
+      return (
+        this.room.addRoomTransferTask({
+          type: ROOM_TRANSFER_TASK.LAB_OUT
+        }) !== -1
+      );
     } else return false;
   }
 }

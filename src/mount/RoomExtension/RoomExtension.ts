@@ -582,34 +582,9 @@ export default class RoomExtension extends Room {
    */
   public startWar(boostType: BoostType): OK | ERR_NAME_EXISTS | ERR_NOT_FOUND | ERR_INVALID_TARGET {
     if (this.memory.war) return ERR_NAME_EXISTS;
-
-    // 获取 boost 旗帜
-    const boostFlagName = this.name + "Boost";
-    const boostFlag = Game.flags[boostFlagName];
-    if (!boostFlag) return ERR_NOT_FOUND;
-
-    // 获取执行强化的 lab
-    const labs = boostFlag.pos.findInRange<StructureLab>(FIND_STRUCTURES, 1, {
-      filter: s => s.structureType === STRUCTURE_LAB
-    });
-    // 如果 lab 数量不够
-    if (labs.length < BOOST_RESOURCE[boostType].length) return ERR_INVALID_TARGET;
-
-    // 初始化 boost 任务
-    const boostTask: BoostTask = {
-      state: "boostGet",
-      pos: [boostFlag.pos.x, boostFlag.pos.y],
-      type: boostType,
-      lab: {}
-    };
-
-    // 统计需要执行强化工作的 lab 并保存到内存
-    BOOST_RESOURCE[boostType].forEach(res => (boostTask.lab[res] = labs.pop().id));
-
-    // 发布 boost 任务
-    this.memory.boost = boostTask;
     this.memory.war = {};
-    return OK;
+    // 发布 boost 任务
+    return this.releaseBoostTask(boostType);
   }
 
   /**
@@ -763,5 +738,69 @@ export default class RoomExtension extends Room {
    */
   public deleteCurrentPowerTask(): void {
     this.memory.powerTasks.shift();
+  }
+
+  /**
+   * 切换为升级状态
+   * 需要提前插好名为 [房间名 + Boost] 的旗帜，并保证其周围有足够数量的 lab
+   *
+   * @returns ERR_NAME_EXISTS 已经处于升级状态
+   * @returns ERR_NOT_FOUND 未找到强化旗帜
+   * @returns ERR_INVALID_TARGET 强化旗帜附近的lab数量不足
+   */
+  public startUpgrade(): OK | ERR_NAME_EXISTS | ERR_NOT_FOUND | ERR_INVALID_TARGET {
+    if (this.memory.upgrade) return ERR_NAME_EXISTS;
+    this.memory.upgrade = {};
+    // 发布 boost 任务
+    return this.releaseBoostTask("UPGRADE");
+  }
+
+  /**
+   * 解除战争状态
+   * 会同步取消 boost 进程
+   */
+  public stopUpgrade(): OK | ERR_NOT_FOUND {
+    if (!this.memory.upgrade) return ERR_NOT_FOUND;
+
+    // 将 boost 状态置为 clear，labExtension 会自动发布清理任务并移除 boostTask
+    if (this.memory.boost) this.memory.boost.state = "boostClear";
+    delete this.memory.upgrade;
+
+    return OK;
+  }
+
+  /**
+   * 发布 Boost 任务
+   * 需要提前插好名为 [房间名 + Boost] 的旗帜，并保证其周围有足够数量的 lab
+   *
+   * @param boostType boost 形式
+   * @returns ERR_NOT_FOUND 未找到强化旗帜
+   * @returns ERR_INVALID_TARGET 强化旗帜附近的lab数量不足
+   */
+  private releaseBoostTask(boostType: BoostType): OK | ERR_NOT_FOUND | ERR_INVALID_TARGET {
+    // 获取 boost 旗帜
+    const boostFlagName = this.name + "Boost";
+    const boostFlag = Game.flags[boostFlagName];
+    if (!boostFlag) return ERR_NOT_FOUND;
+
+    // 获取执行强化的 lab
+    const labs = boostFlag.pos.findInRange<StructureLab>(FIND_STRUCTURES, 1, {
+      filter: s => s.structureType === STRUCTURE_LAB
+    });
+    // 如果 lab 数量不够
+    if (labs.length < BOOST_RESOURCE[boostType].length) return ERR_INVALID_TARGET;
+
+    // 初始化 boost 任务
+    const boostTask: BoostTask = {
+      state: "boostGet",
+      pos: [boostFlag.pos.x, boostFlag.pos.y],
+      type: boostType,
+      lab: {}
+    };
+
+    // 统计需要执行强化工作的 lab 并保存到内存
+    BOOST_RESOURCE[boostType].forEach(res => (boostTask.lab[res] = labs.pop().id));
+    this.memory.boost = boostTask;
+    return OK;
   }
 }

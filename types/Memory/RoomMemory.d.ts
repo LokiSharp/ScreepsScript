@@ -99,6 +99,11 @@ interface RoomMemory {
   war?: Record<string, unknown>;
 
   /**
+   * 升级状态
+   */
+  upgrade?: Record<string, unknown>;
+
+  /**
    * boost 强化任务
    * @see doc/boost设计案
    */

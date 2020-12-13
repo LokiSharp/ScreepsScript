@@ -60,28 +60,47 @@ export const labTarget = [
   { target: RESOURCE_HYDROXIDE, targetNumber: 500 },
   { target: RESOURCE_ZYNTHIUM_KEANITE, targetNumber: 500 },
   { target: RESOURCE_UTRIUM_LEMERGITE, targetNumber: 500 },
-  // G
   { target: RESOURCE_GHODIUM, targetNumber: 5000 },
-  // XKHO2 生产线，强化 RANGE_ATTACK
+  // XUH2O 生产线，强化 ATTACK 的 attack 效率
+  { target: RESOURCE_UTRIUM_HYDRIDE, targetNumber: 300 },
+  { target: RESOURCE_UTRIUM_ACID, targetNumber: 1000 },
+  { target: RESOURCE_CATALYZED_UTRIUM_ACID, targetNumber: 5000 },
+  // XUH02 生产线，强化 WORK 的 harvest 效率
+  { target: RESOURCE_UTRIUM_OXIDE, targetNumber: 300 },
+  { target: RESOURCE_UTRIUM_ALKALIDE, targetNumber: 1000 },
+  { target: RESOURCE_CATALYZED_UTRIUM_ALKALIDE, targetNumber: 5000 },
+  // XKH2O 生产线，强化 CARRY 的容量
+  { target: RESOURCE_KEANIUM_HYDRIDE, targetNumber: 300 },
+  { target: RESOURCE_KEANIUM_ACID, targetNumber: 1000 },
+  { target: RESOURCE_CATALYZED_KEANIUM_ACID, targetNumber: 5000 },
+  // XKHO2 生产线，强化 RANGE_ATTACK 的 rangedAttack 和 rangedMassAttack 效率
   { target: RESOURCE_KEANIUM_OXIDE, targetNumber: 300 },
   { target: RESOURCE_KEANIUM_ALKALIDE, targetNumber: 1000 },
-  { target: RESOURCE_CATALYZED_KEANIUM_ALKALIDE, targetNumber: 4000 },
-  // XLHO2 生产线，强化 HEAL
+  { target: RESOURCE_CATALYZED_KEANIUM_ALKALIDE, targetNumber: 5000 },
+  // XLH2O 生产线，强化 WORK 的 repair 和 build 效率
+  { target: RESOURCE_LEMERGIUM_HYDRIDE, targetNumber: 300 },
+  { target: RESOURCE_LEMERGIUM_ACID, targetNumber: 1000 },
+  { target: RESOURCE_CATALYZED_LEMERGIUM_ACID, targetNumber: 5000 },
+  // XLHO2 生产线，强化 HEAL 的 heal 和 rangedHeal 效率
   { target: RESOURCE_LEMERGIUM_OXIDE, targetNumber: 300 },
   { target: RESOURCE_LEMERGIUM_ALKALIDE, targetNumber: 1000 },
-  { target: RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE, targetNumber: 4000 },
-  // XZHO2 生产线，强化 MOVE
-  { target: RESOURCE_ZYNTHIUM_OXIDE, targetNumber: 300 },
-  { target: RESOURCE_ZYNTHIUM_ALKALIDE, targetNumber: 1000 },
-  { target: RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE, targetNumber: 4000 },
-  // XZH2O 生产线，强化 WORK 的 dismantle
+  { target: RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE, targetNumber: 5000 },
+  // XZH2O 生产线，强化 WORK 的 dismantle 效率
   { target: RESOURCE_ZYNTHIUM_HYDRIDE, targetNumber: 300 },
   { target: RESOURCE_ZYNTHIUM_ACID, targetNumber: 1000 },
-  { target: RESOURCE_CATALYZED_ZYNTHIUM_ACID, targetNumber: 4000 },
-  // XGHO2 生产线，强化 TOUGH
+  { target: RESOURCE_CATALYZED_ZYNTHIUM_ACID, targetNumber: 5000 },
+  // XZHO2 生产线，强化 MOVE 的 fatigue 减低速度
+  { target: RESOURCE_ZYNTHIUM_OXIDE, targetNumber: 300 },
+  { target: RESOURCE_ZYNTHIUM_ALKALIDE, targetNumber: 1000 },
+  { target: RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE, targetNumber: 5000 },
+  // XGH20 生产线，强化 WORK 的 upgradeController 效率
+  { target: RESOURCE_GHODIUM_HYDRIDE, targetNumber: 300 },
+  { target: RESOURCE_GHODIUM_ACID, targetNumber: 1000 },
+  { target: RESOURCE_CATALYZED_GHODIUM_ACID, targetNumber: 5000 },
+  // XGHO2 生产线，强化 TOUGH 的伤害减免
   { target: RESOURCE_GHODIUM_OXIDE, targetNumber: 300 },
   { target: RESOURCE_GHODIUM_ALKALIDE, targetNumber: 1000 },
-  { target: RESOURCE_CATALYZED_GHODIUM_ALKALIDE, targetNumber: 4000 }
+  { target: RESOURCE_CATALYZED_GHODIUM_ALKALIDE, targetNumber: 5000 }
 ];
 
 /**
@@ -112,6 +131,15 @@ export const BOOST_RESOURCE: BoostResourceConfig = {
     RESOURCE_CATALYZED_KEANIUM_ALKALIDE,
     // TOUGH
     RESOURCE_CATALYZED_GHODIUM_ALKALIDE,
+    // MOVE
+    RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE
+  ],
+  // 升级时所需资源
+  UPGRADE: [
+    // WORK
+    RESOURCE_CATALYZED_GHODIUM_ACID,
+    // CARRY
+    RESOURCE_CATALYZED_KEANIUM_ACID,
     // MOVE
     RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE
   ]

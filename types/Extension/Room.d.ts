@@ -58,13 +58,22 @@ interface Room {
 
   // power 任务 api
   addPowerTask(task: PowerConstant, priority?: number): OK | ERR_NAME_EXISTS | ERR_INVALID_TARGET;
+
   deleteCurrentPowerTask(): void;
+
   getPowerTask(): PowerConstant | undefined;
+
   hangPowerTask(): void;
 
   // 战争相关
   startWar(boostType: BoostType): OK | ERR_NAME_EXISTS | ERR_NOT_FOUND | ERR_INVALID_TARGET;
+
   stopWar(): OK | ERR_NOT_FOUND;
+
+  // 升级相关
+  startUpgrade(): OK | ERR_NAME_EXISTS | ERR_NOT_FOUND | ERR_INVALID_TARGET;
+
+  stopUpgrade(): OK | ERR_NOT_FOUND;
 
   // 房间基础服务
   [STRUCTURE_FACTORY]?: StructureFactory;

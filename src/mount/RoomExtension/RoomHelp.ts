@@ -201,6 +201,16 @@ export default class RoomHelp extends RoomExtension {
             title: "移除本房间",
             describe: "会移除房间内的建筑（不包括墙壁）、移除对应的 creep 及 memory，需二次确认",
             functionName: "remove"
+          },
+          {
+            title: "启动升级",
+            describe: "进入升级状态，会同步启动 boost 进程",
+            functionName: "upgrade"
+          },
+          {
+            title: "结束升级",
+            describe: "解除升级状态并回收 boost 材料",
+            functionName: "noupgrade"
           }
         ]
       },
