@@ -8,11 +8,12 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-
     strategy:
       matrix:
+        os: [ubuntu-20.04, windows-2019]
         node-version: [10.x, 12.x]
+
+    runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v2
@@ -22,12 +23,18 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      - name: Get npm cache directory
+        id: npm-cache
+        run: |
+          echo "::set-output name=dir::$(npm config get cache)"
       - uses: actions/cache@v2
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          path: ${{ steps.npm-cache.outputs.dir }}
+          key: ${{ matrix.os }}-node-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-node-
+            ${{ matrix.os }}-node-${{ matrix.node-version }}-
+            ${{ matrix.os }}-node-
+            ${{ matrix.os }}-
 
       - run: npm install
       - run: npm run lint
