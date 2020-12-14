@@ -272,7 +272,11 @@ export class Move {
             for (let x = 0; x < 50; x++)
               for (let y = 0; y < 50; y++) {
                 const tile = terrain.get(x, y);
-                const weight = tile === TERRAIN_MASK_WALL ? 255 : tile === TERRAIN_MASK_SWAMP ? 10 : 2;
+                let weight = 0;
+                if (tile === TERRAIN_MASK_WALL) weight = 255;
+                else if (tile === TERRAIN_MASK_SWAMP) weight = 10;
+                else if (x === 0 || x === 49 || y === 0 || y === 49) weight = 15;
+                else weight = 2;
 
                 costs.set(x, y, weight);
               }
