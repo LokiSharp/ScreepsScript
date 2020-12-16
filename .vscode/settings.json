@@ -37,5 +37,5 @@
     "**/node_modules": true,
     "**/server": true
   },
-  "mochaExplorer.files": "test/unit/**/*.test.ts"
+  "mochaExplorer.files": "test/**/*.test.ts"
 }

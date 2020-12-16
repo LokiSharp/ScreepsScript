@@ -39,7 +39,7 @@ jobs:
 
       - run: npm install
       - run: npm run build
-      - run: npx mocha test/integration/${{ matrix.RCL }}.test.ts
+      - run: npx mocha test/integration/RCLTest/${{ matrix.RCL }}.RCLTest.ts
 
       - name: Update Code Artifact
         uses: actions/upload-artifact@v1

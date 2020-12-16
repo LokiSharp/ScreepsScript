@@ -16,7 +16,7 @@
     "push-season": "rollup -c rollup.config.ts --environment DEST:season",
     "test": "npm run test-unit && npm run test-integration ",
     "test-unit": "mocha test/unit/**/*.test.ts",
-    "test-integration": "mocha test/integration/integration.test.ts",
+    "test-integration": "mocha test/integration/**/*.test.ts",
     "test-nyc": "nyc npm run test-unit",
     "test-nyc-report": "nyc --reporter=lcov --reporter=text-summary npm run test-unit",
     "watch-main": "rollup -c rollup.config.ts -w --environment DEST:main",
