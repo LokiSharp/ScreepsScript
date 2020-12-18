@@ -1,46 +1,40 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-const { ScreepsServer, stdHooks } = require("screeps-server-mockup");
+import { Server, StdHooks, User } from "screeps-test-server";
 
 export class IntegrationTestHelper {
-  private mockedServer;
+  private serverCache: Server;
+  private userCache: User;
+  private targetCache: User;
 
-  public get server(): MockedServer {
-    return this.mockedServer as MockedServer;
+  public get server(): Server {
+    return this.serverCache;
   }
 
-  private mockedUser;
-
-  public get user(): MockedUser {
-    return this.mockedUser as MockedUser;
+  public get user(): User {
+    return this.userCache;
   }
 
-  public set user(user: MockedUser) {
-    this.mockedUser = user;
+  public set user(user: User) {
+    this.userCache = user;
   }
 
-  private mockedTarget;
-
-  public get target(): MockedUser {
-    return this.mockedTarget as MockedUser;
+  public get target(): User {
+    return this.targetCache;
   }
 
-  public set target(user: MockedUser) {
-    this.mockedTarget = user;
+  public set target(user: User) {
+    this.targetCache = user;
   }
 
   public async beforeEach(): Promise<void> {
-    this.mockedServer = new ScreepsServer();
-    await this.mockedServer.world.reset();
+    this.serverCache = new Server();
+    await this.serverCache.world.reset();
 
     // Start server
-    await this.mockedServer.start();
+    await this.serverCache.start();
   }
 
-  public async afterEach(): Promise<void> {
-    await this.mockedServer.stop();
+  public afterEach(): void {
+    this.serverCache.stop();
   }
 }
 
@@ -50,10 +44,10 @@ beforeEach(async () => {
   await helper.beforeEach();
 });
 
-afterEach(async () => {
-  await helper.afterEach();
+afterEach(() => {
+  helper.afterEach();
 });
 
 before(() => {
-  (stdHooks as StdHooks).hookWrite();
+  StdHooks.hookWrite();
 });

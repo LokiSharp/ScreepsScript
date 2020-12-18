@@ -1,17 +1,17 @@
 /* eslint-disable no-underscore-dangle */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import { IntegrationTestHelper } from "../helper";
+import { TerrainMatrix } from "screeps-test-server";
 const { readFileSync } = require("fs");
-const { TerrainMatrix } = require("screeps-server-mockup");
+
 const DIST_MAIN_JS = "dist/main.js";
 const DIST_MAIN_JS_MAP = "dist/main.js.map.js";
 
 export async function initBattleTestRoom(helper: IntegrationTestHelper): Promise<void> {
-  const terrain: MockedTerrainMatrix = new TerrainMatrix();
+  const terrain = new TerrainMatrix();
 
   await helper.server.world.addRoom("W0N0");
   await helper.server.world.setTerrain("W0N0", terrain);

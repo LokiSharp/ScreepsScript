@@ -5,16 +5,16 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import { IntegrationTestHelper } from "../helper";
-
+import { TerrainMatrix } from "screeps-test-server";
 const { readFileSync } = require("fs");
-const { TerrainMatrix } = require("screeps-server-mockup");
+
 const DIST_MAIN_JS = "dist/main.js";
 const DIST_MAIN_JS_MAP = "dist/main.js.map.js";
 
 export async function initRCLTestRoom(helper: IntegrationTestHelper, RCL: number): Promise<void> {
   const { db } = helper.server.common.storage;
   const C = helper.server.constants;
-  const terrain: MockedTerrainMatrix = new TerrainMatrix();
+  const terrain = new TerrainMatrix();
   const walls = [
     [10, 10],
     [10, 40],

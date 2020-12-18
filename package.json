@@ -71,7 +71,7 @@
     "rollup-plugin-nodent": "^0.2.2",
     "rollup-plugin-screeps": "^1.0.0",
     "rollup-plugin-typescript2": "^0.29.0",
-    "screeps-server-mockup": "^1.5.1",
+    "screeps-test-server": "0.0.2",
     "sinon": "^9.2.1",
     "sinon-chai": "^3.2.0",
     "standard-version": "^9.0.0",
