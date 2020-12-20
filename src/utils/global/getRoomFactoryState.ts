@@ -1,6 +1,6 @@
 import colorful from "../console/colorful";
 import createRoomLink from "../console/createRoomLink";
-import { factoryTopTargets } from "setting";
+import { factoryTopTargets } from "../../setting";
 
 /**
  * 获取指定房间的工厂状态

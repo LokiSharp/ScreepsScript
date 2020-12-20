@@ -1,5 +1,5 @@
 import colorful from "utils/console/colorful";
-import roles from "role";
+import creepWorks from "role";
 
 /**
  * creep 发布 api
@@ -24,7 +24,7 @@ export const creepApi = {
     spawnRoom: string
   ): OK | ERR_NOT_FOUND | ERR_NOT_OWNER {
     if (!Memory.creepConfigs) Memory.creepConfigs = {};
-    if (!roles[role]) return ERR_NOT_FOUND;
+    if (!creepWorks[role]) return ERR_NOT_FOUND;
 
     // 不管有没有直接覆盖掉
     Memory.creepConfigs[creepName] = { role, data, spawnRoom };

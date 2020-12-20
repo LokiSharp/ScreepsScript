@@ -1,26 +1,6 @@
 import { baseLayout } from "setting";
 
 /**
- * 判断当前位置是否可以站立 creep
- *
- * @param pos 要判断的位置
- */
-function canPosStand(pos: RoomPosition): boolean {
-  const onPosStructures = pos.lookFor(LOOK_STRUCTURES);
-
-  // 遍历该位置上的所有建筑，如果建筑上不能站人的话就返回 false
-  for (const structure of onPosStructures) {
-    if (
-      structure.structureType !== STRUCTURE_CONTAINER &&
-      structure.structureType !== STRUCTURE_RAMPART &&
-      structure.structureType !== STRUCTURE_ROAD
-    )
-      return false;
-  }
-  return true;
-}
-
-/**
  * 放置集中布局之外的 link
  *
  * 默认有三个，分别位于两个 source 和一个 controller 旁边
@@ -44,13 +24,13 @@ function getOutLinkPos(room: Room): RoomPosition[] {
     // 获取目标点位旁边的所有可用的开采空位
     const harvesterPos = target.pos.getFreeSpace();
     // 找到第一个可以站 creep 的地方
-    const targetHarvesterPos = harvesterPos.find(canPosStand);
+    const targetHarvesterPos = harvesterPos.find(pos => pos.canStand());
     if (!targetHarvesterPos) continue;
 
     // 以开采单位为基础寻找所有可以放置 link 的位置
     const targetPos = targetHarvesterPos.getFreeSpace();
     // 第一个空位就是放置 link 的位置
-    const linkPos = targetPos.find(canPosStand);
+    const linkPos = targetPos.find(pos => pos.canStand());
     if (!linkPos) continue;
 
     result.push(linkPos);

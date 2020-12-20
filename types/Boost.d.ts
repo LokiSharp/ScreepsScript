@@ -24,8 +24,9 @@ type BoostStats = "boostGet" | "labGetEnergy" | "waitBoost" | "boostClear";
  *
  * @type WAR 对外战争
  * @type DEFENSE 主动防御
+ * @type UPGRADE 升级
  */
-type BoostType = "WAR" | "DEFENSE";
+type BoostType = "WAR" | "DEFENSE" | "UPGRADE";
 /**
  * boost 资源配置表
  * 规定了不同模式下需要往 lab 装填的资源类型

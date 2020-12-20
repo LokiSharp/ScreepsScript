@@ -6,12 +6,20 @@ interface Room {
   log(content: string, instanceName: string, color?: Colors | undefined, notify?: boolean): void;
 
   // creep 发布 api
-  releaseCreep(role: BaseRoleConstant | AdvancedRoleConstant, releaseNumber?: number): ScreepsReturnCode;
+  releaseCreep(role: CreepRoleConstant, releaseNumber?: number): ScreepsReturnCode;
+
   spawnReiver(sourceFlagName: string, targetStructureId: Id<StructureWithStore>): string;
+
   addRemoteHelper(remoteRoomName: string, wayPointFlagName?: string): void;
+
   addRemoteReserver(remoteRoomName: string, single?: boolean): void;
+
   addRemoteCreepGroup(remoteRoomName: string): void;
+
+  addRemoteHarvester(remoteRoomName: string): void;
+
   removePbHarvesteGroup(attackerName: string, healerName: string): void;
+
   spawnPbCarrierGroup(flagName: string, releaseNumber: number): void;
 
   /**
@@ -19,7 +27,9 @@ interface Room {
    */
   // 孵化队列 api
   addSpawnTask(taskName: string): number | ERR_NAME_EXISTS;
+
   hasSpawnTask(taskName: string): boolean;
+
   clearSpawnTask(): void;
   hangSpawnTask(): void;
 
@@ -58,13 +68,22 @@ interface Room {
 
   // power 任务 api
   addPowerTask(task: PowerConstant, priority?: number): OK | ERR_NAME_EXISTS | ERR_INVALID_TARGET;
+
   deleteCurrentPowerTask(): void;
+
   getPowerTask(): PowerConstant | undefined;
+
   hangPowerTask(): void;
 
   // 战争相关
   startWar(boostType: BoostType): OK | ERR_NAME_EXISTS | ERR_NOT_FOUND | ERR_INVALID_TARGET;
+
   stopWar(): OK | ERR_NOT_FOUND;
+
+  // 升级相关
+  startUpgrade(): OK | ERR_NAME_EXISTS | ERR_NOT_FOUND | ERR_INVALID_TARGET;
+
+  stopUpgrade(): OK | ERR_NOT_FOUND;
 
   // 房间基础服务
   [STRUCTURE_FACTORY]?: StructureFactory;
@@ -110,7 +129,13 @@ interface Room {
   importantWall: StructureWall | StructureRampart;
 
   // 获取房间中的有效能量来源
-  getAvailableSource(): StructureTerminal | StructureStorage | StructureContainer | Source;
+  getAvailableSource():
+    | StructureTerminal
+    | StructureStorage
+    | StructureContainer
+    | Source
+    | Ruin
+    | Resource<RESOURCE_ENERGY>;
 
   // 自动规划相关
   findBaseCenterPos(): RoomPosition[];

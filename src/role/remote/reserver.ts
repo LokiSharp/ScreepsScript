@@ -8,35 +8,38 @@ import createBodyGetter from "utils/creep/createBodyGetter";
  * 准备阶段：向指定房间控制器移动
  * 阶段A：预定控制器
  */
-export default function reserver(data: RemoteDeclarerData): ICreepConfig {
-  return {
-    // 该 creep 死了就不会再次孵化
-    isNeed: () => false,
-    // 向指定房间移动，这里移动是为了避免 target 阶段里 controller 所在的房间没有视野
-    prepare: creep => {
-      // 只要进入房间则准备结束
-      if (creep.room.name !== data.targetRoomName) {
-        creep.goTo(new RoomPosition(25, 25, data.targetRoomName));
-        return false;
-      } else return true;
-    },
-    // 一直进行预定
-    target: creep => {
-      const targetRoom = Game.rooms[data.targetRoomName];
-      if (!targetRoom) return false;
-      const controller = targetRoom.controller;
-      if (!controller) return false;
-
-      // 如果房间的预订者不是自己, 就攻击控制器
-      if (controller.reservation && controller.reservation.username !== creep.owner.username) {
-        if (creep.attackController(controller) === ERR_NOT_IN_RANGE) creep.goTo(controller.pos, { range: 1 });
-      }
-      // 房间没有预定满, 就继续预定
-      if (!controller.reservation || controller.reservation.ticksToEnd < CONTROLLER_RESERVE_MAX) {
-        if (creep.reserveController(controller) === ERR_NOT_IN_RANGE) creep.goTo(controller.pos, { range: 1 });
-      }
+export const reserver: CreepConfig<"reserver"> = {
+  // 该 creep 死了就不会再次孵化
+  isNeed: () => false,
+  // 向指定房间移动，这里移动是为了避免 target 阶段里 controller 所在的房间没有视野
+  prepare: creep => {
+    const { targetRoomName } = creep.memory.data;
+    // 只要进入房间则准备结束
+    if (creep.room.name !== targetRoomName) {
+      creep.goTo(new RoomPosition(25, 25, targetRoomName));
       return false;
-    },
-    bodys: createBodyGetter(bodyConfigs.reserver)
-  };
-}
+    } else return true;
+  },
+  // 一直进行预定
+  target: creep => {
+    const { targetRoomName, spawnRoom } = creep.memory.data;
+    const targetRoom = Game.rooms[targetRoomName];
+    if (!(`${targetRoomName} source0` in Game.flags)) {
+      Game.rooms[spawnRoom].addRemoteHarvester(targetRoomName);
+    }
+    if (!targetRoom) return false;
+    const controller = targetRoom.controller;
+    if (!controller) return false;
+
+    // 如果房间的预订者不是自己, 就攻击控制器
+    if (controller.reservation && controller.reservation.username !== creep.owner.username) {
+      if (creep.attackController(controller) === ERR_NOT_IN_RANGE) creep.goTo(controller.pos, { range: 1 });
+    }
+    // 房间没有预定满, 就继续预定
+    if (!controller.reservation || controller.reservation.ticksToEnd < CONTROLLER_RESERVE_MAX) {
+      if (creep.reserveController(controller) === ERR_NOT_IN_RANGE) creep.goTo(controller.pos, { range: 1 });
+    }
+    return false;
+  },
+  bodys: createBodyGetter(bodyConfigs.reserver)
+};

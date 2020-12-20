@@ -16,7 +16,7 @@ type EnergySourceStructure = StructureLink | StructureContainer | StructureTermi
  *
  * creep 将会从这些地方获取能量
  */
-type AllEnergySource = Source | EnergySourceStructure;
+type AllEnergySource = Source | EnergySourceStructure | Ruin | Resource<RESOURCE_ENERGY>;
 
 /**
  * 包含 store 属性的建筑

@@ -92,7 +92,7 @@ export default class RoomExtension extends Room {
    * @param role 要发布的 creep 角色
    * @param releaseNumber 孵化几个 creep
    */
-  public releaseCreep(role: BaseRoleConstant | AdvancedRoleConstant, releaseNumber = 1): ScreepsReturnCode {
+  public releaseCreep(role: CreepRoleConstant, releaseNumber = 1): ScreepsReturnCode {
     return releaseCreep(this, role, releaseNumber);
   }
 
@@ -109,20 +109,44 @@ export default class RoomExtension extends Room {
   /**
    * 查找房间中的有效能量来源
    */
-  public getAvailableSource(): StructureTerminal | StructureStorage | StructureContainer | Source {
+  public getAvailableSource():
+    | StructureTerminal
+    | StructureStorage
+    | StructureContainer
+    | Source
+    | Ruin
+    | Resource<RESOURCE_ENERGY> {
     // terminal 或 storage 里有能量就优先用
     if (this.terminal && this.terminal.store[RESOURCE_ENERGY] > 10000) return this.terminal;
     if (this.storage && this.storage.store[RESOURCE_ENERGY] > 100000) return this.storage;
     // 如果有 sourceConainer 的话就挑个多的
-    if (this.sourceContainers.length > 0)
-      return _.max(this.sourceContainers, container => container.store[RESOURCE_ENERGY]);
+    if (this.sourceContainers.length > 0) {
+      // 能量必须够多才会选用
+      const availableContainer = this.sourceContainers.filter(container => container.store[RESOURCE_ENERGY] > 300);
+      // 挑个能量多的 container
+      if (availableContainer.length > 0)
+        return _.max(availableContainer, container => container.store[RESOURCE_ENERGY]);
+    }
+
+    // 查找散落的能量，如果能量满足要求就设为目标
+    const resources = this.find(FIND_DROPPED_RESOURCES);
+    for (const resource of resources) {
+      if (resource?.resourceType === RESOURCE_ENERGY && resource.amount > 500) {
+        return resource as Resource<RESOURCE_ENERGY>;
+      }
+    }
+
+    // 查找废墟，如果有包含 store 的废墟就设为目标
+    const ruins = this.find(FIND_RUINS);
+    for (const ruin of ruins) {
+      if ("store" in ruin && ruin.store[RESOURCE_ENERGY] > 0) {
+        return ruin;
+      }
+    }
 
     // 没有就选边上有空位的 source
     return this.source.find(source => {
-      const freeCount = source.pos.getFreeSpace().length;
-      const harvestCount = source.pos.findInRange(FIND_CREEPS, 1).length;
-
-      return freeCount - harvestCount > 0;
+      return source.pos.getCanStandPos().length > 1;
     });
   }
 
@@ -225,10 +249,7 @@ export default class RoomExtension extends Room {
   public addCenterTask(task: ITransferTask, priority: number = null): number {
     if (this.hasCenterTask(task.submit)) return -1;
     // 由于这里的目标建筑限制型和非限制型存储都有，这里一律作为非限制性检查来减少代码量
-    if (
-      this[task.target] &&
-      (this[task.target].store as StoreDefinitionUnlimited).getFreeCapacity(task.resourceType) < task.amount
-    )
+    if ((this[task.target]?.store as StoreDefinitionUnlimited)?.getFreeCapacity(task.resourceType) < task.amount)
       return -2;
 
     if (!priority) this.memory.centerTransferTasks.push(task);
@@ -314,21 +335,14 @@ export default class RoomExtension extends Room {
    * 拓展新的外矿
    *
    * @param remoteRoomName 要拓展的外矿房间名
-   * @param targetId 能量搬到哪个建筑里
    * @returns ERR_INVALID_TARGET targetId 找不到对应的建筑
    * @returns ERR_NOT_FOUND 没有找到足够的 source 旗帜
    */
-  public addRemote(remoteRoomName: string, targetId: Id<StructureWithStore>): OK | ERR_INVALID_TARGET | ERR_NOT_FOUND {
-    // target 建筑一定要有
-    if (!Game.getObjectById(targetId)) return ERR_INVALID_TARGET;
-    // 目标 source 也至少要有一个
-    const sourceFlagsName = [`${remoteRoomName} source0`, `${remoteRoomName} source1`];
-    if (!(sourceFlagsName[0] in Game.flags)) return ERR_NOT_FOUND;
-    // 兜底
+  public addRemote(remoteRoomName: string): OK | ERR_INVALID_TARGET | ERR_NOT_FOUND {
     if (!this.memory.remote) this.memory.remote = {};
 
     // 添加对应的键值对
-    this.memory.remote[remoteRoomName] = { targetId };
+    this.memory.remote[remoteRoomName] = { targetId: this.storage.id };
 
     this.addRemoteCreepGroup(remoteRoomName);
     return OK;
@@ -434,51 +448,6 @@ export default class RoomExtension extends Room {
   }
 
   /**
-   * 根据资源类型查找来源房间
-   *
-   * @param resourceType 要查找的资源类型
-   * @returns 找到的目标房间，没找到返回 null
-   */
-  private shareGetSource(resourceType: ResourceConstant): Room | null {
-    // 兜底
-    if (!Memory.resourceSourceMap) {
-      Memory.resourceSourceMap = {};
-      return null;
-    }
-    const SourceRoomsName = Memory.resourceSourceMap[resourceType];
-    if (!SourceRoomsName) return null;
-
-    // 寻找合适的房间
-    let targetRoom: Room = null;
-    // 变量房间名数组，注意，这里会把所有无法访问的房间筛选出来
-    const roomWithEmpty = SourceRoomsName.map(roomName => {
-      const room = Game.rooms[roomName];
-
-      if (!room || !room.terminal) return "";
-      // 该房间有任务或者就是自己，不能作为共享来源
-      if (room.memory.shareTask || room.name === this.name) return roomName;
-
-      // 如果请求共享的是能量
-      if (resourceType === RESOURCE_ENERGY) {
-        if (!room.storage) return "";
-        // 该房间 storage 中能量低于要求的话，就从资源提供列表中移除该房间
-        if (room.storage.store[RESOURCE_ENERGY] < ENERGY_SHARE_LIMIT) return "";
-      } else {
-        // 如果请求的资源已经没有的话就暂时跳过（因为无法确定之后是否永远无法提供该资源）
-        if ((room.terminal.store[resourceType] || 0) <= 0) return roomName;
-      }
-
-      // 接受任务的房间就是你了！
-      targetRoom = room;
-      return roomName;
-    });
-
-    // 把上面筛选出来的空字符串元素去除
-    Memory.resourceSourceMap[resourceType] = roomWithEmpty.filter(roomName => roomName);
-    return targetRoom;
-  }
-
-  /**
    * 执行自动建筑规划
    */
   public planLayout(): string {
@@ -563,34 +532,9 @@ export default class RoomExtension extends Room {
    */
   public startWar(boostType: BoostType): OK | ERR_NAME_EXISTS | ERR_NOT_FOUND | ERR_INVALID_TARGET {
     if (this.memory.war) return ERR_NAME_EXISTS;
-
-    // 获取 boost 旗帜
-    const boostFlagName = this.name + "Boost";
-    const boostFlag = Game.flags[boostFlagName];
-    if (!boostFlag) return ERR_NOT_FOUND;
-
-    // 获取执行强化的 lab
-    const labs = boostFlag.pos.findInRange<StructureLab>(FIND_STRUCTURES, 1, {
-      filter: s => s.structureType === STRUCTURE_LAB
-    });
-    // 如果 lab 数量不够
-    if (labs.length < BOOST_RESOURCE[boostType].length) return ERR_INVALID_TARGET;
-
-    // 初始化 boost 任务
-    const boostTask: BoostTask = {
-      state: "boostGet",
-      pos: [boostFlag.pos.x, boostFlag.pos.y],
-      type: boostType,
-      lab: {}
-    };
-
-    // 统计需要执行强化工作的 lab 并保存到内存
-    BOOST_RESOURCE[boostType].forEach(res => (boostTask.lab[res] = labs.pop().id));
-
-    // 发布 boost 任务
-    this.memory.boost = boostTask;
     this.memory.war = {};
-    return OK;
+    // 发布 boost 任务
+    return this.releaseBoostTask(boostType);
   }
 
   /**
@@ -714,15 +658,6 @@ export default class RoomExtension extends Room {
   }
 
   /**
-   * 检查是否已经存在指定任务
-   *
-   * @param task 要检查的 power 任务
-   */
-  private hasPowerTask(task: PowerConstant): boolean {
-    return !!this.memory.powerTasks.find(power => power === task);
-  }
-
-  /**
    * 获取当前的 power 任务
    */
   public getPowerTask(): PowerConstant | undefined {
@@ -744,5 +679,123 @@ export default class RoomExtension extends Room {
    */
   public deleteCurrentPowerTask(): void {
     this.memory.powerTasks.shift();
+  }
+
+  /**
+   * 切换为升级状态
+   * 需要提前插好名为 [房间名 + Boost] 的旗帜，并保证其周围有足够数量的 lab
+   *
+   * @returns ERR_NAME_EXISTS 已经处于升级状态
+   * @returns ERR_NOT_FOUND 未找到强化旗帜
+   * @returns ERR_INVALID_TARGET 强化旗帜附近的lab数量不足
+   */
+  public startUpgrade(): OK | ERR_NAME_EXISTS | ERR_NOT_FOUND | ERR_INVALID_TARGET {
+    if (this.memory.upgrade) return ERR_NAME_EXISTS;
+    this.memory.upgrade = {};
+    // 发布 boost 任务
+    return this.releaseBoostTask("UPGRADE");
+  }
+
+  /**
+   * 解除战争状态
+   * 会同步取消 boost 进程
+   */
+  public stopUpgrade(): OK | ERR_NOT_FOUND {
+    if (!this.memory.upgrade) return ERR_NOT_FOUND;
+
+    // 将 boost 状态置为 clear，labExtension 会自动发布清理任务并移除 boostTask
+    if (this.memory.boost) this.memory.boost.state = "boostClear";
+    delete this.memory.upgrade;
+
+    return OK;
+  }
+
+  /**
+   * 根据资源类型查找来源房间
+   *
+   * @param resourceType 要查找的资源类型
+   * @returns 找到的目标房间，没找到返回 null
+   */
+  private shareGetSource(resourceType: ResourceConstant): Room | null {
+    // 兜底
+    if (!Memory.resourceSourceMap) {
+      Memory.resourceSourceMap = {};
+      return null;
+    }
+    const SourceRoomsName = Memory.resourceSourceMap[resourceType];
+    if (!SourceRoomsName) return null;
+
+    // 寻找合适的房间
+    let targetRoom: Room = null;
+    // 变量房间名数组，注意，这里会把所有无法访问的房间筛选出来
+    const roomWithEmpty = SourceRoomsName.map(roomName => {
+      const room = Game.rooms[roomName];
+
+      if (!room || !room.terminal) return "";
+      // 该房间有任务或者就是自己，不能作为共享来源
+      if (room.memory.shareTask || room.name === this.name) return roomName;
+
+      // 如果请求共享的是能量
+      if (resourceType === RESOURCE_ENERGY) {
+        if (!room.storage) return "";
+        // 该房间 storage 中能量低于要求的话，就从资源提供列表中移除该房间
+        if (room.storage.store[RESOURCE_ENERGY] < ENERGY_SHARE_LIMIT) return "";
+      } else {
+        // 如果请求的资源已经没有的话就暂时跳过（因为无法确定之后是否永远无法提供该资源）
+        if ((room.terminal.store[resourceType] || 0) <= 0) return roomName;
+      }
+
+      // 接受任务的房间就是你了！
+      targetRoom = room;
+      return roomName;
+    });
+
+    // 把上面筛选出来的空字符串元素去除
+    Memory.resourceSourceMap[resourceType] = roomWithEmpty.filter(roomName => roomName);
+    return targetRoom;
+  }
+
+  /**
+   * 检查是否已经存在指定任务
+   *
+   * @param task 要检查的 power 任务
+   */
+  private hasPowerTask(task: PowerConstant): boolean {
+    return !!this.memory.powerTasks.find(power => power === task);
+  }
+
+  /**
+   * 发布 Boost 任务
+   * 需要提前插好名为 [房间名 + Boost] 的旗帜，并保证其周围有足够数量的 lab
+   *
+   * @param boostType boost 形式
+   * @returns ERR_NOT_FOUND 未找到强化旗帜
+   * @returns ERR_INVALID_TARGET 强化旗帜附近的lab数量不足
+   */
+  private releaseBoostTask(boostType: BoostType): OK | ERR_NOT_FOUND | ERR_INVALID_TARGET {
+    // 获取 boost 旗帜
+    const boostFlagName = this.name + "Boost";
+    const boostFlag = Game.flags[boostFlagName];
+    if (!boostFlag) return ERR_NOT_FOUND;
+
+    // 获取执行强化的 lab
+    const labs = boostFlag.pos.findInRange<StructureLab>(FIND_STRUCTURES, 1, {
+      filter: s => s.structureType === STRUCTURE_LAB
+    });
+    // 如果 lab 数量不够
+    if (labs.length < BOOST_RESOURCE[boostType].length) return ERR_INVALID_TARGET;
+
+    // 初始化 boost 任务
+    const boostTask: BoostTask = {
+      state: "boostGet",
+      pos: [boostFlag.pos.x, boostFlag.pos.y],
+      type: boostType,
+      lab: {}
+    };
+
+    // 统计需要执行强化工作的 lab 并保存到内存
+    BOOST_RESOURCE[boostType].forEach(res => (boostTask.lab[res] = labs.pop().id));
+    this.memory.boost = boostTask;
+    return OK;
   }
 }

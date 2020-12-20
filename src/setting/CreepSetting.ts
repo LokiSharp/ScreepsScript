@@ -1,9 +1,18 @@
-import getBodyConfig from "utils/creep/getBodyConfig";
+import getBodyConfig from "../utils/creep/getBodyConfig";
 
 // 每个房间最多同时存在多少单位
 export const MAX_UPGRADER_NUM = 24;
 export const MAX_HARVESTER_NUM = 4;
 export const TRANSFER_DEATH_LIMIT = 20;
+
+/**
+ * source container 离基地中心的距离与对应发布的 filler 数量
+ * 这个值是每个 container 发布的 filler
+ */
+export const FILLER_WITH_CONTAINER_RANGE = [
+  { range: 25, num: 2 },
+  { range: 0, num: 1 }
+];
 
 /**
  * storage 中的能量和对应发布的 upgrader 数量
@@ -37,9 +46,9 @@ export const bodyConfigs: BodyConfigs = {
    * 诸如 builder 之类的
    */
   worker: getBodyConfig(
-    { [WORK]: 1, [CARRY]: 1, [MOVE]: 1 },
-    { [WORK]: 2, [CARRY]: 2, [MOVE]: 2 },
-    { [WORK]: 3, [CARRY]: 3, [MOVE]: 3 },
+    { [WORK]: 1, [CARRY]: 1, [MOVE]: 2 },
+    { [WORK]: 2, [CARRY]: 2, [MOVE]: 4 },
+    { [WORK]: 3, [CARRY]: 3, [MOVE]: 6 },
     { [WORK]: 5, [CARRY]: 5, [MOVE]: 5 },
     { [WORK]: 8, [CARRY]: 8, [MOVE]: 8 },
     { [WORK]: 10, [CARRY]: 10, [MOVE]: 10 },
@@ -52,9 +61,9 @@ export const bodyConfigs: BodyConfigs = {
    * 最大的身体部件只包含 12 个 WORK
    */
   upgrader: getBodyConfig(
-    { [WORK]: 1, [CARRY]: 1, [MOVE]: 1 },
-    { [WORK]: 2, [CARRY]: 2, [MOVE]: 2 },
-    { [WORK]: 3, [CARRY]: 3, [MOVE]: 3 },
+    { [WORK]: 1, [CARRY]: 1, [MOVE]: 2 },
+    { [WORK]: 2, [CARRY]: 2, [MOVE]: 4 },
+    { [WORK]: 3, [CARRY]: 3, [MOVE]: 6 },
     { [WORK]: 5, [CARRY]: 5, [MOVE]: 5 },
     { [WORK]: 8, [CARRY]: 8, [MOVE]: 8 },
     { [WORK]: 10, [CARRY]: 10, [MOVE]: 10 },
@@ -118,7 +127,7 @@ export const bodyConfigs: BodyConfigs = {
     { [WORK]: 5, [CARRY]: 9, [MOVE]: 7 },
     { [WORK]: 6, [CARRY]: 10, [MOVE]: 8 },
     { [WORK]: 7, [CARRY]: 15, [MOVE]: 11 },
-    { [WORK]: 11, [CARRY]: 15, [MOVE]: 19 }
+    { [WORK]: 11, [CARRY]: 15, [MOVE]: 13 }
   ),
 
   /**
@@ -177,13 +186,29 @@ export const bodyConfigs: BodyConfigs = {
     { [WORK]: 15, [MOVE]: 15 },
     { [WORK]: 25, [MOVE]: 25 },
     { [WORK]: 25, [MOVE]: 25 }
+  ),
+
+  /**
+   * 远程作战单位身体
+   */
+  rangedAttacker: getBodyConfig(
+    { [RANGED_ATTACK]: 1, [MOVE]: 1 },
+    { [RANGED_ATTACK]: 1, [MOVE]: 2, [HEAL]: 1 },
+    { [RANGED_ATTACK]: 2, [MOVE]: 3, [HEAL]: 1 },
+    { [RANGED_ATTACK]: 3, [MOVE]: 5, [HEAL]: 2 },
+    { [RANGED_ATTACK]: 6, [MOVE]: 8, [HEAL]: 2 },
+    { [RANGED_ATTACK]: 7, [MOVE]: 10, [HEAL]: 3 },
+    { [RANGED_ATTACK]: 12, [MOVE]: 20, [HEAL]: 8 },
+    { [RANGED_ATTACK]: 15, [MOVE]: 25, [HEAL]: 10 }
   )
 };
 
 // creep 的默认内存
 export const creepDefaultMemory: CreepMemory = {
-  role: "harvester",
+  role: undefined,
   ready: false,
+  setWayPoint: false,
+  inPlace: false,
   working: false
 };
 

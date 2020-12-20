@@ -7,8 +7,9 @@ export default class CreepControl extends RoomConsole {
   /**
    * 给本房间发布或重新规划指定的 creep 角色
    * @param role 要发布的 creep 角色
+   * @param releaseNumber 发布数量
    */
-  public releaseCreep(role: BaseRoleConstant, releaseNumber = 1): ScreepsReturnCode {
+  public releaseCreep(role: CreepRoleConstant, releaseNumber = 1): ScreepsReturnCode {
     return releaseCreep(this, role, releaseNumber);
   }
 
@@ -47,25 +48,29 @@ export default class CreepControl extends RoomConsole {
    * @param remoteRoomName 要发布 creep 的外矿房间
    */
   public addRemoteCreepGroup(remoteRoomName: string): void {
-    const sourceFlagsName = [`${remoteRoomName} source0`, `${remoteRoomName} source1`];
+    this.addRemoteReserver(remoteRoomName);
+  }
 
-    // 添加对应数量的外矿采集者
-    sourceFlagsName.forEach((flagName, index) => {
-      if (!(flagName in Game.flags)) return;
-
+  /**
+   * 发布外矿挖掘单位
+   *
+   * @param remoteRoomName 要发布 creep 的外矿房间
+   */
+  public addRemoteHarvester(remoteRoomName: string): void {
+    Game.rooms[remoteRoomName].source.forEach((targetSource, index) => {
+      const flagName = `${remoteRoomName} source${index}`;
+      targetSource.pos.createFlag(flagName, COLOR_WHITE, COLOR_WHITE);
       creepApi.add(
         `${remoteRoomName} remoteHarvester${index}`,
         "remoteHarvester",
         {
           sourceFlagName: flagName,
           spawnRoom: this.name,
-          targetId: this.memory.remote[remoteRoomName].targetId
+          targetId: this.storage.id
         },
         this.name
       );
     });
-
-    this.addRemoteReserver(remoteRoomName);
   }
 
   /**
@@ -82,7 +87,8 @@ export default class CreepControl extends RoomConsole {
         reserverName,
         "reserver",
         {
-          targetRoomName: remoteRoomName
+          targetRoomName: remoteRoomName,
+          spawnRoom: this.name
         },
         this.name
       );
@@ -116,6 +122,7 @@ export default class CreepControl extends RoomConsole {
    * 发布支援角色组
    *
    * @param remoteRoomName 要支援的房间名
+   * @param wayPointFlagName 路径点旗帜名
    */
   public addRemoteHelper(remoteRoomName: string, wayPointFlagName?: string): void {
     const room = Game.rooms[remoteRoomName];
@@ -186,6 +193,7 @@ export default class CreepControl extends RoomConsole {
    *
    * @param targetFlagName 进攻旗帜名称
    * @param releaseNumber 要孵化的数量
+   * @param keepSpawn 是否持续生成
    */
   public spawnAttacker(targetFlagName = "", releaseNumber = 1, keepSpawn = false): string {
     if (releaseNumber <= 0 || releaseNumber > 10) releaseNumber = 1;
@@ -419,7 +427,7 @@ export default class CreepControl extends RoomConsole {
    * @param targetFlagName 目标旗帜名称
    * @param keepSpawn 是否持续生成
    */
-  public spawnRangedAttacker(
+  public spawnBoostRangedAttacker(
     bearTowerNum: 0 | 1 | 3 | 5 | 2 | 4 | 6 = 6,
     targetFlagName: string = DEFAULT_FLAG_NAME.ATTACK,
     keepSpawn = false
@@ -427,10 +435,10 @@ export default class CreepControl extends RoomConsole {
     if (!this.memory.boost) return `发布失败，未启动 Boost 进程，执行 ${this.name}.war() 来启动战争状态`;
     if (this.memory.boost.state !== "waitBoost") return `无法发布，Boost 材料未准备就绪`;
 
-    const creepName = `${this.name} rangedAttacker ${Game.time}`;
+    const creepName = `${this.name} boostRangedAttacker ${Game.time}`;
     creepApi.add(
       creepName,
-      "rangedAttacker",
+      "boostRangedAttacker",
       {
         targetFlagName: targetFlagName || DEFAULT_FLAG_NAME.ATTACK,
         bearTowerNum,
@@ -440,6 +448,29 @@ export default class CreepControl extends RoomConsole {
     );
 
     return `已发布进攻一体机 [${creepName}] [扛塔等级] ${bearTowerNum} [进攻旗帜名称] ${targetFlagName} ${
+      keepSpawn ? "" : "不"
+    }持续生成，GoodLuck Commander`;
+  }
+
+  /**
+   * 孵化 boost 进攻一体机
+   *
+   * @param targetFlagName 目标旗帜名称
+   * @param keepSpawn 是否持续生成
+   */
+  public spawnRangedAttacker(targetFlagName: string = DEFAULT_FLAG_NAME.ATTACK, keepSpawn = false): string {
+    const creepName = `${this.name} RangedAttacker ${Game.time}`;
+    creepApi.add(
+      creepName,
+      "rangedAttacker",
+      {
+        targetFlagName: targetFlagName || DEFAULT_FLAG_NAME.ATTACK,
+        keepSpawn
+      },
+      this.name
+    );
+
+    return `已发布进攻一体机 [${creepName}] [进攻旗帜名称] ${targetFlagName} ${
       keepSpawn ? "" : "不"
     }持续生成，GoodLuck Commander`;
   }

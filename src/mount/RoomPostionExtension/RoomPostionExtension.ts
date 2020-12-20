@@ -2,6 +2,8 @@
  * 房间位置拓展
  */
 export default class RoomPostionExtension extends RoomPosition {
+  private canStandPosCache: RoomPosition[];
+
   /**
    * 获取当前位置目标方向的 pos 对象
    *
@@ -28,14 +30,21 @@ export default class RoomPostionExtension extends RoomPosition {
   }
 
   /**
-   * 获取该位置周围的开采位空位
+   * 获取该位置周围的空位
+   *
+   * @param range 目标范围
    */
-  public getFreeSpace(): RoomPosition[] {
+  public getFreeSpace(range = 1): RoomPosition[] {
     const terrain = new Room.Terrain(this.roomName);
     const result: RoomPosition[] = [];
 
-    const xs = [this.x - 1, this.x, this.x + 1];
-    const ys = [this.y - 1, this.y, this.y + 1];
+    const xs = [this.x];
+    const ys = [this.y];
+
+    _.range(1, 1 + range).forEach(dxdy => {
+      xs.push(this.x - dxdy, this.x + dxdy);
+      ys.push(this.y - dxdy, this.y + dxdy);
+    });
 
     // 遍历 x 和 y 坐标
     xs.forEach(x =>
@@ -46,5 +55,46 @@ export default class RoomPostionExtension extends RoomPosition {
     );
 
     return result;
+  }
+
+  /**
+   * 获取该位置周围可站立的的空位
+   *
+   * @param range 目标范围
+   */
+  public getCanStandPos(range = 1): RoomPosition[] {
+    if (!this.canStandPosCache) {
+      this.canStandPosCache = this.getFreeSpace(range)
+        .filter(pos => pos.canStand())
+        .filter(pos => !pos.hasCreepStand());
+    }
+
+    return this.canStandPosCache;
+  }
+
+  /**
+   * 判断当前位置是否可以站立 creep
+   */
+  public canStand(): boolean {
+    const onPosStructures = this.lookFor(LOOK_STRUCTURES);
+
+    // 遍历该位置上的所有建筑，如果建筑上不能站人的话就返回 false
+    for (const structure of onPosStructures) {
+      if (
+        structure.structureType !== STRUCTURE_CONTAINER &&
+        structure.structureType !== STRUCTURE_RAMPART &&
+        structure.structureType !== STRUCTURE_ROAD
+      )
+        return false;
+    }
+    return true;
+  }
+
+  /**
+   * 判断当前位置是否有 creep
+   */
+  public hasCreepStand(): boolean {
+    const onPosCreep = this.lookFor(LOOK_CREEPS);
+    return onPosCreep.length > 0;
   }
 }

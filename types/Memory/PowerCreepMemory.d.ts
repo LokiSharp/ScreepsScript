@@ -19,6 +19,10 @@ interface PowerCreepMemory {
   role: undefined;
   // creep 是否已经准备好可以工作了
   ready: boolean;
+  // 是否设置了路径点
+  setWayPoint: boolean;
+  // 是否抵达了路径点
+  inPlace: boolean;
   // 为 true 时执行 target，否则执行 source
   working: boolean;
   // 接下来要检查哪个 power

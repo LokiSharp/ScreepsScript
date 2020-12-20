@@ -1,6 +1,6 @@
 import { creepApi } from "../creepController/creepApi";
+import creepWorks from "role";
 import log from "utils/console/log";
-import roles from "role";
 
 /**
  * 处理去世的 creep
@@ -10,7 +10,7 @@ import roles from "role";
  * @param creepMemory creep 死时的内存
  */
 
-export const handleNotExistCreep = function (creepName: string, creepMemory: CreepMemory | PowerCreepMemory): void {
+export const handleNotExistCreep = function (creepName: string, creepMemory: CreepMemory): void {
   const creepConfig = Memory.creepConfigs[creepName];
   // 获取配置项
   if (!creepConfig) {
@@ -27,11 +27,13 @@ export const handleNotExistCreep = function (creepName: string, creepMemory: Cre
     return;
   }
 
-  const creepWork = roles[creepConfig.role](creepConfig.data);
+  const creepWork = creepWorks[creepConfig.role];
 
   // 通过 isNeed 阶段判断该 creep 是否要继续孵化
   // 没有提供 isNeed 阶段的话则默认需要重新孵化
-  if (creepWork.isNeed && !creepWork.isNeed(spawnRoom, creepName, creepMemory)) {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  if (creepWork.isNeed && !creepWork.isNeed(spawnRoom, creepMemory)) {
     // creep 不需要了，遗弃该 creep
     creepApi.remove(creepName);
     delete Memory.creeps[creepName];

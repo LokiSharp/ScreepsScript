@@ -1,14 +1,17 @@
 import { battleBase } from "utils/creep/battleBase";
-import { bodyConfigs } from "../../setting";
-import createBodyGetter from "../../utils/creep/createBodyGetter";
+import { boostPrepare } from "utils/creep/boostPrepare";
+import calcBodyPart from "utils/creep/calcBodyPart";
 import { inPlaceBase } from "../../utils/creep/inPlaceBase";
 
 /**
- * 远程作战单位
+ * 强化 - 远程作战单位
+ * 本角色仅能在 RCL >= 7 时生成
+ * 扛塔数量为 0 时依旧会携带 3 个强化 HEAL (144/T 的回复)，但是不会有 TOUGH
  */
-export const rangedAttacker: CreepConfig<"rangedAttacker"> = {
+export const boostRangedAttacker: CreepConfig<"boostRangedAttacker"> = {
   // 组装 CreepConfig
   ...battleBase(),
+  ...boostPrepare(),
   ...inPlaceBase(),
   target: creep => {
     const { targetFlagName } = creep.memory.data;
@@ -46,5 +49,21 @@ export const rangedAttacker: CreepConfig<"rangedAttacker"> = {
     }
     return false;
   },
-  bodys: createBodyGetter(bodyConfigs.rangedAttacker)
+  bodys: (room, spawn, data) => {
+    // 越界就置为 6
+    if (data.bearTowerNum < 0 || data.bearTowerNum > 6) data.bearTowerNum = 6;
+    // 扛塔等级和bodyPart的对应关系
+    const bodyMap = {
+      0: { [TOUGH]: 0, [RANGED_ATTACK]: 15, [MOVE]: 6, [HEAL]: 3 },
+      1: { [TOUGH]: 2, [RANGED_ATTACK]: 15, [MOVE]: 6, [HEAL]: 5 },
+      2: { [TOUGH]: 4, [RANGED_ATTACK]: 20, [MOVE]: 9, [HEAL]: 9 },
+      3: { [TOUGH]: 6, [RANGED_ATTACK]: 21, [MOVE]: 10, [HEAL]: 13 },
+      4: { [TOUGH]: 8, [RANGED_ATTACK]: 15, [MOVE]: 10, [HEAL]: 17 },
+      5: { [TOUGH]: 10, [RANGED_ATTACK]: 9, [MOVE]: 10, [HEAL]: 21 },
+      6: { [TOUGH]: 12, [RANGED_ATTACK]: 5, [MOVE]: 10, [HEAL]: 23 }
+    };
+    const bodyConfig: BodySet = bodyMap[data.bearTowerNum];
+
+    return calcBodyPart(bodyConfig);
+  }
 };

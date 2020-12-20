@@ -5,11 +5,11 @@ import { handleNotExistCreep } from "./handleNotExistCreep";
  *
  * 每种请求都必须存在对应的策略
  */
-const requestHandleStrategies: CrossShardRequestStrategies = {
+export const requestHandleStrategies: CrossShardRequestStrategies = {
   /**
    * 其他 shard 发来了 creep
    */
-  sendCreep: (data: SendCreepData) => {
+  ["sendCreep"]: data => {
     if (!Memory.crossShardCreeps) Memory.crossShardCreeps = {};
 
     // 把 creep 内存复制到暂存区里
@@ -21,11 +21,9 @@ const requestHandleStrategies: CrossShardRequestStrategies = {
   /**
    *  其他 shard 发来了 creep 的重新孵化任务
    */
-  sendRespawn: (data: SendRespawnData) => {
+  ["sendRespawn"]: data => {
     console.log("Respawn >", JSON.stringify(data));
     handleNotExistCreep(data.name, data.memory);
     return OK;
   }
 };
-
-export default requestHandleStrategies;

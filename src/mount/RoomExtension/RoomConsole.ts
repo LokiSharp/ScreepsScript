@@ -23,11 +23,11 @@ export default class RoomConsole extends RoomExtension {
    * 用户操作 - 拓展新外矿
    *
    */
-  public radd(remoteRoomName: string, targetId: Id<StructureWithStore>): string {
+  public radd(remoteRoomName: string): string {
     let stats = `[${this.name} 外矿] `;
 
-    const actionResult = this.addRemote(remoteRoomName, targetId);
-    if (actionResult === OK) stats += "拓展完成，已发布 remoteHarvester 及 reserver";
+    const actionResult = this.addRemote(remoteRoomName);
+    if (actionResult === OK) stats += "拓展完成，已发布 reserver，remoteHarvester 将在 reserver 插旗后自动发布";
     else if (actionResult === ERR_INVALID_TARGET) stats += "拓展失败，无效的 targetId";
     else if (actionResult === ERR_NOT_FOUND)
       stats += `拓展失败，未找到 source 旗帜，请在外矿房间的 source 上放置名为 [${remoteRoomName} source0] 的旗帜（有多个 source 请依次增加旗帜名最后一位的编号）`;
@@ -471,6 +471,35 @@ export default class RoomConsole extends RoomExtension {
 
     if (result === OK) stats += `已解除战争状态，boost 强化材料会依次运回 Terminal`;
     else if (result === ERR_NOT_FOUND) stats += `未启动战争状态`;
+
+    return stats;
+  }
+
+  /**
+   * 用户操作 - 启动升级状态
+   */
+  public upgrade(): string {
+    let stats = `[${this.name}] `;
+    const result = this.startUpgrade();
+
+    if (result === OK) stats += `已启动升级状态，正在准备 boost 材料，请在准备完成后再发布角色组`;
+    else if (result === ERR_NAME_EXISTS) stats += "已处于升级状态";
+    else if (result === ERR_NOT_FOUND)
+      stats += `未找到名为 [${this.name}Boost] 的旗帜，请保证其周围有足够数量的 lab（至少 6 个）`;
+    else if (result === ERR_INVALID_TARGET) stats += "旗帜周围的 lab 数量不足，请移动旗帜位置";
+
+    return stats;
+  }
+
+  /**
+   * 用户操作 - 取消升级状态
+   */
+  public noupgrade(): string {
+    let stats = `[${this.name}] `;
+    const result = this.stopUpgrade();
+
+    if (result === OK) stats += `已解除升级状态，boost 强化材料会依次运回 Terminal`;
+    else if (result === ERR_NOT_FOUND) stats += `未启动升级状态`;
 
     return stats;
   }

@@ -1,7 +1,7 @@
 import { MIN_WALL_HITS, repairSetting } from "setting";
 import { Move, WayPoint } from "modules/move";
+import creepWorks from "role";
 import { getMemoryFromCrossShard } from "modules/crossShard";
-import roles from "role";
 import { updateStructure } from "modules/shortcut/updateStructure";
 
 export default class CreepExtension extends Creep {
@@ -9,7 +9,6 @@ export default class CreepExtension extends Creep {
    * 发送日志
    *
    * @param content 日志内容
-   * @param instanceName 发送日志的实例名
    * @param color 日志前缀颜色
    * @param notify 是否发送邮件
    */
@@ -22,7 +21,7 @@ export default class CreepExtension extends Creep {
    */
   public work(): void {
     // 检查 creep 内存中的角色是否存在
-    if (!(this.memory.role in roles)) {
+    if (!(this.memory.role in creepWorks)) {
       // 没有的话可能是放在跨 shard 暂存区了
       const memory = getMemoryFromCrossShard(this.name);
       // console.log(`${this.name} 从暂存区获取了内存`, memory)
@@ -37,7 +36,7 @@ export default class CreepExtension extends Creep {
     if (this.spawning) return;
 
     // 获取对应配置项
-    const creepConfig: ICreepConfig = roles[this.memory.role](this.memory.data);
+    const creepConfig: CreepConfig<CreepRoleConstant> = creepWorks[this.memory.role];
 
     // 没准备的时候就执行准备阶段
     if (!this.memory.ready) {
@@ -49,6 +48,28 @@ export default class CreepExtension extends Creep {
 
     // 如果执行了 prepare 还没有 ready，就返回等下个 tick 再执行
     if (!this.memory.ready) return;
+
+    // 没路径的时候就执行路径阶段
+    if (!this.memory.setWayPoint) {
+      // 有路径阶段配置则执行
+      if (creepConfig.wayPoint) this.memory.setWayPoint = creepConfig.wayPoint(this);
+      // 没有就直接完成
+      else this.memory.setWayPoint = true;
+    }
+
+    // 如果执行了 wayPoint 还没有 ready，就返回等下个 tick 再执行
+    if (!this.memory.setWayPoint) return;
+
+    // 没路径的时候就执行路径阶段
+    if (!this.memory.inPlace) {
+      // 有路径阶段配置则执行
+      if (creepConfig.inPlace) this.memory.inPlace = creepConfig.inPlace(this);
+      // 没有就直接完成
+      else this.memory.inPlace = true;
+    }
+
+    // 如果执行了 wayPoint 还没有 ready，就返回等下个 tick 再执行
+    if (!this.memory.inPlace) return;
 
     // 获取是否工作，没有 source 的话直接执行 target
     const working = creepConfig.source ? this.memory.working : true;
@@ -75,6 +96,7 @@ export default class CreepExtension extends Creep {
    * 无视 Creep 的寻路
    *
    * @param target 要移动到的位置
+   * @param moveOpt 移动参数
    */
   public goTo(target?: RoomPosition, moveOpt?: MoveOpt): ScreepsReturnCode {
     return Move.goTo(this, target, moveOpt);
@@ -87,6 +109,7 @@ export default class CreepExtension extends Creep {
    * @param target 要进行设置的目标，位置字符串数组或者是路径名前缀
    */
   public setWayPoint(target: string[] | string): ScreepsReturnCode {
+    this.memory.fromShard = Game.shard.name as ShardName;
     return WayPoint.setWayPoint(this, target);
   }
 
@@ -96,10 +119,12 @@ export default class CreepExtension extends Creep {
    * @param target 提供能量的结构
    * @returns 执行 harvest 或 withdraw 后的返回值
    */
-  public getEngryFrom(target: Structure | Source): ScreepsReturnCode {
+  public getEngryFrom(target: Structure | Source | Ruin | Resource<RESOURCE_ENERGY>): ScreepsReturnCode {
     let result: ScreepsReturnCode;
+    // 是资源就用 pickup
+    if (target instanceof Resource) result = this.pickup(target);
     // 是建筑就用 withdraw
-    if (target instanceof Structure) result = this.withdraw(target, RESOURCE_ENERGY);
+    else if (target instanceof Structure || target instanceof Ruin) result = this.withdraw(target, RESOURCE_ENERGY);
     // 不是的话就用 harvest
     else {
       result = this.harvest(target);
@@ -128,9 +153,12 @@ export default class CreepExtension extends Creep {
   public upgrade(): ScreepsReturnCode {
     const result = this.upgradeController(this.room.controller);
 
-    if (result === ERR_NOT_IN_RANGE) {
+    if (
+      this.upgradeController(this.room.controller) === ERR_NOT_IN_RANGE ||
+      this.room.controller.pos.getCanStandPos().length > 0
+    )
       this.goTo(this.room.controller.pos);
-    }
+
     return result;
   }
 
@@ -338,17 +366,7 @@ export default class CreepExtension extends Creep {
         );
 
         // 找到血量最低的建筑
-        target = _.min(targets, structure => {
-          // 该 creep 是否在 rampart 中
-          const inRampart = structure.pos
-            .lookFor(LOOK_STRUCTURES)
-            .find(rampart => rampart.structureType === STRUCTURE_RAMPART);
-
-          // 在 rampart 里就不会作为进攻目标
-          if (inRampart) return structure.hits + inRampart.hits;
-          // 找到血量最低的
-          else return structure.hits;
-        });
+        target = this.getMinHitsTarget(targets);
       }
     }
 
@@ -370,7 +388,7 @@ export default class CreepExtension extends Creep {
 
     // 获取治疗目标，目标生命值损失大于等于自己的话，就治疗目标
     // 否则治疗自己
-    let target: Creep = null;
+    let target: Creep;
     if (creep.hitsMax - creep.hits >= this.hitsMax - this.hits) target = creep;
     else target = this;
 
@@ -415,8 +433,7 @@ export default class CreepExtension extends Creep {
    * @returns 可以移动时返回 true，否则返回 false
    */
   private canMoveWith(creep: Creep): boolean {
-    if (creep && this.pos.isNearTo(creep) && creep.fatigue === 0) return true;
-    return false;
+    return creep && this.pos.isNearTo(creep) && creep.fatigue === 0;
   }
 
   /**
@@ -424,6 +441,7 @@ export default class CreepExtension extends Creep {
    * 向指定旗帜发起进攻并拆除旗帜下的建筑
    *
    * @param flagName 要进攻的旗帜名称
+   * @param healerName 治疗单位名称
    */
   public dismantleFlag(flagName: string, healerName = ""): boolean {
     // 获取旗帜
@@ -460,17 +478,7 @@ export default class CreepExtension extends Creep {
         );
 
         // 找到血量最低的建筑
-        target = _.min(targets, structure => {
-          // 该 creep 是否在 rampart 中
-          const inRampart = structure.pos
-            .lookFor(LOOK_STRUCTURES)
-            .find(rampart => rampart.structureType === STRUCTURE_RAMPART);
-
-          // 在 rampart 里就不会作为进攻目标
-          if (inRampart) return structure.hits + inRampart.hits;
-          // 找到血量最低的
-          else return structure.hits;
-        });
+        target = this.getMinHitsTarget(targets) as Structure;
       }
 
       if (target && this.dismantle(target) === ERR_NOT_IN_RANGE) this.moveTo(target);
@@ -485,6 +493,27 @@ export default class CreepExtension extends Creep {
   }
 
   /**
+   * 找到血量最低的目标
+   *
+   * @param targets 目标
+   */
+  private getMinHitsTarget(
+    targets: (AnyCreep | Structure<StructureConstant>)[]
+  ): AnyCreep | Structure<StructureConstant> {
+    return _.min(targets, target => {
+      // 该 creep 是否在 rampart 中
+      const inRampart = target.pos
+        .lookFor(LOOK_STRUCTURES)
+        .find(rampart => rampart.structureType === STRUCTURE_RAMPART);
+
+      // 在 rampart 里就不会作为进攻目标
+      if (inRampart) return target.hits + inRampart.hits;
+      // 找到血量最低的
+      else return target.hits;
+    });
+  }
+
+  /**
    * RA 攻击血量最低的敌方单位
    *
    * @param hostils 敌方目标
@@ -494,17 +523,7 @@ export default class CreepExtension extends Creep {
     const targets = this.pos.findInRange(hostils, 3);
     if (targets.length > 0) {
       // 找到血量最低的 creep
-      const target = _.min(targets, creep => {
-        // 该 creep 是否在 rampart 中
-        const inRampart = creep.pos
-          .lookFor(LOOK_STRUCTURES)
-          .find(rampart => rampart.structureType === STRUCTURE_RAMPART);
-
-        // 在 rampart 里就不会作为进攻目标
-        if (inRampart) return creep.hits + inRampart.hits;
-        // 找到血量最低的
-        else return creep.hits;
-      });
+      const target = this.getMinHitsTarget(targets);
 
       if (target && this.rangedAttack(target) === ERR_NOT_IN_RANGE) this.moveTo(target);
       return OK;
@@ -543,17 +562,7 @@ export default class CreepExtension extends Creep {
     if (targets.length <= 0) return ERR_NOT_FOUND;
 
     // 找到血量最低的建筑
-    const target = _.min(targets, structure => {
-      // 该 creep 是否在 rampart 中
-      const inRampart = structure.pos
-        .lookFor(LOOK_STRUCTURES)
-        .find(rampart => rampart.structureType === STRUCTURE_RAMPART);
-
-      // 在 rampart 里就不会作为进攻目标
-      if (inRampart) return structure.hits + inRampart.hits;
-      // 找到血量最低的
-      else return structure.hits;
-    });
+    const target = this.getMinHitsTarget(targets);
 
     if (target && this.rangedAttack(target) === ERR_NOT_IN_RANGE) this.moveTo(target);
 
@@ -607,7 +616,7 @@ export default class CreepExtension extends Creep {
    * 从缓存获取敌方 Creep
    */
   public getHostileCreepsWithCache(hard?: boolean): AnyCreep[] {
-    const expireTime = 20;
+    const expireTime = 5;
     if (!this.room.memory.targetHostileCreepsCache) {
       this.room.memory.targetHostileCreepsCache = [];
     }

@@ -5,7 +5,7 @@
 
 import { ALL_SHARD_NAME } from "setting";
 import log from "utils/console/log";
-import requestHandleStrategies from "./handleStrategies";
+import { requestHandleStrategies } from "./handleStrategies";
 
 // 其他 shard 的数据
 const otherShardData: { [shard in ShardName]?: InterShardData } = {};
@@ -19,7 +19,7 @@ const selfShardName: ShardName = Game.shard.name as ShardName;
 /**
  * 从 InterShardMemory 初始化消息
  */
-const initShardData = function (): void {
+function initShardData(): void {
   // 获取所有 shard 的 InterShardMemory
   ALL_SHARD_NAME.forEach(name => {
     // 缓存消失时才会重新获取
@@ -30,7 +30,7 @@ const initShardData = function (): void {
       otherShardData[name] = (JSON.parse(InterShardMemory.getRemote(name)) || {}) as InterShardData;
     }
   });
-};
+}
 
 /**
  * 检查一个消息是否为响应
@@ -38,9 +38,9 @@ const initShardData = function (): void {
  * @param msgName 消息名称
  * @returns 是否为响应
  */
-const isReply = function (msgName: string): boolean {
+function isReply(msgName: string): boolean {
   return msgName.startsWith("shard");
-};
+}
 
 /**
  * 解析该响应对应的请求信息
@@ -61,9 +61,9 @@ const getRequestInfo = function (replyName: string): CrossShardRequestInfo {
  * @param requestName 要获取响应名的请求
  * @param sourceShard 要获取的 Shard
  */
-const getReplyName = function (requestName: string, sourceShard: ShardName): string {
+function getReplyName(requestName: string, sourceShard: ShardName): string {
   return `${sourceShard}:${requestName}`;
-};
+}
 
 /**
  * 响应请求
@@ -72,13 +72,13 @@ const getReplyName = function (requestName: string, sourceShard: ShardName): str
  * @param sourceShard 请求的发起 shard
  * @param result 请求处理结果
  */
-const doReply = function (requestName: string, sourceShard: ShardName, result: ScreepsReturnCode) {
+function doReply(requestName: string, sourceShard: ShardName, result: ScreepsReturnCode) {
   const replyName = getReplyName(requestName, sourceShard);
 
   // 暂存数据，等待 tick 结尾统一保存
   selfData[replyName] = result;
   Game.needSaveInterShardData = true;
-};
+}
 
 /**
  * 检查某个请求是否有对应的响应
@@ -103,7 +103,7 @@ const checkReply = function (sourceShard: ShardName, requestName: string, reques
  * 检查自身消息
  * 确定自身发布的请求或者响应是否可以关闭
  */
-const handleSelfMessage = function () {
+function handleSelfMessage() {
   // 针对自己负责的消息进行处理
   for (const msgName in selfData) {
     // 如果消息是响应
@@ -131,12 +131,12 @@ const handleSelfMessage = function () {
       }
     }
   }
-};
+}
 
 /**
  * 处理其他 shard 的请求
  */
-const handleOtherMessage = function (): ScreepsReturnCode {
+function handleOtherMessage(): ScreepsReturnCode {
   // 遍历所有 shard 搜索需要处理的请求
   for (const shardName in otherShardData) {
     // 遍历该 shard 的所有消息
@@ -169,16 +169,16 @@ const handleOtherMessage = function (): ScreepsReturnCode {
     }
   }
   return OK;
-};
+}
 
 /**
  * 保存消息到 InterShardMemory
  */
-export const saveShardData = function (): void {
+export function saveShardData(): void {
   if (!Game.needSaveInterShardData) return;
   // 需要保存时再执行保存
   InterShardMemory.setLocal(JSON.stringify(selfData));
-};
+}
 
 /**
  * 发布新的跨 shard 请求
@@ -188,15 +188,15 @@ export const saveShardData = function (): void {
  * @param type 跨 shard 请求的类型
  * @param data 跨 shard 请求携带的数据
  */
-export const addCrossShardRequest = function (
+export function addCrossShardRequest<K extends CrossShardRequestType>(
   name: string,
   to: ShardName,
-  type: CrossShardRequestType,
-  data: CrossShardRequestData
+  type: K,
+  data: CrossShardDatas[K]
 ): void {
-  selfData[name] = { to, type, data } as CrossShardRequest;
+  selfData[name] = { to, type, data };
   Game.needSaveInterShardData = true;
-};
+}
 
 /**
  * 从跨 shard 内存暂存区取出 creep 内存
@@ -205,7 +205,7 @@ export const addCrossShardRequest = function (
  *
  * @param creepName 要取出内存的 creep 名字
  */
-export const getMemoryFromCrossShard = function (creepName: string): CreepMemory | PowerCreepMemory {
+export function getMemoryFromCrossShard(creepName: string): CreepMemory | PowerCreepMemory {
   if (!Memory.crossShardCreeps) return undefined;
 
   // 取出并清空暂存区
@@ -216,7 +216,7 @@ export const getMemoryFromCrossShard = function (creepName: string): CreepMemory
   if (!Memory.creeps) Memory.creeps = {};
   if (!Memory.powerCreeps) Memory.powerCreeps = {};
   return (Memory.creeps[creepName] = creepMemory);
-};
+}
 
 /**
  * 工作入口 - 检查并处理其他 shard 的消息

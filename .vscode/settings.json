@@ -1,32 +1,41 @@
 {
-    "[javascript]": {
-        "editor.formatOnSave": false
-    },
-    "[json]": {
-        "editor.formatOnSave": true
-    },
-    "[typescript]": {
-        "editor.formatOnSave": false
-    },
-    "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": true
-    },
-    "editor.formatOnSave": true,
-    "editor.renderWhitespace": "boundary",
-    "files.encoding": "utf8",
-    "files.insertFinalNewline": true,
-    "files.trimTrailingWhitespace": true,
-    "search.exclude": {
-        "_book/**": true,
-        ".rpt2_cache/**": true,
-        "dist/**": true,
-        "node_modules/**": true,
-        "typings/**": true
-    },
-    "typescript.tsdk": "./node_modules/typescript/lib",
-    "eslint.enable": true,
-    "files.exclude": {
-        "**/.vscode": true,
-        "**/node_modules": true
-    }
+  "[javascript]": {
+    "editor.formatOnSave": false
+  },
+  "[json]": {
+    "editor.formatOnSave": true
+  },
+  "[typescript]": {
+    "editor.formatOnSave": false
+  },
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "editor.formatOnSave": true,
+  "editor.renderWhitespace": "boundary",
+  "files.encoding": "utf8",
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "search.exclude": {
+    "_book/**": true,
+    ".rpt2_cache/**": true,
+    "**/.nyc_output": true,
+    "**/coverage": true,
+    "dist/**": true,
+    "node_modules/**": true,
+    "typings/**": true,
+    "**/server": true
+  },
+  "typescript.tsdk": "./node_modules/typescript/lib",
+  "files.exclude": {
+    "**/.github": true,
+    "**/.idea": true,
+    "**/.nyc_output": true,
+    "**/.vscode": true,
+    "**/coverage": true,
+    "**/dist": true,
+    "**/node_modules": true,
+    "**/server": true
+  },
+  "mochaExplorer.files": "test/unit/**/*.test.ts"
 }
