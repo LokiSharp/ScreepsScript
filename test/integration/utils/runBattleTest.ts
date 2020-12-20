@@ -11,7 +11,6 @@ export async function runBattleTest(): Promise<void> {
   await initBattleTestRoom(helper);
   const storage = helper.server.common.storage;
   const { db } = storage;
-  const C = helper.server.constants;
 
   await db["rooms.flags"].insert({ room: "W0N0", user: helper.user.id, data: "attack~10~10~40~40" });
   await db["rooms.flags"].insert({ room: "W0N0", user: helper.target.id, data: "attack~10~10~10~10" });
@@ -20,16 +19,16 @@ export async function runBattleTest(): Promise<void> {
     helper,
     "attacker",
     [
-      { type: C.ATTACK, hits: 100 },
-      { type: C.MOVE, hits: 100 },
-      { type: C.ATTACK, hits: 100 },
-      { type: C.MOVE, hits: 100 },
-      { type: C.ATTACK, hits: 100 },
-      { type: C.MOVE, hits: 100 },
-      { type: C.ATTACK, hits: 100 },
-      { type: C.MOVE, hits: 100 },
-      { type: C.ATTACK, hits: 100 },
-      { type: C.MOVE, hits: 100 }
+      { type: ATTACK, hits: 100 },
+      { type: MOVE, hits: 100 },
+      { type: ATTACK, hits: 100 },
+      { type: MOVE, hits: 100 },
+      { type: ATTACK, hits: 100 },
+      { type: MOVE, hits: 100 },
+      { type: ATTACK, hits: 100 },
+      { type: MOVE, hits: 100 },
+      { type: ATTACK, hits: 100 },
+      { type: MOVE, hits: 100 }
     ],
     "W0N0",
     10,
@@ -42,10 +41,10 @@ export async function runBattleTest(): Promise<void> {
     helper,
     "attacker",
     [
-      { type: C.ATTACK, hits: 100 },
-      { type: C.MOVE, hits: 100 },
-      { type: C.ATTACK, hits: 100 },
-      { type: C.MOVE, hits: 100 }
+      { type: ATTACK, hits: 100 },
+      { type: MOVE, hits: 100 },
+      { type: ATTACK, hits: 100 },
+      { type: MOVE, hits: 100 }
     ],
     "W0N0",
     40,

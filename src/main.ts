@@ -4,7 +4,7 @@ import creepNumberListener from "modules/creepController/creepNumberListener";
 import doing from "utils/global/doing";
 import generatePixel from "utils/global/generatePixel";
 import mountExtension from "mount";
-import stateScanner from "utils/global/stateScanner";
+import { stateScanner } from "./modules/stateCollector";
 
 export const loop = ErrorMapper.wrapLoop(() => {
   if (Memory.showCost) console.log(`-------------------------- [${Game.time}] -------------------------- `);
