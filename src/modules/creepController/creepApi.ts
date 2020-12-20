@@ -17,10 +17,10 @@ export const creepApi = {
    * @returns ERR_NOT_FOUND 未找到对应的 creepWork
    * @returns ERR_NOT_OWNER 孵化房间不是自己的或者无法进行孵化
    */
-  add(
+  add<Role extends CreepRoleConstant = CreepRoleConstant>(
     creepName: string,
-    role: CreepRoleConstant,
-    data: CreepData,
+    role: Role,
+    data: RoleDatas[Role],
     spawnRoom: string
   ): OK | ERR_NOT_FOUND | ERR_NOT_OWNER {
     if (!Memory.creepConfigs) Memory.creepConfigs = {};

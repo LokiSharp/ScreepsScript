@@ -56,8 +56,16 @@ interface RoomMemory {
   // 中央集群的资源转移任务队列
   centerTransferTasks: ITransferTask[];
 
-  // 房间物流任务队列
-  transferTasks: RoomTransferTasks[];
+  /**
+   * 房间物流任务队列
+   */
+  transferTasks: RoomTransportTasks[];
+
+  /**
+   * 房间物流任务的备份数据
+   * 会在全局重置时通过该数据重建物流任务
+   */
+  transport: string;
 
   // 当前房间所处的防御模式
   // defense 为基础防御，active 为主动防御，该值未定义时为日常模式

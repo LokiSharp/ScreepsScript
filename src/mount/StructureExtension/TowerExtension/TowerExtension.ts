@@ -1,4 +1,4 @@
-import { MAX_WALL_HITS, ROOM_TRANSFER_TASK, TOWER_FILL_WALL_LEVEL, repairSetting } from "setting";
+import { MAX_WALL_HITS, TOWER_FILL_WALL_LEVEL, repairSetting } from "setting";
 import { creepApi } from "modules/creepController/creepApi";
 import { whiteListFilter } from "utils/global/whiteListFilter";
 
@@ -190,7 +190,8 @@ export default class TowerExtension extends StructureTower {
               `${repairCreepName} ${index}`,
               "repairer",
               {
-                sourceId: this.room.storage ? this.room.storage.id : ""
+                sourceId: this.room.storage ? this.room.storage.id : undefined,
+                workRoom: this.room.name
               },
               this.room.name
             );
@@ -353,7 +354,7 @@ export default class TowerExtension extends StructureTower {
    */
   private requireEnergy(lowerLimit = 900): void {
     if (this.store[RESOURCE_ENERGY] <= lowerLimit) {
-      this.room.addRoomTransferTask({ type: ROOM_TRANSFER_TASK.FILL_TOWER, id: this.id });
+      this.room.transport.addTask({ type: "fillTower", id: this.id });
     }
   }
 }

@@ -31,8 +31,10 @@ Function.prototype.setNextPlan = function (nextPlan): PlanNodeFunction {
  * @param indexes creep 的名称后缀
  * @param sourceId 能量来源 id
  */
-function addUpgrader(roomName: string, indexes: number[], sourceId: string): void {
-  indexes.forEach(i => creepApi.add(`${roomName} upgrader${i}`, "upgrader", { sourceId }, roomName));
+function addUpgrader(roomName: string, indexes: number[], sourceId: Id<EnergySourceStructure>): void {
+  indexes.forEach(i =>
+    creepApi.add(`${roomName} upgrader${i}`, "upgrader", { sourceId, workRoom: roomName }, roomName)
+  );
 }
 
 const releasePlans: CreepReleasePlans = {
@@ -259,7 +261,8 @@ const releasePlans: CreepReleasePlans = {
               `${room.name} filler${index}${i}`,
               "filler",
               {
-                sourceId: containerId
+                sourceId: containerId,
+                workRoom: room.name
               },
               room.name
             );
@@ -281,7 +284,8 @@ const releasePlans: CreepReleasePlans = {
           `${room.name} manager`,
           "manager",
           {
-            sourceId: storageId
+            sourceId: storageId,
+            workRoom: room.name
           },
           room.name
         );
@@ -366,7 +370,8 @@ function releaseBuilder(room: Room, releaseNumber = 2): OK {
       `${room.name} builder${i}`,
       "builder",
       {
-        sourceId: room.getAvailableSource()?.id
+        sourceId: room.getAvailableSource()?.id as Id<EnergySourceStructure>,
+        workRoom: room.name
       },
       room.name
     );
@@ -381,7 +386,7 @@ function releaseBuilder(room: Room, releaseNumber = 2): OK {
  * @param releaseNumber 要发布的角色数量
  */
 function releaseRepairer(room: Room, releaseNumber = 1): OK | ERR_NOT_ENOUGH_ENERGY {
-  let sources: string[];
+  let sources: Id<EnergySourceStructure>[];
 
   // 优先使用 container 中的能量
   if (!sources && room.sourceContainers.length > 0) sources = room.sourceContainers.map(c => c.id);
@@ -396,7 +401,8 @@ function releaseRepairer(room: Room, releaseNumber = 1): OK | ERR_NOT_ENOUGH_ENE
       `${room.name} repair${i}`,
       "repairer",
       {
-        sourceId: sources[i % sources.length]
+        sourceId: sources[i % sources.length],
+        workRoom: room.name
       },
       room.name
     );

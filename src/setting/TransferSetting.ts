@@ -1,24 +1,3 @@
-/**
- * 此处定义了所有的房间物流任务类型
- * 每个房间物流的任务的 type 属性都必须是下列定义之一
- */
-export const ROOM_TRANSFER_TASK = {
-  // 基础运维
-  FILL_EXTENSION: "fillExtension",
-  FILL_TOWER: "fillTower",
-  // nuker 填充
-  FILL_NUKER: "fillNuker",
-  // lab 物流
-  LAB_IN: "labIn",
-  LAB_OUT: "labOut",
-  LAB_GET_ENERGY: "labGetEnergy",
-  FILL_POWERSPAWN: "fillPowerSpawn",
-  // boost 物流
-  BOOST_GET_RESOURCE: "boostGetResource",
-  BOOST_GET_ENERGY: "boostGetEnergy",
-  BOOST_CLEAR: "boostClear"
-};
-
 // 终端支持的物流模式
 export const terminalModes: {
   get: ModeGet;

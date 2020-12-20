@@ -34,11 +34,13 @@ interface Room {
   hangSpawnTask(): void;
 
   // 房间物流 api
-  addRoomTransferTask(task: RoomTransferTasks, priority?: number): number;
-  hasRoomTransferTask(taskType: string): boolean;
-  getRoomTransferTask(): RoomTransferTasks | null;
-  handleLabInTask(resourceType: ResourceConstant, amount: number): boolean;
-  deleteCurrentRoomTransferTask(): void;
+  // addRoomTransferTask(task: RoomTransferTasks, priority?: number): number;
+  // hasRoomTransferTask(taskType: string): boolean;
+  // getRoomTransferTask(): RoomTransferTasks | null;
+  // handleLabInTask(resourceType: ResourceConstant, amount: number): boolean;
+  // deleteCurrentRoomTransferTask(): void;
+
+  transport: RoomTransportType;
 
   // 中央物流 api
   addCenterTask(task: ITransferTask, priority?: number): number;

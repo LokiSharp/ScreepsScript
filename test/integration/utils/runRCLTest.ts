@@ -10,7 +10,7 @@ export async function runRCLTest(RCL: number, _RCL: number, tickNum: number): Pr
 
   for (let gameTime = 1; gameTime < tickNum; gameTime += 1) {
     await helper.server.tick();
-    if (gameTime % 20) continue;
+    if (gameTime % 100) continue;
     const memory: Memory = JSON.parse(await helper.user.memory);
     printDebugInfo(memory, gameTime);
 

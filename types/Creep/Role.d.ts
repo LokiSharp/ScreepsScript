@@ -14,16 +14,16 @@ interface RoleDatas {
    */
   harvester: HarvesterData;
   collector: HarvesterData;
-  miner: HarvesterData;
+  miner: MinerData;
   upgrader: WorkerData;
-  filler: WorkerData;
+  filler: TransporterData;
   builder: WorkerData;
   repairer: WorkerData;
 
   /**
    * 房间高级运营
    */
-  manager: WorkerData;
+  manager: TransporterData;
   processor: ProcessorData;
 
   /**
@@ -32,8 +32,8 @@ interface RoleDatas {
   claimer: RemoteDeclarerData;
   reserver: RemoteDeclarerData;
   signer: RemoteDeclarerData;
-  remoteBuilder: RemoteDeclarerData;
-  remoteUpgrader: RemoteDeclarerData;
+  remoteBuilder: RemoteHelperData;
+  remoteUpgrader: RemoteHelperData;
   remoteHarvester: RemoteHarvesterData;
   depositHarvester: RemoteHarvesterData;
   pbAttacker: pbAttackerData;
@@ -79,7 +79,21 @@ interface HarvesterData {
   // 要采集的 source id
   sourceId: Id<Source>;
   // 把采集到的资源存到哪里存在哪里
-  targetId: Id<EnergySourceStructure>;
+  targetId?: Id<EnergySourceStructure>;
+}
+
+/**
+ * 矿工 data
+ */
+interface MinerData {
+  /**
+   * 要采集的 mineral id
+   */
+  sourceId: Id<Mineral>;
+  /**
+   * 把采集到的资源存到哪里存在哪里
+   */
+  targetId?: Id<EnergySourceStructure>;
 }
 
 /**
@@ -87,8 +101,30 @@ interface HarvesterData {
  * 由于由确定的工作目标所以不需要 targetId
  */
 interface WorkerData {
-  // 要使用的资源存放建筑 id
-  sourceId: Id<EnergySourceStructure>;
+  /**
+   * 要使用的资源存放建筑 id
+   */
+  sourceId?: Id<EnergySourceStructure>;
+  /**
+   * 该 creep 的工作房间
+   * 例如一个外矿搬运者需要知道自己的老家在哪里
+   */
+  workRoom: string;
+}
+
+/**
+ * 运输单位的 data
+ */
+interface TransporterData {
+  /**
+   * 要使用的资源存放建筑 id
+   */
+  sourceId: Id<StructureWithStore>;
+  /**
+   * 该 creep 的工作房间
+   * 例如一个外矿搬运者需要知道自己的老家在哪里
+   */
+  workRoom: string;
 }
 
 /**
@@ -133,14 +169,13 @@ interface RemoteHarvesterData {
  * 远程协助单位的 data
  */
 interface RemoteHelperData {
-  /**
-   * 要支援的房间名
-   */
+  // 要支援的房间名
   targetRoomName: string;
-  /**
-   * 该房间中的能量来源
-   */
+  // 该房间中的能量来源
   sourceId: Id<Source | StructureContainer | StructureStorage | StructureTerminal>;
+  // 出生房名称，资源会被运输到该房间中
+  spawnRoom?: string;
+  wayPoint?: string;
 }
 
 interface pbAttackerData {
@@ -197,7 +232,7 @@ interface RangedAttackerData {
   // 要攻击的旗帜名
   targetFlagName: string;
   // 抗几个塔的伤害，由这个参数决定其身体部件组成
-  bearTowerNum: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+  bearTowerNum?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
   // 是否持续孵化
   keepSpawn: boolean;
   wayPoint?: string;

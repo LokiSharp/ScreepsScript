@@ -1,4 +1,4 @@
-import { BOOST_RESOURCE, ENERGY_SHARE_LIMIT, ROOM_TRANSFER_TASK } from "setting";
+import { BOOST_RESOURCE, ENERGY_SHARE_LIMIT } from "setting";
 import { confirmBasePos, findBaseCenterPos, setBaseCenter } from "modules/autoPlanning/planBasePos";
 import { manageStructure, releaseCreep } from "modules/autoPlanning";
 import createRoomLink from "utils/console/createRoomLink";
@@ -148,85 +148,6 @@ export default class RoomExtension extends Room {
     return this.source.find(source => {
       return source.pos.getCanStandPos().length > 1;
     });
-  }
-
-  /**
-   * 向房间物流任务队列推送新的任务
-   *
-   * @param task 要添加的任务
-   * @param priority 任务优先级位置，默认追加到队列末尾。例：该值为 0 时将无视队列长度直接将任务插入到第一个位置
-   * @returns 任务的排队位置, 0 是最前面，-1 为添加失败（已有同种任务）
-   */
-  public addRoomTransferTask(task: RoomTransferTasks, priority: number = null): number {
-    if (this.hasRoomTransferTask(task.type)) return -1;
-
-    // 默认追加到队列末尾
-    if (!priority) {
-      this.memory.transferTasks.push(task);
-      return this.memory.transferTasks.length - 1;
-    }
-    // 追加到队列指定位置
-    else {
-      this.memory.transferTasks.splice(priority, 0, task);
-      return priority < this.memory.transferTasks.length ? priority : this.memory.transferTasks.length - 1;
-    }
-  }
-
-  /**
-   * 是否有相同的房间物流任务
-   * 房间物流队列中一种任务只允许同时存在一个
-   *
-   * @param taskType 任务类型
-   */
-  public hasRoomTransferTask(taskType: string): boolean {
-    if (!this.memory.transferTasks) this.memory.transferTasks = [];
-
-    const transferTask = this.memory.transferTasks.find(task => task.type === taskType);
-    return !!transferTask;
-  }
-
-  /**
-   * 获取当前的房间物流任务
-   */
-  public getRoomTransferTask(): RoomTransferTasks | null {
-    if (!this.memory.transferTasks) this.memory.transferTasks = [];
-
-    if (this.memory.transferTasks.length <= 0) {
-      return null;
-    } else {
-      return this.memory.transferTasks[0];
-    }
-  }
-
-  /**
-   * 更新 labIn 任务信息
-   * @param resourceType 要更新的资源 id
-   * @param amount 要更新成的数量
-   */
-  public handleLabInTask(resourceType: ResourceConstant, amount: number): boolean {
-    const currentTask = this.getRoomTransferTask() as ILabIn;
-    // 判断当前任务为 labin
-    if (currentTask.type === ROOM_TRANSFER_TASK.LAB_IN) {
-      // 找到对应的底物
-
-      for (const resource of currentTask.resource) {
-        if (resource.type === resourceType) {
-          // 更新底物数量
-          resource.amount = amount;
-          break;
-        }
-      }
-      // 更新对应的任务
-      this.memory.transferTasks.splice(0, 1, currentTask);
-      return true;
-    } else return false;
-  }
-
-  /**
-   * 移除当前处理的房间物流任务
-   */
-  public deleteCurrentRoomTransferTask(): void {
-    this.memory.transferTasks.shift();
   }
 
   /**
@@ -557,12 +478,6 @@ export default class RoomExtension extends Room {
       // 强化成功了就发布资源填充任务是因为
       // 在方法返回 OK 时，还没有进行 boost（将在 tick 末进行），所以这里检查资源并不会发现有资源减少
       // 为了提高存储量，这里直接发布任务，交给 manager 在处理任务时检查是否有资源不足的情况
-      this.addRoomTransferTask({
-        type: ROOM_TRANSFER_TASK.BOOST_GET_RESOURCE
-      });
-      this.addRoomTransferTask({
-        type: ROOM_TRANSFER_TASK.BOOST_GET_ENERGY
-      });
 
       return OK;
     } else return ERR_NOT_IN_RANGE;
