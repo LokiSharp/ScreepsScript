@@ -136,14 +136,15 @@ export default class CreepExtension extends Creep {
   }
 
   /**
-   * 转移资源到结构
+   * 转移资源到建筑
+   * 包含移动逻辑
    *
    * @param target 要转移到的目标
    * @param RESOURCE 要转移的资源类型
+   * @param moveOpt 移动参数
    */
-  public transferTo(target: Structure, RESOURCE: ResourceConstant): ScreepsReturnCode {
-    // 转移能量实现
-    this.goTo(target.pos);
+  public transferTo(target: Structure, RESOURCE: ResourceConstant, moveOpt: MoveOpt = {}): ScreepsReturnCode {
+    this.goTo(target.pos, moveOpt);
     return this.transfer(target, RESOURCE);
   }
 

@@ -49,8 +49,7 @@ export const miner: CreepConfig<"miner"> = {
       return false;
     }
     // 转移/移动
-    if (creep.transfer(target, Object.keys(creep.store)[0] as ResourceConstant) === ERR_NOT_IN_RANGE)
-      creep.goTo(target.pos);
+    creep.transferTo(target, Object.keys(creep.store)[0] as ResourceConstant);
 
     return creep.store.getUsedCapacity() === 0;
   },

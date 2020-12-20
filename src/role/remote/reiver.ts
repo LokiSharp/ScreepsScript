@@ -120,10 +120,7 @@ export const reiver: CreepConfig<"reiver"> = {
       for (const res in creep.store) {
         // eslint-disable-next-line no-prototype-builtins
         if (creep.store.hasOwnProperty(res) && creep.store[res] > 0) {
-          const result = creep.transfer(targetStructure, res as ResourceConstant);
-
-          // 还没到就继续走
-          if (result === ERR_NOT_IN_RANGE) creep.goTo(targetStructure.pos);
+          creep.transferTo(targetStructure, res as ResourceConstant);
           return false;
         }
       }

@@ -15,7 +15,7 @@ interface Creep<Role extends CreepRoleConstant = CreepRoleConstant> {
 
   getEngryFrom(target: Structure | Source | Ruin | Resource<RESOURCE_ENERGY>): ScreepsReturnCode;
 
-  transferTo(target: Structure, RESOURCE: ResourceConstant): ScreepsReturnCode;
+  transferTo(target: Structure, RESOURCE: ResourceConstant, moveOpt?: MoveOpt): ScreepsReturnCode;
 
   upgrade(): ScreepsReturnCode;
 
