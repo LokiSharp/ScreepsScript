@@ -74,7 +74,7 @@ export default class RoomTransport implements RoomTransportType {
 
     // 在目标索引位置插入新任务并重新分配任务
     this.tasks.splice(insertIndex, 0, targetTask);
-    this.dispatchTask();
+    // this.dispatchTask();
     this.saveTask();
 
     return targetTask.key;

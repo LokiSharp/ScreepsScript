@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+import { expect } from "chai";
 import { helper } from "../helper";
 import { initRCLTestRoom } from "../init/initRCLTestRoom";
 import { printDebugInfo } from "./printDebugInfo";
@@ -27,4 +28,5 @@ export async function runRCLTest(RCL: number, _RCL: number, tickNum: number): Pr
 
     _.each(await helper.user.newNotifications, ({ message }) => console.log("[notification]", message));
   }
+  expect((JSON.parse(await helper.user.memory) as Memory).stats.rooms.W0N0.controllerLevel).to.equal(_RCL);
 }
