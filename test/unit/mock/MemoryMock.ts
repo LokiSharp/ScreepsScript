@@ -84,6 +84,11 @@ export default class MemoryMock extends BaseMock implements Memory {
         controllerLevel?: number;
         structureNums?: { [structureName: string]: number };
         constructionSiteNums?: { [structureName: string]: number };
+        upgraderWorkingTime: number;
+        upgraderLifeTime: number;
+        transporterWorkingTime: number;
+        transporterLifeTime: number;
+        commRes: { [commType: string]: number };
       };
     };
   };

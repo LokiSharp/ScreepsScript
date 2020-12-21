@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { boostResourceReloadLimit } from "setting";
+import { boostResourceReloadLimit } from "../../setting";
 
 /**
  * 没有任务时的行为逻辑

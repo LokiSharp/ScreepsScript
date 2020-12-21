@@ -366,11 +366,12 @@ function releaseUpgrader(room: Room): OK {
  */
 function releaseBuilder(room: Room, releaseNumber = 2): OK {
   for (let i = 0; i < releaseNumber; i++) {
+    const source = room.getAvailableSource(false);
     creepApi.add(
       `${room.name} builder${i}`,
       "builder",
       {
-        sourceId: room.getAvailableSource()?.id as Id<EnergySourceStructure>,
+        sourceId: source?.id as Id<EnergySourceStructure>,
         workRoom: room.name
       },
       room.name

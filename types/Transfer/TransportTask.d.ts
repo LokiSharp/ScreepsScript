@@ -127,7 +127,7 @@ interface RoomTransportType {
    * @param task 要添加的物流任务
    * @returns taskKey 该任务的唯一索引
    */
-  addTask(task: RoomTransportTasks): number;
+  addTask(task: RoomTransportTasks, canRepeat?: boolean): number;
   /**
    * 获取应该执行的任务
    */

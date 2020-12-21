@@ -131,13 +131,10 @@ interface Room {
   importantWall: StructureWall | StructureRampart;
 
   // 获取房间中的有效能量来源
-  getAvailableSource():
-    | StructureTerminal
-    | StructureStorage
-    | StructureContainer
-    | Source
-    | Ruin
-    | Resource<RESOURCE_ENERGY>;
+
+  getAvailableSource(
+    includeSource?: boolean
+  ): StructureTerminal | StructureStorage | StructureContainer | Source | Ruin | Resource<RESOURCE_ENERGY>;
 
   // 自动规划相关
   findBaseCenterPos(): RoomPosition[];

@@ -59,21 +59,20 @@ export default class RoomTransport implements RoomTransportType {
    * 允许添加多个同类型物流任务，所以如果只想发布唯一任务的话，在发布前需要自行检查是否已经包含任务
    *
    * @param targetTask 要添加的任务
+   * @param canTaskTypeRepeat 任务类型是否可重复
    * @returns 该物流任务的唯一索引
    */
-  public addTask(targetTask: RoomTransportTasks): number {
+  public addTask(targetTask: RoomTransportTasks, canTaskTypeRepeat = false): number {
+    if (!canTaskTypeRepeat && this.hasTask(targetTask.type)) return -1;
     targetTask.key = new Date().getTime() + this.tasks.length * 0.1;
     // 发布任务的时候为了方便可以不填这个，这里给它补上
     if (!targetTask.executor) targetTask.executor = [];
 
-    // 因为 this.tasks 是按照优先级降序的，所以这里要找到新任务的插入索引
-    let insertIndex = this.tasks.length;
-    this.tasks.find((task, index) => {
-      if (task.priority < targetTask.priority) insertIndex = index;
+    // 插入新任务按优先级排序并重新分配任务
+    this.tasks.push(targetTask);
+    this.tasks.sort((a, b) => {
+      return b.priority - a.priority;
     });
-
-    // 在目标索引位置插入新任务并重新分配任务
-    this.tasks.splice(insertIndex, 0, targetTask);
     // this.dispatchTask();
     this.saveTask();
 
@@ -97,6 +96,7 @@ export default class RoomTransport implements RoomTransportType {
    */
   private initTask() {
     if (!Memory.rooms) return;
+    if (!Memory.rooms[this.roomName]) return;
     // 从内存中解析数据
     this.tasks = JSON.parse(Memory.rooms[this.roomName].transport || "[]") as TransportData;
   }
@@ -106,6 +106,7 @@ export default class RoomTransport implements RoomTransportType {
    */
   private saveTask() {
     if (!Memory.rooms) Memory.rooms = {};
+    if (!Memory.rooms[this.roomName]) Memory.rooms[this.roomName] = {} as RoomMemory;
     Memory.rooms[this.roomName].transport = JSON.stringify(this.tasks);
   }
 
@@ -151,7 +152,7 @@ export default class RoomTransport implements RoomTransportType {
    *
    * @param creeps 要分配任务的 creep
    */
-  private giveJob(...creeps: Creep[]) {
+  private giveJob(creeps: Creep[]) {
     // 把执行该任务的 creep 分配到缺人做的任务上
     if (creeps.length > 0) {
       for (const processingTask of this.tasks) {
@@ -165,7 +166,8 @@ export default class RoomTransport implements RoomTransportType {
 
     // 还没分完的话就依次分给优先度高的任务
     if (creeps.length > 0) {
-      for (let i = 0; i < creeps.length; i++) {
+      const num = creeps.length;
+      for (let i = 0; i < num; i++) {
         // 不检查是否缺人，直接分（因为缺人的任务在上面已经分完了）
         RoomTransport.giveTask(creeps.shift(), this.tasks[i % this.tasks.length]);
       }
@@ -186,7 +188,7 @@ export default class RoomTransport implements RoomTransportType {
       // 这里直接返回了，所以摸鱼时不会增加工作时长
       if (this.tasks.length <= 0) return noTask(creep);
 
-      this.giveJob(creep);
+      this.giveJob([creep]);
       this.saveTask();
       // 分配完后重新获取任务
       task = this.getTask(creep.memory.transportTaskKey);
@@ -219,7 +221,7 @@ export default class RoomTransport implements RoomTransportType {
 
       // 给干完活的搬运工重新分配任务
       const extraCreeps = task.executor.map(id => Game.getObjectById(id)).filter(Boolean);
-      this.giveJob(...extraCreeps);
+      this.giveJob(extraCreeps);
       return false;
     });
 

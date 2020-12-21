@@ -86,6 +86,8 @@ interface Memory {
     rooms: {
       [roomName: string]: RoomStats;
     };
+    cpuCost?: Record<string, number>;
+    gameTime?: number;
   };
 
   // 启动 powerSpawn 的房间名列表

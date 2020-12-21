@@ -11,10 +11,8 @@ export const loop = ErrorMapper.wrapLoop(() => {
 
   // 挂载所有拓展
   mountExtension();
-
   // 检查跨 shard 请求
   execShard();
-
   // creep 数量控制
   creepNumberListener();
 
