@@ -1,5 +1,5 @@
 import { runRCLTest } from "../utils/runRCLTest";
-const TICK_NUM = 100000;
+const TICK_NUM = 25000;
 const RCL = 4;
 
 describe(`测试 RCL${RCL} -> RCL${RCL + 1}`, () => {

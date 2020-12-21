@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import { IntegrationTestHelper } from "../helper";
-import { TerrainMatrix } from "screeps-test-server";
+const { TerrainMatrix } = require("screeps-server-mockup");
 const { readFileSync } = require("fs");
 
 const DIST_MAIN_JS = "dist/main.js";

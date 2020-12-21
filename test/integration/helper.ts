@@ -1,4 +1,4 @@
-import { Server, StdHooks, User } from "screeps-test-server";
+const { ScreepsServer, stdHooks } = require("screeps-server-mockup");
 
 export class IntegrationTestHelper {
   private serverCache: Server;
@@ -26,7 +26,7 @@ export class IntegrationTestHelper {
   }
 
   public async beforeEach(): Promise<void> {
-    this.serverCache = new Server();
+    this.serverCache = new ScreepsServer() as Server;
     await this.serverCache.world.reset();
 
     // Start server
@@ -49,5 +49,5 @@ afterEach(() => {
 });
 
 before(() => {
-  StdHooks.hookWrite();
+  stdHooks.hookWrite();
 });
