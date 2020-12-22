@@ -29,4 +29,9 @@ export default class GameMock extends BaseMock {
   public notify(): void {
     // PASS
   }
+
+  @pushMethodCallInfoToCalled
+  public getObjectById(): void {
+    // PASS
+  }
 }

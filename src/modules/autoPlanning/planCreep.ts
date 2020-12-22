@@ -1,4 +1,4 @@
-import { FILLER_WITH_CONTAINER_RANGE, MAX_HARVESTER_NUM, MAX_UPGRADER_NUM, UPGRADE_WITH_STORAGE } from "setting";
+import { MAX_HARVESTER_NUM, MAX_UPGRADER_NUM, UPGRADE_WITH_STORAGE } from "setting";
 import { creepApi } from "modules/creepController/creepApi";
 
 // 在 Function 原型上挂载 setNextPlan 方法来完成 creep 发布的职责链
@@ -242,7 +242,7 @@ function releaseHarvester(room: Room): OK {
 /**
  * 发布搬运工
  * @param room 要发布角色的房间
- * @param number 要发布的数量
+ * @param releaseNumber 要发布的数量
  */
 function releaseManager(room: Room, releaseNumber: number): OK {
   for (let i = 0; i < releaseNumber; i++) {

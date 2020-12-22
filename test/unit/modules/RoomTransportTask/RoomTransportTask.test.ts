@@ -21,14 +21,27 @@ describe("RoomTransportTask", () => {
 
   it("addTask 可以添加任务", () => {
     const roomTransport = new RoomTransport("W0N0");
+    // 添加一个任务
     const taskKey = roomTransport.addTask({ type: "fillExtension", executor: [] });
     assert.equal(roomTransport.tasks.length, 1);
     assert.equal(roomTransport.tasks[0].key, taskKey);
     assert.equal(roomTransport.tasks[0].type, "fillExtension");
+    // 添加一个其他种类的任务
     roomTransport.addTask({ type: "boostGetResource" });
     assert.equal(roomTransport.tasks.length, 2);
     assert.equal(roomTransport.tasks[0].type, "fillExtension");
     assert.equal(roomTransport.tasks[1].type, "boostGetResource");
+    // 添加一个相同种类的任务不允许重复
+    roomTransport.addTask({ type: "fillExtension", executor: [] });
+    assert.equal(roomTransport.tasks.length, 2);
+    assert.equal(roomTransport.tasks[0].type, "fillExtension");
+    assert.equal(roomTransport.tasks[1].type, "boostGetResource");
+    // 添加一个相同种类的任务允许重复
+    roomTransport.addTask({ type: "boostGetResource", executor: [] }, true);
+    assert.equal(roomTransport.tasks.length, 3);
+    assert.equal(roomTransport.tasks[0].type, "fillExtension");
+    assert.equal(roomTransport.tasks[1].type, "boostGetResource");
+    assert.equal(roomTransport.tasks[2].type, "boostGetResource");
   });
 
   it("addTask 可以按优先级添加任务", () => {
@@ -114,12 +127,35 @@ describe("RoomTransportTask", () => {
   });
 
   it("removeTask 可以移除任务", () => {
+    const creepsSet = [...new Array(2).keys()].map(num => {
+      const creep = (new CreepMock(`creepOne${num}` as Id<CreepMock>, 0, 0) as unknown) as Creep<"manager">;
+      creep.memory = {} as CreepMemory<"manager">;
+      return creep;
+    });
+    const creeps = _.cloneDeep(creepsSet);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    // eslint-disable-next-line deprecation/deprecation
+    Game.getObjectById = function (id: string): Creep<"manager"> {
+      creeps.find(creep => creep.id === id);
+    };
     const roomTransport = new RoomTransport("W0N0");
-    const taskKey = roomTransport.addTask({ type: "fillExtension" });
-    assert.equal(roomTransport.tasks.length, 1);
+    roomTransport.addTask({ type: "boostGetResource" }, true);
+    const taskKey = roomTransport.addTask({ type: "fillExtension" }, true);
+    roomTransport.addTask({ type: "boostGetResource" }, true);
+    roomTransport.addTask({ type: "fillExtension" }, true);
+    assert.equal(roomTransport.tasks.length, 4);
     assert.equal(roomTransport.removeTask(taskKey), OK);
-    assert.equal(roomTransport.tasks.length, 0);
+    assert.equal(roomTransport.tasks.length, 3);
     assert.equal(roomTransport.removeTask(taskKey), OK);
+    assert.equal(roomTransport.tasks.length, 3);
+    const taskKey2 = roomTransport.addTask({ type: "fillExtension", executor: creepsSet.map(creep => creep.id) }, true);
+    assert.equal(roomTransport.tasks.length, 4);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    roomTransport.giveJob(creepsSet);
+    assert.equal(roomTransport.removeTask(taskKey2), OK);
+    assert.equal(roomTransport.tasks.length, 3);
   });
 
   it("giveTask 可以给指定 creep 分配任务", () => {

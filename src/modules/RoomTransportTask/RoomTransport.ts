@@ -45,6 +45,11 @@ export default class RoomTransport implements RoomTransportType {
   public totalWorkTime = 0;
 
   /**
+   * 生成唯一 key 时的计数器
+   */
+  private keyCounter = 0;
+
+  /**
    * 构造- 管理指定房间的物流任务
    *
    * @param roomName 要管理物流任务的房间名
@@ -64,7 +69,7 @@ export default class RoomTransport implements RoomTransportType {
    */
   public addTask(targetTask: RoomTransportTasks, canTaskTypeRepeat = false): number {
     if (!canTaskTypeRepeat && this.hasTask(targetTask.type)) return -1;
-    targetTask.key = new Date().getTime() + this.tasks.length * 0.1;
+    targetTask.key = this.generatetKey();
     // 发布任务的时候为了方便可以不填这个，这里给它补上
     if (!targetTask.executor) targetTask.executor = [];
 
@@ -255,5 +260,13 @@ export default class RoomTransport implements RoomTransportType {
   private static giveTask(creep: Creep, task: TransportTasks[AllTransportTaskType]): void {
     task.executor.push(creep.id);
     creep.memory.transportTaskKey = task.key;
+  }
+
+  /**
+   * 生成唯一 key
+   */
+  private generatetKey(): number {
+    this.keyCounter += 1;
+    return new Date().getTime() + this.keyCounter * 0.1;
   }
 }
