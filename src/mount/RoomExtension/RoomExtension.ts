@@ -35,7 +35,6 @@ export default class RoomExtension extends Room {
     this.memory.sourceContainersIds = _.uniq([...this.memory.sourceContainersIds, container.id]);
 
     // 触发对应的 creep 发布规划
-    this.releaseCreep("filler");
     this.releaseCreep("upgrader");
 
     return OK;

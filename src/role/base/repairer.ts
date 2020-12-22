@@ -42,7 +42,7 @@ export const repairer: CreepConfig<"repairer"> = {
     const { sourceId } = creep.memory.data;
     const source = Game.getObjectById(sourceId) || creep.room.storage || creep.room.terminal;
 
-    // 能量不足就先等待，优先满足 filler 需求
+    // 能量不足就先等待，优先满足 manager 需求
     if (source.store[RESOURCE_ENERGY] < 500) {
       creep.say("🎮");
       return false;
