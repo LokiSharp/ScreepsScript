@@ -1,7 +1,8 @@
+import RoomTransport, { WORK_PROPORTION_TO_EXPECT } from "../../../../src/modules/RoomTransportTask/RoomTransport";
 import CreepMock from "../../mock/CreepMock";
 import GameMock from "../../mock/GameMock";
 import MemoryMock from "../../mock/MemoryMock";
-import RoomTransport from "../../../../src/modules/RoomTransportTask/RoomTransport";
+
 import { assert } from "chai";
 
 describe("RoomTransportTask", () => {
@@ -127,18 +128,17 @@ describe("RoomTransportTask", () => {
   });
 
   it("removeTask 可以移除任务", () => {
-    const creepsSet = [...new Array(2).keys()].map(num => {
+    const creepsSet = [...new Array(4).keys()].map(num => {
       const creep = (new CreepMock(`creepOne${num}` as Id<CreepMock>, 0, 0) as unknown) as Creep<"manager">;
       creep.memory = {} as CreepMemory<"manager">;
       return creep;
     });
-    const creeps = _.cloneDeep(creepsSet);
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    // eslint-disable-next-line deprecation/deprecation
-    Game.getObjectById = function (id: string): Creep<"manager"> {
-      creeps.find(creep => creep.id === id);
-    };
+    // creepsSet 的浅拷贝
+    const creepShallowCopySet: Creep[] = [];
+    Object.assign(creepShallowCopySet, creepsSet);
+
+    assert.sameMembers(creepShallowCopySet, creepsSet);
+
     const roomTransport = new RoomTransport("W0N0");
     roomTransport.addTask({ type: "boostGetResource" }, true);
     const taskKey = roomTransport.addTask({ type: "fillExtension" }, true);
@@ -149,11 +149,19 @@ describe("RoomTransportTask", () => {
     assert.equal(roomTransport.tasks.length, 3);
     assert.equal(roomTransport.removeTask(taskKey), OK);
     assert.equal(roomTransport.tasks.length, 3);
-    const taskKey2 = roomTransport.addTask({ type: "fillExtension", executor: creepsSet.map(creep => creep.id) }, true);
+    const taskKey2 = roomTransport.addTask({ type: "fillExtension" }, true);
     assert.equal(roomTransport.tasks.length, 4);
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    // eslint-disable-next-line deprecation/deprecation
+    Game.getObjectById = function (id: string): Creep<"manager"> {
+      creepsSet.find(creep => creep.id === id);
+    };
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     roomTransport.giveJob(creepsSet);
+
     assert.equal(roomTransport.removeTask(taskKey2), OK);
     assert.equal(roomTransport.tasks.length, 3);
   });
@@ -173,31 +181,47 @@ describe("RoomTransportTask", () => {
   });
 
   it("giveJob 可以给 creep 分配任务", () => {
+    const roomTransport = new RoomTransport("W0N0");
+    // 创建 10 个任务
+    [...new Array(10).keys()].forEach(priority => {
+      roomTransport.addTask({ type: "fillExtension", priority }, true);
+    });
+    // 模拟分配任务给 10 个 Creep
     const creepsSetOne = [...new Array(10).keys()].map(num => {
       const creep = (new CreepMock(`creepOne${num}` as Id<CreepMock>, 0, 0) as unknown) as Creep<"manager">;
       creep.memory = { transportTaskKey: 0 } as CreepMemory<"manager">;
       return creep;
     });
-    const creepsSetTwo = [...new Array(10).keys()].map(num => {
-      const creep = (new CreepMock(`creepTwo${num}` as Id<CreepMock>, 0, 0) as unknown) as Creep<"manager">;
-      creep.memory = { transportTaskKey: 0 } as CreepMemory<"manager">;
-      return creep;
-    });
-    const roomTransport = new RoomTransport("W0N0");
-    [...new Array(10).keys()].forEach(priority => {
-      roomTransport.addTask({ type: "fillExtension", priority }, true);
-    });
+    // 检验是否每个任务都有 1 个 Creep
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     roomTransport.giveJob(creepsSetOne);
     for (const task of roomTransport.tasks) {
       assert.equal(task.executor.length, 1);
     }
+    // 模拟分配任务给另外 10 个 Creep
+    const creepsSetTwo = [...new Array(10).keys()].map(num => {
+      const creep = (new CreepMock(`creepTwo${num}` as Id<CreepMock>, 0, 0) as unknown) as Creep<"manager">;
+      creep.memory = { transportTaskKey: 0 } as CreepMemory<"manager">;
+      return creep;
+    });
+    // 检验是否每个任务都有 2 个 Creep
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     roomTransport.giveJob(creepsSetTwo);
     for (const task of roomTransport.tasks) {
       assert.equal(task.executor.length, 2);
     }
+  });
+
+  it("getExpect 获取当前的搬运工调整期望", () => {
+    const roomTransport = new RoomTransport("W0N0");
+    roomTransport.totalLifeTime = 500;
+    roomTransport.totalWorkTime = roomTransport.totalLifeTime * 0.9;
+    assert.equal(roomTransport.getExpect(), 2);
+    (WORK_PROPORTION_TO_EXPECT as { proportion: number; expect: number }[]).forEach(item => {
+      roomTransport.totalWorkTime = roomTransport.totalLifeTime * item.proportion;
+      assert.equal(roomTransport.getExpect(), item.expect);
+    });
   });
 });

@@ -56,8 +56,7 @@ export const transportActions: {
   fillExtension: creep => ({
     source: () => {
       if (creep.store[RESOURCE_ENERGY] > 0) return true;
-      const { sourceId } = creep.memory.data;
-      const result = creep.getEngryFrom(sourceId ? Game.getObjectById(sourceId) : creep.room.storage);
+      const result = creep.getEngryFrom(creep.room.getAvailableSource(false));
       return result === OK;
     },
     target: () => {

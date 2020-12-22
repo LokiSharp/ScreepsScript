@@ -245,6 +245,7 @@ function releaseHarvester(room: Room): OK {
  * @param releaseNumber 要发布的数量
  */
 function releaseManager(room: Room, releaseNumber: number): OK {
+  if (releaseNumber <= 0) releaseNumber = 1;
   for (let i = 0; i < releaseNumber; i++) {
     if (creepApi.has(`${room.name} manager${i}`)) continue;
     creepApi.add(`${room.name} manager${i}`, "manager", { workRoom: room.name }, room.name);

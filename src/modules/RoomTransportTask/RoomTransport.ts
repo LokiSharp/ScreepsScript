@@ -7,7 +7,7 @@ import { noTask, transportActions } from "./transportActions";
  * @property {} proportion 工作时长占比
  * @property {} expect 对应的期望
  */
-const WORK_PROPORTION_TO_EXPECT = [
+export const WORK_PROPORTION_TO_EXPECT = [
   { proportion: 0.9, expect: 2 },
   { proportion: 0.8, expect: 1 },
   { proportion: 0.7, expect: 0 },
@@ -247,8 +247,7 @@ export default class RoomTransport implements RoomTransportType {
     const currentExpect = WORK_PROPORTION_TO_EXPECT.find(opt => {
       return this.totalWorkTime / this.totalLifeTime >= opt.proportion;
     });
-
-    return currentExpect?.expect || -2;
+    return currentExpect.expect === undefined ? -2 : currentExpect.expect;
   }
 
   /**

@@ -31,7 +31,8 @@ export default class StorageExtension extends StructureStorage {
    */
   public onBuildComplete(): void {
     this.room.releaseCreep("harvester");
-    this.room.releaseCreep("manager");
+    this.room.memory.transporterNumber = 1;
+    this.room.releaseCreep("manager", this.room.memory.transporterNumber);
     this.room.releaseCreep("upgrader");
   }
 

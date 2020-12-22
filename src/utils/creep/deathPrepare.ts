@@ -7,21 +7,24 @@
  * @param sourceId 能量存放处
  */
 export default function deathPrepare(creep: Creep, sourceId: Id<StructureWithStore>): false {
-  if (creep.store.getUsedCapacity() > 0) {
+  if (creep.store.getUsedCapacity() > 0 && (creep.room.terminal || creep.room.storage)) {
     for (const resourceType in creep.store) {
-      let target: StructureWithStore;
-      // 不是能量就放到 terminal 里
-      if (resourceType !== RESOURCE_ENERGY && resourceType !== RESOURCE_POWER && creep.room.terminal) {
-        target = creep.room.terminal;
+      // eslint-disable-next-line no-prototype-builtins
+      if (creep.store.hasOwnProperty(resourceType)) {
+        let target: StructureWithStore;
+        // 不是能量就放到 terminal 里
+        if (resourceType !== RESOURCE_ENERGY && resourceType !== RESOURCE_POWER && creep.room.terminal) {
+          target = creep.room.terminal;
+        }
+        // 否则就放到 storage 或者玩家指定的地方
+        else target = sourceId ? Game.getObjectById(sourceId) : creep.room.storage;
+
+        // 转移资源
+        creep.goTo(target.pos);
+        creep.transfer(target, resourceType as ResourceConstant);
+
+        return false;
       }
-      // 否则就放到 storage 或者玩家指定的地方
-      else target = sourceId ? Game.getObjectById(sourceId) : creep.room.storage;
-
-      // 转移资源
-      creep.goTo(target.pos);
-      creep.transfer(target, resourceType as ResourceConstant);
-
-      return false;
     }
   } else creep.suicide();
 
