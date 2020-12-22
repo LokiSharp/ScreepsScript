@@ -12,6 +12,12 @@ export default class ControllerExtension extends StructureController {
     // 如果等级发生变化了就运行 creep 规划
     if (this.stateScanner()) this.onLevelChange(this.level);
 
+    // 放置队列中的工地
+    this.constructionSiteScanner();
+
+    // 调整运营 creep 数量
+    this.adjustCreep();
+
     // 8 级并且快掉级了就孵化 upgrader
     if (this.level === 8 && this.ticksToDowngrade <= 100000) this.room.releaseCreep("upgrader");
 
@@ -72,7 +78,6 @@ export default class ControllerExtension extends StructureController {
       };
     });
 
-    this.constructionSiteScanner();
     this.structureScanner();
 
     return hasLevelChange;
@@ -156,5 +161,19 @@ export default class ControllerExtension extends StructureController {
       });
     }
     Memory.stats.rooms[this.room.name].structureNums = structureNums;
+  }
+
+  /**
+   * 根据房间情况调整运营单位的数量
+   */
+  private adjustCreep(): void {
+    if (Game.time % 500) return;
+
+    const { transporterNumber } = this.room.memory;
+    if (!transporterNumber || transporterNumber <= 0) this.room.memory.transporterNumber = 1;
+
+    // 根据物流模块返回的期望调整当前搬运工数量
+    this.room.memory.transporterNumber += this.room.transport.getExpect();
+    this.room.releaseCreep("manager", this.room.memory.transporterNumber);
   }
 }

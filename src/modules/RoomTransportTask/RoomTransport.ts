@@ -27,7 +27,7 @@ export default class RoomTransport implements RoomTransportType {
   /**
    * 本物流对象所处的房间名
    */
-  public roomName: string;
+  public readonly roomName: string;
 
   /**
    * 当前正在执行的所有物流任务

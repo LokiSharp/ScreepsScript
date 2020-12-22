@@ -113,7 +113,6 @@ interface RoomMemory {
 
   /**
    * boost 强化任务
-   * @see doc/boost设计案
    */
   boost?: BoostTask;
 
@@ -167,6 +166,11 @@ interface RoomMemory {
   resourceKeepInfo?: {
     terminal?: IResourceKeepInfo;
   };
+
+  /**
+   * 当前本房间物流单位的数量
+   */
+  transporterNumber?: number;
 
   // 目标敌方建筑缓存
   targetHostileStructuresCache: Id<Structure>[];

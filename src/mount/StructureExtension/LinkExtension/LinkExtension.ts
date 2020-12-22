@@ -28,6 +28,7 @@ export default class LinkExtension extends StructureLink {
     // 在基地中心附近就转换为 CenterLink
     const center = this.room.memory.center;
     if (center && this.pos.isNearTo(new RoomPosition(center[0], center[1], this.room.name))) {
+      this.room.releaseCreep("processor");
       this.asCenter();
       return;
     }

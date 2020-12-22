@@ -216,103 +216,6 @@ const releasePlans: CreepReleasePlans = {
         return true;
       }
     ]
-  },
-
-  /**
-   * 发布资源运输单位的相关逻辑
-   */
-  transporter: {
-    // 状态收集
-    getStats(room: Room): TransporterPlanStats {
-      const stats: TransporterPlanStats = {
-        room,
-        sourceContainerIds: room.sourceContainers.map(container => container.id) || []
-      };
-      if (room.storage) stats.storageId = room.storage.id;
-      if (room.centerLink) stats.centerLinkId = room.centerLink.id;
-      if (room.memory) stats.centerPos = room.memory.center;
-
-      return stats;
-    },
-    // 发布计划
-    plans: [
-      // container 修建完成
-      ({ room, sourceContainerIds, centerPos }: TransporterPlanStats) => {
-        let releaseNumber = 0;
-        // 遍历现存的 container，发布填充单位
-        // 会根据 container 到基地的距离决定发布数量
-        sourceContainerIds.forEach((containerId, index) => {
-          const container = Game.getObjectById(containerId);
-          if (!container) return;
-
-          // 获取 container 到基地中心的距离
-          const range = centerPos
-            ? container.pos.findPathTo(centerPos[0], centerPos[1]).length
-            : // 没有设置基地中心点，使用第一个 spawn 的位置
-              container.pos.findPathTo(room[STRUCTURE_SPAWN][0].pos.x, room[STRUCTURE_SPAWN][0].pos.y).length;
-
-          // 根据获取合适的人数
-          const numberConfig = FILLER_WITH_CONTAINER_RANGE.find(config => range > config.range);
-          releaseNumber += numberConfig.num;
-
-          // 发布对应数量的 filler
-          for (let i = 0; i < numberConfig.num; i++) {
-            creepApi.add(
-              `${room.name} filler${index}${i}`,
-              "filler",
-              {
-                sourceId: containerId,
-                workRoom: room.name
-              },
-              room.name
-            );
-          }
-        });
-
-        room.log(`发布 filler * ${releaseNumber}`, "transporter", "green");
-        // 发布并没有完成，继续检查是否可以发布 manager 和 processor
-        return false;
-      },
-
-      // storage 修建完成
-      ({ room, storageId }: TransporterPlanStats) => {
-        if (!storageId) return true;
-        if (!Game.getObjectById(storageId).my) return true;
-
-        // 发布房间物流管理单位
-        creepApi.add(
-          `${room.name} manager`,
-          "manager",
-          {
-            sourceId: storageId,
-            workRoom: room.name
-          },
-          room.name
-        );
-
-        room.log(`发布 manager`, "transporter", "green");
-        return false;
-      },
-
-      // centerLink 修建完成
-      ({ room, centerLinkId, centerPos }: TransporterPlanStats) => {
-        if (!centerLinkId || !centerPos) return true;
-
-        // 发布中央运输单位
-        creepApi.add(
-          `${room.name} processor`,
-          "processor",
-          {
-            x: centerPos[0],
-            y: centerPos[1]
-          },
-          room.name
-        );
-
-        room.log(`发布 processor`, "transporter", "green");
-        return true;
-      }
-    ]
   }
 };
 
@@ -337,12 +240,37 @@ function releaseHarvester(room: Room): OK {
 }
 
 /**
- * 发布运输者
+ * 发布搬运工
  * @param room 要发布角色的房间
+ * @param number 要发布的数量
  */
-function releaseTransporter(room: Room): OK {
-  // 不需要提前移除，因为运输者的数量不会发生大范围波动
-  planChains.transporter(releasePlans.transporter.getStats(room));
+function releaseManager(room: Room, releaseNumber: number): OK {
+  for (let i = 0; i < releaseNumber; i++) {
+    if (creepApi.has(`${room.name} manager${i}`)) continue;
+    creepApi.add(`${room.name} manager${i}`, "manager", { workRoom: room.name }, room.name);
+  }
+
+  let extraIndex = releaseNumber;
+  // 移除多余的搬运工
+  while (creepApi.has(`${room.name} manager${extraIndex}`)) {
+    creepApi.remove(`${room.name} manager${extraIndex}`);
+    extraIndex += 1;
+  }
+
+  return OK;
+}
+
+/**
+ * 发布搬运工
+ * 发布中央运输单位
+ * @param room 要发布角色的房间（memory 需要包含 center 字段）
+ */
+function releaseProcessor(room: Room): OK | ERR_NOT_FOUND {
+  if (!room.memory.center) return ERR_NOT_FOUND;
+
+  const [x, y] = room.memory.center;
+  creepApi.add(`${room.name} processor`, "processor", { x, y }, room.name);
+
   return OK;
 }
 
@@ -440,9 +368,8 @@ export const roleToRelease: {
 } = {
   harvester: releaseHarvester,
   collector: releaseHarvester,
-  filler: releaseTransporter,
-  manager: releaseTransporter,
-  processor: releaseTransporter,
+  manager: releaseManager,
+  processor: releaseProcessor,
   upgrader: releaseUpgrader,
   builder: releaseBuilder,
   repairer: releaseRepairer,
