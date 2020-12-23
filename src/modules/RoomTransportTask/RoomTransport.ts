@@ -78,7 +78,7 @@ export default class RoomTransport implements RoomTransportType {
     this.tasks.sort((a, b) => {
       return b.priority - a.priority;
     });
-    // this.dispatchTask();
+    this.dispatchTask();
     this.saveTask();
 
     return targetTask.key;

@@ -1,6 +1,3 @@
-import { getCpuUsage } from "./getCpuUsage";
-import log from "../console/log";
-
 /**
  * 执行 Hash Map 中子元素对象的 work 方法
  *
@@ -8,17 +5,11 @@ import log from "../console/log";
  */
 // eslint-disable-next-line @typescript-eslint/ban-types
 export default function doing(...hashMaps: Object[]): void {
-  getCpuUsage("start");
-  hashMaps.forEach((obj, index) => {
-    const startCost = Game.cpu.getUsed();
-
+  hashMaps.forEach(obj => {
     // 遍历执行 work
     Object.values(obj).forEach(item => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       if (item.work) item.work();
     });
-    getCpuUsage(index.toString());
-    // 如果有需求的话就显示 cpu 消耗
-    if (Memory.showCost) log(`消耗 ${Game.cpu.getUsed() - startCost}`, [`[${index}]`]);
   });
 }

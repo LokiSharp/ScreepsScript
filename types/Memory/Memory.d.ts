@@ -3,8 +3,6 @@ interface Memory {
   moveNumber?: number;
   // 移动消耗总用时
   moveUseCpu?: number;
-  // 是否显示 cpu 消耗
-  showCost?: boolean;
 
   // 核弹投放指示器
   // 核弹是否已经确认
@@ -138,4 +136,8 @@ interface RoomStats {
    * 其他种类的资源数量，由 factory 统计
    */
   commRes: { [commType: string]: number };
+  /**
+   * 测试消息预留
+   */
+  debugMessage?: string;
 }

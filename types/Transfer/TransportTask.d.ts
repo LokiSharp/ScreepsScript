@@ -125,6 +125,7 @@ interface RoomTransportType {
    * 填写一个新的房间物流任务
    *
    * @param task 要添加的物流任务
+   * @param canRepeat 任务类型能否重复
    * @returns taskKey 该任务的唯一索引
    */
   addTask(task: RoomTransportTasks, canRepeat?: boolean): number;

@@ -23,8 +23,6 @@ export default class MemoryMock extends BaseMock implements Memory {
 
   public moveNumber?: number;
   public moveUseCpu?: number;
-  public movePathFindUseCpu?: number;
-  public showCost?: boolean;
 
   public nukerLock?: boolean;
   public nukerDirective?: {
