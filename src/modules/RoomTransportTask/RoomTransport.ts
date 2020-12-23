@@ -250,15 +250,6 @@ export default class RoomTransport implements RoomTransportType {
    * 返回 0 代表不需要调整搬运工数量
    */
   public getExpect(): number {
-    Memory.stats.rooms[this.roomName].debugMessage =
-      JSON.stringify(this.tasks) +
-      "\n" +
-      "totalLifeTime: " +
-      this.totalLifeTime.toString() +
-      "\n" +
-      "totalWorkTime: " +
-      this.totalWorkTime.toString();
-    console.log(Memory.stats.rooms[this.roomName].debugMessage);
     // 统计数据还太少，不具备参考性，暂时不调整搬运工数量
     if (this.totalLifeTime < REGULATE_LIMIT) return 0;
 

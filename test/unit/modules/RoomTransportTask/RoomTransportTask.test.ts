@@ -30,19 +30,19 @@ describe("RoomTransportTask", () => {
     // 添加一个其他种类的任务
     roomTransport.addTask({ type: "boostGetResource" }, false, false);
     assert.equal(roomTransport.tasks.length, 2);
-    assert.equal(roomTransport.tasks[0].type, "fillExtension");
-    assert.equal(roomTransport.tasks[1].type, "boostGetResource");
+    assert.equal(roomTransport.tasks[0].type, "boostGetResource");
+    assert.equal(roomTransport.tasks[1].type, "fillExtension");
     // 添加一个相同种类的任务不允许重复
     roomTransport.addTask({ type: "fillExtension", executor: [] }, false, false);
     assert.equal(roomTransport.tasks.length, 2);
-    assert.equal(roomTransport.tasks[0].type, "fillExtension");
-    assert.equal(roomTransport.tasks[1].type, "boostGetResource");
+    assert.equal(roomTransport.tasks[0].type, "boostGetResource");
+    assert.equal(roomTransport.tasks[1].type, "fillExtension");
     // 添加一个相同种类的任务允许重复
     roomTransport.addTask({ type: "boostGetResource", executor: [] }, true, false);
     assert.equal(roomTransport.tasks.length, 3);
-    assert.equal(roomTransport.tasks[0].type, "fillExtension");
+    assert.equal(roomTransport.tasks[0].type, "boostGetResource");
     assert.equal(roomTransport.tasks[1].type, "boostGetResource");
-    assert.equal(roomTransport.tasks[2].type, "boostGetResource");
+    assert.equal(roomTransport.tasks[2].type, "fillExtension");
   });
 
   it("addTask 可以按优先级添加任务", () => {
@@ -133,12 +133,9 @@ describe("RoomTransportTask", () => {
       creep.memory = {} as CreepMemory<"manager">;
       return creep;
     });
-    // creepsSet 的浅拷贝
-    const creepShallowCopySet: Creep[] = [];
     creepsSet.forEach(creep => {
       Game.creeps[creep.id] = creep;
     });
-    assert.sameMembers(creepShallowCopySet, creepsSet);
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     // eslint-disable-next-line deprecation/deprecation
@@ -163,11 +160,11 @@ describe("RoomTransportTask", () => {
     // @ts-ignore
     // eslint-disable-next-line deprecation/deprecation
     Game.getObjectById = function (id: string): Creep<"manager"> {
-      creepShallowCopySet.find(creep => creep.id === id);
+      creepsSet.find(creep => creep.id === id);
     };
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    roomTransport.giveJob(creepShallowCopySet);
+    roomTransport.giveJob(creepsSet);
 
     assert.equal(roomTransport.removeTask(taskKey2), OK);
     assert.equal(roomTransport.tasks.length, 3);
@@ -241,7 +238,6 @@ describe("RoomTransportTask", () => {
     // creepsSet 的浅拷贝
     const creepShallowCopySet: Creep[] = [];
     Object.assign(creepShallowCopySet, creepsSet);
-    Game.creeps = {};
     creepsSet.forEach(creep => {
       Game.creeps[creep.id] = creep;
     });

@@ -1,5 +1,5 @@
+import { cpuUsageScanner, roomTaskScanner, stateScanner } from "./modules/stateCollector";
 import { execShard, saveShardData } from "./modules/crossShard";
-import { getCpuUsage, stateScanner } from "./modules/stateCollector";
 import ErrorMapper from "./utils/global/ErrorMapper";
 import creepNumberListener from "modules/creepController/creepNumberListener";
 import doing from "./utils/global/doing";
@@ -7,30 +7,32 @@ import generatePixel from "./utils/global/generatePixel";
 import mountExtension from "./mount";
 
 export const loop = ErrorMapper.wrapLoop(() => {
-  getCpuUsage("start");
+  cpuUsageScanner("start");
 
   // 挂载所有拓展
   mountExtension();
-  getCpuUsage("mountExtension");
+  cpuUsageScanner("mountExtension");
   // 检查跨 shard 请求
   execShard();
-  getCpuUsage("execShard");
+  cpuUsageScanner("execShard");
   // creep 数量控制
   creepNumberListener();
-  getCpuUsage("creepNumberListener");
+  cpuUsageScanner("creepNumberListener");
   // 所有建筑、creep、powerCreep 执行工作
   doing(Game.structures);
-  getCpuUsage("doing structures");
+  cpuUsageScanner("doing structures");
   doing(Game.creeps);
-  getCpuUsage("doing creeps");
+  cpuUsageScanner("doing creeps");
   doing(Game.powerCreeps);
-  getCpuUsage("doing powerCreeps");
+  cpuUsageScanner("doing powerCreeps");
   // 搓 pixel
   generatePixel();
-  getCpuUsage("generatePixel");
+  cpuUsageScanner("generatePixel");
   // // 保存自己的跨 shard 消息
   saveShardData();
-  getCpuUsage("saveShardData");
+  cpuUsageScanner("saveShardData");
   stateScanner();
-  getCpuUsage("stateScanner");
+  cpuUsageScanner("stateScanner");
+  roomTaskScanner();
+  cpuUsageScanner("roomTaskScanner");
 });

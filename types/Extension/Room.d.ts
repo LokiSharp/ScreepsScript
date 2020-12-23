@@ -33,13 +33,7 @@ interface Room {
   clearSpawnTask(): void;
   hangSpawnTask(): void;
 
-  // 房间物流 api
-  // addRoomTransferTask(task: RoomTransferTasks, priority?: number): number;
-  // hasRoomTransferTask(taskType: string): boolean;
-  // getRoomTransferTask(): RoomTransferTasks | null;
-  // handleLabInTask(resourceType: ResourceConstant, amount: number): boolean;
-  // deleteCurrentRoomTransferTask(): void;
-
+  // 房间任务 api
   transport: RoomTransportType;
 
   // 中央物流 api

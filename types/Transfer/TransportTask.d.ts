@@ -122,6 +122,25 @@ interface TransportAction {
 
 interface RoomTransportType {
   /**
+   * 本物流对象所处的房间名
+   */
+  readonly roomName: string;
+
+  /**
+   * 当前正在执行的所有物流任务
+   */
+  tasks: TransportTasks[AllTransportTaskType][];
+
+  /**
+   * 本房间的搬运工总生命时长
+   */
+  totalLifeTime: number;
+
+  /**
+   * 本房间的搬运工总工作时长
+   */
+  totalWorkTime: number;
+  /**
    * 填写一个新的房间物流任务
    *
    * @param task 要添加的物流任务

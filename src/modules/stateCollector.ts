@@ -79,7 +79,7 @@ export function stateScanner(): void {
   Memory.stats.cpu = Game.cpu.getUsed();
 }
 
-export function getCpuUsage(key: string): void {
+export function cpuUsageScanner(key: string): void {
   if (!Memory.stats) Memory.stats = { rooms: {} };
   if (!Memory.stats.cpuCost) {
     Memory.stats.cpuCost = {};
@@ -91,4 +91,20 @@ export function getCpuUsage(key: string): void {
 
   const startCpu = Object.values(Memory.stats.cpuCost);
   Memory.stats.cpuCost[key] = Game.cpu.getUsed() - _.sum(startCpu);
+}
+
+export function roomTaskScanner(): void {
+  Object.values(Game.rooms)
+    .filter(room => room.controller.my === true)
+    .forEach(room => {
+      if (room.transport)
+        Memory.stats.rooms[room.name].debugMessage =
+          room.memory.transport +
+          "\n" +
+          "totalLifeTime: " +
+          room.transport.totalLifeTime.toString() +
+          "\n" +
+          "totalWorkTime: " +
+          room.transport.totalWorkTime.toString();
+    });
 }
