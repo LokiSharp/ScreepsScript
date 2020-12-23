@@ -56,7 +56,7 @@ export const transportActions: {
   fillExtension: creep => ({
     source: () => {
       if (creep.store[RESOURCE_ENERGY] > 0) return true;
-      const result = creep.getEngryFrom(creep.room.getAvailableSource(false));
+      const result = creep.getEngryFrom(creep.room.storage ? creep.room.storage : creep.room.getAvailableSource(false));
       return result === OK;
     },
     target: () => {
@@ -111,9 +111,8 @@ export const transportActions: {
    */
   fillTower: (creep, task) => ({
     source: () => {
-      const { sourceId } = creep.memory.data;
       if (creep.store[RESOURCE_ENERGY] > 0) return true;
-      const result = creep.getEngryFrom(sourceId ? Game.getObjectById(sourceId) : creep.room.storage);
+      const result = creep.getEngryFrom(creep.room.storage ? creep.room.storage : creep.room.getAvailableSource(false));
       return result === OK;
     },
     target: () => {
@@ -346,11 +345,10 @@ export const transportActions: {
       // 如果身上有对应资源的话就直接去填充
       if (creep.store[task.resourceType] > 0) return true;
 
-      const { sourceId } = creep.memory.data;
       // 获取资源存储建筑
-      let sourceStructure: StructureWithStore;
+      let sourceStructure: StructureWithStore | Ruin;
       if (task.resourceType === RESOURCE_ENERGY)
-        sourceStructure = sourceId ? Game.getObjectById(sourceId) : creep.room.storage;
+        sourceStructure = creep.room.storage ? creep.room.storage : creep.room.getAvailableSource(false);
       else sourceStructure = creep.room.terminal;
       // 获取 powerspawn
       const powerspawn = Game.getObjectById(task.id);
@@ -427,7 +425,7 @@ export const transportActions: {
       let resource = creep.memory.taskResource;
       // 没有缓存的话就找到第一个需要的强化材料，然后从终端拿出
       if (!resource) {
-        resource = Object.keys(boostConfig.lab).find((res, index) => {
+        resource = Object.keys(boostConfig.lab).find(res => {
           // 如果这个材料已经用完了就检查下一个
           if (!terminal.store[res] || terminal.store[res] === 0) return false;
           const lab = Game.getObjectById(boostConfig.lab[res]);
@@ -483,9 +481,8 @@ export const transportActions: {
   boostGetEnergy: (creep, task) => ({
     source: () => {
       if (creep.store[RESOURCE_ENERGY] > 0) return true;
-      const { sourceId } = creep.memory.data;
-      creep.getEngryFrom(sourceId ? Game.getObjectById(sourceId) : creep.room.storage);
-      return false;
+      const result = creep.getEngryFrom(creep.room.storage ? creep.room.storage : creep.room.getAvailableSource(false));
+      return result === OK;
     },
     target: () => {
       const boostLabs = Object.values(creep.room.memory.boost.lab);

@@ -23,22 +23,22 @@ describe("RoomTransportTask", () => {
   it("addTask 可以添加任务", () => {
     const roomTransport = new RoomTransport("W0N0");
     // 添加一个任务
-    const taskKey = roomTransport.addTask({ type: "fillExtension", executor: [] });
+    const taskKey = roomTransport.addTask({ type: "fillExtension", executor: [] }, false, false);
     assert.equal(roomTransport.tasks.length, 1);
     assert.equal(roomTransport.tasks[0].key, taskKey);
     assert.equal(roomTransport.tasks[0].type, "fillExtension");
     // 添加一个其他种类的任务
-    roomTransport.addTask({ type: "boostGetResource" });
+    roomTransport.addTask({ type: "boostGetResource" }, false, false);
     assert.equal(roomTransport.tasks.length, 2);
     assert.equal(roomTransport.tasks[0].type, "fillExtension");
     assert.equal(roomTransport.tasks[1].type, "boostGetResource");
     // 添加一个相同种类的任务不允许重复
-    roomTransport.addTask({ type: "fillExtension", executor: [] });
+    roomTransport.addTask({ type: "fillExtension", executor: [] }, false, false);
     assert.equal(roomTransport.tasks.length, 2);
     assert.equal(roomTransport.tasks[0].type, "fillExtension");
     assert.equal(roomTransport.tasks[1].type, "boostGetResource");
     // 添加一个相同种类的任务允许重复
-    roomTransport.addTask({ type: "boostGetResource", executor: [] }, true);
+    roomTransport.addTask({ type: "boostGetResource", executor: [] }, true, false);
     assert.equal(roomTransport.tasks.length, 3);
     assert.equal(roomTransport.tasks[0].type, "fillExtension");
     assert.equal(roomTransport.tasks[1].type, "boostGetResource");
@@ -50,13 +50,13 @@ describe("RoomTransportTask", () => {
     // 模拟乱序添加多个不同优先级的任务
     const priorities = [100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 0].sort(() => Math.random() - 0.5);
     priorities.forEach(priority => {
-      roomTransport.addTask({ type: "fillExtension", priority }, true);
+      roomTransport.addTask({ type: "fillExtension", priority }, true, false);
     });
     assert.equal(roomTransport.tasks.length, 11);
     assert.equal(roomTransport.tasks[0].priority, 100);
     assert.equal(roomTransport.tasks[10].priority, 0);
     // 模拟插入一个中间优先级的任务
-    roomTransport.addTask({ type: "fillExtension", priority: 55 }, true);
+    roomTransport.addTask({ type: "fillExtension", priority: 55 }, true, false);
     assert.equal(roomTransport.tasks[5].priority, 55);
   });
 
@@ -88,7 +88,7 @@ describe("RoomTransportTask", () => {
   it("saveTask 可以保存任务", () => {
     Memory.rooms.W0N0 = {} as RoomMemory;
     const roomTransport = new RoomTransport("W0N0");
-    roomTransport.addTask({ type: "fillExtension" });
+    roomTransport.addTask({ type: "fillExtension" }, false, false);
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     roomTransport.saveTask();
@@ -115,7 +115,7 @@ describe("RoomTransportTask", () => {
 
   it("getTask 可以获取任务", () => {
     const roomTransport = new RoomTransport("W0N0");
-    const taskKey = roomTransport.addTask({ type: "fillExtension" });
+    const taskKey = roomTransport.addTask({ type: "fillExtension" }, false, false);
     assert.equal(roomTransport.getTask(taskKey).type, "fillExtension");
     assert.isUndefined(roomTransport.getTask(undefined));
   });
@@ -123,7 +123,7 @@ describe("RoomTransportTask", () => {
   it("hasTask 可以检查是否有任务", () => {
     const roomTransport = new RoomTransport("W0N0");
     assert.isFalse(roomTransport.hasTask("fillExtension"));
-    roomTransport.addTask({ type: "fillExtension" });
+    roomTransport.addTask({ type: "fillExtension" }, false, false);
     assert.isTrue(roomTransport.hasTask("fillExtension"));
   });
 
@@ -135,32 +135,39 @@ describe("RoomTransportTask", () => {
     });
     // creepsSet 的浅拷贝
     const creepShallowCopySet: Creep[] = [];
-    Object.assign(creepShallowCopySet, creepsSet);
-
+    creepsSet.forEach(creep => {
+      Game.creeps[creep.id] = creep;
+    });
     assert.sameMembers(creepShallowCopySet, creepsSet);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    // eslint-disable-next-line deprecation/deprecation
+    Game.getObjectById = function (id: string): Creep<"manager"> {
+      return Game.creeps[id] as Creep<"manager">;
+    };
 
     const roomTransport = new RoomTransport("W0N0");
-    roomTransport.addTask({ type: "boostGetResource" }, true);
-    const taskKey = roomTransport.addTask({ type: "fillExtension" }, true);
-    roomTransport.addTask({ type: "boostGetResource" }, true);
-    roomTransport.addTask({ type: "fillExtension" }, true);
+    roomTransport.addTask({ type: "boostGetResource" }, true, false);
+    const taskKey = roomTransport.addTask({ type: "fillExtension" }, true, false);
+    roomTransport.addTask({ type: "boostGetResource" }, true, false);
+    roomTransport.addTask({ type: "fillExtension" }, true, false);
     assert.equal(roomTransport.tasks.length, 4);
     assert.equal(roomTransport.removeTask(taskKey), OK);
     assert.equal(roomTransport.tasks.length, 3);
     assert.equal(roomTransport.removeTask(taskKey), OK);
     assert.equal(roomTransport.tasks.length, 3);
-    const taskKey2 = roomTransport.addTask({ type: "fillExtension" }, true);
+    const taskKey2 = roomTransport.addTask({ type: "fillExtension" }, true, false);
     assert.equal(roomTransport.tasks.length, 4);
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     // eslint-disable-next-line deprecation/deprecation
     Game.getObjectById = function (id: string): Creep<"manager"> {
-      creepsSet.find(creep => creep.id === id);
+      creepShallowCopySet.find(creep => creep.id === id);
     };
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    roomTransport.giveJob(creepsSet);
+    roomTransport.giveJob(creepShallowCopySet);
 
     assert.equal(roomTransport.removeTask(taskKey2), OK);
     assert.equal(roomTransport.tasks.length, 3);
@@ -172,7 +179,7 @@ describe("RoomTransportTask", () => {
     TestCreep1.memory = {} as CreepMemory<"manager">;
 
     const roomTransport = new RoomTransport("W0N0");
-    const taskKey = roomTransport.addTask({ type: "fillExtension", executor: [] });
+    const taskKey = roomTransport.addTask({ type: "fillExtension", executor: [] }, false, false);
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     RoomTransport.giveTask(TestCreep1, roomTransport.getTask(taskKey));
@@ -184,7 +191,7 @@ describe("RoomTransportTask", () => {
     const roomTransport = new RoomTransport("W0N0");
     // 创建 10 个任务
     [...new Array(10).keys()].forEach(priority => {
-      roomTransport.addTask({ type: "fillExtension", priority }, true);
+      roomTransport.addTask({ type: "fillExtension", priority }, true, false);
     });
     // 模拟分配任务给 10 个 Creep
     const creepsSetOne = [...new Array(10).keys()].map(num => {
@@ -223,5 +230,54 @@ describe("RoomTransportTask", () => {
       roomTransport.totalWorkTime = roomTransport.totalLifeTime * item.proportion;
       assert.equal(roomTransport.getExpect(), item.expect);
     });
+  });
+
+  it("dispatchTask 给当前现存的任务按照优先级重新分配 creep", () => {
+    const creepsSet = [...new Array(5).keys()].map(num => {
+      const creep = (new CreepMock(`creepOne${num}` as Id<CreepMock>, 0, 0) as unknown) as Creep<"manager">;
+      creep.memory = {} as CreepMemory<"manager">;
+      return creep;
+    });
+    // creepsSet 的浅拷贝
+    const creepShallowCopySet: Creep[] = [];
+    Object.assign(creepShallowCopySet, creepsSet);
+    Game.creeps = {};
+    creepsSet.forEach(creep => {
+      Game.creeps[creep.id] = creep;
+    });
+    assert.sameMembers(creepShallowCopySet, creepsSet);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    // eslint-disable-next-line deprecation/deprecation
+    Game.getObjectById = function (id: string): Creep<"manager"> {
+      return Game.creeps[id] as Creep<"manager">;
+    };
+
+    const roomTransport = new RoomTransport("W0N0");
+    [50, 40, 30, 20, 10].forEach(priority => {
+      roomTransport.addTask({ type: "fillExtension", priority }, true, false);
+    });
+    // 检验是否每个任务都有 1 个 Creep
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    roomTransport.giveJob(creepShallowCopySet);
+    Object.assign(creepShallowCopySet, creepsSet);
+
+    for (const task of roomTransport.tasks) {
+      assert.equal(task.executor.length, 1);
+    }
+    [100, 90, 80, 70, 60].forEach(priority => {
+      roomTransport.addTask({ type: "fillExtension", priority }, true, false);
+    });
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    roomTransport.dispatchTask();
+    for (let i = 0; i < 5; i++) {
+      assert.equal(roomTransport.tasks[i].executor.length, 1);
+    }
+
+    for (let i = 5; i < 10; i++) {
+      assert.equal(roomTransport.tasks[i].executor.length, 0);
+    }
   });
 });

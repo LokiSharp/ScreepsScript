@@ -108,6 +108,7 @@ export default class RoomExtension extends Room {
   /**
    * 查找房间中的有效能量来源
    */
+  public getAvailableSource(includeSource?: false): StructureTerminal | StructureStorage | StructureContainer;
   public getAvailableSource(
     includeSource = true
   ): StructureTerminal | StructureStorage | StructureContainer | Source | Ruin | Resource<RESOURCE_ENERGY> {

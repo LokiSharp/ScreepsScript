@@ -131,7 +131,7 @@ interface Room {
   importantWall: StructureWall | StructureRampart;
 
   // 获取房间中的有效能量来源
-
+  getAvailableSource(includeSource?: false): StructureTerminal | StructureStorage | StructureContainer;
   getAvailableSource(
     includeSource?: boolean
   ): StructureTerminal | StructureStorage | StructureContainer | Source | Ruin | Resource<RESOURCE_ENERGY>;

@@ -9,7 +9,7 @@ import { printDebugInfo } from "./printDebugInfo";
 export async function runRCLTest(RCL: number, _RCL: number, tickNum: number): Promise<void> {
   await initRCLTestRoom(helper, RCL);
 
-  for (let gameTime = 1; gameTime < tickNum; gameTime += 1) {
+  for (let gameTime = 1; gameTime <= tickNum; gameTime += 1) {
     await helper.server.tick();
     if (gameTime % 100) continue;
     const memory: Memory = JSON.parse(await helper.user.memory);

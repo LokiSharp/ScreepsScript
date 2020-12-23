@@ -22,7 +22,7 @@ interface RoleDatas {
   /**
    * 房间高级运营
    */
-  manager: TransporterData;
+  manager: ManagerData;
   processor: ProcessorData;
 
   /**
@@ -114,11 +114,7 @@ interface WorkerData {
 /**
  * 运输单位的 data
  */
-interface TransporterData {
-  /**
-   * 要使用的资源存放建筑 id
-   */
-  sourceId?: Id<StructureWithStore>;
+interface ManagerData {
   /**
    * 该 creep 的工作房间
    * 例如一个外矿搬运者需要知道自己的老家在哪里

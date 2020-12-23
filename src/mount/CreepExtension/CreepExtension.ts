@@ -165,8 +165,12 @@ export default class CreepExtension extends Creep {
 
   /**
    * 建设房间内存在的建筑工地
+   * @param constructionSiteId 手动指定建造的工地
    */
-  public buildStructure(): CreepActionReturnCode | ERR_NOT_ENOUGH_RESOURCES | ERR_RCL_NOT_ENOUGH | ERR_NOT_FOUND {
+  public buildStructure(
+    constructionSiteId: Id<ConstructionSite> = undefined
+  ): CreepActionReturnCode | ERR_NOT_ENOUGH_RESOURCES | ERR_RCL_NOT_ENOUGH | ERR_NOT_FOUND {
+    if (constructionSiteId) this.memory.constructionSiteId = constructionSiteId;
     // 新建目标建筑工地
     let target: ConstructionSite;
     // 检查是否有缓存

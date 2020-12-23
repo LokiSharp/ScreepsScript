@@ -65,20 +65,27 @@ export default class RoomTransport implements RoomTransportType {
    *
    * @param targetTask 要添加的任务
    * @param canTaskTypeRepeat 任务类型是否可重复
+   * @param enableDispatchTask 是否禁用重分配（测试用）
    * @returns 该物流任务的唯一索引
    */
-  public addTask(targetTask: RoomTransportTasks, canTaskTypeRepeat = false): number {
+  public addTask(targetTask: RoomTransportTasks, canTaskTypeRepeat = false, enableDispatchTask = true): number {
     if (!canTaskTypeRepeat && this.hasTask(targetTask.type)) return -1;
     targetTask.key = this.generatetKey();
     // 发布任务的时候为了方便可以不填这个，这里给它补上
     if (!targetTask.executor) targetTask.executor = [];
 
-    // 插入新任务按优先级排序并重新分配任务
-    this.tasks.push(targetTask);
-    this.tasks.sort((a, b) => {
-      return b.priority - a.priority;
+    // 因为 this.tasks 是按照优先级降序的，所以这里要找到新任务的插入索引
+    let insertIndex = this.tasks.length;
+    this.tasks.find((existTask, index) => {
+      // 老任务的优先级更高，不能在这里插入
+      if (existTask.priority >= targetTask.priority) return false;
+
+      insertIndex = index;
+      return true;
     });
-    this.dispatchTask();
+    // 在目标索引位置插入新任务并重新分配任务
+    this.tasks.splice(insertIndex, 0, targetTask);
+    if (enableDispatchTask) this.dispatchTask();
     this.saveTask();
 
     return targetTask.key;
@@ -125,29 +132,32 @@ export default class RoomTransport implements RoomTransportType {
     let j = this.tasks.length - 1;
 
     // 这里没用碰撞指针，是因为有可能存在低优先度任务缺人但是高优先度任务人多的情况
-    while (i <= this.tasks.length - 1 || j >= 0) {
+    while (i < this.tasks.length - 1) {
       const task = this.tasks[i];
       // 工作人数符合要求，检查下一个
       if (task.executor.length > 0) continue;
 
-      // 从优先级低的任务抽人
-      while (j >= 0) {
-        const lowTask = this.tasks[j];
-        // 人手不够，检查优先级略高的任务
-        if (lowTask.executor.length <= 0) {
-          j--;
-          continue;
+      this.tasks[i].executor.filter(creepId => Game.getObjectById(creepId));
+      if (i < j) {
+        // 从优先级低的任务抽人
+        while (j > 0) {
+          const lowTask = this.tasks[j];
+          // 人手不够，检查优先级略高的任务
+          if (lowTask.executor.length <= 0) {
+            j--;
+            continue;
+          }
+
+          // 从人多的低级任务里抽调一个人到高优先级任务
+          const freeCreepId = lowTask.executor.shift();
+          const freeCreep = Game.getObjectById(freeCreepId);
+          // 这里没有 j--，因为这个任务的执行 creep 有可能有两个以上，要重新走一遍流程
+          if (!freeCreep) continue;
+
+          RoomTransport.giveTask(freeCreep, task);
+          break;
         }
-
-        // 从人多的低级任务里抽调一个人到高优先级任务
-        const freeCreepId = lowTask.executor.shift();
-        const freeCreep = Game.getObjectById(freeCreepId);
-        // 这里没有 j--，因为这个任务的执行 creep 有可能有两个以上，要重新走一遍流程
-        if (!freeCreep) continue;
-
-        RoomTransport.giveTask(freeCreep, task);
       }
-
       i++;
     }
   }
@@ -240,6 +250,15 @@ export default class RoomTransport implements RoomTransportType {
    * 返回 0 代表不需要调整搬运工数量
    */
   public getExpect(): number {
+    Memory.stats.rooms[this.roomName].debugMessage =
+      JSON.stringify(this.tasks) +
+      "\n" +
+      "totalLifeTime: " +
+      this.totalLifeTime.toString() +
+      "\n" +
+      "totalWorkTime: " +
+      this.totalWorkTime.toString();
+    console.log(Memory.stats.rooms[this.roomName].debugMessage);
     // 统计数据还太少，不具备参考性，暂时不调整搬运工数量
     if (this.totalLifeTime < REGULATE_LIMIT) return 0;
 

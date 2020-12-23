@@ -126,9 +126,10 @@ interface RoomTransportType {
    *
    * @param task 要添加的物流任务
    * @param canRepeat 任务类型能否重复
+   * @param disableDispatchTask 是否禁用重分配（测试用）
    * @returns taskKey 该任务的唯一索引
    */
-  addTask(task: RoomTransportTasks, canRepeat?: boolean): number;
+  addTask(task: RoomTransportTasks, canRepeat?: boolean, disableDispatchTask?: boolean): number;
   /**
    * 获取应该执行的任务
    */

@@ -53,7 +53,7 @@ export async function runBattleTest(): Promise<void> {
     helper.target.id
   );
 
-  for (let i = 1; i < 5000; i += 1) {
+  for (let i = 1; i <= 5000; i += 1) {
     const userAttackerResult = await db["rooms.objects"].findOne({ name: userAttacker.name });
     const targetAttackerResult = await db["rooms.objects"].findOne({ name: targetAttacker.name });
     if (!userAttackerResult || !targetAttackerResult) {

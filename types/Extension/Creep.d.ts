@@ -19,7 +19,9 @@ interface Creep<Role extends CreepRoleConstant = CreepRoleConstant> {
 
   upgrade(): ScreepsReturnCode;
 
-  buildStructure(): CreepActionReturnCode | ERR_NOT_ENOUGH_RESOURCES | ERR_RCL_NOT_ENOUGH | ERR_NOT_FOUND;
+  buildStructure(
+    constructionSiteId?: Id<ConstructionSite>
+  ): CreepActionReturnCode | ERR_NOT_ENOUGH_RESOURCES | ERR_RCL_NOT_ENOUGH | ERR_NOT_FOUND;
 
   steadyWall(): OK | ERR_NOT_FOUND;
   fillDefenseStructure(expectHits?: number): boolean;

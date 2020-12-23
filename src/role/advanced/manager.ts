@@ -9,8 +9,8 @@ import deathPrepare from "utils/creep/deathPrepare";
  */
 export const manager: CreepConfig<"manager"> = {
   source: creep => {
-    const { sourceId, workRoom } = creep.memory.data;
-    if (creep.ticksToLive <= TRANSFER_DEATH_LIMIT) return deathPrepare(creep, sourceId);
+    const { workRoom } = creep.memory.data;
+    if (creep.ticksToLive <= TRANSFER_DEATH_LIMIT) return deathPrepare(creep);
 
     return Game.rooms[workRoom]?.transport.getWork(creep).source();
   },
