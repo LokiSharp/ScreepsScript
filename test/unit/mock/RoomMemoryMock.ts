@@ -35,7 +35,7 @@ export default class RoomMemoryMock extends BaseMock implements RoomMemory {
 
   public centerTransferTasks: ITransferTask[];
 
-  public transferTasks: RoomTransferTasks[];
+  public transport: string;
 
   public defenseMode?: "defense" | "active";
 

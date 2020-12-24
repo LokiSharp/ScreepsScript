@@ -132,31 +132,34 @@ export default class RoomTransport implements RoomTransportType {
     let j = this.tasks.length - 1;
 
     // 这里没用碰撞指针，是因为有可能存在低优先度任务缺人但是高优先度任务人多的情况
-    while (i < this.tasks.length - 1) {
+    while (i <= this.tasks.length - 1 && j >= 0) {
       const task = this.tasks[i];
+      this.tasks[i].executor = this.tasks[i].executor.filter(creepId => Game.getObjectById(creepId));
+
       // 工作人数符合要求，检查下一个
-      if (task.executor.length > 0) continue;
+      if (task.executor.length > 0) {
+        i++;
+        continue;
+      }
 
-      this.tasks[i].executor.filter(creepId => Game.getObjectById(creepId));
-      if (i < j) {
-        // 从优先级低的任务抽人
-        while (j > 0) {
-          const lowTask = this.tasks[j];
-          // 人手不够，检查优先级略高的任务
-          if (lowTask.executor.length <= 0) {
-            j--;
-            continue;
-          }
-
-          // 从人多的低级任务里抽调一个人到高优先级任务
-          const freeCreepId = lowTask.executor.shift();
-          const freeCreep = Game.getObjectById(freeCreepId);
-          // 这里没有 j--，因为这个任务的执行 creep 有可能有两个以上，要重新走一遍流程
-          if (!freeCreep) continue;
-
-          RoomTransport.giveTask(freeCreep, task);
-          break;
+      // 从优先级低的任务抽人
+      while (j > 0 && task.executor.length <= 0) {
+        const lowTask = this.tasks[j];
+        // 人手不够，检查优先级更高的任务
+        // 后面这个 (j > i ? 0 : 1) 的意思是：低优先任务往高优先任务调人允许把人全调走，但是高优先往低优先调人至少会保留一个人
+        if (j === i || lowTask.executor.length <= (j > i ? 0 : 1)) {
+          j--;
+          continue;
         }
+
+        // 从人多的低级任务里抽调一个人到高优先级任务
+        const freeCreepId = lowTask.executor.shift();
+        const freeCreep = Game.getObjectById(freeCreepId);
+        // 这里没有 j--，因为这个任务的执行 creep 有可能有两个以上，要重新走一遍流程
+        if (!freeCreep) continue;
+
+        RoomTransport.giveTask(freeCreep, task);
+        break;
       }
       i++;
     }

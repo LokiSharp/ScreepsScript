@@ -94,8 +94,9 @@ export function cpuUsageScanner(key: string): void {
 }
 
 export function roomTaskScanner(): void {
+  if (!Memory.stats.rooms) return;
   Object.values(Game.rooms)
-    .filter(room => room.controller.my === true)
+    .filter(room => room.controller?.my === true)
     .forEach(room => {
       if (room.transport)
         Memory.stats.rooms[room.name].debugMessage =

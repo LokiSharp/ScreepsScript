@@ -57,11 +57,6 @@ interface RoomMemory {
   centerTransferTasks: ITransferTask[];
 
   /**
-   * 房间物流任务队列
-   */
-  transferTasks: RoomTransportTasks[];
-
-  /**
    * 房间物流任务的备份数据
    * 会在全局重置时通过该数据重建物流任务
    */
