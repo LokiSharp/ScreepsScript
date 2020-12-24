@@ -20,11 +20,11 @@ export const loop = ErrorMapper.wrapLoop(() => {
   cpuUsageScanner("creepNumberListener");
   // 所有建筑、creep、powerCreep 执行工作
   doing(Game.structures);
-  cpuUsageScanner("doing structures");
+  cpuUsageScanner("doingStructures");
   doing(Game.creeps);
-  cpuUsageScanner("doing creeps");
+  cpuUsageScanner("doingCreeps");
   doing(Game.powerCreeps);
-  cpuUsageScanner("doing powerCreeps");
+  cpuUsageScanner("doingPowerCreeps");
   // 搓 pixel
   generatePixel();
   cpuUsageScanner("generatePixel");
