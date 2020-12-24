@@ -24,18 +24,29 @@ const finishTask = function (creep: Creep<"manager">): void {
 };
 
 /**
- * 处理掉 creep 身上携带的能量
- * 运输者在之前处理任务的时候身上可能会残留能量，如果不及时处理的话可能会导致任务处理能力下降
+ * 处理掉 creep 身上携带的资源
+ * 运输者在之前处理任务的时候身上可能会残留资源，如果不及时处理的话可能会导致任务处理能力下降
  *
  * @param creep 要净空的 creep
  * @returns 为 true 时代表已经处理完成，可以继续执行任务
  */
-const clearCarryingEnergy = function (creep: Creep): boolean {
-  if (creep.store[RESOURCE_ENERGY] > 0) {
+const clearCarryingRecources = function (creep: Creep): boolean {
+  if (creep.store.getUsedCapacity() > 0) {
     // 能放下就放，放不下说明能量太多了，直接扔掉
-    if (creep.room.storage && creep.room.storage.store.getFreeCapacity() >= creep.store[RESOURCE_ENERGY])
-      creep.transferTo(creep.room.storage, RESOURCE_ENERGY);
-    else creep.drop(RESOURCE_ENERGY);
+    const resourcesType = Object.keys(creep.store).find(key => creep.store[key] > 0) as ResourceConstant;
+    if (
+      resourcesType === RESOURCE_ENERGY &&
+      creep.room.storage &&
+      creep.room.storage.store.getFreeCapacity() >= creep.store[resourcesType]
+    )
+      creep.transferTo(creep.room.storage, resourcesType);
+    else if (
+      resourcesType !== RESOURCE_ENERGY &&
+      creep.room.terminal &&
+      creep.room.terminal.store.getFreeCapacity() >= creep.store[resourcesType]
+    )
+      creep.transferTo(creep.room.terminal, resourcesType);
+    else creep.drop(resourcesType);
 
     return false;
   }
@@ -181,7 +192,7 @@ export const transportActions: {
         return false;
       }
 
-      if (!clearCarryingEnergy(creep)) return false;
+      if (!clearCarryingRecources(creep)) return false;
 
       // 获取应拿取的数量（能拿取的最小值）
       const getAmount = Math.min(
@@ -237,7 +248,7 @@ export const transportActions: {
         return false;
       }
 
-      if (!clearCarryingEnergy(creep)) return false;
+      if (!clearCarryingRecources(creep)) return false;
 
       // 找到第一个需要从终端取出的底物
       const targetResource = task.resource.find(res => !Game.getObjectById(res.id)?.mineralType);
@@ -292,7 +303,7 @@ export const transportActions: {
       // 还找不到或者目标里没有化合物了，说明已经搬空，执行 target
       if (!targetLab || !targetLab.mineralType) return true;
 
-      if (!clearCarryingEnergy(creep)) return false;
+      if (!clearCarryingRecources(creep)) return false;
 
       // 转移资源
       creep.goTo(targetLab.pos);
@@ -360,7 +371,7 @@ export const transportActions: {
         return false;
       }
 
-      if (!clearCarryingEnergy(creep)) return false;
+      if (!clearCarryingRecources(creep)) return false;
 
       // 获取应拿取的数量
       const getAmount = Math.min(
@@ -417,7 +428,7 @@ export const transportActions: {
         return false;
       }
 
-      if (!clearCarryingEnergy(creep)) return false;
+      if (!clearCarryingRecources(creep)) return false;
 
       const boostConfig = creep.room.memory.boost;
 
@@ -537,7 +548,7 @@ export const transportActions: {
         return false;
       }
 
-      if (!clearCarryingEnergy(creep)) return false;
+      if (!clearCarryingRecources(creep)) return false;
 
       // 转移资源
       creep.goTo(targetLab.pos);

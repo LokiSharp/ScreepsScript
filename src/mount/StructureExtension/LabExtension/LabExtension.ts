@@ -286,6 +286,10 @@ export default class LabExtension extends StructureLab {
       else if (runResult === ERR_NOT_ENOUGH_RESOURCES) {
         this.room.memory.lab.state = LAB_STATE.PUT_RESOURCE;
         return;
+      } // 原材料异常的话就清空
+      else if (runResult === ERR_INVALID_ARGS) {
+        this.room.memory.lab.state = LAB_STATE.PUT_RESOURCE;
+        return;
       } // 上面说的会遍历到 inLab 导致的问题就是返回 ERR_INVALID_TARGET，这里不显示
       else if (runResult !== OK && runResult !== ERR_INVALID_TARGET) {
         this.log(`runReaction 异常，错误码 ${runResult}`, "red");
