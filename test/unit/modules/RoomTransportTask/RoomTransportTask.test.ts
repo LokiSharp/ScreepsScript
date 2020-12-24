@@ -227,11 +227,16 @@ describe("RoomTransportTask", () => {
       roomTransport.totalWorkTime = roomTransport.totalLifeTime * item.proportion;
       assert.equal(roomTransport.getExpect(), item.expect);
     });
+    roomTransport.totalLifeTime = 300;
+    assert.equal(roomTransport.getExpect(), 0);
+    roomTransport.totalLifeTime = 500;
+    roomTransport.totalWorkTime = -100;
+    assert.equal(roomTransport.getExpect(), -2);
   });
 
   it("dispatchTask 给当前现存的任务按照优先级重新分配 creep", () => {
     const creepsSet = [...new Array(5).keys()].map(num => {
-      const creep = (new CreepMock(`creepOne${num}` as Id<CreepMock>, 0, 0) as unknown) as Creep<"manager">;
+      const creep = (new CreepMock(`creep${num}` as Id<CreepMock>, 0, 0) as unknown) as Creep<"manager">;
       creep.memory = {} as CreepMemory<"manager">;
       return creep;
     });
@@ -274,6 +279,42 @@ describe("RoomTransportTask", () => {
 
     for (let i = 5; i < 10; i++) {
       assert.equal(roomTransport.tasks[i].executor.length, 0);
+    }
+  });
+  it("taskExecutorFilter 可以过滤已经不存在的任务执行者", () => {
+    const creepsSet = [...new Array(5).keys()].map(num => {
+      const creep = (new CreepMock(`creep${num}` as Id<CreepMock>, 0, 0) as unknown) as Creep<"manager">;
+      creep.memory = {} as CreepMemory<"manager">;
+      return creep;
+    });
+    // creepsSet 的浅拷贝
+    const creepShallowCopySet: Creep[] = [];
+    Object.assign(creepShallowCopySet, creepsSet);
+    creepsSet.forEach(creep => {
+      Game.creeps[creep.id] = creep;
+    });
+    assert.sameMembers(creepShallowCopySet, creepsSet);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    // eslint-disable-next-line deprecation/deprecation
+    Game.getObjectById = function (id: string): Creep<"manager"> {
+      return Game.creeps[id] as Creep<"manager">;
+    };
+    const roomTransport = new RoomTransport("W0N0");
+    [50, 40, 30, 20, 10].forEach(priority => {
+      roomTransport.addTask({ type: "fillExtension", priority }, true, false);
+    });
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    roomTransport.giveJob(creepShallowCopySet);
+    delete Game.creeps.creep1;
+    delete Game.creeps.creep3;
+    for (let i = 0; i < roomTransport.tasks.length; i++) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      roomTransport.taskExecutorFilter(i);
+
+      assert.equal(roomTransport.tasks[i].executor.length, [1, 0, 1, 0, 1][i]);
     }
   });
 });

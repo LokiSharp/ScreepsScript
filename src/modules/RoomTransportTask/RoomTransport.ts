@@ -133,8 +133,8 @@ export default class RoomTransport implements RoomTransportType {
 
     // 这里没用碰撞指针，是因为有可能存在低优先度任务缺人但是高优先度任务人多的情况
     while (i <= this.tasks.length - 1 && j >= 0) {
+      this.taskExecutorFilter(i);
       const task = this.tasks[i];
-      this.tasks[i].executor = this.tasks[i].executor.filter(creepId => Game.getObjectById(creepId));
 
       // 工作人数符合要求，检查下一个
       if (task.executor.length > 0) {
@@ -260,7 +260,7 @@ export default class RoomTransport implements RoomTransportType {
     const currentExpect = WORK_PROPORTION_TO_EXPECT.find(opt => {
       return this.totalWorkTime / this.totalLifeTime >= opt.proportion;
     });
-    return currentExpect.expect === undefined ? -2 : currentExpect.expect;
+    return currentExpect?.expect === undefined ? -2 : currentExpect.expect;
   }
 
   /**
@@ -280,5 +280,13 @@ export default class RoomTransport implements RoomTransportType {
   private generatetKey(): number {
     this.keyCounter += 1;
     return new Date().getTime() + this.keyCounter * 0.1;
+  }
+
+  /**
+   * 过滤已经不存在的任务执行者
+   * @param key 需要操作的任务索引
+   */
+  private taskExecutorFilter(key: number): void {
+    this.tasks[key].executor = this.tasks[key].executor.filter(creepId => Game.getObjectById(creepId));
   }
 }
