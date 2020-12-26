@@ -234,15 +234,16 @@ export default class RoomTransport implements RoomTransportType {
    * @param taskKey 要移除的任务索引
    */
   public removeTask(taskKey: number): OK | ERR_NOT_FOUND {
+    let extraCreeps: Creep[] = [];
     this.tasks = this.tasks.filter(task => {
       if (task.key !== taskKey) return true;
-
-      // 给干完活的搬运工重新分配任务
-      const extraCreeps = task.executor.map(id => Game.getObjectById(id)).filter(Boolean);
-      this.giveJob(extraCreeps);
+      // 找到干完活的搬运工
+      extraCreeps = task.executor.map(id => Game.getObjectById(id)).filter(Boolean);
       return false;
     });
 
+    // 给干完活的搬运工重新分配任务
+    this.giveJob(extraCreeps);
     this.saveTask();
     return OK;
   }

@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-unsafe-assignment
 const { ScreepsServer, stdHooks } = require("screeps-server-mockup");
 
 export class IntegrationTestHelper {
@@ -26,6 +27,7 @@ export class IntegrationTestHelper {
   }
 
   public async beforeEach(): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     this.serverCache = new ScreepsServer() as Server;
     await this.serverCache.world.reset();
 
@@ -49,5 +51,6 @@ afterEach(() => {
 });
 
 before(() => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
   stdHooks.hookWrite();
 });
