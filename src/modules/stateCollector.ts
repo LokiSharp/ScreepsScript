@@ -99,13 +99,10 @@ export function roomTaskScanner(): void {
     .filter(room => room.controller?.my === true)
     .forEach(room => {
       if (room.transport && Memory.stats.rooms[room.name])
-        Memory.stats.rooms[room.name].debugMessage =
-          room.memory.transportTasks +
-          "\n" +
-          "totalLifeTime: " +
-          room.transport.totalLifeTime.toString() +
-          "\n" +
-          "totalWorkTime: " +
-          room.transport.totalWorkTime.toString();
+        Memory.stats.rooms[room.name].debugMessage = {
+          transportTasks: room.memory.transportTasks,
+          totalLifeTime: room.transport.totalLifeTime,
+          totalWorkTime: room.transport.totalWorkTime
+        };
     });
 }

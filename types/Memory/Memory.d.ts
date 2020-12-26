@@ -139,5 +139,5 @@ interface RoomStats {
   /**
    * 测试消息预留
    */
-  debugMessage?: string;
+  debugMessage?: unknown;
 }
