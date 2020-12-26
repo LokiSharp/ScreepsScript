@@ -5,7 +5,7 @@ import { boostResourceReloadLimit } from "../../../setting";
  * 没有任务时的行为逻辑
  */
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const noTask = (creep: Creep) => ({
+export const noTask = (creep: Creep<"manager">) => ({
   source: () => {
     creep.say("💤");
     return false;
@@ -60,6 +60,83 @@ const clearCarryingRecources = function (creep: Creep): boolean {
 export const actions: {
   [TaskType in AllTransportTaskType]: TransportActionGenerator<TaskType>;
 } = {
+  /**
+   * 基础搬运任务
+   * 从一个地方（建筑）搬运东西到另一个地方（建筑）
+   */
+  transport: (creep, task) => ({
+    source: () => {
+      if (creep.store[task.resourceType] > 0) return true;
+
+      // 是 id，从建筑获取
+      if (typeof task.from === "string") {
+        // 获取目标建筑
+        const targetStructure = Game.getObjectById(task.from);
+        if (!targetStructure) finishTask(creep);
+
+        // 检查下有没有资源
+        const resAmount = targetStructure.store[task.resourceType];
+        if (!resAmount) {
+          // 如果任务有结束条件的话就结束，没有就等会
+          if (task.endWith && task.endWith === "clear") finishTask(creep);
+          else creep.say("🏓");
+          return false;
+        }
+
+        // 移动到目的地，获取资源
+        creep.goTo(targetStructure.pos, { range: 1 });
+        const result = creep.withdraw(targetStructure, task.resourceType);
+        return result === OK;
+      }
+      // 是位置，尝试捡一下
+      else {
+        // 获取目标位置
+        const [x, y, roomName] = task.from as [number, number, string];
+        const targetPos = new RoomPosition(x, y, roomName);
+
+        // 检查下有没有资源
+        const targetRes = targetPos.lookFor(LOOK_RESOURCES).find(res => res.resourceType === task.resourceType);
+        if (!targetRes) {
+          // 如果任务有结束条件的话就结束，没有就等会
+          if (task.endWith && task.endWith === "clear") finishTask(creep);
+          else creep.say("🎨");
+          return false;
+        }
+
+        // 移动到目的地，捡起资源
+        creep.goTo(targetPos, { range: 1 });
+        const result = creep.pickup(targetRes);
+        return result === OK;
+      }
+    },
+    target: () => {
+      if (creep.store[task.resourceType] <= 0) return true;
+
+      // 是 id，存放到只当建筑
+      if (typeof task.to === "string") {
+        // 获取目标建筑
+        const targetStructure = Game.getObjectById(task.to);
+        if (!targetStructure) finishTask(creep);
+
+        // 移动到目的地，获取资源
+        creep.goTo(targetStructure.pos, { range: 1 });
+        const result = creep.transfer(targetStructure, task.resourceType);
+        return result === OK;
+      }
+      // 是位置，走到地方然后扔下去
+      else {
+        // 获取目标位置
+        const [x, y, roomName] = task.to as [number, number, string];
+        const targetPos = new RoomPosition(x, y, roomName);
+
+        // 移动到目的地，捡起资源
+        creep.goTo(targetPos, { range: 1 });
+        const result = creep.drop(task.resourceType);
+        return result === OK;
+      }
+    }
+  }),
+
   /**
    * extension 填充任务
    * 维持正常孵化的任务
