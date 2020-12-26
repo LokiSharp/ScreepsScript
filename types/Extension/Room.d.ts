@@ -36,6 +36,11 @@ interface Room {
   // 房间任务 api
   transport: RoomTransportType;
 
+  /**
+   * 房间工作 api
+   */
+  work: RoomWorkType;
+
   // 中央物流 api
   addCenterTask(task: ITransferTask, priority?: number): number;
   hasCenterTask(submit: CenterStructures | number): boolean;

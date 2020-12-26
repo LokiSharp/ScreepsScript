@@ -98,9 +98,9 @@ export function roomTaskScanner(): void {
   Object.values(Game.rooms)
     .filter(room => room.controller?.my === true)
     .forEach(room => {
-      if (room.transport)
+      if (room.transport && Memory.stats.rooms[room.name])
         Memory.stats.rooms[room.name].debugMessage =
-          room.memory.transport +
+          room.memory.transportTasks +
           "\n" +
           "totalLifeTime: " +
           room.transport.totalLifeTime.toString() +

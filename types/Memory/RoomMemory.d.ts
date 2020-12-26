@@ -60,7 +60,13 @@ interface RoomMemory {
    * 房间物流任务的备份数据
    * 会在全局重置时通过该数据重建物流任务
    */
-  transport: string;
+  transportTasks: string;
+
+  /**
+   * 房间工作任务的备份数据
+   * 会在全局重置时通过该数据重建工作任务
+   */
+  workTasks: string;
 
   // 当前房间所处的防御模式
   // defense 为基础防御，active 为主动防御，该值未定义时为日常模式

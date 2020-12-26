@@ -1,4 +1,4 @@
-import RoomTransport, { WORK_PROPORTION_TO_EXPECT } from "../../../../src/modules/RoomTransportTask/RoomTransport";
+import RoomTransport, { WORK_PROPORTION_TO_EXPECT } from "../../../../src/modules/Task/RoomTransportTask/RoomTransport";
 import CreepMock from "../../mock/CreepMock";
 import GameMock from "../../mock/GameMock";
 import MemoryMock from "../../mock/MemoryMock";
@@ -64,7 +64,7 @@ describe("RoomTransportTask", () => {
     const roomTransport = new RoomTransport("W0N0");
     Memory.rooms.W0N0 = {} as RoomMemory;
     // 模拟从内存还原任务
-    Memory.rooms.W0N0.transport = `[{ "type": "fillExtension" }]`;
+    Memory.rooms.W0N0.transportTasks = `[{ "type": "fillExtension" }]`;
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     roomTransport.initTask();
@@ -92,8 +92,8 @@ describe("RoomTransportTask", () => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     roomTransport.saveTask();
-    assert.isDefined(Memory.rooms.W0N0.transport);
-    assert.isAbove(Memory.rooms.W0N0.transport.length, 0);
+    assert.isDefined(Memory.rooms.W0N0.transportTasks);
+    assert.isAbove(Memory.rooms.W0N0.transportTasks.length, 0);
 
     // 模拟 RoomMemory 被删除时创建
     delete Memory.rooms.W0N0;

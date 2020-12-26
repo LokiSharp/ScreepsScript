@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { boostResourceReloadLimit } from "../../setting";
+import { boostResourceReloadLimit } from "../../../setting";
 
 /**
  * 没有任务时的行为逻辑
@@ -57,7 +57,7 @@ const clearCarryingRecources = function (creep: Creep): boolean {
 /**
  * 搬运工在执行各种类型的物流任务时的对应逻辑
  */
-export const transportActions: {
+export const actions: {
   [TaskType in AllTransportTaskType]: TransportActionGenerator<TaskType>;
 } = {
   /**

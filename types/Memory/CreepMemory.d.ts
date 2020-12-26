@@ -31,6 +31,11 @@ interface CreepMemory<Role extends CreepRoleConstant = CreepRoleConstant> {
 
   // creep 的角色
   role: CreepRoleConstant;
+  /**
+   * 该 creep 的特殊体型，例如一个 20WORK 1CARRY 5MOVE 的黄球就是工作单位的一种特殊体型
+   * 该字段为空代表是标准的角色体型
+   */
+  bodyType?: string;
   // creep 是否已经准备好可以工作了
   ready: boolean;
   // 是否设置了路径点
@@ -73,4 +78,8 @@ interface CreepMemory<Role extends CreepRoleConstant = CreepRoleConstant> {
   taskResource?: ResourceConstant;
   // manager 特有，当前正在执行的物流任务索引
   transportTaskKey?: number;
+  /**
+   * worker 特有，当前正在执行的工作任务类型
+   */
+  workTaskType?: AllWorkTaskType;
 }

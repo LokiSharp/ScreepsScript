@@ -1,4 +1,4 @@
-import { noTask, transportActions } from "./transportActions";
+import { actions, noTask } from "./actions";
 
 /**
  * 搬运工工作时长占比到调整期望的 map
@@ -68,7 +68,7 @@ export default class RoomTransport implements RoomTransportType {
    * @param enableDispatchTask 是否禁用重分配（测试用）
    * @returns 该物流任务的唯一索引
    */
-  public addTask(targetTask: RoomTransportTasks, canTaskTypeRepeat = false, enableDispatchTask = true): number {
+  public addTask(targetTask: AllRoomTransportTask, canTaskTypeRepeat = false, enableDispatchTask = true): number {
     if (!canTaskTypeRepeat && this.hasTask(targetTask.type)) return -1;
     targetTask.key = this.generatetKey();
     // 发布任务的时候为了方便可以不填这个，这里给它补上
@@ -97,7 +97,7 @@ export default class RoomTransport implements RoomTransportType {
    * @param taskKey 要获取的任务索引
    * @returns 对应的任务，没有的话则返回 undefined
    */
-  public getTask(taskKey: number): RoomTransportTasks | undefined {
+  public getTask(taskKey: number): AllRoomTransportTask | undefined {
     if (!taskKey) return undefined;
 
     return this.tasks.find(task => task.key === taskKey);
@@ -110,7 +110,7 @@ export default class RoomTransport implements RoomTransportType {
     if (!Memory.rooms) return;
     if (!Memory.rooms[this.roomName]) return;
     // 从内存中解析数据
-    this.tasks = JSON.parse(Memory.rooms[this.roomName].transport || "[]") as TransportData;
+    this.tasks = JSON.parse(Memory.rooms[this.roomName].transportTasks || "[]") as TransportData;
   }
 
   /**
@@ -119,7 +119,7 @@ export default class RoomTransport implements RoomTransportType {
   private saveTask() {
     if (!Memory.rooms) Memory.rooms = {};
     if (!Memory.rooms[this.roomName]) Memory.rooms[this.roomName] = {} as RoomMemory;
-    Memory.rooms[this.roomName].transport = JSON.stringify(this.tasks);
+    Memory.rooms[this.roomName].transportTasks = JSON.stringify(this.tasks);
   }
 
   /**
@@ -211,7 +211,7 @@ export default class RoomTransport implements RoomTransportType {
       // 分配完后重新获取任务
       task = this.getTask(creep.memory.transportTaskKey);
     }
-    const actionGenerator: TransportActionGenerator = transportActions[task.type];
+    const actionGenerator: TransportActionGenerator = actions[task.type];
 
     // 这里增加工作时长，所以要在本 tick 执行下面的逻辑，就算不执行也会被认为在工作
     this.totalWorkTime += 1;
