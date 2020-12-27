@@ -362,7 +362,7 @@ export const actions: {
         return false;
       }
 
-      if (!clearCarryingRecources(creep, targetResource.type)) return false;
+      if (targetResource.type && !clearCarryingRecources(creep, targetResource.type)) return false;
 
       creep.goTo(terminal.pos);
       const result = creep.withdraw(terminal, targetResource.type);
@@ -379,6 +379,8 @@ export const actions: {
         finishTask(creep);
         return true;
       }
+
+      if (targetResource.type && !clearCarryingRecources(creep, targetResource.type)) return false;
 
       const targetLab = Game.getObjectById(targetResource.id);
       // 找不到目标 lab，说明有可能被拆掉了，放弃该任务
@@ -408,7 +410,7 @@ export const actions: {
       // 还找不到或者目标里没有化合物了，说明已经搬空，执行 target
       if (!targetLab || !targetLab.mineralType) return true;
 
-      if (!clearCarryingRecources(creep, targetLab.mineralType)) return false;
+      if (targetLab.mineralType && !clearCarryingRecources(creep, targetLab.mineralType)) return false;
 
       // 转移资源
       creep.goTo(targetLab.pos);

@@ -9,15 +9,10 @@ import { setRoomStats } from "../../../modules/stateCollector";
  */
 export default class StorageExtension extends StructureStorage {
   public work(): void {
-    if (Game.time % 20) return;
-
-    this.energyKeeper();
-    this.stateScanner();
-
     if (
+      this.room.sourceContainers?.length > 0 &&
       this.room.transport.tasks.length === 0 &&
-      this.store.getFreeCapacity() > 100000 &&
-      this.room.sourceContainers?.length > 0
+      this.store.getFreeCapacity() > 100000
     ) {
       this.room.sourceContainers.forEach(container => {
         // 添加从 container 到自己的能量搬运任务
@@ -30,6 +25,11 @@ export default class StorageExtension extends StructureStorage {
           });
       });
     }
+
+    if (Game.time % 20) return;
+
+    this.energyKeeper();
+    this.stateScanner();
 
     if (Game.time % 1000) return;
     // 定时运行规划
