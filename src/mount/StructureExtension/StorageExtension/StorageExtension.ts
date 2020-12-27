@@ -14,10 +14,14 @@ export default class StorageExtension extends StructureStorage {
     this.energyKeeper();
     this.stateScanner();
 
-    if (this.room.sourceContainers?.length > 0) {
+    if (
+      this.room.transport.tasks.length === 0 &&
+      this.store.getFreeCapacity() > 100000 &&
+      this.room.sourceContainers?.length > 0
+    ) {
       this.room.sourceContainers.forEach(container => {
         // 添加从 container 到自己的能量搬运任务
-        if (container.store.getUsedCapacity() > (container.store.getCapacity() / 3) * 2)
+        if (container.store.getFreeCapacity() < 100)
           this.room.transport.addTask({
             type: "transport",
             from: container.id,
@@ -27,7 +31,7 @@ export default class StorageExtension extends StructureStorage {
       });
     }
 
-    if (Game.time % 10000) return;
+    if (Game.time % 1000) return;
     // 定时运行规划
     this.room.releaseCreep("upgrader");
   }
