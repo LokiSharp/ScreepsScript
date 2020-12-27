@@ -26,7 +26,7 @@ describe("getRoomFactoryState", () => {
 
   it("可以获取工厂状态 工厂未设置生产线", () => {
     const testRoom = new RoomMock("testRoom");
-    const testRoomMemory = testRoom.memory as RoomMemoryMock;
+    const testRoomMemory = (testRoom.memory as unknown) as RoomMemoryMock;
     testRoomMemory.factory = {
       level: 1,
       targetIndex: 0,
@@ -42,7 +42,7 @@ describe("getRoomFactoryState", () => {
   it("可以获取工厂状态 已设置生产线 工作中", () => {
     const testRoom = new RoomMock("testRoom");
     testRoom.terminal = new StructureTerminalMock(25, 25);
-    const testRoomMemory = testRoom.memory as RoomMemoryMock;
+    const testRoomMemory = (testRoom.memory as unknown) as RoomMemoryMock;
     testRoomMemory.factory = {
       level: 1,
       targetIndex: 0,
@@ -60,7 +60,7 @@ describe("getRoomFactoryState", () => {
   it("可以获取工厂状态 已设置生产线 暂停中", () => {
     const testRoom = new RoomMock("testRoom");
     testRoom.terminal = new StructureTerminalMock(25, 25);
-    const testRoomMemory = testRoom.memory as RoomMemoryMock;
+    const testRoomMemory = (testRoom.memory as unknown) as RoomMemoryMock;
     testRoomMemory.factory = {
       level: 1,
       targetIndex: 0,
@@ -79,7 +79,7 @@ describe("getRoomFactoryState", () => {
   it("可以获取工厂状态 已设置生产线 休眠中", () => {
     const testRoom = new RoomMock("testRoom");
     testRoom.terminal = new StructureTerminalMock(25, 25);
-    const testRoomMemory = testRoom.memory as RoomMemoryMock;
+    const testRoomMemory = (testRoom.memory as unknown) as RoomMemoryMock;
     testRoomMemory.factory = {
       level: 1,
       targetIndex: 0,
@@ -101,7 +101,7 @@ describe("getRoomFactoryState", () => {
   it("可以获取工厂状态 已设置生产线 工作中 统计当前任务信息", () => {
     const testRoom = new RoomMock("testRoom");
     testRoom.terminal = new StructureTerminalMock(25, 25);
-    const testRoomMemory = testRoom.memory as RoomMemoryMock;
+    const testRoomMemory = (testRoom.memory as unknown) as RoomMemoryMock;
     testRoomMemory.factory = {
       level: 1,
       targetIndex: 0,
@@ -119,7 +119,7 @@ describe("getRoomFactoryState", () => {
   it("可以获取工厂状态 已设置生产线 工作中 统计当前任务信息 有共享任务", () => {
     const testRoom = new RoomMock("testRoom");
     testRoom.terminal = new StructureTerminalMock(25, 25);
-    const testRoomMemory = testRoom.memory as RoomMemoryMock;
+    const testRoomMemory = (testRoom.memory as unknown) as RoomMemoryMock;
     testRoomMemory.factory = {
       level: 1,
       targetIndex: 0,
@@ -137,7 +137,7 @@ describe("getRoomFactoryState", () => {
 
   it("可以获取工厂状态 未发现终端", () => {
     const testRoom = new RoomMock("testRoom");
-    const testRoomMemory = testRoom.memory as RoomMemoryMock;
+    const testRoomMemory = (testRoom.memory as unknown) as RoomMemoryMock;
     testRoomMemory.factory = {
       level: 1,
       targetIndex: 0,

@@ -1,9 +1,10 @@
-import { BOOST_RESOURCE, ENERGY_SHARE_LIMIT } from "setting";
-import { confirmBasePos, findBaseCenterPos, setBaseCenter } from "modules/autoPlanning/planBasePos";
-import { manageStructure, releaseCreep } from "modules/autoPlanning";
-import createRoomLink from "utils/console/createRoomLink";
-import { creepApi } from "modules/creepController/creepApi";
-import log from "utils/console/log";
+import { BOOST_RESOURCE, ENERGY_SHARE_LIMIT } from "../../setting";
+import { confirmBasePos, findBaseCenterPos, setBaseCenter } from "../../modules/autoPlanning/planBasePos";
+import { manageStructure, releaseCreep } from "../../modules/autoPlanning";
+import createRoomLink from "../../utils/console/createRoomLink";
+import { creepApi } from "../../modules/creepController/creepApi";
+import log from "../../utils/console/log";
+import { updateStructure } from "../../modules/shortcut/updateStructure";
 
 export default class RoomExtension extends Room {
   /**
@@ -33,6 +34,8 @@ export default class RoomExtension extends Room {
     if (!this.memory.sourceContainersIds) this.memory.sourceContainersIds = [];
     // 去重，防止推入了多个相同的 container
     this.memory.sourceContainersIds = _.uniq([...this.memory.sourceContainersIds, container.id]);
+    // 更新建筑缓存
+    updateStructure(this.name, STRUCTURE_CONTAINER, container.id);
 
     // 触发对应的 creep 发布规划
     this.releaseCreep("upgrader");
@@ -108,10 +111,9 @@ export default class RoomExtension extends Room {
   /**
    * 查找房间中的有效能量来源
    */
-  public getAvailableSource(includeSource?: false): StructureTerminal | StructureStorage | StructureContainer;
-  public getAvailableSource(
-    includeSource = true
-  ): StructureTerminal | StructureStorage | StructureContainer | Source | Ruin | Resource<RESOURCE_ENERGY> {
+  public getAvailableSource(includeSource: false): EnergySourceStructure;
+  public getAvailableSource(includeSource: true): AllEnergySource;
+  public getAvailableSource(includeSource = true): EnergySourceStructure | AllEnergySource {
     // terminal 或 storage 里有能量就优先用
     if (this.terminal && this.terminal.store[RESOURCE_ENERGY] > 10000) return this.terminal;
     if (this.storage && this.storage.store[RESOURCE_ENERGY] > 100000) return this.storage;

@@ -169,6 +169,9 @@ export default class ControllerExtension extends StructureController {
   private adjustCreep(): void {
     if (Game.time % 500) return;
 
+    const { transporterNumber } = this.room.memory;
+    if (!transporterNumber || transporterNumber <= 0) this.room.memory.transporterNumber = 1;
+
     // 根据物流模块返回的期望调整当前搬运工数量
     this.room.memory.transporterNumber += this.room.transport.getExpect();
     this.room.releaseCreep("manager", this.room.memory.transporterNumber);

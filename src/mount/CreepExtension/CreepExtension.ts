@@ -131,7 +131,6 @@ export default class CreepExtension extends Creep {
     }
 
     if (result === ERR_NOT_IN_RANGE) this.goTo(target.pos);
-
     return result;
   }
 

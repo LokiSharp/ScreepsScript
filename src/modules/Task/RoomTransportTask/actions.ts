@@ -25,16 +25,50 @@ const finishTask = function (creep: Creep<"manager">): void {
 };
 
 /**
+ * 搬运工去房间内获取能量
+ *
+ * @param creep 要获取能量的 creep
+ * @returns 身上是否已经有足够的能量了
+ */
+const getEnergy = function (creep: Creep<"manager">): boolean {
+  if (creep.store[RESOURCE_ENERGY] > 10) return true;
+
+  // 从内存中找到缓存的能量来源
+  const { sourceId, workRoom } = creep.memory.data;
+  let sourceStructure = Game.getObjectById(sourceId);
+
+  // 来源建筑不可用，更新来源
+  if (!sourceStructure || sourceStructure.store[RESOURCE_ENERGY] <= 0) {
+    sourceStructure = Game.rooms[workRoom].getAvailableSource(false);
+
+    // 更新失败，现在房间里没有可用的能量源，挂机
+    if (!sourceStructure) {
+      creep.say("⛳");
+      return false;
+    }
+
+    creep.memory.data.sourceId = sourceStructure.id;
+  }
+
+  // 获取能量
+  const result = creep.getEngryFrom(sourceStructure);
+  return result === OK;
+};
+
+/**
  * 处理掉 creep 身上携带的资源
  * 运输者在之前处理任务的时候身上可能会残留资源，如果不及时处理的话可能会导致任务处理能力下降
  *
  * @param creep 要净空的 creep
+ * @param excludeResourceType 排除的资源类型
  * @returns 为 true 时代表已经处理完成，可以继续执行任务
  */
-const clearCarryingRecources = function (creep: Creep): boolean {
+const clearCarryingRecources = function (creep: Creep, excludeResourceType?: ResourceConstant): boolean {
   if (creep.store.getUsedCapacity() > 0) {
     // 能放下就放，放不下说明能量太多了，直接扔掉
-    const resourcesType = Object.keys(creep.store).find(key => creep.store[key] > 0) as ResourceConstant;
+    const resourcesType = Object.keys(creep.store).find(
+      key => key !== excludeResourceType && creep.store[key] > 0
+    ) as ResourceConstant;
     if (
       resourcesType === RESOURCE_ENERGY &&
       creep.room.storage &&
@@ -68,6 +102,7 @@ export const actions: {
   transport: (creep, task) => ({
     source: () => {
       if (creep.store[task.resourceType] > 0) return true;
+      if (!clearCarryingRecources(creep, task.resourceType)) return false;
 
       // 是 id，从建筑获取
       if (typeof task.from === "string") {
@@ -143,13 +178,7 @@ export const actions: {
    * 维持正常孵化的任务
    */
   fillExtension: creep => ({
-    source: () => {
-      if (creep.store[RESOURCE_ENERGY] > 0) return true;
-      const result = creep.getEngryFrom(
-        creep.room.storage?.store.energy > 10000 ? creep.room.storage : creep.room.getAvailableSource(false)
-      );
-      return result === OK;
-    },
+    source: () => getEnergy(creep),
     target: () => {
       if (creep.store[RESOURCE_ENERGY] === 0) return true;
       let target: StructureExtension | StructureSpawn;
@@ -201,13 +230,7 @@ export const actions: {
    * 维持房间内所有 tower 的能量
    */
   fillTower: (creep, task) => ({
-    source: () => {
-      if (creep.store[RESOURCE_ENERGY] > 0) return true;
-      const result = creep.getEngryFrom(
-        creep.room.storage?.store.energy > 10000 ? creep.room.storage : creep.room.getAvailableSource(false)
-      );
-      return result === OK;
-    },
+    source: () => getEnergy(creep),
     target: () => {
       if (creep.store[RESOURCE_ENERGY] === 0) return true;
       let target: StructureTower;
@@ -259,6 +282,7 @@ export const actions: {
     source: () => {
       // 如果身上有对应资源的话就直接去填充
       if (creep.store[task.resourceType] > 0) return true;
+      if (!clearCarryingRecources(creep, task.resourceType)) return false;
 
       // 获取资源存储建筑
       let sourceStructure: StructureStorage | StructureTerminal;
@@ -273,8 +297,6 @@ export const actions: {
         creep.log(`nuker 填充任务，未找到 Storage 或者 Nuker`);
         return false;
       }
-
-      if (!clearCarryingRecources(creep)) return false;
 
       // 获取应拿取的数量（能拿取的最小值）
       const getAmount = Math.min(
@@ -330,8 +352,6 @@ export const actions: {
         return false;
       }
 
-      if (!clearCarryingRecources(creep)) return false;
-
       // 找到第一个需要从终端取出的底物
       const targetResource = task.resource.find(res => !Game.getObjectById(res.id)?.mineralType);
 
@@ -340,6 +360,8 @@ export const actions: {
         finishTask(creep);
         return false;
       }
+
+      if (!clearCarryingRecources(creep, targetResource.type)) return false;
 
       creep.goTo(terminal.pos);
       const result = creep.withdraw(terminal, targetResource.type);
@@ -385,7 +407,7 @@ export const actions: {
       // 还找不到或者目标里没有化合物了，说明已经搬空，执行 target
       if (!targetLab || !targetLab.mineralType) return true;
 
-      if (!clearCarryingRecources(creep)) return false;
+      if (!clearCarryingRecources(creep, targetLab.mineralType)) return false;
 
       // 转移资源
       creep.goTo(targetLab.pos);
@@ -437,6 +459,7 @@ export const actions: {
     source: () => {
       // 如果身上有对应资源的话就直接去填充
       if (creep.store[task.resourceType] > 0) return true;
+      if (!clearCarryingRecources(creep, task.resourceType)) return false;
 
       // 获取资源存储建筑
       let sourceStructure: StructureWithStore | Ruin;
@@ -453,7 +476,7 @@ export const actions: {
         return false;
       }
 
-      if (!clearCarryingRecources(creep)) return false;
+      if (!clearCarryingRecources(creep, task.resourceType)) return false;
 
       // 获取应拿取的数量
       const getAmount = Math.min(
@@ -510,8 +533,6 @@ export const actions: {
         return false;
       }
 
-      if (!clearCarryingRecources(creep)) return false;
-
       const boostConfig = creep.room.memory.boost;
 
       // 从缓存中读取要拿取的资源
@@ -533,6 +554,8 @@ export const actions: {
           return false;
         }
       }
+
+      if (!clearCarryingRecources(creep, resource)) return false;
 
       // 获取转移数量
       const getAmount = Math.min(creep.store.getFreeCapacity(resource), terminal.store[resource]);
@@ -574,6 +597,7 @@ export const actions: {
   boostGetEnergy: (creep, task) => ({
     source: () => {
       if (creep.store[RESOURCE_ENERGY] > 0) return true;
+      if (!clearCarryingRecources(creep, RESOURCE_ENERGY)) return false;
       const result = creep.getEngryFrom(
         creep.room.storage?.store.energy > 10000 ? creep.room.storage : creep.room.getAvailableSource(false)
       );
