@@ -183,7 +183,7 @@ export default class RoomTransport implements RoomTransportType {
     }
 
     // 还没分完的话就依次分给优先度高的任务
-    if (creeps.length > 0) {
+    if (creeps.length > 0 && this.tasks.length > 0) {
       const num = creeps.length;
       for (let i = 0; i < num; i++) {
         // 不检查是否缺人，直接分（因为缺人的任务在上面已经分完了）

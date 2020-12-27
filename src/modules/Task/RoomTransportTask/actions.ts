@@ -145,7 +145,11 @@ export const actions: {
   fillExtension: creep => ({
     source: () => {
       if (creep.store[RESOURCE_ENERGY] > 0) return true;
-      const result = creep.getEngryFrom(creep.room.storage ? creep.room.storage : creep.room.getAvailableSource(false));
+      const result = creep.getEngryFrom(
+        creep.room.storage && creep.room.storage.store.energy > 10000
+          ? creep.room.storage
+          : creep.room.getAvailableSource(false)
+      );
       return result === OK;
     },
     target: () => {
@@ -201,7 +205,11 @@ export const actions: {
   fillTower: (creep, task) => ({
     source: () => {
       if (creep.store[RESOURCE_ENERGY] > 0) return true;
-      const result = creep.getEngryFrom(creep.room.storage ? creep.room.storage : creep.room.getAvailableSource(false));
+      const result = creep.getEngryFrom(
+        creep.room.storage && creep.room.storage.store.energy > 10000
+          ? creep.room.storage
+          : creep.room.getAvailableSource(false)
+      );
       return result === OK;
     },
     target: () => {
@@ -570,7 +578,11 @@ export const actions: {
   boostGetEnergy: (creep, task) => ({
     source: () => {
       if (creep.store[RESOURCE_ENERGY] > 0) return true;
-      const result = creep.getEngryFrom(creep.room.storage ? creep.room.storage : creep.room.getAvailableSource(false));
+      const result = creep.getEngryFrom(
+        creep.room.storage && creep.room.storage.store.energy > 10000
+          ? creep.room.storage
+          : creep.room.getAvailableSource(false)
+      );
       return result === OK;
     },
     target: () => {
