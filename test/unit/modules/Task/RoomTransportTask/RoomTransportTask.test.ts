@@ -1,4 +1,5 @@
 import RoomTransport, {
+  REGULATE_LIMIT,
   WORK_PROPORTION_TO_EXPECT
 } from "../../../../../src/modules/Task/RoomTransportTask/RoomTransport";
 import CreepMock from "../../../mock/CreepMock";
@@ -254,17 +255,17 @@ describe("RoomTransportTask", () => {
 
   it("getExpect 获取当前的搬运工调整期望", () => {
     const roomTransport = new RoomTransport("W0N0");
-    roomTransport.totalLifeTime = 500;
+    roomTransport.totalLifeTime = REGULATE_LIMIT;
     roomTransport.totalWorkTime = roomTransport.totalLifeTime * 0.9;
     assert.equal(roomTransport.getExpect(), 2);
     (WORK_PROPORTION_TO_EXPECT as { proportion: number; expect: number }[]).forEach(item => {
       roomTransport.totalWorkTime = roomTransport.totalLifeTime * item.proportion;
       assert.equal(roomTransport.getExpect(), item.expect);
     });
-    roomTransport.totalLifeTime = 300;
+    roomTransport.totalLifeTime = REGULATE_LIMIT / 2;
     assert.equal(roomTransport.getExpect(), 0);
-    roomTransport.totalLifeTime = 500;
-    roomTransport.totalWorkTime = -100;
+    roomTransport.totalLifeTime = REGULATE_LIMIT;
+    roomTransport.totalWorkTime = -REGULATE_LIMIT;
     assert.equal(roomTransport.getExpect(), -2);
   });
 

@@ -146,9 +146,7 @@ export const actions: {
     source: () => {
       if (creep.store[RESOURCE_ENERGY] > 0) return true;
       const result = creep.getEngryFrom(
-        creep.room.storage && creep.room.storage.store.energy > 10000
-          ? creep.room.storage
-          : creep.room.getAvailableSource(false)
+        creep.room.storage?.store.energy > 10000 ? creep.room.storage : creep.room.getAvailableSource(false)
       );
       return result === OK;
     },
@@ -206,9 +204,7 @@ export const actions: {
     source: () => {
       if (creep.store[RESOURCE_ENERGY] > 0) return true;
       const result = creep.getEngryFrom(
-        creep.room.storage && creep.room.storage.store.energy > 10000
-          ? creep.room.storage
-          : creep.room.getAvailableSource(false)
+        creep.room.storage?.store.energy > 10000 ? creep.room.storage : creep.room.getAvailableSource(false)
       );
       return result === OK;
     },
@@ -579,9 +575,7 @@ export const actions: {
     source: () => {
       if (creep.store[RESOURCE_ENERGY] > 0) return true;
       const result = creep.getEngryFrom(
-        creep.room.storage && creep.room.storage.store.energy > 10000
-          ? creep.room.storage
-          : creep.room.getAvailableSource(false)
+        creep.room.storage?.store.energy > 10000 ? creep.room.storage : creep.room.getAvailableSource(false)
       );
       return result === OK;
     },

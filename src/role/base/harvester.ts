@@ -56,7 +56,7 @@ export const harvester: CreepConfig<"harvester"> = {
     creep.say("🚧");
 
     // 没有能量就进行采集，因为是维护阶段，所以允许采集一下工作一下
-    if (creep.store[RESOURCE_ENERGY] <= 0) {
+    if (creep.store[RESOURCE_ENERGY] < 20) {
       creep.getEngryFrom(Game.getObjectById(sourceId));
       return false;
     }
@@ -95,7 +95,7 @@ export const harvester: CreepConfig<"harvester"> = {
     // 找到了就缓存 id
     else creep.memory.constructionSiteId = constructionSite.id;
 
-    creep.buildStructure(creep.memory.constructionSiteId);
+    creep.build(constructionSite);
     return false;
   },
   target: creep => {

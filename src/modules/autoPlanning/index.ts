@@ -68,6 +68,8 @@ const clearStructure = function (room: Room): OK | ERR_NOT_FOUND {
     ) {
       if (s.store.getUsedCapacity() > 0) return;
     }
+    // 默认不摧毁 Container
+    else if (s.structureType === STRUCTURE_CONTAINER) return;
     // 墙壁交给玩家决定，默认不摧毁
     else if (s.structureType === STRUCTURE_WALL) return;
 

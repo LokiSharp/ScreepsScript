@@ -21,7 +21,7 @@ export const WORK_PROPORTION_TO_EXPECT = [
  * 当这两个值还太小时会造成期望不够准确
  * 所以在 totalLifeTime 大于该值时才会调整搬运工数量
  */
-const REGULATE_LIMIT = 500;
+export const REGULATE_LIMIT = 1000;
 
 export default class RoomTransport implements RoomTransportType {
   /**
