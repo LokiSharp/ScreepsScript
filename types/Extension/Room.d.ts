@@ -33,12 +33,13 @@ interface Room {
   clearSpawnTask(): void;
   hangSpawnTask(): void;
 
-  // 房间物流 api
-  addRoomTransferTask(task: RoomTransferTasks, priority?: number): number;
-  hasRoomTransferTask(taskType: string): boolean;
-  getRoomTransferTask(): RoomTransferTasks | null;
-  handleLabInTask(resourceType: ResourceConstant, amount: number): boolean;
-  deleteCurrentRoomTransferTask(): void;
+  // 房间任务 api
+  transport: RoomTransportType;
+
+  /**
+   * 房间工作 api
+   */
+  work: RoomWorkType;
 
   // 中央物流 api
   addCenterTask(task: ITransferTask, priority?: number): number;
@@ -129,13 +130,10 @@ interface Room {
   importantWall: StructureWall | StructureRampart;
 
   // 获取房间中的有效能量来源
-  getAvailableSource():
-    | StructureTerminal
-    | StructureStorage
-    | StructureContainer
-    | Source
-    | Ruin
-    | Resource<RESOURCE_ENERGY>;
+  getAvailableSource(includeSource?: false): StructureTerminal | StructureStorage | StructureContainer;
+  getAvailableSource(
+    includeSource?: boolean
+  ): StructureTerminal | StructureStorage | StructureContainer | Source | Ruin | Resource<RESOURCE_ENERGY>;
 
   // 自动规划相关
   findBaseCenterPos(): RoomPosition[];

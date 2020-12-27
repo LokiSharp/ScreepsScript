@@ -1,8 +1,6 @@
 import { TRANSFER_DEATH_LIMIT, bodyConfigs } from "setting";
 import createBodyGetter from "utils/creep/createBodyGetter";
 import deathPrepare from "utils/creep/deathPrepare";
-import { getRoomTransferTask } from "utils/creep/getRoomTransferTask";
-import { transferTaskOperations } from "utils/creep/transferTaskOperations";
 
 /**
  * 房间物流运输者
@@ -11,24 +9,14 @@ import { transferTaskOperations } from "utils/creep/transferTaskOperations";
  */
 export const manager: CreepConfig<"manager"> = {
   source: creep => {
-    const { sourceId } = creep.memory.data;
-    if (creep.ticksToLive <= TRANSFER_DEATH_LIMIT) return deathPrepare(creep, sourceId);
+    const { workRoom } = creep.memory.data;
+    if (creep.ticksToLive <= TRANSFER_DEATH_LIMIT) return deathPrepare(creep);
 
-    const task = getRoomTransferTask(creep.room);
-
-    // 有任务就执行
-    if (task) return transferTaskOperations[task.type].source(creep, task, sourceId);
-    else {
-      creep.say("💤");
-      return false;
-    }
+    return Game.rooms[workRoom]?.transport.getWork(creep).source();
   },
   target: creep => {
-    const task = getRoomTransferTask(creep.room);
-
-    // 有任务就执行
-    if (task) return transferTaskOperations[task.type].target(creep, task);
-    else return true;
+    const { workRoom } = creep.memory.data;
+    return Game.rooms[workRoom]?.transport.getWork(creep).target();
   },
   bodys: createBodyGetter(bodyConfigs.transporter)
 };

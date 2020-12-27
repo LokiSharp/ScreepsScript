@@ -39,16 +39,16 @@ jobs:
 
       - run: npm install
       - run: npm run build
-      - run: npx mocha test/integration/${{ matrix.RCL }}.test.ts
+      - run: npx mocha test/integration/RCLTest/${{ matrix.RCL }}.RCLTest.ts
 
       - name: Update Code Artifact
         uses: actions/upload-artifact@v1
         with:
-          name: dist
+          name: ${{ matrix.RCL }}-dist
           path: dist
 
       - name: Update Server Artifact
         uses: actions/upload-artifact@v1
         with:
-          name: server
+          name: ${{ matrix.RCL }}-server
           path: server

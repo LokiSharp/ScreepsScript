@@ -29,7 +29,7 @@ export const upgrader: CreepConfig<"upgrader"> = {
           return false;
         }
       }
-      // 有能量但是太少，就等到其中能量大于指定数量再拿（优先满足 filler 的能量需求）
+      // 有能量但是太少，就等到其中能量大于指定数量再拿（优先满足 manager 的能量需求）
       else if (source.store[RESOURCE_ENERGY] <= 500) {
         creep.say("🎲");
         return false;

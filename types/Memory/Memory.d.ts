@@ -3,8 +3,6 @@ interface Memory {
   moveNumber?: number;
   // 移动消耗总用时
   moveUseCpu?: number;
-  // 是否显示 cpu 消耗
-  showCost?: boolean;
 
   // 核弹投放指示器
   // 核弹是否已经确认
@@ -84,22 +82,10 @@ interface Memory {
      * 房间内的数据统计
      */
     rooms: {
-      [roomName: string]: {
-        // storage 中的能量剩余量
-        energy?: number;
-        // 终端中的 power 数量
-        power?: number;
-        // nuker 的资源存储量
-        nukerEnergy?: number;
-        nukerG?: number;
-        nukerCooldown?: number;
-        // 控制器升级进度，只包含没有到 8 级的
-        controllerRatio?: number;
-        controllerLevel?: number;
-        structureNums?: { [structureName: string]: number };
-        constructionSiteNums?: { [structureName: string]: number };
-      };
+      [roomName: string]: RoomStats;
     };
+    cpuCost?: Record<string, number>;
+    gameTime?: number;
   };
 
   // 启动 powerSpawn 的房间名列表
@@ -114,4 +100,44 @@ interface Memory {
    * 延迟任务存储
    */
   delayTasks: DelayTaskMemory[];
+}
+
+interface RoomStats {
+  // storage 中的能量剩余量
+  energy?: number;
+  // 终端中的 power 数量
+  power?: number;
+  // nuker 的资源存储量
+  nukerEnergy?: number;
+  nukerG?: number;
+  nukerCooldown?: number;
+  // 控制器升级进度，只包含没有到 8 级的
+  controllerRatio?: number;
+  controllerLevel?: number;
+  structureNums?: { [structureName: string]: number };
+  constructionSiteNums?: { [structureName: string]: number };
+  /**
+   * 升级工的工作时长
+   */
+  upgraderWorkingTime: number;
+  /**
+   * 升级工的生命总时长
+   */
+  upgraderLifeTime: number;
+  /**
+   * 搬运工的工作时长
+   */
+  transporterWorkingTime: number;
+  /**
+   * 搬运工的生命总时长
+   */
+  transporterLifeTime: number;
+  /**
+   * 其他种类的资源数量，由 factory 统计
+   */
+  commRes: { [commType: string]: number };
+  /**
+   * 测试消息预留
+   */
+  debugMessage?: unknown;
 }

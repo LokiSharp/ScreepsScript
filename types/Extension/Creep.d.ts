@@ -15,11 +15,13 @@ interface Creep<Role extends CreepRoleConstant = CreepRoleConstant> {
 
   getEngryFrom(target: Structure | Source | Ruin | Resource<RESOURCE_ENERGY>): ScreepsReturnCode;
 
-  transferTo(target: Structure, RESOURCE: ResourceConstant): ScreepsReturnCode;
+  transferTo(target: Structure, RESOURCE: ResourceConstant, moveOpt?: MoveOpt): ScreepsReturnCode;
 
   upgrade(): ScreepsReturnCode;
 
-  buildStructure(): CreepActionReturnCode | ERR_NOT_ENOUGH_RESOURCES | ERR_RCL_NOT_ENOUGH | ERR_NOT_FOUND;
+  buildStructure(
+    constructionSiteId?: Id<ConstructionSite>
+  ): CreepActionReturnCode | ERR_NOT_ENOUGH_RESOURCES | ERR_RCL_NOT_ENOUGH | ERR_NOT_FOUND;
 
   steadyWall(): OK | ERR_NOT_FOUND;
   fillDefenseStructure(expectHits?: number): boolean;

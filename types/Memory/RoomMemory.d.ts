@@ -56,8 +56,17 @@ interface RoomMemory {
   // 中央集群的资源转移任务队列
   centerTransferTasks: ITransferTask[];
 
-  // 房间物流任务队列
-  transferTasks: RoomTransferTasks[];
+  /**
+   * 房间物流任务的备份数据
+   * 会在全局重置时通过该数据重建物流任务
+   */
+  transportTasks: string;
+
+  /**
+   * 房间工作任务的备份数据
+   * 会在全局重置时通过该数据重建工作任务
+   */
+  workTasks: string;
 
   // 当前房间所处的防御模式
   // defense 为基础防御，active 为主动防御，该值未定义时为日常模式
@@ -105,7 +114,6 @@ interface RoomMemory {
 
   /**
    * boost 强化任务
-   * @see doc/boost设计案
    */
   boost?: BoostTask;
 
@@ -159,6 +167,11 @@ interface RoomMemory {
   resourceKeepInfo?: {
     terminal?: IResourceKeepInfo;
   };
+
+  /**
+   * 当前本房间物流单位的数量
+   */
+  transporterNumber?: number;
 
   // 目标敌方建筑缓存
   targetHostileStructuresCache: Id<Structure>[];

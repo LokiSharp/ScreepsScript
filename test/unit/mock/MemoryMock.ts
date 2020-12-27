@@ -23,8 +23,6 @@ export default class MemoryMock extends BaseMock implements Memory {
 
   public moveNumber?: number;
   public moveUseCpu?: number;
-  public movePathFindUseCpu?: number;
-  public showCost?: boolean;
 
   public nukerLock?: boolean;
   public nukerDirective?: {
@@ -84,6 +82,11 @@ export default class MemoryMock extends BaseMock implements Memory {
         controllerLevel?: number;
         structureNums?: { [structureName: string]: number };
         constructionSiteNums?: { [structureName: string]: number };
+        upgraderWorkingTime: number;
+        upgraderLifeTime: number;
+        transporterWorkingTime: number;
+        transporterLifeTime: number;
+        commRes: { [commType: string]: number };
       };
     };
   };

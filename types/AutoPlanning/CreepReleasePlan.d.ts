@@ -33,19 +33,6 @@ interface HarvesterPlanStats {
   // 房间内中央 link 的 id
   centerLinkId?: Id<StructureLink>;
 }
-// 房间中用于发布 filler manager processor 所需要的信息
-interface TransporterPlanStats {
-  // 房间对象
-  room: Room;
-  // 房间内 storage 的 id，房间没 storage 时该值为空，下同
-  storageId?: Id<StructureStorage>;
-  // 房间内中央 link 的 id
-  centerLinkId?: Id<StructureLink>;
-  // source 建造好的 container 的 id
-  sourceContainerIds?: Id<StructureContainer>[];
-  // 基地中心点（processor的位置）坐标
-  centerPos?: [number, number];
-}
 // 发布角色配置项需要的素材集合
 interface ReleasePlanConstructor<T> {
   // 搜集发布该角色需要的房间信息
@@ -57,7 +44,6 @@ interface ReleasePlanConstructor<T> {
 interface CreepReleasePlans {
   harvester: ReleasePlanConstructor<HarvesterPlanStats>;
   upgrader: ReleasePlanConstructor<UpgraderPlanStats>;
-  transporter: ReleasePlanConstructor<TransporterPlanStats>;
 }
 
 /**
@@ -66,4 +52,4 @@ interface CreepReleasePlans {
  * @param detail 该 creep 发布所需的房间信息
  * @returns 代表该发布计划是否适合房间状态
  */
-type PlanNodeFunction = (detail: UpgraderPlanStats | HarvesterPlanStats | TransporterPlanStats) => boolean;
+type PlanNodeFunction = (detail: UpgraderPlanStats | HarvesterPlanStats) => boolean;

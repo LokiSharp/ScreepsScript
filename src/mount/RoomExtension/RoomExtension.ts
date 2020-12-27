@@ -1,4 +1,4 @@
-import { BOOST_RESOURCE, ENERGY_SHARE_LIMIT, ROOM_TRANSFER_TASK } from "setting";
+import { BOOST_RESOURCE, ENERGY_SHARE_LIMIT } from "setting";
 import { confirmBasePos, findBaseCenterPos, setBaseCenter } from "modules/autoPlanning/planBasePos";
 import { manageStructure, releaseCreep } from "modules/autoPlanning";
 import createRoomLink from "utils/console/createRoomLink";
@@ -35,7 +35,6 @@ export default class RoomExtension extends Room {
     this.memory.sourceContainersIds = _.uniq([...this.memory.sourceContainersIds, container.id]);
 
     // 触发对应的 creep 发布规划
-    this.releaseCreep("filler");
     this.releaseCreep("upgrader");
 
     return OK;
@@ -109,134 +108,45 @@ export default class RoomExtension extends Room {
   /**
    * 查找房间中的有效能量来源
    */
-  public getAvailableSource():
-    | StructureTerminal
-    | StructureStorage
-    | StructureContainer
-    | Source
-    | Ruin
-    | Resource<RESOURCE_ENERGY> {
+  public getAvailableSource(includeSource?: false): StructureTerminal | StructureStorage | StructureContainer;
+  public getAvailableSource(
+    includeSource = true
+  ): StructureTerminal | StructureStorage | StructureContainer | Source | Ruin | Resource<RESOURCE_ENERGY> {
     // terminal 或 storage 里有能量就优先用
     if (this.terminal && this.terminal.store[RESOURCE_ENERGY] > 10000) return this.terminal;
     if (this.storage && this.storage.store[RESOURCE_ENERGY] > 100000) return this.storage;
-    // 如果有 sourceConainer 的话就挑个多的
-    if (this.sourceContainers.length > 0) {
+    // 如果有 container
+    if (this[STRUCTURE_CONTAINER].length > 0) {
       // 能量必须够多才会选用
-      const availableContainer = this.sourceContainers.filter(container => container.store[RESOURCE_ENERGY] > 300);
+      const availableContainer = this[STRUCTURE_CONTAINER].filter(container => container.store[RESOURCE_ENERGY] > 300);
       // 挑个能量多的 container
       if (availableContainer.length > 0)
         return _.max(availableContainer, container => container.store[RESOURCE_ENERGY]);
     }
 
-    // 查找散落的能量，如果能量满足要求就设为目标
-    const resources = this.find(FIND_DROPPED_RESOURCES);
-    for (const resource of resources) {
-      if (resource?.resourceType === RESOURCE_ENERGY && resource.amount > 500) {
-        return resource as Resource<RESOURCE_ENERGY>;
-      }
-    }
-
-    // 查找废墟，如果有包含 store 的废墟就设为目标
-    const ruins = this.find(FIND_RUINS);
-    for (const ruin of ruins) {
-      if ("store" in ruin && ruin.store[RESOURCE_ENERGY] > 0) {
-        return ruin;
-      }
-    }
-
-    // 没有就选边上有空位的 source
-    return this.source.find(source => {
-      return source.pos.getCanStandPos().length > 1;
-    });
-  }
-
-  /**
-   * 向房间物流任务队列推送新的任务
-   *
-   * @param task 要添加的任务
-   * @param priority 任务优先级位置，默认追加到队列末尾。例：该值为 0 时将无视队列长度直接将任务插入到第一个位置
-   * @returns 任务的排队位置, 0 是最前面，-1 为添加失败（已有同种任务）
-   */
-  public addRoomTransferTask(task: RoomTransferTasks, priority: number = null): number {
-    if (this.hasRoomTransferTask(task.type)) return -1;
-
-    // 默认追加到队列末尾
-    if (!priority) {
-      this.memory.transferTasks.push(task);
-      return this.memory.transferTasks.length - 1;
-    }
-    // 追加到队列指定位置
-    else {
-      this.memory.transferTasks.splice(priority, 0, task);
-      return priority < this.memory.transferTasks.length ? priority : this.memory.transferTasks.length - 1;
-    }
-  }
-
-  /**
-   * 是否有相同的房间物流任务
-   * 房间物流队列中一种任务只允许同时存在一个
-   *
-   * @param taskType 任务类型
-   */
-  public hasRoomTransferTask(taskType: string): boolean {
-    if (!this.memory.transferTasks) this.memory.transferTasks = [];
-
-    const transferTask = this.memory.transferTasks.find(task => task.type === taskType);
-    return !!transferTask;
-  }
-
-  /**
-   * 获取当前的房间物流任务
-   */
-  public getRoomTransferTask(): RoomTransferTasks | null {
-    if (!this.memory.transferTasks) this.memory.transferTasks = [];
-
-    if (this.memory.transferTasks.length <= 0) {
-      return null;
-    } else {
-      return this.memory.transferTasks[0];
-    }
-  }
-
-  /**
-   * 更新 labIn 任务信息
-   * @param resourceType 要更新的资源 id
-   * @param amount 要更新成的数量
-   */
-  public handleLabInTask(resourceType: ResourceConstant, amount: number): boolean {
-    const currentTask = this.getRoomTransferTask() as ILabIn;
-    // 判断当前任务为 labin
-    if (currentTask.type === ROOM_TRANSFER_TASK.LAB_IN) {
-      // 找到对应的底物
-
-      for (const resource of currentTask.resource) {
-        if (resource.type === resourceType) {
-          // 更新底物数量
-          resource.amount = amount;
-          break;
+    if (includeSource) {
+      // 查找散落的能量，如果能量满足要求就设为目标
+      const resources = this.find(FIND_DROPPED_RESOURCES);
+      for (const resource of resources) {
+        if (resource?.resourceType === RESOURCE_ENERGY && resource.amount > 500) {
+          return resource as Resource<RESOURCE_ENERGY>;
         }
       }
-      // 更新对应的任务
-      this.memory.transferTasks.splice(0, 1, currentTask);
-      return true;
-    } else return false;
-  }
 
-  /**
-   * 移除当前处理的房间物流任务
-   * 并统计至 Memory.stats
-   */
-  public deleteCurrentRoomTransferTask(): void {
-    const finishedTask = this.memory.transferTasks.shift();
+      // 查找废墟，如果有包含 store 的废墟就设为目标
+      const ruins = this.find(FIND_RUINS);
+      for (const ruin of ruins) {
+        if ("store" in ruin && ruin.store[RESOURCE_ENERGY] > 0) {
+          return ruin;
+        }
+      }
 
-    // // 先兜底
-    if (!Memory.stats) Memory.stats = { rooms: {} };
-    if (!Memory.stats.roomTaskNumber) Memory.stats.roomTaskNumber = {};
-
-    // 如果这个任务之前已经有过记录的话就增 1
-    if (Memory.stats.roomTaskNumber[finishedTask.type]) Memory.stats.roomTaskNumber[finishedTask.type] += 1;
-    // 没有就设为 1
-    else Memory.stats.roomTaskNumber[finishedTask.type] = 1;
+      // 没有就选边上有空位的 source
+      return this.source.find(source => {
+        return source.pos.getCanStandPos().length > 1;
+      });
+    }
+    return undefined;
   }
 
   /**
@@ -567,12 +477,6 @@ export default class RoomExtension extends Room {
       // 强化成功了就发布资源填充任务是因为
       // 在方法返回 OK 时，还没有进行 boost（将在 tick 末进行），所以这里检查资源并不会发现有资源减少
       // 为了提高存储量，这里直接发布任务，交给 manager 在处理任务时检查是否有资源不足的情况
-      this.addRoomTransferTask({
-        type: ROOM_TRANSFER_TASK.BOOST_GET_RESOURCE
-      });
-      this.addRoomTransferTask({
-        type: ROOM_TRANSFER_TASK.BOOST_GET_ENERGY
-      });
 
       return OK;
     } else return ERR_NOT_IN_RANGE;

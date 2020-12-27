@@ -26,11 +26,4 @@ describe("doing", () => {
     doing({ testObject });
     assert.deepEqual(testObject.calledRecords, []);
   });
-
-  it("可以 showCost", () => {
-    Memory.showCost = true;
-    const testObject = new BaseMock();
-    doing({ testObject });
-    assert.deepEqual(testObject.calledRecords, []);
-  });
 });

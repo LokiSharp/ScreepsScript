@@ -191,4 +191,28 @@ export default class CreepMock extends RoomObjectMock {
   public dismantleFlag(): boolean {
     return false;
   }
+
+  @pushMethodCallInfoToCalled
+  public rangedAttackLowestHitsHostileCreeps(): OK | ERR_NOT_FOUND {
+    return undefined;
+  }
+  @pushMethodCallInfoToCalled
+  public rangedAttackNearestHostileCreeps(): OK | ERR_NOT_FOUND {
+    return undefined;
+  }
+  @pushMethodCallInfoToCalled
+  public rangedAttackLowestHitsHostileStructures(): OK | ERR_NOT_FOUND {
+    return undefined;
+  }
+  @pushMethodCallInfoToCalled
+  public rangedAttackNearHostileStructures(): OK | ERR_NOT_FOUND {
+    return undefined;
+  }
+
+  public getHostileCreepsWithCache(): AnyCreep[] {
+    return undefined;
+  }
+  public getHostileStructuresWithCache(): Structure<StructureConstant>[] {
+    return undefined;
+  }
 }

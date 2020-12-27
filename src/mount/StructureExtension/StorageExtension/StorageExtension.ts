@@ -1,4 +1,5 @@
 import { DEFAULT_ENERGY_KEEP_AMOUNT, DEFAULT_ENERGY_KEEP_LIMIT } from "setting";
+import { setRoomStats } from "../../../modules/stateCollector";
 
 /**
  * Storage 拓展
@@ -22,10 +23,7 @@ export default class StorageExtension extends StructureStorage {
    * 统计自己存储中的剩余能量
    */
   private stateScanner(): void {
-    if (Game.time % 20) return;
-    if (!Memory.stats.rooms[this.room.name]) Memory.stats.rooms[this.room.name] = {};
-
-    Memory.stats.rooms[this.room.name].energy = this.store[RESOURCE_ENERGY];
+    setRoomStats(this.room.name, () => ({ energy: this.store[RESOURCE_ENERGY] }));
   }
 
   /**
@@ -33,8 +31,18 @@ export default class StorageExtension extends StructureStorage {
    */
   public onBuildComplete(): void {
     this.room.releaseCreep("harvester");
-    this.room.releaseCreep("manager");
     this.room.releaseCreep("upgrader");
+
+    this.room.sourceContainers.forEach(container => {
+      // 添加从 container 到自己的能量搬运任务
+      // 虽然没指定任务完成条件，但是后面 container 是会被主动摧毁的（link 造好后），这时对应的搬运任务就会被释放掉
+      this.room.transport.addTask({
+        type: "transport",
+        from: container.id,
+        to: this.id,
+        resourceType: RESOURCE_ENERGY
+      });
+    });
   }
 
   /**

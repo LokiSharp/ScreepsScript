@@ -136,14 +136,15 @@ export default class CreepExtension extends Creep {
   }
 
   /**
-   * 转移资源到结构
+   * 转移资源到建筑
+   * 包含移动逻辑
    *
    * @param target 要转移到的目标
    * @param RESOURCE 要转移的资源类型
+   * @param moveOpt 移动参数
    */
-  public transferTo(target: Structure, RESOURCE: ResourceConstant): ScreepsReturnCode {
-    // 转移能量实现
-    this.goTo(target.pos);
+  public transferTo(target: Structure, RESOURCE: ResourceConstant, moveOpt: MoveOpt = {}): ScreepsReturnCode {
+    this.goTo(target.pos, moveOpt);
     return this.transfer(target, RESOURCE);
   }
 
@@ -164,8 +165,12 @@ export default class CreepExtension extends Creep {
 
   /**
    * 建设房间内存在的建筑工地
+   * @param constructionSiteId 手动指定建造的工地
    */
-  public buildStructure(): CreepActionReturnCode | ERR_NOT_ENOUGH_RESOURCES | ERR_RCL_NOT_ENOUGH | ERR_NOT_FOUND {
+  public buildStructure(
+    constructionSiteId: Id<ConstructionSite> = undefined
+  ): CreepActionReturnCode | ERR_NOT_ENOUGH_RESOURCES | ERR_RCL_NOT_ENOUGH | ERR_NOT_FOUND {
+    if (constructionSiteId) this.memory.constructionSiteId = constructionSiteId;
     // 新建目标建筑工地
     let target: ConstructionSite;
     // 检查是否有缓存

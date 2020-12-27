@@ -6,15 +6,6 @@ export const MAX_HARVESTER_NUM = 4;
 export const TRANSFER_DEATH_LIMIT = 20;
 
 /**
- * source container 离基地中心的距离与对应发布的 filler 数量
- * 这个值是每个 container 发布的 filler
- */
-export const FILLER_WITH_CONTAINER_RANGE = [
-  { range: 25, num: 2 },
-  { range: 0, num: 1 }
-];
-
-/**
  * storage 中的能量和对应发布的 upgrader 数量
  */
 export const UPGRADE_WITH_STORAGE = [
@@ -213,4 +204,4 @@ export const creepDefaultMemory: CreepMemory = {
 };
 
 // 用于维持房间能量正常运转的重要角色
-export const importantRoles: CreepRoleConstant[] = ["manager", "processor", "harvester", "filler"];
+export const importantRoles: CreepRoleConstant[] = ["manager", "processor", "harvester"];

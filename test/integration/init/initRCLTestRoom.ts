@@ -5,16 +5,16 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import { IntegrationTestHelper } from "../helper";
-
-const { readFileSync } = require("fs");
 const { TerrainMatrix } = require("screeps-server-mockup");
+const { readFileSync } = require("fs");
+
 const DIST_MAIN_JS = "dist/main.js";
 const DIST_MAIN_JS_MAP = "dist/main.js.map.js";
 
 export async function initRCLTestRoom(helper: IntegrationTestHelper, RCL: number): Promise<void> {
   const { db } = helper.server.common.storage;
   const C = helper.server.constants;
-  const terrain: MockedTerrainMatrix = new TerrainMatrix();
+  const terrain = new TerrainMatrix();
   const walls = [
     [10, 10],
     [10, 40],
@@ -49,7 +49,7 @@ export async function initRCLTestRoom(helper: IntegrationTestHelper, RCL: number
   helper.user = await helper.server.world.addBot({ username: "tester", room: "W0N0", x: 21, y: 26, modules });
   await helper.user.console(`Memory.rooms.W0N0.center = [24, 24]`);
 
-  const rclProgressPercent = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 70 };
+  const rclProgressPercent = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 90 };
   await db["rooms.objects"].update(
     { _id: controller._id },
     { $set: { level: RCL, progress: (C.CONTROLLER_LEVELS[RCL] / 100) * rclProgressPercent[RCL] } }

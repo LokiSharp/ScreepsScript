@@ -1,4 +1,5 @@
 import { DEAL_RATIO, terminalChannels, terminalModes } from "setting";
+import { setRoomStats } from "../../../modules/stateCollector";
 
 /**
  * 全局缓存的订单价格表
@@ -41,8 +42,7 @@ export default class TerminalExtension extends StructureTerminal {
    * 目前只统计 power 数量
    */
   private stateScanner(): void {
-    if (Game.time % 20) return;
-    if (!Memory.stats.rooms[this.room.name]) Memory.stats.rooms[this.room.name] = {};
+    setRoomStats(this.room.name, () => ({ power: this.store[RESOURCE_POWER] }));
   }
 
   /**
@@ -332,7 +332,7 @@ export default class TerminalExtension extends StructureTerminal {
     priceLimit: number = undefined
   ) {
     // 获取订单
-    const targetOrder = this.getOrder({ type, resourceType }, priceLimit);
+    const targetOrder = TerminalExtension.getOrder({ type, resourceType }, priceLimit);
 
     if (!targetOrder) {
       return this.setNextIndex();
@@ -389,10 +389,11 @@ export default class TerminalExtension extends StructureTerminal {
    * 寻找合适的订单
    * 该方法**不会**将订单缓存到房间内存
    *
-   * @param config 市场交易任务
+   * @param filter 订单过滤器
+   * @param priceLimit 价格限制
    * @returns 找到则返回订单, 否找返回 null
    */
-  private getOrder(filter: OrderFilter, priceLimit: number = undefined): Order | null {
+  private static getOrder(filter: OrderFilter, priceLimit: number = undefined): Order | null {
     const orders = Game.market.getAllOrders(filter);
     // 没找到订单就返回空
     if (orders.length <= 0) return null;
@@ -408,7 +409,7 @@ export default class TerminalExtension extends StructureTerminal {
       if (targetOrder.type === ORDER_SELL) return targetOrder.price <= priceLimit ? targetOrder : null;
       // 买单的价格不能太低
       else return targetOrder.price >= priceLimit ? targetOrder : null;
-    } else if (!this.checkPrice(targetOrder)) return null;
+    } else if (!TerminalExtension.checkPrice(targetOrder)) return null;
     else return targetOrder;
   }
 
@@ -436,7 +437,7 @@ export default class TerminalExtension extends StructureTerminal {
       // 降序排列，价高在前，方便下面遍历
       const sortedOrders = _.sortBy(orders, order => -order.price);
       // 找到价格合理的订单中售价最高的
-      const targetOrder = sortedOrders.find(order => this.checkPrice(order));
+      const targetOrder = sortedOrders.find(order => TerminalExtension.checkPrice(order));
 
       price = targetOrder ? targetOrder.price : undefined;
     }
@@ -452,7 +453,7 @@ export default class TerminalExtension extends StructureTerminal {
    *
    * @param targetOrder 目标订单
    */
-  private checkPrice(targetOrder: Order): boolean {
+  private static checkPrice(targetOrder: Order): boolean {
     const history = Game.market.getHistory(targetOrder.resourceType as ResourceConstant);
     // 没有历史记录的话直接运行购买
     if (history.length <= 0) return true;
@@ -550,9 +551,7 @@ export default class TerminalExtension extends StructureTerminal {
    * @param task 要序列化的任务
    */
   protected stringifyTask({ mod, channel, type, amount, priceLimit, supportRoomName }: TerminalListenerTask): string {
-    const stringifyTask = `${mod} ${channel} ${type} ${amount} ${priceLimit} ${supportRoomName}`;
-
-    return stringifyTask;
+    return `${mod} ${channel} ${type} ${amount} ${priceLimit} ${supportRoomName}`;
   }
 
   /**

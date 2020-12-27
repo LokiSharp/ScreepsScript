@@ -95,7 +95,7 @@ export const harvester: CreepConfig<"harvester"> = {
     // 找到了就缓存 id
     else creep.memory.constructionSiteId = constructionSite.id;
 
-    creep.build(constructionSite);
+    creep.buildStructure(creep.memory.constructionSiteId);
     return false;
   },
   target: creep => {

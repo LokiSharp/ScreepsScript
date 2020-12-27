@@ -10,7 +10,6 @@ import { collector } from "./base/collector";
 import { defender } from "./war/defender";
 import { depositHarvester } from "./remote/depositHarvester";
 import { dismantler } from "./war/dismantler";
-import { filler } from "./base/filler";
 import { harvester } from "./base/harvester";
 import { healer } from "./war/healer";
 import { manager } from "./advanced/manager";
@@ -36,7 +35,6 @@ const creepWorks: CreepWork = {
    * 包括了在没有 Storage 和 Link 的房间内运维所需的角色
    */
   harvester,
-  filler,
   upgrader,
   builder,
   repairer,
