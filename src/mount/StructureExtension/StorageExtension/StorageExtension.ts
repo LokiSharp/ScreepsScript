@@ -14,6 +14,19 @@ export default class StorageExtension extends StructureStorage {
     this.energyKeeper();
     this.stateScanner();
 
+    if (this.room.sourceContainers?.length > 0) {
+      this.room.sourceContainers.forEach(container => {
+        // 添加从 container 到自己的能量搬运任务
+        if (container.store.getUsedCapacity() > (container.store.getCapacity() / 3) * 2)
+          this.room.transport.addTask({
+            type: "transport",
+            from: container.id,
+            to: this.id,
+            resourceType: RESOURCE_ENERGY
+          });
+      });
+    }
+
     if (Game.time % 10000) return;
     // 定时运行规划
     this.room.releaseCreep("upgrader");
@@ -32,17 +45,6 @@ export default class StorageExtension extends StructureStorage {
   public onBuildComplete(): void {
     this.room.releaseCreep("harvester");
     this.room.releaseCreep("upgrader");
-
-    this.room.sourceContainers.forEach(container => {
-      // 添加从 container 到自己的能量搬运任务
-      // 虽然没指定任务完成条件，但是后面 container 是会被主动摧毁的（link 造好后），这时对应的搬运任务就会被释放掉
-      this.room.transport.addTask({
-        type: "transport",
-        from: container.id,
-        to: this.id,
-        resourceType: RESOURCE_ENERGY
-      });
-    });
   }
 
   /**
