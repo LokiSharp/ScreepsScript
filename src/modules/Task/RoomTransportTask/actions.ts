@@ -63,9 +63,10 @@ const clearCarryingRecources = function (creep: Creep, excludeResourceType?: Res
  * 搬运工去房间内获取能量
  *
  * @param creep 要获取能量的 creep
+ * @param transport 物流任务对象
  * @returns 身上是否已经有足够的能量了
  */
-const getEnergy = function (creep: Creep<"manager">): boolean {
+const getEnergy = function (creep: Creep<"manager">, transport: RoomTransportType): boolean {
   if (creep.store[RESOURCE_ENERGY] > 10) return true;
   if (!clearCarryingRecources(creep, RESOURCE_ENERGY)) return false;
 
@@ -74,7 +75,7 @@ const getEnergy = function (creep: Creep<"manager">): boolean {
   let sourceStructure = Game.getObjectById(sourceId);
 
   // 来源建筑不可用，更新来源
-  if (!sourceStructure || sourceStructure.store[RESOURCE_ENERGY] <= 0) {
+  if (!sourceStructure || sourceStructure.store[RESOURCE_ENERGY] <= 300) {
     sourceStructure = Game.rooms[workRoom].getAvailableSource(false);
 
     // 更新失败，现在房间里没有可用的能量源，挂机
@@ -88,6 +89,7 @@ const getEnergy = function (creep: Creep<"manager">): boolean {
 
   // 获取能量
   const result = creep.getEngryFrom(sourceStructure);
+  transport.countWorkTime();
   return result === OK;
 };
 
@@ -101,7 +103,7 @@ export const actions: {
    * 基础搬运任务
    * 从一个地方（建筑）搬运东西到另一个地方（建筑）
    */
-  transport: (creep, task) => ({
+  transport: (creep, task, transport) => ({
     source: () => {
       if (creep.store[task.resourceType] > 0) return true;
       if (!clearCarryingRecources(creep, task.resourceType)) return false;
@@ -116,14 +118,17 @@ export const actions: {
         const resAmount = targetStructure.store[task.resourceType];
         if (!resAmount) {
           // 如果任务有结束条件的话就结束，没有就等会
-          if (task.endWith && task.endWith === "clear") finishTask(creep);
-          else creep.say("🏓");
+          if (task.endWith && task.endWith === "clear") {
+            finishTask(creep);
+            transport.countWorkTime();
+          } else creep.say("🏓");
           return false;
         }
 
         // 移动到目的地，获取资源
         creep.goTo(targetStructure.pos, { range: 1 });
         const result = creep.withdraw(targetStructure, task.resourceType);
+        transport.countWorkTime();
         return result === OK;
       }
       // 是位置，尝试捡一下
@@ -136,18 +141,22 @@ export const actions: {
         const targetRes = targetPos.lookFor(LOOK_RESOURCES).find(res => res.resourceType === task.resourceType);
         if (!targetRes) {
           // 如果任务有结束条件的话就结束，没有就等会
-          if (task.endWith && task.endWith === "clear") finishTask(creep);
-          else creep.say("🎨");
+          if (task.endWith && task.endWith === "clear") {
+            finishTask(creep);
+            transport.countWorkTime();
+          } else creep.say("🎨");
           return false;
         }
 
         // 移动到目的地，捡起资源
         creep.goTo(targetPos, { range: 1 });
         const result = creep.pickup(targetRes);
+        transport.countWorkTime();
         return result === OK;
       }
     },
     target: () => {
+      transport.countWorkTime();
       if (creep.store[task.resourceType] <= 0) return true;
       let result;
       // 是 id，存放到只当建筑
@@ -170,7 +179,6 @@ export const actions: {
         creep.goTo(targetPos, { range: 1 });
         result = creep.drop(task.resourceType);
       }
-      if (result === OK) finishTask(creep);
       return result === OK;
     }
   }),
@@ -179,9 +187,10 @@ export const actions: {
    * extension 填充任务
    * 维持正常孵化的任务
    */
-  fillExtension: creep => ({
-    source: () => getEnergy(creep),
+  fillExtension: (creep, task, transport) => ({
+    source: () => getEnergy(creep, transport),
     target: () => {
+      transport.countWorkTime();
       if (creep.store[RESOURCE_ENERGY] === 0) return true;
       let target: StructureExtension | StructureSpawn;
 
@@ -231,9 +240,10 @@ export const actions: {
    * tower 填充任务
    * 维持房间内所有 tower 的能量
    */
-  fillTower: (creep, task) => ({
-    source: () => getEnergy(creep),
+  fillTower: (creep, task, transport) => ({
+    source: () => getEnergy(creep, transport),
     target: () => {
+      transport.countWorkTime();
       if (creep.store[RESOURCE_ENERGY] === 0) return true;
       let target: StructureTower;
 
@@ -280,8 +290,9 @@ export const actions: {
    * 由 nuker 在 Nuker.work 中发布
    * 任务的搬运量取决于 manager 的最大存储量，搬一次就算任务完成
    */
-  fillNuker: (creep, task) => ({
+  fillNuker: (creep, task, transport) => ({
     source: () => {
+      transport.countWorkTime();
       // 如果身上有对应资源的话就直接去填充
       if (creep.store[task.resourceType] > 0) return true;
 
@@ -320,6 +331,7 @@ export const actions: {
       return false;
     },
     target: () => {
+      transport.countWorkTime();
       // 获取 nuker 及兜底
       const target = Game.getObjectById(task.id);
       if (!target) {
@@ -343,8 +355,9 @@ export const actions: {
    * 在 inLab 中填充两种底物
    * 并不会填满，而是根据自己最大的存储量进行填充，保证在取出产物时可以一次搬完
    */
-  labIn: (creep, task) => ({
+  labIn: (creep, task, transport) => ({
     source: () => {
+      transport.countWorkTime();
       // 获取 terminal
       const terminal = creep.room.terminal;
       if (!terminal) {
@@ -373,6 +386,7 @@ export const actions: {
       return false;
     },
     target: () => {
+      transport.countWorkTime();
       const targetResource = task.resource.find(res => !Game.getObjectById(res.id)?.mineralType);
       // 找不到了就说明都成功转移了
       if (!targetResource) {
@@ -393,6 +407,7 @@ export const actions: {
       const result = creep.transferTo(targetLab, targetResource.type);
       // 正常转移资源则更新任务
       if (result === OK) return true;
+      else if (result === ERR_NOT_ENOUGH_RESOURCES) return true;
       else if (result !== ERR_NOT_IN_RANGE) creep.say(`labInB ${result}`);
       return false;
     }
@@ -402,8 +417,9 @@ export const actions: {
    * lab 产物移出任务
    * 把 lab 中所有的资源都转移到 terminal 中
    */
-  labOut: (creep, task) => ({
+  labOut: (creep, task, transport) => ({
     source: () => {
+      transport.countWorkTime();
       // 获取还有资源的 lab（mineralType 有值就代表其中还有资源）
       const targetLab = creep.room[STRUCTURE_LAB].find(lab => lab.mineralType);
 
@@ -425,6 +441,7 @@ export const actions: {
       return false;
     },
     target: () => {
+      transport.countWorkTime();
       const terminal = creep.room.terminal;
 
       if (!terminal) {
@@ -457,8 +474,9 @@ export const actions: {
    * 由 powerSpawn 在 powerSpawn.work 中发布
    * 任务的搬运量取决于 manager 的最大存储量，搬一次就算任务完成
    */
-  fillPowerSpawn: (creep, task) => ({
+  fillPowerSpawn: (creep, task, transport) => ({
     source: () => {
+      transport.countWorkTime();
       // 如果身上有对应资源的话就直接去填充
       if (creep.store[task.resourceType] > 0) return true;
       if (!clearCarryingRecources(creep, task.resourceType)) return false;
@@ -501,6 +519,7 @@ export const actions: {
       return false;
     },
     target: () => {
+      transport.countWorkTime();
       // 获取 powerSpawn 及兜底
       const target = Game.getObjectById(task.id);
       if (!target) {
@@ -525,8 +544,9 @@ export const actions: {
    * 在 boost 任务的 getResource 阶段发布
    * 将任务中给定的 lab 装载资源
    */
-  boostGetResource: (creep, task) => ({
+  boostGetResource: (creep, task, transport) => ({
     source: () => {
+      transport.countWorkTime();
       // 获取 terminal
       const terminal = creep.room.terminal;
       if (!terminal) {
@@ -571,6 +591,7 @@ export const actions: {
       return false;
     },
     target: () => {
+      transport.countWorkTime();
       // 找到要转移的资源以及目标 lab
       const targetResource = creep.memory.taskResource;
       const targetLab = Game.getObjectById(creep.room.memory.boost.lab[targetResource]);
@@ -596,8 +617,9 @@ export const actions: {
    * 在 boost 阶段发布
    * 将给指定的 lab 填满能量
    */
-  boostGetEnergy: (creep, task) => ({
+  boostGetEnergy: (creep, task, transport) => ({
     source: () => {
+      transport.countWorkTime();
       if (creep.store[RESOURCE_ENERGY] > 0) return true;
       if (!clearCarryingRecources(creep, RESOURCE_ENERGY)) return false;
       const result = creep.getEngryFrom(
@@ -606,6 +628,7 @@ export const actions: {
       return result === OK;
     },
     target: () => {
+      transport.countWorkTime();
       const boostLabs = Object.values(creep.room.memory.boost.lab);
 
       // 获取能量为空的 lab
@@ -638,7 +661,7 @@ export const actions: {
    * boost 材料清理任务
    * 将 boost 强化没用完的材料再搬回 terminal
    */
-  boostClear: (creep, task) => ({
+  boostClear: (creep, task, transport) => ({
     source: () => {
       const boostLabs = Object.values(creep.room.memory.boost.lab);
 
@@ -669,6 +692,7 @@ export const actions: {
       return false;
     },
     target: () => {
+      transport.countWorkTime();
       const terminal = creep.room.terminal;
 
       if (!terminal) {

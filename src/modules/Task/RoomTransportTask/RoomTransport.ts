@@ -203,7 +203,7 @@ export default class RoomTransport implements RoomTransportType {
 
     // 是新人，分配任务
     if (!task) {
-      // 这里直接返回了，所以摸鱼时不会增加工作时长
+      // 任务队列为空，不需要执行工作
       if (this.tasks.length <= 0) return noTask(creep);
 
       this.giveJob([creep]);
@@ -213,10 +213,8 @@ export default class RoomTransport implements RoomTransportType {
     }
     const actionGenerator: TransportActionGenerator = actions[task.type];
 
-    // 这里增加工作时长，所以要在本 tick 执行下面的逻辑，就算不执行也会被认为在工作
-    this.totalWorkTime += 1;
     // 分配完后获取任务执行逻辑
-    return actionGenerator(creep, task);
+    return actionGenerator(creep, task, this);
   }
 
   /**
@@ -234,16 +232,17 @@ export default class RoomTransport implements RoomTransportType {
    * @param taskKey 要移除的任务索引
    */
   public removeTask(taskKey: number): OK | ERR_NOT_FOUND {
-    let extraCreeps: Creep[] = [];
-    this.tasks = this.tasks.filter(task => {
-      if (task.key !== taskKey) return true;
-      // 找到干完活的搬运工
-      extraCreeps = task.executor.map(id => Game.getObjectById(id)).filter(Boolean);
-      return false;
+    this.tasks.find((task, index) => {
+      if (task.key !== taskKey) return false;
+
+      // 删除该任务
+      this.tasks.splice(index, 1);
+      // 给干完活的搬运工重新分配任务
+      const extraCreeps = task.executor.map(id => Game.getObjectById(id)).filter(Boolean);
+      this.giveJob(extraCreeps);
+      return true;
     });
 
-    // 给干完活的搬运工重新分配任务
-    this.giveJob(extraCreeps);
     this.saveTask();
     return OK;
   }
@@ -262,6 +261,13 @@ export default class RoomTransport implements RoomTransportType {
       return this.totalWorkTime / this.totalLifeTime >= opt.proportion;
     });
     return currentExpect?.expect === undefined ? -2 : currentExpect.expect;
+  }
+
+  /**
+   * 用于 actions 中 creep 统计工作时长
+   */
+  public countWorkTime(): void {
+    this.totalWorkTime += 1;
   }
 
   /**

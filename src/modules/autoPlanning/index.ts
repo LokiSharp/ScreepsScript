@@ -60,18 +60,17 @@ const clearStructure = function (room: Room): OK | ERR_NOT_FOUND {
   if (notMyStructure.length <= 0) return ERR_NOT_FOUND;
 
   notMyStructure.forEach(s => {
-    // 如果是这三种建筑则看一下存储，只要不为空就不摧毁，反正就三个建筑，如果玩家觉得里边的资源不重要的话就手动摧毁
+    // 如果是这下面几种建筑则看一下存储，只要不为空就不摧毁，如果玩家觉得里边的资源不重要的话就手动摧毁
     if (
       s.structureType === STRUCTURE_TERMINAL ||
       s.structureType === STRUCTURE_FACTORY ||
-      s.structureType === STRUCTURE_STORAGE
+      s.structureType === STRUCTURE_STORAGE ||
+      s.structureType === STRUCTURE_CONTAINER
     ) {
       if (s.store.getUsedCapacity() > 0) return;
     }
-    // 默认不摧毁 Container
-    else if (s.structureType === STRUCTURE_CONTAINER) return;
     // 墙壁交给玩家决定，默认不摧毁
-    else if (s.structureType === STRUCTURE_WALL) return;
+    else if (s.structureType === STRUCTURE_WALL || s.structureType === STRUCTURE_ROAD) return;
 
     // 其他建筑一律摧毁
     s.destroy();

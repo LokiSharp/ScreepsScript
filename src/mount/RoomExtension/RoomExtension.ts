@@ -116,7 +116,7 @@ export default class RoomExtension extends Room {
   public getAvailableSource(includeSource = true): EnergySourceStructure | AllEnergySource {
     // terminal 或 storage 里有能量就优先用
     if (this.terminal && this.terminal.store[RESOURCE_ENERGY] > 10000) return this.terminal;
-    if (this.storage && this.storage.store[RESOURCE_ENERGY] > 100000) return this.storage;
+    if (this.storage && this.storage.store[RESOURCE_ENERGY] > 50000) return this.storage;
     // 如果有 container
     if (this[STRUCTURE_CONTAINER].length > 0) {
       // 能量必须够多才会选用

@@ -9,23 +9,6 @@ import { setRoomStats } from "../../../modules/stateCollector";
  */
 export default class StorageExtension extends StructureStorage {
   public work(): void {
-    if (
-      this.room.sourceContainers?.length > 0 &&
-      this.room.transport.tasks.length === 0 &&
-      this.store.getFreeCapacity() > 100000
-    ) {
-      this.room.sourceContainers.forEach(container => {
-        // 添加从 container 到自己的能量搬运任务
-        if (container.store.getFreeCapacity() < 100)
-          this.room.transport.addTask({
-            type: "transport",
-            from: container.id,
-            to: this.id,
-            resourceType: RESOURCE_ENERGY
-          });
-      });
-    }
-
     if (Game.time % 20) return;
 
     this.energyKeeper();
@@ -49,6 +32,21 @@ export default class StorageExtension extends StructureStorage {
   public onBuildComplete(): void {
     this.room.releaseCreep("harvester");
     this.room.releaseCreep("upgrader");
+
+    this.room.sourceContainers.forEach(container => {
+      // 添加从 container 到自己的能量搬运任务
+      // 虽然没指定任务完成条件，但是后面 container 是会被主动摧毁的（link 造好后），这时对应的搬运任务就会被释放掉
+      // 这里不指定任务完成时间的原因是在 storage 造好后 harvester 还是会用 container 好久，这个任务要一直持续到 container 消失
+      this.room.transport.addTask(
+        {
+          type: "transport",
+          from: container.id,
+          to: this.id,
+          resourceType: RESOURCE_ENERGY
+        },
+        true
+      );
+    });
   }
 
   /**

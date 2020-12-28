@@ -444,7 +444,7 @@ describe("RoomTransportTask", () => {
     }
   });
 
-  it("getWork 可以在执行者有任务时获取任务工作，并修改生存时间和工作时间", () => {
+  it("getWork 可以在执行者有任务时获取任务工作，并修改生存时间", () => {
     const creep = (new CreepMock(`creep` as Id<CreepMock>, 0, 0) as unknown) as Creep<"manager">;
     creep.memory = {} as CreepMemory<"manager">;
 
@@ -455,7 +455,7 @@ describe("RoomTransportTask", () => {
     roomTransport.giveJob([creep]);
     const work = roomTransport.getWork(creep);
     assert.isDefined(work);
-    assert.equal(roomTransport.totalWorkTime, 1);
+    assert.equal(roomTransport.totalWorkTime, 0);
     assert.equal(roomTransport.totalLifeTime, 1);
   });
 
@@ -471,7 +471,7 @@ describe("RoomTransportTask", () => {
     assert.equal(roomTransport.totalLifeTime, 1);
   });
 
-  it("getWork 可以在执行者无任务和队列有任务时分配工作获取任务工作，并修改生存时间和工作时间", () => {
+  it("getWork 可以在执行者无任务和队列有任务时分配工作获取任务工作，并修改生存时间", () => {
     const creep = (new CreepMock(`creep` as Id<CreepMock>, 0, 0) as unknown) as Creep<"manager">;
     creep.memory = {} as CreepMemory<"manager">;
 
@@ -480,7 +480,7 @@ describe("RoomTransportTask", () => {
 
     const work = roomTransport.getWork(creep);
     assert.isDefined(work);
-    assert.equal(roomTransport.totalWorkTime, 1);
+    assert.equal(roomTransport.totalWorkTime, 0);
     assert.equal(roomTransport.totalLifeTime, 1);
   });
 });
