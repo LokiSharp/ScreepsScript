@@ -10,10 +10,10 @@ export const TRANSFER_DEATH_LIMIT = 20;
  */
 export const UPGRADE_WITH_STORAGE = [
   { energy: 900000, num: 10 },
-  { energy: 700000, num: 8 },
-  { energy: 500000, num: 6 },
-  { energy: 300000, num: 4 },
-  { energy: 100000, num: 2 }
+  { energy: 700000, num: 9 },
+  { energy: 500000, num: 7 },
+  { energy: 300000, num: 5 },
+  { energy: 100000, num: 3 }
 ];
 
 export const bodyConfigs: BodyConfigs = {
