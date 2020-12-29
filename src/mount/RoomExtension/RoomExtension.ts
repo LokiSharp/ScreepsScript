@@ -32,8 +32,10 @@ export default class RoomExtension extends Room {
   public registerContainer(container: StructureContainer): OK {
     // 把 container 添加到房间基础服务
     if (!this.memory.sourceContainersIds) this.memory.sourceContainersIds = [];
-    // 去重，防止推入了多个相同的 container
-    this.memory.sourceContainersIds = _.uniq([...this.memory.sourceContainersIds, container.id]);
+    // 去重，防止推入了多个相同的 container，同时筛掉已经过期的 id
+    this.memory.sourceContainersIds = _.uniq([...this.memory.sourceContainersIds, container.id]).filter(containerId =>
+      Game.getObjectById(containerId)
+    );
     // 更新建筑缓存
     updateStructure(this.name, STRUCTURE_CONTAINER, container.id);
 
