@@ -1,4 +1,5 @@
 import { LEVEL_BUILD_RAMPART } from "../../../setting";
+import { countEnergyChangeRatio } from "../../../modules/energyController";
 import { setRoomStats } from "modules/stateCollector";
 import { whiteListFilter } from "utils/global/whiteListFilter";
 
@@ -78,6 +79,8 @@ export default class ControllerExtension extends StructureController {
       };
     });
 
+    // 统计本房间能量状态
+    countEnergyChangeRatio(this.room.name);
     this.structureScanner();
 
     return hasLevelChange;
@@ -120,7 +123,7 @@ export default class ControllerExtension extends StructureController {
     let hasConstructionSites = false;
     const constructionSites = this.room.find(FIND_CONSTRUCTION_SITES);
 
-    const constructionSiteIds: Id<ConstructionSite<BuildableStructureConstant>>[] = [];
+    const constructionSiteIds: Id<ConstructionSite>[] = [];
     const constructionSiteNums: { [structureName: string]: number } = {};
 
     if (constructionSites.length > 0) {

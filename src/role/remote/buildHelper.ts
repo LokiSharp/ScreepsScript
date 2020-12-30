@@ -1,5 +1,6 @@
 import { bodyConfigs } from "setting";
 import createBodyGetter from "utils/creep/createBodyGetter";
+import { getRoomAvailableSource } from "../../modules/energyController";
 
 /**
  * 协助建造者
@@ -39,7 +40,7 @@ export const buildHelper: CreepConfig<"buildHelper"> = {
     // 获取有效的能量来源
     let source: AllEnergySource;
     if (!creep.memory.sourceId) {
-      source = creep.room.getAvailableSource();
+      source = getRoomAvailableSource(creep.room);
       if (!source) {
         creep.say("没能量了，歇会");
         return false;

@@ -129,11 +129,6 @@ interface Room {
   // 焦点墙，维修单位总是倾向于优先修复该墙体
   importantWall: StructureWall | StructureRampart;
 
-  // 获取房间中的有效能量来源
-  getAvailableSource(includeSource?: false): EnergySourceStructure;
-  getAvailableSource(includeSource?: true): AllEnergySource;
-  getAvailableSource(includeSource?: boolean): EnergySourceStructure | AllEnergySource;
-
   // 自动规划相关
   findBaseCenterPos(): RoomPosition[];
   confirmBaseCenter(targetPos?: RoomPosition[]): RoomPosition | ERR_NOT_FOUND;

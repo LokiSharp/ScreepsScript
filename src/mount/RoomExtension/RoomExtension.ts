@@ -112,49 +112,6 @@ export default class RoomExtension extends Room {
   }
 
   /**
-   * 查找房间中的有效能量来源
-   */
-  public getAvailableSource(includeSource: false): EnergySourceStructure;
-  public getAvailableSource(includeSource: true): AllEnergySource;
-  public getAvailableSource(includeSource = true): EnergySourceStructure | AllEnergySource {
-    // terminal 或 storage 里有能量就优先用
-    if (this.terminal && this.terminal.store[RESOURCE_ENERGY] > 10000) return this.terminal;
-    if (this.storage && this.storage.store[RESOURCE_ENERGY] > 50000) return this.storage;
-    // 如果有 container
-    if (this[STRUCTURE_CONTAINER].length > 0) {
-      // 能量必须够多才会选用
-      const availableContainer = this[STRUCTURE_CONTAINER].filter(container => container.store[RESOURCE_ENERGY] > 300);
-      // 挑个能量多的 container
-      if (availableContainer.length > 0)
-        return _.max(availableContainer, container => container.store[RESOURCE_ENERGY]);
-    }
-
-    if (includeSource) {
-      // 查找散落的能量，如果能量满足要求就设为目标
-      const resources = this.find(FIND_DROPPED_RESOURCES);
-      for (const resource of resources) {
-        if (resource?.resourceType === RESOURCE_ENERGY && resource.amount > 500) {
-          return resource as Resource<RESOURCE_ENERGY>;
-        }
-      }
-
-      // 查找废墟，如果有包含 store 的废墟就设为目标
-      const ruins = this.find(FIND_RUINS);
-      for (const ruin of ruins) {
-        if ("store" in ruin && ruin.store[RESOURCE_ENERGY] > 0) {
-          return ruin;
-        }
-      }
-
-      // 没有就选边上有空位的 source
-      return this.source.find(source => {
-        return source.pos.getCanStandPos().length > 1;
-      });
-    }
-    return undefined;
-  }
-
-  /**
    * 添加任务
    *
    * @param task 要提交的任务
