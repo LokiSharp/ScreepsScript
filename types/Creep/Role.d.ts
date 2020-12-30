@@ -40,7 +40,7 @@ interface RoleDatas {
   pbCarrier: RemoteHarvesterData;
   moveTester: RemoteDeclarerData;
   reiver: ReiverData;
-  buildHelper: RemoteDeclarerData;
+  buildHelper: RemoteHelperData;
 
   /**
    * 战斗单位
