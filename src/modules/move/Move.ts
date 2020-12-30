@@ -286,8 +286,8 @@ export class Move {
               if (item.structureType === STRUCTURE_ROAD) {
                 // 造好的路可以走
                 if (item instanceof Structure) costs.set(item.pos.x, item.pos.y, 1);
-                // 路的工地保持原有 cost
-                else return;
+                // 路的工地消耗在路和平地之间
+                else costs.set(item.pos.x, item.pos.y, 1.5);
               }
               // 不能穿过无法行走的建筑
               else if (
