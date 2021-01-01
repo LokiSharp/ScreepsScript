@@ -1,5 +1,6 @@
 import { LEVEL_BUILD_RAMPART } from "../../../setting";
 import { countEnergyChangeRatio } from "../../../modules/energyController";
+import { creepApi } from "../../../modules/creepController/creepApi";
 import { setRoomStats } from "modules/stateCollector";
 import { whiteListFilter } from "utils/global/whiteListFilter";
 
@@ -21,6 +22,14 @@ export default class ControllerExtension extends StructureController {
 
     // 8 级并且快掉级了就孵化 upgrader
     if (this.level === 8 && this.ticksToDowngrade <= 100000) this.room.releaseCreep("upgrader");
+
+    const { storage, terminal } = this.room;
+    if (
+      this.room.memory.canReClaim &&
+      this.level >= 8 &&
+      storage.store.getUsedCapacity(RESOURCE_ENERGY) + terminal.store.getUsedCapacity(RESOURCE_ENERGY) >= 1000000
+    )
+      this.reClaim();
 
     // 检查外矿有没有被入侵的，有的话是不是可以重新发布 creep
     if (this.room.memory.remote) {
@@ -178,5 +187,11 @@ export default class ControllerExtension extends StructureController {
     // 根据物流模块返回的期望调整当前搬运工数量
     this.room.memory.transporterNumber += this.room.transport.getExpect();
     this.room.releaseCreep("manager", this.room.memory.transporterNumber);
+  }
+  /**
+   * 重新占领，刷 RCL 用
+   */
+  private reClaim(): void {
+    creepApi.add(`${this.room.name} reClaimer`, "reClaimer", { targetRoomName: this.room.name }, this.room.name);
   }
 }

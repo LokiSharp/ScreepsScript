@@ -41,6 +41,8 @@ interface RoleDatas {
   moveTester: RemoteDeclarerData;
   reiver: ReiverData;
   buildHelper: RemoteHelperData;
+  boostBuildHelper: RemoteHelperData;
+  reClaimer: RemoteDeclarerData;
 
   /**
    * 战斗单位

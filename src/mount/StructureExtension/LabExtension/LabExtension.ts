@@ -1,4 +1,11 @@
-import { BOOST_RESOURCE, LAB_STATE, labTarget, reactionSource } from "setting";
+import {
+  BOOST_RESOURCE,
+  LAB_STATE,
+  boostEnergyReloadLimit,
+  boostResourceReloadLimit,
+  labTarget,
+  reactionSource
+} from "setting";
 
 /**
  * Lab 原型拓展
@@ -15,7 +22,7 @@ export default class LabExtension extends StructureLab {
       if (this.room.memory.boost && !this.room.hasRunLab) {
         this.room.hasRunLab = true;
 
-        if (Game.time % 10) return;
+        if (Game.time % 5) return;
         this.boostController();
       }
       return;
@@ -100,7 +107,7 @@ export default class LabExtension extends StructureLab {
       if (!lab) continue;
 
       // 有的资源还没到位
-      if (lab.store[res] <= 0) allResourceReady = false;
+      if (lab.store[res] <= boostResourceReloadLimit) allResourceReady = false;
     }
 
     // 都就位了就进入下一个阶段
@@ -132,7 +139,11 @@ export default class LabExtension extends StructureLab {
       const lab = Game.getObjectById(boostTask.lab[resourceType]);
 
       // 有 lab 能量不达标的话就发布能量填充任务
-      if (lab && lab.store[RESOURCE_ENERGY] < 1000 && !this.room.transport.hasTask("boostGetEnergy")) {
+      if (
+        lab &&
+        lab.store[RESOURCE_ENERGY] <= boostEnergyReloadLimit &&
+        !this.room.transport.hasTask("boostGetEnergy")
+      ) {
         // 有 lab 能量不满的话就发布任务
         this.room.transport.addTask({ type: "boostGetEnergy" });
         return;

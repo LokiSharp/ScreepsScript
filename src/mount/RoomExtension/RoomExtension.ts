@@ -1,4 +1,4 @@
-import { BOOST_RESOURCE, ENERGY_SHARE_LIMIT } from "../../setting";
+import { BOOST_RESOURCE, ENERGY_SHARE_LIMIT, boostEnergyReloadLimit, boostResourceReloadLimit } from "../../setting";
 import { confirmBasePos, findBaseCenterPos, setBaseCenter } from "../../modules/autoPlanning/planBasePos";
 import { manageStructure, releaseCreep } from "../../modules/autoPlanning";
 import createRoomLink from "../../utils/console/createRoomLink";
@@ -427,6 +427,13 @@ export default class RoomExtension extends Room {
     const executiveLab: StructureLab[] = [];
     for (const resourceType in this.memory.boost.lab) {
       const lab = Game.getObjectById(this.memory.boost.lab[resourceType]);
+      if (lab?.store[RESOURCE_ENERGY] <= boostEnergyReloadLimit) {
+        this.transport.addTask({ type: "boostGetEnergy" });
+        return ERR_BUSY;
+      } else if (lab?.store[resourceType] <= boostResourceReloadLimit) {
+        this.transport.addTask({ type: "boostGetResource" });
+        return ERR_BUSY;
+      }
       // 这里没有直接终止进程是为了避免 lab 集群已经部分被摧毁而导致整个 boost 进程无法执行
       if (lab) executiveLab.push(lab);
     }
