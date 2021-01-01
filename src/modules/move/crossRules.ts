@@ -39,7 +39,18 @@ const crossRules: CrossRules = {
   upgrader: noCrossWithWork,
   remoteUpgrader: noCrossWithWork,
   builder: noCrossWithWork,
-  remoteBuilder: noCrossWithWork
+  remoteBuilder: noCrossWithWork,
+  boostBuildHelper: (creep, requireCreep) => {
+    if (
+      (requireCreep.memory.role === creep.memory.role &&
+        creep.store.getUsedCapacity() !== 0 &&
+        requireCreep.store.getUsedCapacity() === 0) ||
+      requireCreep.memory.role === "reClaimer"
+    )
+      return true;
+    else return defaultRule(creep, requireCreep);
+  },
+  reClaimer: () => false
 };
 
 export default crossRules;

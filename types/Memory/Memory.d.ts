@@ -142,6 +142,7 @@ interface RoomStats {
    * 其他种类的资源数量，由 factory 统计
    */
   commRes: { [commType: string]: number };
+  resources: { [resourceType: string]: number };
   /**
    * 测试消息预留
    */

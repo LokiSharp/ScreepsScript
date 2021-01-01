@@ -179,4 +179,6 @@ interface RoomMemory {
   // 目标敌方 creep 缓存
   targetHostileCreepsCache: Id<AnyCreep>[];
   targetHostileCreepsCacheExpireTime: number;
+  // 可以重新占领，刷 RCL 用
+  canReClaim?: boolean;
 }

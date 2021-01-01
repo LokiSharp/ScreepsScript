@@ -153,6 +153,7 @@ const releasePlans: CreepReleasePlans = {
     plans: [
       // 8 级时的特殊判断
       ({ room, controllerLevel, ticksToDowngrade, upgradeLinkId }: UpgraderPlanStats) => {
+        if (room.memory.canReClaim) return true;
         if (controllerLevel < 8) return false;
         // 掉级还早，不发布 upgrader 了
         if (ticksToDowngrade >= 100000) return true;

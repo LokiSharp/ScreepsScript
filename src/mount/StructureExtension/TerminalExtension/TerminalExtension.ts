@@ -18,7 +18,7 @@ const resourcePrice = {};
 export default class TerminalExtension extends StructureTerminal {
   public work(): void {
     // 没有冷却好或者不到 10 tick 就跳过
-    if (this.cooldown !== 0 || Game.time % 10) return;
+    if (this.cooldown !== 0 || Game.time % 10 || !this.isActive()) return;
 
     // 资源统计
     this.stateScanner();
@@ -42,7 +42,21 @@ export default class TerminalExtension extends StructureTerminal {
    * 目前只统计 power 数量
    */
   private stateScanner(): void {
-    setRoomStats(this.room.name, () => ({ power: this.store[RESOURCE_POWER] }));
+    setRoomStats(this.room.name, () => ({
+      resources: {
+        power: this.store[RESOURCE_POWER],
+        XUH2O: this.store[RESOURCE_CATALYZED_UTRIUM_ACID],
+        XUH02: this.store[RESOURCE_CATALYZED_UTRIUM_ALKALIDE],
+        XKH2O: this.store[RESOURCE_CATALYZED_KEANIUM_ACID],
+        XKHO2: this.store[RESOURCE_CATALYZED_KEANIUM_ALKALIDE],
+        XLH2O: this.store[RESOURCE_CATALYZED_LEMERGIUM_ACID],
+        XLHO2: this.store[RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE],
+        XZH2O: this.store[RESOURCE_CATALYZED_ZYNTHIUM_ACID],
+        XZHO2: this.store[RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE],
+        XGH20: this.store[RESOURCE_CATALYZED_GHODIUM_ACID],
+        XGHO2: this.store[RESOURCE_CATALYZED_GHODIUM_ALKALIDE]
+      }
+    }));
   }
 
   /**

@@ -332,6 +332,7 @@ export const actions: {
     },
     target: () => {
       transport.countWorkTime();
+      if (creep.store[task.resourceType] === 0) return true;
       // 获取 nuker 及兜底
       const target = Game.getObjectById(task.id);
       if (!target) {
@@ -565,10 +566,30 @@ export const actions: {
       if (!resource) {
         resource = Object.keys(boostConfig.lab).find(res => {
           // 如果这个材料已经用完了就检查下一个
-          if (!terminal.store[res] || terminal.store[res] === 0) return false;
+          if (!terminal.store[res] || terminal.store[res] === 0) {
+            const sourceRoomInfo = _.filter(Game.rooms, room => room.controller?.my)
+              .map(room => {
+                // 无法正常接收的不参与计算
+                if (!room || !room.terminal) return { room, num: null };
+
+                return {
+                  room,
+                  num: room.terminal.store[resource]
+                };
+              })
+              // 移除掉所有不参与计算的房间
+              .filter(info => info.num !== null)
+              // 找到 power 数量最小的房间
+              .reduce((prev, next) => {
+                if (prev.num > next.num) return next;
+                else return prev;
+              });
+            if (sourceRoomInfo.num > 3000) sourceRoomInfo.room.shareAdd(creep.room.name, resource, 3000);
+            return false;
+          }
           const lab = Game.getObjectById(boostConfig.lab[res]);
           // lab 里的资源不达标就进行运输
-          return lab && lab.store[res] < boostResourceReloadLimit;
+          return lab && lab.store[res] <= boostResourceReloadLimit;
         }) as ResourceConstant;
 
         if (resource) creep.memory.taskResource = resource;
@@ -594,6 +615,7 @@ export const actions: {
     },
     target: () => {
       transport.countWorkTime();
+      if (!creep.memory.taskResource) return true;
       // 找到要转移的资源以及目标 lab
       const targetResource = creep.memory.taskResource;
       const targetLab = Game.getObjectById(creep.room.memory.boost.lab[targetResource]);

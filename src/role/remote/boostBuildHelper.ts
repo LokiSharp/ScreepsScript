@@ -1,14 +1,15 @@
-import { bodyConfigs } from "setting";
-import createBodyGetter from "utils/creep/createBodyGetter";
+import { TRANSFER_DEATH_LIMIT } from "../../setting";
+import calcBodyPart from "../../utils/creep/calcBodyPart";
+import deathPrepare from "../../utils/creep/deathPrepare";
 import { getRoomAvailableSource } from "../../modules/energyController";
 
 /**
- * 协助建造者
- * 协助其他玩家进行建造工作
+ * 强化协助建造者
+ * 协助其他房间进行建造工作，刷 RCL 用
  */
-export const buildHelper: CreepConfig<"buildHelper"> = {
-  // 下面是正常的建造者逻辑
+export const boostBuildHelper: CreepConfig<"boostBuildHelper"> = {
   source: creep => {
+    if (creep.ticksToLive <= TRANSFER_DEATH_LIMIT) return deathPrepare(creep);
     if (creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
       const { targetRoomName } = creep.memory.data;
       if (creep.room.name !== targetRoomName) {
@@ -25,7 +26,7 @@ export const buildHelper: CreepConfig<"buildHelper"> = {
     if (!creep.memory.sourceId) {
       source =
         getRoomAvailableSource(Game.rooms[creep.room.name], { includeSource: false }) ||
-        getRoomAvailableSource(Game.rooms[creep.memory.data.spawnRoom], { includeSource: false });
+        getRoomAvailableSource(Game.rooms[creep.memory.data.targetRoomName], { includeSource: false });
       if (!source) {
         creep.say("没能量了，歇会");
         return false;
@@ -36,9 +37,10 @@ export const buildHelper: CreepConfig<"buildHelper"> = {
     // 之前的来源建筑里能量不够了就更新来源
     if (
       !source ||
-      (source instanceof Structure && source.store[RESOURCE_ENERGY] < 300) ||
+      (source instanceof Structure && source.store[RESOURCE_ENERGY] < 10000) ||
       (source instanceof Source && source.energy === 0) ||
-      (source instanceof Ruin && source.store[RESOURCE_ENERGY] === 0)
+      (source instanceof Ruin && source.store[RESOURCE_ENERGY] === 0) ||
+      source.room.name === creep.memory.data.spawnRoom
     )
       delete creep.memory.sourceId;
 
@@ -67,5 +69,5 @@ export const buildHelper: CreepConfig<"buildHelper"> = {
 
     return creep.store.getUsedCapacity() === 0;
   },
-  bodys: createBodyGetter(bodyConfigs.remoteHelper)
+  bodys: () => calcBodyPart({ [WORK]: 20, [CARRY]: 12, [MOVE]: 16 })
 };
