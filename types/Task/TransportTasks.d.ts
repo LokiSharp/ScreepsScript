@@ -30,7 +30,7 @@ interface TransportTasks {
     resourceType: ResourceConstant;
     /**
      * 怎么算完成任务：clear 代表目标位置不存在该资源就完成任务
-     * 该字段的话该任务将永远不会结束，需要外部模块手动取消
+     * 该字段为空的话该任务将永远不会结束，需要外部模块手动取消（或者 from 指定的建筑不存在了也会结束）
      */
     endWith?: "clear";
   };
@@ -169,6 +169,10 @@ interface RoomTransportType {
    * 获取该房间的搬运工调整期望
    */
   getExpect(): number;
+  /**
+   * 搬运工工作时长 + 1
+   */
+  countWorkTime(): void;
 }
 
 /**
@@ -176,5 +180,6 @@ interface RoomTransportType {
  */
 type TransportActionGenerator<T extends AllTransportTaskType = AllTransportTaskType> = (
   creep: Creep<"manager">,
-  task: TransportTasks[T]
+  task: TransportTasks[T],
+  transportController: RoomTransportType
 ) => TransportAction;

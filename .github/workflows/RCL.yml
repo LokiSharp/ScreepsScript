@@ -41,14 +41,27 @@ jobs:
       - run: npm run build
       - run: npx mocha test/integration/RCLTest/${{ matrix.RCL }}.RCLTest.ts
 
-      - name: Update Code Artifact
-        uses: actions/upload-artifact@v1
-        with:
-          name: ${{ matrix.RCL }}-dist
-          path: dist
-
       - name: Update Server Artifact
         uses: actions/upload-artifact@v1
         with:
-          name: ${{ matrix.RCL }}-server
+          name: RCLtest-result-${{ matrix.RCL }}
           path: server
+
+  RCLresult:
+    needs: RCLtest
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Download result for RCLtest
+        uses: actions/download-artifact@v2
+        with:
+          path: RCLtest-result
+
+      - name: Display structure of downloaded files
+        run: ls -R
+        working-directory: RCLtest-result
+
+      - name: Update Result Artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: RCLresult-${{ matrix.RCL }}
+          path: RCLtest-result

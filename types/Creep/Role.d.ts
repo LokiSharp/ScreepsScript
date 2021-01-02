@@ -116,6 +116,10 @@ interface WorkerData {
  */
 interface ManagerData {
   /**
+   * 要使用的资源存放建筑 id
+   */
+  sourceId?: Id<EnergySourceStructure>;
+  /**
    * 该 creep 的工作房间
    * 例如一个外矿搬运者需要知道自己的老家在哪里
    */

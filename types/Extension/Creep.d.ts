@@ -38,4 +38,5 @@ interface Creep<Role extends CreepRoleConstant = CreepRoleConstant> {
 
   getHostileCreepsWithCache(hard?: boolean): AnyCreep[];
   getHostileStructuresWithCache(hard?: boolean): Structure<StructureConstant>[];
+  callDefender(targetRoomName: string, targetFlagName: string, spawnRoomName: string): void;
 }

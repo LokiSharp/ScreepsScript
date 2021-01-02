@@ -1,4 +1,5 @@
 import RoomTransport, {
+  REGULATE_LIMIT,
   WORK_PROPORTION_TO_EXPECT
 } from "../../../../../src/modules/Task/RoomTransportTask/RoomTransport";
 import CreepMock from "../../../mock/CreepMock";
@@ -254,17 +255,17 @@ describe("RoomTransportTask", () => {
 
   it("getExpect 获取当前的搬运工调整期望", () => {
     const roomTransport = new RoomTransport("W0N0");
-    roomTransport.totalLifeTime = 500;
+    roomTransport.totalLifeTime = REGULATE_LIMIT;
     roomTransport.totalWorkTime = roomTransport.totalLifeTime * 0.9;
     assert.equal(roomTransport.getExpect(), 2);
     (WORK_PROPORTION_TO_EXPECT as { proportion: number; expect: number }[]).forEach(item => {
       roomTransport.totalWorkTime = roomTransport.totalLifeTime * item.proportion;
       assert.equal(roomTransport.getExpect(), item.expect);
     });
-    roomTransport.totalLifeTime = 300;
+    roomTransport.totalLifeTime = REGULATE_LIMIT / 2;
     assert.equal(roomTransport.getExpect(), 0);
-    roomTransport.totalLifeTime = 500;
-    roomTransport.totalWorkTime = -100;
+    roomTransport.totalLifeTime = REGULATE_LIMIT;
+    roomTransport.totalWorkTime = -REGULATE_LIMIT;
     assert.equal(roomTransport.getExpect(), -2);
   });
 
@@ -443,7 +444,7 @@ describe("RoomTransportTask", () => {
     }
   });
 
-  it("getWork 可以在执行者有任务时获取任务工作，并修改生存时间和工作时间", () => {
+  it("getWork 可以在执行者有任务时获取任务工作，并修改生存时间", () => {
     const creep = (new CreepMock(`creep` as Id<CreepMock>, 0, 0) as unknown) as Creep<"manager">;
     creep.memory = {} as CreepMemory<"manager">;
 
@@ -454,7 +455,7 @@ describe("RoomTransportTask", () => {
     roomTransport.giveJob([creep]);
     const work = roomTransport.getWork(creep);
     assert.isDefined(work);
-    assert.equal(roomTransport.totalWorkTime, 1);
+    assert.equal(roomTransport.totalWorkTime, 0);
     assert.equal(roomTransport.totalLifeTime, 1);
   });
 
@@ -470,7 +471,7 @@ describe("RoomTransportTask", () => {
     assert.equal(roomTransport.totalLifeTime, 1);
   });
 
-  it("getWork 可以在执行者无任务和队列有任务时分配工作获取任务工作，并修改生存时间和工作时间", () => {
+  it("getWork 可以在执行者无任务和队列有任务时分配工作获取任务工作，并修改生存时间", () => {
     const creep = (new CreepMock(`creep` as Id<CreepMock>, 0, 0) as unknown) as Creep<"manager">;
     creep.memory = {} as CreepMemory<"manager">;
 
@@ -479,7 +480,7 @@ describe("RoomTransportTask", () => {
 
     const work = roomTransport.getWork(creep);
     assert.isDefined(work);
-    assert.equal(roomTransport.totalWorkTime, 1);
+    assert.equal(roomTransport.totalWorkTime, 0);
     assert.equal(roomTransport.totalLifeTime, 1);
   });
 });

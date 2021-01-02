@@ -70,6 +70,8 @@ export const remoteHarvester: CreepConfig<"remoteHarvester"> = {
         creep.log(`找不到 ${spawnRoom}`);
         return false;
       }
+      creep.callDefender(creep.room.name, sourceFlagName, spawnRoom);
+
       // 如果还没有设置重生时间的话
       if (room.memory.remote[sourceFlag.pos.roomName] && !room.memory.remote[sourceFlag.pos.roomName].disableTill) {
         // 将重生时间设置为 1500 tick 之后
@@ -122,33 +124,35 @@ export const remoteHarvester: CreepConfig<"remoteHarvester"> = {
   },
   target: creep => {
     const { targetId } = creep.memory.data;
-    // dontBuild 为 false 时表明还在建造阶段
-    if (!creep.memory.dontBuild) {
-      // 没有可建造的工地后就再也不建造
-      const buildResult = creep.buildStructure();
+    if (creep.store.getUsedCapacity(RESOURCE_ENERGY) <= 0) return true;
 
-      if (buildResult === ERR_NOT_FOUND) creep.memory.dontBuild = true;
-
-      return false;
-    }
-
-    // 检查脚下的路有没有问题，有的话就进行维修
+    // 检查脚下的路有没有问题，有的话就进行维修，没有就创建道路工地并建造
     const structures = creep.pos.lookFor(LOOK_STRUCTURES);
+    const roadConstruction = creep.pos
+      .lookFor(LOOK_CONSTRUCTION_SITES)
+      .find(construction => construction.structureType === STRUCTURE_ROAD);
+    let result: ScreepsReturnCode;
     if (structures.length > 0) {
       const road = structures[0];
       if (road.hits < road.hitsMax) creep.repair(road);
+    } else if (!roadConstruction) creep.room.createConstructionSite(creep.pos, STRUCTURE_ROAD);
+    if (roadConstruction) {
+      result = creep.build(roadConstruction);
+      delete creep.memory.moveInfo;
+    } else {
+      const target = Game.getObjectById(targetId);
+      if (!target) {
+        creep.log(`找不到存放建筑 ${targetId}`, "yellow");
+        return false;
+      }
+
+      // 再把剩余能量运回去
+      result = creep.transferTo(target, RESOURCE_ENERGY, { range: 1 });
     }
 
-    const target = Game.getObjectById(targetId);
-    if (!target) {
-      creep.log(`找不到存放建筑 ${targetId}`, "yellow");
-      return false;
-    }
-
-    // 再把剩余能量运回去
-    const result = creep.transferTo(target, RESOURCE_ENERGY, { range: 1 });
     // 报自己身上资源不足了就说明能量放完了
     if (result === ERR_NOT_ENOUGH_RESOURCES) return true;
+    else if (result === ERR_NOT_IN_RANGE) creep.say("🚚");
     else if (result === ERR_FULL) creep.say("满了啊");
     else if (result !== OK) creep.log(`target 阶段 transfer 出现异常，错误码 ${result}`, "red");
 
