@@ -194,4 +194,49 @@ export default class ControllerExtension extends StructureController {
   private reClaim(): void {
     creepApi.add(`${this.room.name} reClaimer`, "reClaimer", { targetRoomName: this.room.name }, this.room.name);
   }
+
+  private upgradePosInfosFiltered = false;
+
+  private getUpgradePosInfos(): Record<string, UpgradePosInfo> {
+    if (!this.room.memory.upgradePosInfos) {
+      this.room.memory.upgradePosInfos = {};
+      this.pos.getCanStandPos(3).forEach(pos => {
+        this.room.memory.upgradePosInfos[`${pos.x},${pos.y}`] = {
+          x: pos.x,
+          y: pos.y,
+          creepId: undefined,
+          rangeToController: pos.getRangeTo(this.room.controller) || undefined,
+          rangeToStorage: pos.getRangeTo(this.room.storage) || undefined,
+          rangeToTerminal: pos.getRangeTo(this.room.terminal) || undefined
+        };
+      });
+    }
+    if (!this.upgradePosInfosFiltered) {
+      _.forEach(this.room.memory.upgradePosInfos, info => {
+        if (!Game.getObjectById(info.creepId))
+          this.room.memory.upgradePosInfos[`${info.x},${info.y}`].creepId = undefined;
+      });
+      this.upgradePosInfosFiltered = true;
+    }
+    return this.room.memory.upgradePosInfos;
+  }
+
+  public getUpgradePos(creep: Creep): RoomPosition {
+    let info: UpgradePosInfo;
+
+    const upgradePosInfos = this.getUpgradePosInfos();
+    const unusedPosInfo = _.filter(upgradePosInfos, item => !item.creepId);
+
+    info = _.find(upgradePosInfos, item => item.creepId === creep.id);
+    for (const range of [1, 2, 3, 4, 5, 6, 7]) {
+      if (info) break;
+      if (!info) info = _.find(unusedPosInfo, item => item.rangeToStorage === range || item.rangeToTerminal === range);
+    }
+    if (!info) info = _.find(unusedPosInfo, item => item);
+    if (creep.memory.role === "boostBuildHelper")
+      (creep as Creep<"boostBuildHelper">).memory.data.upgradePosInfo = info;
+
+    this.room.memory.upgradePosInfos[`${info.x},${info.y}`].creepId = creep.id;
+    return new RoomPosition(info.x, info.y, this.room.name);
+  }
 }

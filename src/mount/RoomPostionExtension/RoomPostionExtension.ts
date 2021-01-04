@@ -71,9 +71,7 @@ export default class RoomPostionExtension extends RoomPosition {
    */
   public getCanStandPos(range = 1): RoomPosition[] {
     if (!this.canStandPosCache) {
-      this.canStandPosCache = this.getFreeSpace(range)
-        .filter(pos => pos.canStand())
-        .filter(pos => !pos.hasCreepStand());
+      this.canStandPosCache = this.getFreeSpace(range).filter(pos => pos.canStand());
     }
 
     return this.canStandPosCache;
@@ -87,8 +85,11 @@ export default class RoomPostionExtension extends RoomPosition {
 
     // 遍历该位置上的所有建筑，如果建筑上不能站人的话就返回 false
     for (const structure of onPosStructures) {
-      if (structure.structureType === STRUCTURE_ROAD) return true;
-      else if (structure.structureType !== STRUCTURE_CONTAINER && structure.structureType !== STRUCTURE_RAMPART)
+      if (
+        structure.structureType !== STRUCTURE_CONTAINER &&
+        structure.structureType !== STRUCTURE_RAMPART &&
+        structure.structureType !== STRUCTURE_ROAD
+      )
         return false;
     }
     return true;
