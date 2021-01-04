@@ -153,16 +153,9 @@ export default class CreepExtension extends Creep {
    */
   public upgrade(): ScreepsReturnCode {
     const result = this.upgradeController(this.room.controller);
-    let upgradePos: RoomPosition;
-    for (const range of [1, 2, 3]) {
-      const canStandUpgradePoss = this.room.controller.pos.getCanStandPos(range);
-      if (canStandUpgradePoss.length >= 1) {
-        upgradePos = canStandUpgradePoss[0];
-        break;
-      }
-    }
+    const upgradePos: RoomPosition = this.room.controller.getUpgradePos(this);
 
-    if (this.upgradeController(this.room.controller) === ERR_NOT_IN_RANGE || upgradePos) {
+    if (upgradePos && (this.pos.x !== upgradePos.x || this.pos.y !== upgradePos.y)) {
       this.goTo(upgradePos);
     }
 

@@ -177,6 +177,7 @@ interface RemoteHelperData {
   // 出生房名称，资源会被运输到该房间中
   spawnRoom?: string;
   wayPoint?: string;
+  upgradePosInfo?: UpgradePosInfo;
 }
 
 interface pbAttackerData {

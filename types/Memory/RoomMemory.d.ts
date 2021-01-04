@@ -181,4 +181,13 @@ interface RoomMemory {
   targetHostileCreepsCacheExpireTime: number;
   // 可以重新占领，刷 RCL 用
   canReClaim?: boolean;
+  upgradePosInfos: Record<string, UpgradePosInfo>;
+}
+interface UpgradePosInfo {
+  x: number;
+  y: number;
+  creepId: Id<Creep>;
+  rangeToController: number;
+  rangeToStorage: number;
+  rangeToTerminal: number;
 }
