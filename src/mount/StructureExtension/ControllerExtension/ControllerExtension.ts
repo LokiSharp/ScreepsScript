@@ -233,8 +233,7 @@ export default class ControllerExtension extends StructureController {
       if (!info) info = _.find(unusedPosInfo, item => item.rangeToStorage === range || item.rangeToTerminal === range);
     }
     if (!info) info = _.find(unusedPosInfo, item => item);
-    if (creep.memory.role === "boostBuildHelper")
-      (creep as Creep<"boostBuildHelper">).memory.data.upgradePosInfo = info;
+    if (creep.memory.role === "gclUpgrader") (creep as Creep<"gclUpgrader">).memory.data.upgradePosInfo = info;
 
     this.room.memory.upgradePosInfos[`${info.x},${info.y}`].creepId = creep.id;
     return new RoomPosition(info.x, info.y, this.room.name);
