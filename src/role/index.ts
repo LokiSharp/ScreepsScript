@@ -1,6 +1,5 @@
 import { attacker } from "./war/attacker";
 import { boostAttacker } from "./war/boostAttacker";
-import { boostBuildHelper } from "./remote/boostBuildHelper";
 import { boostDismantler } from "./war/boostDismantler";
 import { boostHealer } from "./war/boostHealer";
 import { boostRangedAttacker } from "./war/boostRangedAttacker";
@@ -11,6 +10,7 @@ import { collector } from "./base/collector";
 import { defender } from "./war/defender";
 import { depositHarvester } from "./remote/depositHarvester";
 import { dismantler } from "./war/dismantler";
+import { gclUpgrader } from "./remote/gclUpgrader";
 import { harvester } from "./base/harvester";
 import { healer } from "./war/healer";
 import { manager } from "./advanced/manager";
@@ -65,7 +65,7 @@ const creepWorks: CreepWork = {
   pbHealer,
   depositHarvester,
   buildHelper,
-  boostBuildHelper,
+  gclUpgrader,
   reClaimer,
   /**
    * 战斗角色组

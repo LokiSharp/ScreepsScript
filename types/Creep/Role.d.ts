@@ -41,7 +41,7 @@ interface RoleDatas {
   moveTester: RemoteDeclarerData;
   reiver: ReiverData;
   buildHelper: RemoteHelperData;
-  boostBuildHelper: RemoteHelperData;
+  gclUpgrader: RemoteHelperData;
   reClaimer: RemoteDeclarerData;
 
   /**

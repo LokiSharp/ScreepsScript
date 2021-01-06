@@ -7,7 +7,7 @@ import { getRoomAvailableSource } from "../../modules/energyController";
  * 强化协助建造者
  * 协助其他房间进行建造工作，刷 RCL 用
  */
-export const boostBuildHelper: CreepConfig<"boostBuildHelper"> = {
+export const gclUpgrader: CreepConfig<"gclUpgrader"> = {
   source: creep => {
     if (creep.ticksToLive <= TRANSFER_DEATH_LIMIT) return deathPrepare(creep);
     const { targetRoomName, upgradePosInfo } = creep.memory.data;
@@ -83,10 +83,10 @@ export const boostBuildHelper: CreepConfig<"boostBuildHelper"> = {
     if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
       const nearByMinEnergyCreep: Creep = creep.pos
         .findInRange(FIND_MY_CREEPS, 1)
-        .filter((targetCreep: Creep<"boostBuildHelper">) => {
+        .filter((targetCreep: Creep<"gclUpgrader">) => {
           return (
             targetCreep.name !== creep.name &&
-            targetCreep.memory.role === "boostBuildHelper" &&
+            targetCreep.memory.role === "gclUpgrader" &&
             targetCreep.ticksToLive >= 30 &&
             targetCreep.memory.data.upgradePosInfo &&
             creep.memory.data.upgradePosInfo &&
