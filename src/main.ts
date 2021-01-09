@@ -1,4 +1,4 @@
-import { cpuUsageScanner, roomTaskScanner, stateScanner } from "./modules/stateCollector";
+import { cpuUsageScanner, stateScanner } from "./modules/stateCollector";
 import { execShard, saveShardData } from "./modules/crossShard";
 import ErrorMapper from "./utils/global/ErrorMapper";
 import creepNumberListener from "modules/creepController/creepNumberListener";
@@ -33,6 +33,4 @@ export const loop = ErrorMapper.wrapLoop(() => {
   cpuUsageScanner("saveShardData");
   stateScanner();
   cpuUsageScanner("stateScanner");
-  roomTaskScanner();
-  cpuUsageScanner("roomTaskScanner");
 });

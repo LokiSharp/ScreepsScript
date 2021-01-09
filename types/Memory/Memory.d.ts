@@ -103,10 +103,6 @@ interface Memory {
 }
 
 interface RoomStats {
-  // storage 中的能量剩余量
-  energy?: number;
-  // 终端中的 power 数量
-  power?: number;
   // nuker 的资源存储量
   nukerEnergy?: number;
   nukerG?: number;
@@ -143,8 +139,4 @@ interface RoomStats {
    */
   commRes: { [commType: string]: number };
   resources: { [resourceType: string]: number };
-  /**
-   * 测试消息预留
-   */
-  debugMessage?: unknown;
 }
