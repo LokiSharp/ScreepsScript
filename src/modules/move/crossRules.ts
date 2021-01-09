@@ -39,7 +39,10 @@ const crossRules: CrossRules = {
   upgrader: noCrossWithWork,
   remoteUpgrader: noCrossWithWork,
   builder: noCrossWithWork,
-  remoteBuilder: noCrossWithWork
+  remoteBuilder: noCrossWithWork,
+  gclUpgrader: (creep, requireCreep) =>
+    requireCreep.memory.role === creep.memory.role || requireCreep.memory.role === "reClaimer",
+  reClaimer: () => false
 };
 
 export default crossRules;

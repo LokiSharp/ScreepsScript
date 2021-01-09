@@ -10,6 +10,7 @@ import { collector } from "./base/collector";
 import { defender } from "./war/defender";
 import { depositHarvester } from "./remote/depositHarvester";
 import { dismantler } from "./war/dismantler";
+import { gclUpgrader } from "./remote/gclUpgrader";
 import { harvester } from "./base/harvester";
 import { healer } from "./war/healer";
 import { manager } from "./advanced/manager";
@@ -20,6 +21,7 @@ import { pbCarrier } from "./remote/pbCarrier";
 import { pbHealer } from "./remote/pbHealer";
 import { processor } from "./advanced/processor";
 import { rangedAttacker } from "./war/rangedAttacker";
+import { reClaimer } from "./remote/reClaimer";
 import { reiver } from "./remote/reiver";
 import { remoteBuilder } from "./remote/remoteBuilder";
 import { remoteHarvester } from "./remote/remoteHarvester";
@@ -63,6 +65,8 @@ const creepWorks: CreepWork = {
   pbHealer,
   depositHarvester,
   buildHelper,
+  gclUpgrader,
+  reClaimer,
   /**
    * 战斗角色组
    * 本角色组包括了对外战斗和房间防御所需要的角色

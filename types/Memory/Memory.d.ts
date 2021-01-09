@@ -117,13 +117,19 @@ interface RoomStats {
   structureNums?: { [structureName: string]: number };
   constructionSiteNums?: { [structureName: string]: number };
   /**
-   * 升级工的工作时长
+   * 本房间的总可用能量（包括 storage、terminal、container）
    */
-  upgraderWorkingTime: number;
+  totalEnergy: number;
+  /**
+   * totalEnergy 统计时的 Game.time，用于计算下面的获取速率
+   */
+  energyCalcTime: number;
   /**
    * 升级工的生命总时长
+   * 能量获取速率
+   * 例如 100 代表 100 点能量/tick，值为负代表负增长
    */
-  upgraderLifeTime: number;
+  energyGetRate: number;
   /**
    * 搬运工的工作时长
    */
@@ -136,6 +142,7 @@ interface RoomStats {
    * 其他种类的资源数量，由 factory 统计
    */
   commRes: { [commType: string]: number };
+  resources: { [resourceType: string]: number };
   /**
    * 测试消息预留
    */

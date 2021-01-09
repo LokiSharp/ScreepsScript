@@ -1,5 +1,6 @@
 import { MAX_HARVESTER_NUM, MAX_UPGRADER_NUM, UPGRADE_WITH_STORAGE } from "setting";
 import { creepApi } from "modules/creepController/creepApi";
+import { getRoomAvailableSource } from "modules/energyController";
 
 // 在 Function 原型上挂载 setNextPlan 方法来完成 creep 发布的职责链
 declare global {
@@ -152,6 +153,7 @@ const releasePlans: CreepReleasePlans = {
     plans: [
       // 8 级时的特殊判断
       ({ room, controllerLevel, ticksToDowngrade, upgradeLinkId }: UpgraderPlanStats) => {
+        if (room.memory.canReClaim) return true;
         if (controllerLevel < 8) return false;
         // 掉级还早，不发布 upgrader 了
         if (ticksToDowngrade >= 100000) return true;
@@ -295,7 +297,7 @@ function releaseUpgrader(room: Room): OK {
  */
 function releaseBuilder(room: Room, releaseNumber = 2): OK {
   for (let i = 0; i < releaseNumber; i++) {
-    const source = room.getAvailableSource(false);
+    const source = getRoomAvailableSource(room, { includeSource: false });
     creepApi.add(
       `${room.name} builder${i}`,
       "builder",

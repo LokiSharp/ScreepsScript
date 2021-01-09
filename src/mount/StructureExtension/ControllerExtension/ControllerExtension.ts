@@ -1,4 +1,6 @@
 import { LEVEL_BUILD_RAMPART } from "../../../setting";
+import { countEnergyChangeRatio } from "../../../modules/energyController";
+import { creepApi } from "../../../modules/creepController/creepApi";
 import { setRoomStats } from "modules/stateCollector";
 import { whiteListFilter } from "utils/global/whiteListFilter";
 
@@ -20,6 +22,14 @@ export default class ControllerExtension extends StructureController {
 
     // 8 级并且快掉级了就孵化 upgrader
     if (this.level === 8 && this.ticksToDowngrade <= 100000) this.room.releaseCreep("upgrader");
+
+    const { storage, terminal } = this.room;
+    if (
+      this.room.memory.canReClaim &&
+      this.level >= 8 &&
+      storage.store.getUsedCapacity(RESOURCE_ENERGY) + terminal.store.getUsedCapacity(RESOURCE_ENERGY) >= 1000000
+    )
+      this.reClaim();
 
     // 检查外矿有没有被入侵的，有的话是不是可以重新发布 creep
     if (this.room.memory.remote) {
@@ -78,6 +88,8 @@ export default class ControllerExtension extends StructureController {
       };
     });
 
+    // 统计本房间能量状态
+    countEnergyChangeRatio(this.room.name);
     this.structureScanner();
 
     return hasLevelChange;
@@ -120,7 +132,7 @@ export default class ControllerExtension extends StructureController {
     let hasConstructionSites = false;
     const constructionSites = this.room.find(FIND_CONSTRUCTION_SITES);
 
-    const constructionSiteIds: Id<ConstructionSite<BuildableStructureConstant>>[] = [];
+    const constructionSiteIds: Id<ConstructionSite>[] = [];
     const constructionSiteNums: { [structureName: string]: number } = {};
 
     if (constructionSites.length > 0) {
@@ -175,5 +187,55 @@ export default class ControllerExtension extends StructureController {
     // 根据物流模块返回的期望调整当前搬运工数量
     this.room.memory.transporterNumber += this.room.transport.getExpect();
     this.room.releaseCreep("manager", this.room.memory.transporterNumber);
+  }
+  /**
+   * 重新占领，刷 RCL 用
+   */
+  private reClaim(): void {
+    creepApi.add(`${this.room.name} reClaimer`, "reClaimer", { targetRoomName: this.room.name }, this.room.name);
+  }
+
+  private upgradePosInfosFiltered = false;
+
+  private getUpgradePosInfos(): Record<string, UpgradePosInfo> {
+    if (!this.room.memory.upgradePosInfos) {
+      this.room.memory.upgradePosInfos = {};
+      this.pos.getCanStandPos(3).forEach(pos => {
+        this.room.memory.upgradePosInfos[`${pos.x},${pos.y}`] = {
+          x: pos.x,
+          y: pos.y,
+          creepId: undefined,
+          rangeToController: pos.getRangeTo(this.room.controller) || undefined,
+          rangeToStorage: pos.getRangeTo(this.room.storage) || undefined,
+          rangeToTerminal: pos.getRangeTo(this.room.terminal) || undefined
+        };
+      });
+    }
+    if (!this.upgradePosInfosFiltered) {
+      _.forEach(this.room.memory.upgradePosInfos, info => {
+        if (!Game.getObjectById(info.creepId))
+          this.room.memory.upgradePosInfos[`${info.x},${info.y}`].creepId = undefined;
+      });
+      this.upgradePosInfosFiltered = true;
+    }
+    return this.room.memory.upgradePosInfos;
+  }
+
+  public getUpgradePos(creep: Creep): RoomPosition {
+    let info: UpgradePosInfo;
+
+    const upgradePosInfos = this.getUpgradePosInfos();
+    const unusedPosInfo = _.filter(upgradePosInfos, item => !item.creepId);
+
+    info = _.find(upgradePosInfos, item => item.creepId === creep.id);
+    for (const range of [1, 2, 3, 4, 5, 6, 7]) {
+      if (info) break;
+      if (!info) info = _.find(unusedPosInfo, item => item.rangeToStorage === range || item.rangeToTerminal === range);
+    }
+    if (!info) info = _.find(unusedPosInfo, item => item);
+    if (creep.memory.role === "gclUpgrader") (creep as Creep<"gclUpgrader">).memory.data.upgradePosInfo = info;
+
+    this.room.memory.upgradePosInfos[`${info.x},${info.y}`].creepId = creep.id;
+    return new RoomPosition(info.x, info.y, this.room.name);
   }
 }

@@ -136,8 +136,6 @@ export const BOOST_RESOURCE: BoostResourceConfig = {
   ],
   // 升级时所需资源
   UPGRADE: [
-    // WORK
-    RESOURCE_CATALYZED_GHODIUM_ACID,
     // CARRY
     RESOURCE_CATALYZED_KEANIUM_ACID,
     // MOVE
@@ -148,4 +146,5 @@ export const BOOST_RESOURCE: BoostResourceConfig = {
 /**
  * 当 lab 强化过 creep 之后会检查资源的剩余容量，如果低于下面这个值就会重新装填
  */
-export const boostResourceReloadLimit = 900;
+export const boostResourceReloadLimit = 750;
+export const boostEnergyReloadLimit = 500;

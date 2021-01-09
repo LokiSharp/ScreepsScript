@@ -10,25 +10,25 @@ export function sourceContainersGetter(): StructureContainer[] {
   if (!(this as Room).memory.sourceContainersIds) return [];
 
   // container 有可能会消失，每次获取时都要把废弃的 id 移除出内存
-  const abandonedIdIndex = [];
 
   const targets = (this as Room).memory.sourceContainersIds
     // 遍历 id，获取 container 实例
-    .map((containerId, index) => {
+    .map(containerId => {
       const container = Game.getObjectById(containerId);
       if (container) return container;
 
-      abandonedIdIndex.push(index);
       return false;
     })
     // 去除所有为 false 的结果
-    .filter(Boolean);
+    .filter(Boolean) as StructureContainer[];
 
-  // 移除失效的 id
-  abandonedIdIndex.forEach(index => (this as Room).memory.sourceContainersIds.splice(index, 1));
-  if ((this as Room).memory.sourceContainersIds.length <= 0) delete (this as Room).memory.sourceContainersIds;
+  // 如果获取到的 container 数量和内存数量不一致的话说明有 container 失效了，更新内存
+  if ((this as Room).memory.sourceContainersIds.length < targets.length) {
+    if ((this as Room).memory.sourceContainersIds.length <= 0) delete (this as Room).memory.sourceContainersIds;
+    else (this as Room).memory.sourceContainersIds = targets.map(target => target.id);
+  }
 
   // 暂存对象并返回
-  (this as Room).sourceContainersCache = targets as StructureContainer[];
+  (this as Room).sourceContainersCache = targets;
   return (this as Room).sourceContainersCache;
 }

@@ -22,11 +22,13 @@ export function setRoomStats(roomName: string, getNewStats: (stats: RoomStats) =
       nukerCooldown: 0,
       controllerRatio: 0,
       controllerLevel: 0,
-      upgraderWorkingTime: 0,
-      upgraderLifeTime: 0,
       transporterWorkingTime: 0,
       transporterLifeTime: 0,
-      commRes: {}
+      totalEnergy: 0,
+      energyCalcTime: 0,
+      energyGetRate: NaN,
+      commRes: {},
+      resources: {}
     };
   }
 

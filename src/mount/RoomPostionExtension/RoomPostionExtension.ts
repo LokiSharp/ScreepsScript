@@ -49,8 +49,15 @@ export default class RoomPostionExtension extends RoomPosition {
     // 遍历 x 和 y 坐标
     xs.forEach(x =>
       ys.forEach(y => {
+        const pos = new RoomPosition(x, y, this.roomName);
         // 如果不是墙则 ++
-        if (terrain.get(x, y) !== TERRAIN_MASK_WALL) result.push(new RoomPosition(x, y, this.roomName));
+        if (
+          terrain.get(x, y) !== TERRAIN_MASK_WALL ||
+          pos.lookFor(LOOK_STRUCTURES).find(structure => {
+            return structure.structureType === STRUCTURE_ROAD;
+          })
+        )
+          result.push(pos);
       })
     );
 
@@ -64,9 +71,7 @@ export default class RoomPostionExtension extends RoomPosition {
    */
   public getCanStandPos(range = 1): RoomPosition[] {
     if (!this.canStandPosCache) {
-      this.canStandPosCache = this.getFreeSpace(range)
-        .filter(pos => pos.canStand())
-        .filter(pos => !pos.hasCreepStand());
+      this.canStandPosCache = this.getFreeSpace(range).filter(pos => pos.canStand());
     }
 
     return this.canStandPosCache;

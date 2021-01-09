@@ -40,7 +40,9 @@ interface RoleDatas {
   pbCarrier: RemoteHarvesterData;
   moveTester: RemoteDeclarerData;
   reiver: ReiverData;
-  buildHelper: RemoteDeclarerData;
+  buildHelper: RemoteHelperData;
+  gclUpgrader: RemoteHelperData;
+  reClaimer: RemoteDeclarerData;
 
   /**
    * 战斗单位
@@ -175,6 +177,7 @@ interface RemoteHelperData {
   // 出生房名称，资源会被运输到该房间中
   spawnRoom?: string;
   wayPoint?: string;
+  upgradePosInfo?: UpgradePosInfo;
 }
 
 interface pbAttackerData {
