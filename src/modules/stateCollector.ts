@@ -15,8 +15,6 @@
 export function setRoomStats(roomName: string, getNewStats: (stats: RoomStats) => Partial<RoomStats>): void {
   if (!Memory.stats.rooms[roomName]) {
     Memory.stats.rooms[roomName] = {
-      energy: 0,
-      power: 0,
       nukerEnergy: 0,
       nukerG: 0,
       nukerCooldown: 0,
@@ -93,18 +91,4 @@ export function cpuUsageScanner(key: string): void {
 
   const startCpu = Object.values(Memory.stats.cpuCost);
   Memory.stats.cpuCost[key] = Game.cpu.getUsed() - _.sum(startCpu);
-}
-
-export function roomTaskScanner(): void {
-  if (!Memory.stats.rooms) return;
-  Object.values(Game.rooms)
-    .filter(room => room.controller?.my === true)
-    .forEach(room => {
-      if (room.transport && Memory.stats.rooms[room.name])
-        Memory.stats.rooms[room.name].debugMessage = {
-          transportTasks: room.memory.transportTasks,
-          totalLifeTime: room.transport.totalLifeTime,
-          totalWorkTime: room.transport.totalWorkTime
-        };
-    });
 }
