@@ -58,7 +58,7 @@ export const upgrader: CreepConfig<"upgrader"> = {
     if (room.controller && room.controller.my) {
       if (room.controller.level === 7 && room.memory.upgradeLinkId)
         return calcBodyPart({ [WORK]: 20, [CARRY]: 4, [MOVE]: 10 });
-      else if (room.controller.level === 8) return calcBodyPart({ [WORK]: 12, [CARRY]: 12, [MOVE]: 12 });
+      else if (room.controller.level === 8) return calcBodyPart({ [WORK]: 15, [CARRY]: 15, [MOVE]: 15 });
     }
 
     return createBodyGetter(bodyConfigs.worker)(room, spawn);
