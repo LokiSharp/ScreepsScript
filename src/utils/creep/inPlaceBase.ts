@@ -14,7 +14,7 @@ export const inPlaceBase = <Role extends CreepRoleConstant>(): ICreepStage<Role>
         checkTarget: true,
         range: 0
       });
-      return creep.memory.moveInfo?.wayPoints?.length <= 1;
+      return creep.memory.moveInfo?.wayPoints?.length <= 0;
     }
     return true;
   }
