@@ -35,11 +35,9 @@ export const boostRangedAttacker: CreepConfig<"boostRangedAttacker"> = {
     }
 
     if (creep.room.name === targetFlag.pos.roomName) {
-      const hostileCreeps = creep.getHostileCreepsWithCache();
       const structures = targetFlag.pos.lookFor(LOOK_STRUCTURES);
 
-      if (creep.rangedAttackLowestHitsHostileCreeps(hostileCreeps) === OK) return false;
-      else if (structures.length > 0) {
+      if (structures.length > 0) {
         if (creep.rangedAttack(structures[0]) === ERR_NOT_IN_RANGE) creep.moveTo(structures[0]);
       } else if (creep.rangedAttackNearestHostileCreeps() === OK) return false;
       else if (creep.rangedAttackNearHostileStructures() === OK) return false;
