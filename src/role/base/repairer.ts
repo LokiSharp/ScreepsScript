@@ -24,7 +24,7 @@ export const repairer: CreepConfig<"repairer"> = {
 
     // RCL 到 7 就不孵化了，因为要拿能量去升级（到 8 时会有其他模块重新发布 repairer）
     if (room.controller.level === 7) return false;
-    // RCL 8 之后 5000 tick 孵化一次
+    // RCL 8 之后 1000 tick 孵化一次
     else if (room.controller.level >= 8) {
       addSpawnRepairerTask(room.name);
       return false;
@@ -80,7 +80,7 @@ export const repairer: CreepConfig<"repairer"> = {
  * @param roomName 添加到的房间名
  */
 function addSpawnRepairerTask(roomName: string): void {
-  addDelayTask("spawnRepairer", { roomName }, Game.time + 5000);
+  addDelayTask("spawnRepairer", { roomName }, Game.time + 1000);
 }
 
 /**

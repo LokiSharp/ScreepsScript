@@ -33,10 +33,13 @@ export const countEnergyChangeRatio = function (roomName: string): OK | ERR_NOT_
       Boolean
     );
     const storesEnergy = stores.map(store => store[RESOURCE_ENERGY]);
-    const totalEnergy = storesEnergy.reduce(
-      // 计算 store 中的能量总数
-      (pre, next) => (pre || 0) + (next || 0)
-    );
+    const totalEnergy =
+      storesEnergy.length > 0
+        ? storesEnergy.reduce(
+            // 计算 store 中的能量总数
+            (pre, next) => (pre || 0) + (next || 0)
+          )
+        : 0;
 
     // 计算能量获取速率，如果 energyGetRate 为 NaN 的话代表之前还未进行过统计，先设置为 0
     const energyGetRate = _.isNaN(oldStats.energyGetRate)
