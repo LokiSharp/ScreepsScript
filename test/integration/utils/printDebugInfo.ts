@@ -26,7 +26,6 @@ function getDebugInfo(memory: Memory, gameTime: number): Record<string, unknown>
     cpuCost: memory.stats.cpuCost,
     cpu: memory.stats.cpu,
     cpuBucket: memory.stats.bucket,
-    memoryCost: JSON.stringify(memory).length,
-    debugMessage: roomMemory.debugMessage ? roomMemory.debugMessage : ""
+    memoryCost: JSON.stringify(memory).length
   };
 }

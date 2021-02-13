@@ -4,11 +4,11 @@ import ErrorMapper from "./utils/global/ErrorMapper";
 import creepNumberListener from "modules/creepController/creepNumberListener";
 import doing from "./utils/global/doing";
 import generatePixel from "./utils/global/generatePixel";
+import { manageDelayTask } from "modules/delayQueue";
 import mountExtension from "./mount";
 
 export const loop = ErrorMapper.wrapLoop(() => {
   cpuUsageScanner("start");
-
   // 挂载所有拓展
   mountExtension();
   cpuUsageScanner("mountExtension");
@@ -25,6 +25,9 @@ export const loop = ErrorMapper.wrapLoop(() => {
   cpuUsageScanner("doingCreeps");
   doing(Game.powerCreeps);
   cpuUsageScanner("doingPowerCreeps");
+  // 处理延迟任务
+  manageDelayTask();
+  cpuUsageScanner("manageDelayTask");
   // 搓 pixel
   generatePixel();
   cpuUsageScanner("generatePixel");
