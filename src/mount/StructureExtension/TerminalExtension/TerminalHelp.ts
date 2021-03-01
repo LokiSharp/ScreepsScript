@@ -1,5 +1,5 @@
 import TerminalExtension from "./TerminalExtension";
-import { createHelp } from "modules/help";
+import { createHelp } from "@/modules/help";
 
 /**
  * Terminal 上的用户控制接口

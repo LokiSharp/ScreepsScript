@@ -1,7 +1,7 @@
-import { battleBase } from "utils/creep/battleBase";
-import { boostPrepare } from "utils/creep/boostPrepare";
-import calcBodyPart from "utils/creep/calcBodyPart";
-import { inPlaceBase } from "../../utils/creep/inPlaceBase";
+import { battleBase } from "@/utils/creep/battleBase";
+import { boostPrepare } from "@/utils/creep/boostPrepare";
+import calcBodyPart from "@/utils/creep/calcBodyPart";
+import { inPlaceBase } from "@/utils/creep/inPlaceBase";
 
 /**
  * 强化 - 远程作战单位

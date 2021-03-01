@@ -1,7 +1,7 @@
-import { TRANSFER_DEATH_LIMIT } from "../../setting";
-import calcBodyPart from "../../utils/creep/calcBodyPart";
-import deathPrepare from "../../utils/creep/deathPrepare";
-import { getRoomAvailableSource } from "../../modules/energyController";
+import { TRANSFER_DEATH_LIMIT } from "@/setting";
+import calcBodyPart from "@/utils/creep/calcBodyPart";
+import deathPrepare from "@/utils/creep/deathPrepare";
+import { getRoomAvailableSource } from "@/modules/energyController/energyController";
 
 /**
  * 强化协助建造者

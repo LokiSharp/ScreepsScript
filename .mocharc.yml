@@ -1,6 +1,7 @@
 require:
   - test/setup-node.ts
   - ts-node/register
+  - tsconfig-paths/register
 ui: bdd
 reporter: spec
 full-trace: true

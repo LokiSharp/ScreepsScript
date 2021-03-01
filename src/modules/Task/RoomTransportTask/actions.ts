@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { boostResourceReloadLimit } from "../../../setting";
-import { getRoomAvailableSource } from "../../energyController";
+import { boostResourceReloadLimit } from "@/setting";
+import { getRoomAvailableSource } from "../../energyController/energyController";
 
 /**
  * 没有任务时的行为逻辑

@@ -1,8 +1,8 @@
-import FlagMock from "../../mock/FlagMock";
-import GameMock from "../../mock/GameMock";
-import MemoryMock from "../../mock/MemoryMock";
+import FlagMock from "@mock/FlagMock";
+import GameMock from "@mock/GameMock";
+import MemoryMock from "@mock/MemoryMock";
 import { assert } from "chai";
-import { checkAliveFlag } from "../../../../src/utils/global/checkAliveFlag";
+import { checkAliveFlag } from "@/utils/global/checkAliveFlag";
 
 describe("checkAliveFlag", () => {
   beforeEach(() => {

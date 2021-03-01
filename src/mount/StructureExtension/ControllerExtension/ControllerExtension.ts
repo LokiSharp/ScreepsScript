@@ -1,15 +1,15 @@
-import { LEVEL_BUILD_RAMPART } from "../../../setting";
-import { countEnergyChangeRatio } from "../../../modules/energyController";
-import { creepApi } from "../../../modules/creepController/creepApi";
-import { setRoomStats } from "modules/stateCollector";
-import { whiteListFilter } from "utils/global/whiteListFilter";
+import { LEVEL_BUILD_RAMPART } from "@/setting";
+import { countEnergyChangeRatio } from "@/modules/energyController/energyController";
+import { creepApi } from "@/modules/creepController/creepApi";
+import { setRoomStats } from "@/modules/stats";
+import { whiteListFilter } from "@/utils/global/whiteListFilter";
 
 /**
  * Controller 拓展
  * 统计当前升级进度、移除无效的禁止通行点位
  */
 export default class ControllerExtension extends StructureController {
-  public work(): void {
+  public onWork(): void {
     if (Game.time % 20) return;
     // 如果等级发生变化了就运行 creep 规划
     if (this.stateScanner()) this.onLevelChange(this.level);
@@ -76,7 +76,7 @@ export default class ControllerExtension extends StructureController {
    *
    * @returns 为 true 时说明自己等级发生了变化
    */
-  private stateScanner(): boolean {
+  public stateScanner(): boolean {
     let hasLevelChange = false;
     setRoomStats(this.room.name, stats => {
       hasLevelChange = stats.controllerLevel !== this.level;
@@ -159,7 +159,7 @@ export default class ControllerExtension extends StructureController {
   /**
    * 扫描房间内建筑
    */
-  private structureScanner(): void {
+  public structureScanner(): void {
     const structures = this.room.find(FIND_STRUCTURES);
     const structureNums: { [structureName: string]: number } = {};
 

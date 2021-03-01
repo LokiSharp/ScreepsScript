@@ -1,9 +1,9 @@
-import BaseMock from "../../mock/BaseMock";
-import CreepMock from "../../mock/CreepMock";
-import GameMock from "../../mock/GameMock";
-import MemoryMock from "../../mock/MemoryMock";
+import BaseMock from "@mock/BaseMock";
+import CreepMock from "@mock/CreepMock";
+import GameMock from "@mock/GameMock";
+import MemoryMock from "@mock/MemoryMock";
 import { assert } from "chai";
-import doing from "../../../../src/utils/global/doing";
+import doing from "@/utils/global/doing";
 
 describe("doing", () => {
   beforeEach(() => {

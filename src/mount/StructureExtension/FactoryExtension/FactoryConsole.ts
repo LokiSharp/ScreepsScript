@@ -1,5 +1,5 @@
 import FactoryExtension from "./FactoryExtension";
-import colorful from "utils/console/colorful";
+import colorful from "@/utils/console/colorful";
 
 /**
  * Factory 上的用户控制接口

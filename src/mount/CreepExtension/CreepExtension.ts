@@ -1,11 +1,11 @@
-import { MIN_WALL_HITS, repairSetting } from "setting";
-import { Move, WayPoint } from "modules/move";
-import { creepApi } from "../../modules/creepController/creepApi";
-import creepWorks from "role";
-import { getMemoryFromCrossShard } from "modules/crossShard";
-import { updateStructure } from "modules/shortcut/updateStructure";
+import { MIN_WALL_HITS, repairSetting } from "@/setting";
+import { Move, WayPoint } from "@/modules/move";
+import { creepApi } from "@/modules/creepController/creepApi";
+import creepWorks from "@/role";
+import { getMemoryFromCrossShard } from "@/modules/crossShard";
+import { updateStructure } from "@/modules/shortcut/updateStructure";
 
-export default class CreepExtension extends Creep {
+export class CreepExtension extends Creep {
   /**
    * 发送日志
    *
@@ -20,7 +20,7 @@ export default class CreepExtension extends Creep {
   /**
    * creep 主要工作
    */
-  public work(): void {
+  public onWork(): void {
     // 检查 creep 内存中的角色是否存在
     if (!(this.memory.role in creepWorks)) {
       // 没有的话可能是放在跨 shard 暂存区了

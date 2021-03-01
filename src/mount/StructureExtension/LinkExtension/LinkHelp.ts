@@ -1,5 +1,5 @@
 import LinkExtension from "./LinkExtension";
-import { createHelp } from "modules/help";
+import { createHelp } from "@/modules/help";
 
 export class LinkHelp extends LinkExtension {
   /**

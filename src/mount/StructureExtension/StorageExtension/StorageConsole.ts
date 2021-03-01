@@ -1,6 +1,6 @@
-import { DEFAULT_ENERGY_KEEP_AMOUNT, DEFAULT_ENERGY_KEEP_LIMIT } from "setting";
+import { DEFAULT_ENERGY_KEEP_AMOUNT, DEFAULT_ENERGY_KEEP_LIMIT } from "@/setting";
 import StorageExtension from "./StorageExtension";
-import { createHelp } from "modules/help";
+import { createHelp } from "@/modules/help";
 
 export default class StorageConsole extends StorageExtension {
   /**

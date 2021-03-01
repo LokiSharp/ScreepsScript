@@ -1,5 +1,5 @@
 import ObserverExtension from "./ObserverExtension";
-import { createHelp } from "modules/help";
+import { createHelp } from "@/modules/help";
 
 export default class ObserverHelp extends ObserverExtension {
   /**

@@ -1,6 +1,6 @@
-import { TRANSFER_DEATH_LIMIT, bodyConfigs } from "setting";
-import createBodyGetter from "utils/creep/createBodyGetter";
-import deathPrepare from "utils/creep/deathPrepare";
+import { TRANSFER_DEATH_LIMIT, bodyConfigs } from "@/setting";
+import createBodyGetter from "@/utils/creep/createBodyGetter";
+import deathPrepare from "@/utils/creep/deathPrepare";
 
 /**
  * 房间物流运输者

@@ -1,6 +1,6 @@
-import GameMock from "../../mock/GameMock";
+import GameMock from "@mock/GameMock";
 import { assert } from "chai";
-import log from "../../../../src/utils/console/log";
+import log from "@/utils/console/log";
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const stdout = process.stdout.write;

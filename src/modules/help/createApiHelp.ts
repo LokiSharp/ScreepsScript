@@ -1,4 +1,4 @@
-import colorful from "utils/console/colorful";
+import colorful from "@/utils/console/colorful";
 
 /**
  * 绘制单个 api 的帮助元素

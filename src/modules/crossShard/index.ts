@@ -3,8 +3,8 @@
  * 本模块会发起和处理 shard 之间的需求任务
  */
 
-import { ALL_SHARD_NAME } from "setting";
-import log from "utils/console/log";
+import { ALL_SHARD_NAME } from "@/setting";
+import log from "@/utils/console/log";
 import { requestHandleStrategies } from "./handleStrategies";
 
 // 其他 shard 的数据
@@ -232,4 +232,12 @@ export const execShard = function (): ScreepsReturnCode {
   handleSelfMessage();
   handleOtherMessage();
   return OK;
+};
+
+/**
+ * 跨 shard 模块注册插件
+ */
+export const crossShardAppPlugin: AppLifecycleCallbacks = {
+  tickStart: execShard,
+  tickEnd: saveShardData
 };

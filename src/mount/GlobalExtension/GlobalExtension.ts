@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
-import { baseLayout } from "setting";
-import { createHelp } from "modules/help";
-import { creepApi } from "modules/creepController/creepApi";
-import { findBaseCenterPos } from "modules/autoPlanning/planBasePos";
+import { baseLayout } from "@/setting";
+import { createHelp } from "@/modules/help";
+import { creepApi } from "@/modules/creepController/creepApi";
+import { findBaseCenterPos } from "@/modules/autoPlanning/planBasePos";
 
 // 全局拓展对象
 export default {

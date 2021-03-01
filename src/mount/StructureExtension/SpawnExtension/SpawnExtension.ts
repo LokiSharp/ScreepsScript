@@ -1,5 +1,5 @@
-import { creepDefaultMemory, importantRoles } from "setting";
-import creepWorks from "role";
+import { creepDefaultMemory, importantRoles } from "@/setting";
+import creepWorks from "@/role";
 
 /**
  * Spawn 原型拓展
@@ -8,7 +8,7 @@ export default class SpawnExtension extends StructureSpawn {
   /**
    * spawn 主要工作
    */
-  public work(): void {
+  public onWork(): void {
     if (this.spawning) {
       /**
        * 如果孵化已经开始了，就向物流队列推送任务

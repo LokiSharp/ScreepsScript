@@ -1,13 +1,13 @@
-import { DEPOSIT_MAX_COOLDOWN, OBSERVER_DEPOSIT_MAX, OBSERVER_POWERBANK_MAX, observerInterval } from "setting";
-import { checkAliveFlag } from "utils/global/checkAliveFlag";
-import { creepApi } from "modules/creepController/creepApi";
+import { DEPOSIT_MAX_COOLDOWN, OBSERVER_DEPOSIT_MAX, OBSERVER_POWERBANK_MAX, observerInterval } from "@/setting";
+import { checkAliveFlag } from "@/utils/global/checkAliveFlag";
+import { creepApi } from "@/modules/creepController/creepApi";
 
 /**
  * Observer 拓展
  * 定期搜索给定列表中的房间并插旗
  */
 export default class ObserverExtension extends StructureObserver {
-  public work(): void {
+  public onWork(): void {
     const memory = this.room.memory.observer;
     // 没有初始化或者暂停了就不执行工作
     if (!memory) return;

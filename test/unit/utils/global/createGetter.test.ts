@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import createGetter from "../../../../src/utils/global/createGetter";
+import createGetter from "@/utils/global/createGetter";
 
 export class TestObject extends Object {
   public testGetter: boolean;

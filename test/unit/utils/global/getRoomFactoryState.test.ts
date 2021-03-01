@@ -1,10 +1,10 @@
-import GameMock from "../../mock/GameMock";
-import MemoryMock from "../../mock/MemoryMock";
-import RoomMemoryMock from "../../mock/RoomMemoryMock";
-import RoomMock from "../../mock/RoomMock";
-import StructureTerminalMock from "../../mock/StructureTerminalMock";
+import GameMock from "@mock/GameMock";
+import MemoryMock from "@mock/MemoryMock";
+import RoomMemoryMock from "@mock/RoomMemoryMock";
+import RoomMock from "@mock/RoomMock";
+import StructureTerminalMock from "@mock/StructureTerminalMock";
 import { assert } from "chai";
-import getRoomFactoryState from "../../../../src/utils/global/getRoomFactoryState";
+import getRoomFactoryState from "@/utils/global/getRoomFactoryState";
 
 describe("getRoomFactoryState", () => {
   beforeEach(() => {

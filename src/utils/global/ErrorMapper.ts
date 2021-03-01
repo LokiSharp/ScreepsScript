@@ -1,89 +1,95 @@
+/**
+ * 校正异常的堆栈信息
+ *
+ * 由于 rollup 会打包所有代码到一个文件，所以异常的调用栈定位和源码的位置是不同的
+ * 本模块就是用来将异常的调用栈映射至源代码位置
+ *
+ * @see https://github.com/screepers/screeps-typescript-starter/blob/master/src/utils/ErrorMapper.ts
+ */
+
 import { SourceMapConsumer } from "source-map";
+import colorful from "@/utils/console/colorful";
 
-export default class ErrorMapper {
-  // Cache consumer
-  protected static _?: SourceMapConsumer;
+// 缓存 SourceMap
+let consumer = null;
 
-  public static get consumer(): SourceMapConsumer {
-    if (this._ == null) {
-      this._ = new SourceMapConsumer(require("main.js.map"));
+// 第一次报错时创建 sourceMap
+const getConsumer = function (): SourceMapConsumer {
+  if (consumer == null) consumer = new SourceMapConsumer(require("main.js.map"));
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  return consumer;
+};
+
+// 缓存映射关系以提高性能
+const cache: { [key: string]: string } = {};
+
+/**
+ * 使用源映射生成堆栈跟踪，并生成原始标志位
+ * 警告 - global 重置之后的首次调用会产生很高的 cpu 消耗 (> 30 CPU)
+ * 之后的每次调用会产生较低的 cpu 消耗 (~ 0.1 CPU / 次)
+ *
+ * @param {Error | string} error 错误或原始追踪栈
+ * @returns {string} 映射之后的源代码追踪栈
+ */
+const sourceMappedStackTrace = function (error: Error | string): string {
+  const stack: string = error instanceof Error ? error.stack : error;
+  // 有缓存直接用
+  // eslint-disable-next-line no-prototype-builtins
+  if (cache.hasOwnProperty(stack)) return cache[stack];
+
+  const re = /^\s+at\s+(.+?\s+)?\(?([0-z._\-\\/]+):(\d+):(\d+)\)?$/gm;
+  let match: RegExpExecArray | null;
+  let outStack = error.toString();
+  console.log("ErrorMapper -> sourceMappedStackTrace -> outStack", outStack);
+
+  while ((match = re.exec(stack))) {
+    // 解析完成
+    if (match[2] !== "main") break;
+
+    // 获取追踪定位
+    const pos = getConsumer().originalPositionFor({
+      column: parseInt(match[4], 10),
+      line: parseInt(match[3], 10)
+    });
+
+    // 无法定位
+    if (!pos.line) break;
+
+    // 解析追踪栈
+    if (pos.name) outStack += `\n    at ${pos.name} (${pos.source}:${pos.line}:${pos.column})`;
+    else {
+      // 源文件没找到对应文件名，采用原始追踪名
+      if (match[1]) outStack += `\n    at ${match[1]} (${pos.source}:${pos.line}:${pos.column})`;
+      // 源文件没找到对应文件名并且原始追踪栈里也没有，直接省略
+      else outStack += `\n    at ${pos.source}:${pos.line}:${pos.column}`;
     }
-
-    return this._;
   }
 
-  // Cache previously mapped traces to improve performance
-  public static cache: { [key: string]: string } = {};
+  cache[stack] = outStack;
+  return outStack;
+};
 
-  /**
-   * Generates a stack trace using a source map generate original symbol names.
-   *
-   * WARNING - EXTREMELY high CPU cost for first call after reset - >30 CPU! Use sparingly!
-   * (Consecutive calls after a reset are more reasonable, ~0.1 CPU/ea)
-   *
-   * @param {Error | string} error The error or original stack trace
-   * @returns {string} The source-mapped stack trace
-   */
-  public static sourceMappedStackTrace(error: Error | string): string {
-    const stack: string = error instanceof Error ? error.stack : error;
-    if (Object.prototype.hasOwnProperty.call(this.cache, stack)) {
-      return this.cache[stack];
+/**
+ * 错误追踪包装器
+ * 用于把报错信息通过 source-map 解析成源代码的错误位置
+ * 和原本 wrapLoop 的区别是，wrapLoop 会返回一个新函数，而这个会直接执行
+ *
+ * @param next 玩家代码
+ */
+export const errorMapper = function (next: () => any): void {
+  try {
+    // 执行玩家代码
+    next();
+  } catch (e) {
+    if (e instanceof Error) {
+      // 渲染报错调用栈，沙盒模式用不了这个
+      const errorMessage = Game.rooms.sim
+        ? `沙盒模式无法使用 source-map - 显示原始追踪栈<br>${_.escape(e.stack)}`
+        : `${_.escape(sourceMappedStackTrace(e))}`;
+
+      console.log(colorful(errorMessage, "red"));
     }
-
-    const re = /^\s+at\s+(.+?\s+)?\(?([0-z._\-\\/]+):(\d+):(\d+)\)?$/gm;
-    let match: RegExpExecArray | null;
-    let outStack = error.toString();
-
-    while ((match = re.exec(stack))) {
-      if (match[2] === "main") {
-        const pos = this.consumer.originalPositionFor({
-          column: parseInt(match[4], 10),
-          line: parseInt(match[3], 10)
-        });
-
-        if (pos.line != null) {
-          if (pos.name) {
-            outStack += `\n    at ${pos.name} (${pos.source}:${pos.line}:${pos.column})`;
-          } else {
-            if (match[1]) {
-              // no original source file name known - use file name from given trace
-              outStack += `\n    at ${match[1]} (${pos.source}:${pos.line}:${pos.column})`;
-            } else {
-              // no original source file name known or in given trace - omit name
-              outStack += `\n    at ${pos.source}:${pos.line}:${pos.column}`;
-            }
-          }
-        } else {
-          // no known position
-          break;
-        }
-      } else {
-        // no more parse able lines
-        break;
-      }
-    }
-
-    this.cache[stack] = outStack;
-    return outStack;
+    // 处理不了，直接抛出
+    else throw e;
   }
-
-  public static wrapLoop(loop: () => void): () => void {
-    return () => {
-      try {
-        loop();
-      } catch (e) {
-        if (e instanceof Error) {
-          if ("sim" in Game.rooms) {
-            const message = `Source maps don't work in the simulator - displaying original error`;
-            console.log(`<span style='color:#ff0000'>${message}<br>${_.escape(e.stack)}</span>`);
-          } else {
-            console.log(`<span style='color:red'>${_.escape(this.sourceMappedStackTrace(e))}</span>`);
-          }
-        } else {
-          // can't handle it
-          throw e;
-        }
-      }
-    };
-  }
-}
+};

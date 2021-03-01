@@ -1,6 +1,6 @@
-import { terminalChannels, terminalModes } from "setting";
+import { terminalChannels, terminalModes } from "@/setting";
 import TerminalExtension from "./TerminalExtension";
-import colorful from "utils/console/colorful";
+import colorful from "@/utils/console/colorful";
 
 /**
  * Terminal 上的用户控制接口

@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import calcBodyPart from "../../../../src/utils/creep/calcBodyPart";
+import calcBodyPart from "@/utils/creep/calcBodyPart";
 
 describe("calcBodyPart", () => {
   it("可以展开 BodyPart", () => {

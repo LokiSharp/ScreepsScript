@@ -1,4 +1,4 @@
-import { LEVEL_BUILD_RAMPART, LEVEL_BUILD_ROAD } from "setting";
+import { LEVEL_BUILD_RAMPART, LEVEL_BUILD_ROAD } from "@/setting";
 import planBase from "./planBase";
 import planRoad from "./planRoad";
 import planWall from "./planWall";

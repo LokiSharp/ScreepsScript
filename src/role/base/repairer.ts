@@ -1,6 +1,6 @@
-import { addDelayCallback, addDelayTask } from "modules/delayQueue";
-import { bodyConfigs } from "setting";
-import createBodyGetter from "utils/creep/createBodyGetter";
+import { addDelayCallback, addDelayTask } from "@/modules/delayQueue";
+import { bodyConfigs } from "@/setting";
+import createBodyGetter from "@/utils/creep/createBodyGetter";
 
 /**
  * 刷墙者
