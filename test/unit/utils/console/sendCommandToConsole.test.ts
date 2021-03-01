@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import sendCommandToConsole from "../../../../src/utils/console/sendCommandToConsole";
+import sendCommandToConsole from "@/utils/console/sendCommandToConsole";
 
 describe("sendCommandToConsole", () => {
   it("可以发送命令到终端", () => {

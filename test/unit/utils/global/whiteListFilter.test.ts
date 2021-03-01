@@ -1,8 +1,8 @@
-import CreepMock from "../../mock/CreepMock";
-import MemoryMock from "../../mock/MemoryMock";
-import OwnerMock from "../../mock/OwnerMock";
+import CreepMock from "@mock/CreepMock";
+import MemoryMock from "@mock/MemoryMock";
+import OwnerMock from "@mock/OwnerMock";
 import { assert } from "chai";
-import { whiteListFilter } from "../../../../src/utils/global/whiteListFilter";
+import { whiteListFilter } from "@/utils/global/whiteListFilter";
 
 describe("whiteListFilter", () => {
   beforeEach(() => {

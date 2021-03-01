@@ -37,3 +37,13 @@ export default function creepNumberListener(): void {
     else handleNotExistCreep(name, Memory.creeps[name]);
   }
 }
+
+/**
+ * creep 数量控制模块注册插件
+ */
+export const creepNumberControlAppPlugin: AppLifecycleCallbacks = {
+  reset: () => {
+    if (!Memory.creepConfigs) Memory.creepConfigs = {};
+  },
+  tickStart: creepNumberListener
+};

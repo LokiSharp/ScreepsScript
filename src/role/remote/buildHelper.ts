@@ -1,6 +1,6 @@
-import { bodyConfigs } from "setting";
-import createBodyGetter from "utils/creep/createBodyGetter";
-import { getRoomAvailableSource } from "../../modules/energyController";
+import { bodyConfigs } from "@/setting";
+import createBodyGetter from "@/utils/creep/createBodyGetter";
+import { getRoomAvailableSource } from "@/modules/energyController/energyController";
 
 /**
  * 协助建造者

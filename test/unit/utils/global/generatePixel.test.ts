@@ -1,7 +1,7 @@
-import CPUMock from "../../mock/CPUMock";
-import GameMock from "../../mock/GameMock";
+import CPUMock from "@mock/CPUMock";
+import GameMock from "@mock/GameMock";
 import { assert } from "chai";
-import generatePixel from "../../../../src/utils/global/generatePixel";
+import generatePixel from "@/utils/global/generatePixel";
 
 describe("generatePixel", () => {
   beforeEach(() => {

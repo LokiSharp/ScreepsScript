@@ -199,3 +199,8 @@ export const baseLayout: BaseLayout = [
     ]
   }
 ];
+
+/**
+ * 当前所用的基地布局的边长（正方形）
+ */
+export const BASE_SIZE = 11;

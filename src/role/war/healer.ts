@@ -1,6 +1,6 @@
-import { bodyConfigs } from "setting";
-import createBodyGetter from "utils/creep/createBodyGetter";
-import { inPlaceBase } from "../../utils/creep/inPlaceBase";
+import { bodyConfigs } from "@/setting";
+import createBodyGetter from "@/utils/creep/createBodyGetter";
+import { inPlaceBase } from "@/utils/creep/inPlaceBase";
 
 /**
  * 医生

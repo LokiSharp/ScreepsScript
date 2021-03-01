@@ -1,6 +1,6 @@
 import { creepApi } from "../creepController/creepApi";
-import creepWorks from "role";
-import log from "utils/console/log";
+import creepWorks from "@/role";
+import log from "@/utils/console/log";
 
 /**
  * 处理去世的 creep

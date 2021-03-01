@@ -1,7 +1,7 @@
-import { OBSERVER_DEPOSIT_MAX, OBSERVER_POWERBANK_MAX } from "setting";
+import { OBSERVER_DEPOSIT_MAX, OBSERVER_POWERBANK_MAX } from "@/setting";
 import ObserverExtension from "./ObserverExtension";
-import colorful from "utils/console/colorful";
-import createRoomLink from "utils/console/createRoomLink";
+import colorful from "@/utils/console/colorful";
+import createRoomLink from "@/utils/console/createRoomLink";
 
 export default class ObserverConsole extends ObserverExtension {
   /**
@@ -93,11 +93,9 @@ export default class ObserverConsole extends ObserverExtension {
 
   /**
    * 用户操作 - 显示当前监听的房间列表
-   *
-   * @param noTitle 该参数为 true 则不显示前缀
    */
   public showList(): string {
-    const result = this.room.memory.observer
+    return this.room.memory.observer
       ? `监听中的房间列表: ${this.room.memory.observer.watchRooms
           .map((room, index) => {
             if (index === this.room.memory.observer.watchIndex) return colorful(room, "green");
@@ -105,7 +103,5 @@ export default class ObserverConsole extends ObserverExtension {
           })
           .join(" ")}`
       : `未启用`;
-
-    return result;
   }
 }

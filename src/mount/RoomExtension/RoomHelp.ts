@@ -3,9 +3,9 @@
  *
  * 本文件包含了 Room 中用于控制台交互的方法
  */
-import { DEFAULT_FLAG_NAME } from "setting";
+import { DEFAULT_FLAG_NAME } from "@/setting";
 import RoomExtension from "./RoomExtension";
-import { createHelp } from "modules/help";
+import { createHelp } from "@/modules/help";
 
 export default class RoomHelp extends RoomExtension {
   /**

@@ -1,5 +1,5 @@
-import { boostPrepare } from "utils/creep/boostPrepare";
-import calcBodyPart from "utils/creep/calcBodyPart";
+import { boostPrepare } from "@/utils/creep/boostPrepare";
+import calcBodyPart from "@/utils/creep/calcBodyPart";
 
 /**
  * 防御单位

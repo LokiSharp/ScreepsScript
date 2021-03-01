@@ -5,7 +5,7 @@ import {
   boostResourceReloadLimit,
   labTarget,
   reactionSource
-} from "setting";
+} from "@/setting";
 
 /**
  * Lab 原型拓展
@@ -16,7 +16,7 @@ import {
  * 在战争状态结束后后自动清理 lab 中残留的强化材料并重新恢复化合物合成
  */
 export default class LabExtension extends StructureLab {
-  public work(): void {
+  public onWork(): void {
     // 房间没有初始化 lab 集群则检查下有没有 boost 后退出
     if (!this.room.memory.lab) {
       if (this.room.memory.boost && !this.room.hasRunLab) {

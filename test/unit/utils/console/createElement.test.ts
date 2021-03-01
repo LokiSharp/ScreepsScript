@@ -1,5 +1,5 @@
-import CreateElement from "../../../../src/utils/console/createElement";
-import GameMock from "../../mock/GameMock";
+import CreateElement from "@/utils/console/createElement";
+import GameMock from "@mock/GameMock";
 import { assert } from "chai";
 
 describe("CreateElement", () => {

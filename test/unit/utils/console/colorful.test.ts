@@ -1,4 +1,4 @@
-import colorful, { colors } from "../../../../src/utils/console/colorful";
+import colorful, { colors } from "@/utils/console/colorful";
 import { assert } from "chai";
 
 describe("colorful", () => {

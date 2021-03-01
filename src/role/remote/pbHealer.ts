@@ -1,4 +1,4 @@
-import calcBodyPart from "utils/creep/calcBodyPart";
+import calcBodyPart from "@/utils/creep/calcBodyPart";
 
 /**
  * PowerBank 治疗单位

@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import getBodyConfig from "../../../../src/utils/creep/getBodyConfig";
+import getBodyConfig from "@/utils/creep/getBodyConfig";
 
 describe("getBodyConfig", () => {
   it("可以解析 bodySets", () => {

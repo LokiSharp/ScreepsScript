@@ -6,3 +6,10 @@
 export default function generatePixel(cpuLimit = 9000): void {
   if (Game.cpu.bucket >= cpuLimit && Game.cpu.generatePixel && Game.shard.name !== "shard3") Game.cpu.generatePixel();
 }
+
+/**
+ * 生成 pixel 的框架插件
+ */
+export const generatePixelAppPlugin: AppLifecycleCallbacks = {
+  tickEnd: generatePixel
+};

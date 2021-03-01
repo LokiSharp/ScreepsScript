@@ -1,10 +1,10 @@
 import RoomTransport, {
   REGULATE_LIMIT,
   WORK_PROPORTION_TO_EXPECT
-} from "../../../../../src/modules/Task/RoomTransportTask/RoomTransport";
-import CreepMock from "../../../mock/CreepMock";
-import GameMock from "../../../mock/GameMock";
-import MemoryMock from "../../../mock/MemoryMock";
+} from "@/modules/Task/RoomTransportTask/RoomTransport";
+import CreepMock from "@mock/CreepMock";
+import GameMock from "@mock/GameMock";
+import MemoryMock from "@mock/MemoryMock";
 import { assert } from "chai";
 
 describe("RoomTransportTask", () => {

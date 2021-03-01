@@ -3,13 +3,13 @@
  *
  * 本文件包含了 Room 中用于控制台交互的方法
  */
-import { LAB_STATE, ROOM_REMOVE_INTERVAL, labTarget } from "setting";
+import { LAB_STATE, ROOM_REMOVE_INTERVAL, labTarget } from "@/setting";
 import RoomExtension from "./RoomExtension";
-import colorful from "utils/console/colorful";
-import createElement from "utils/console/createElement";
-import { getName } from "utils/global/getName";
-import { manageStructure } from "modules/autoPlanning";
-import { setBaseCenter } from "modules/autoPlanning/planBasePos";
+import colorful from "@/utils/console/colorful";
+import createElement from "@/utils/console/createElement";
+import { getName } from "@/utils/global/getName";
+import { manageStructure } from "@/modules/autoPlanning";
+import { setBaseCenter } from "@/modules/autoPlanning/planBasePos";
 
 export default class RoomConsole extends RoomExtension {
   /**

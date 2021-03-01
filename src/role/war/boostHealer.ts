@@ -1,6 +1,6 @@
-import { boostPrepare } from "utils/creep/boostPrepare";
-import calcBodyPart from "utils/creep/calcBodyPart";
-import { inPlaceBase } from "../../utils/creep/inPlaceBase";
+import { boostPrepare } from "@/utils/creep/boostPrepare";
+import calcBodyPart from "@/utils/creep/calcBodyPart";
+import { inPlaceBase } from "@/utils/creep/inPlaceBase";
 
 /**
  * 强化 - HEAL

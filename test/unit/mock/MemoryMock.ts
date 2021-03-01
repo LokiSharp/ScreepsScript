@@ -72,22 +72,7 @@ export default class MemoryMock extends BaseMock implements Memory {
     roomTaskNumber?: { [roomTransferTaskType: string]: number };
 
     rooms: {
-      [roomName: string]: {
-        energy?: number;
-        power?: number;
-        nukerEnergy?: number;
-        nukerG?: number;
-        nukerCooldown?: number;
-        controllerRatio?: number;
-        controllerLevel?: number;
-        structureNums?: { [structureName: string]: number };
-        constructionSiteNums?: { [structureName: string]: number };
-        upgraderWorkingTime: number;
-        upgraderLifeTime: number;
-        transporterWorkingTime: number;
-        transporterLifeTime: number;
-        commRes: { [commType: string]: number };
-      };
+      [roomName: string]: RoomStats;
     };
   };
 

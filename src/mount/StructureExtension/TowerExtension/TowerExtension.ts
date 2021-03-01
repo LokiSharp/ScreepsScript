@@ -1,13 +1,13 @@
-import { MAX_WALL_HITS, TOWER_FILL_WALL_LEVEL, repairSetting } from "setting";
-import { creepApi } from "modules/creepController/creepApi";
-import { whiteListFilter } from "utils/global/whiteListFilter";
+import { MAX_WALL_HITS, TOWER_FILL_WALL_LEVEL, repairSetting } from "@/setting";
+import { creepApi } from "@/modules/creepController/creepApi";
+import { whiteListFilter } from "@/utils/global/whiteListFilter";
 
 // Tower 原型拓展
 export default class TowerExtension extends StructureTower {
   /**
    * 主要任务
    */
-  public work(): void {
+  public onWork(): void {
     if (this.store[RESOURCE_ENERGY] < 10) return this.requireEnergy();
 
     // 根据当前状态执行对应的逻辑

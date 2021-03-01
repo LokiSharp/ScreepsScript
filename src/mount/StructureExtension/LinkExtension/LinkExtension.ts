@@ -3,7 +3,7 @@ export default class LinkExtension extends StructureLink {
   /**
    * link 主要工作
    */
-  public work(): void {
+  public onWork(): void {
     // 冷却好了再执行
     if (this.cooldown !== 0) return;
 

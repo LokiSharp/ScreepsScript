@@ -1,6 +1,6 @@
-import { PB_HARVEST_STATE } from "setting";
-import calcBodyPart from "utils/creep/calcBodyPart";
-import { removeSelfGroup } from "utils/creep/removeSelfGroup";
+import { PB_HARVEST_STATE } from "@/setting";
+import calcBodyPart from "@/utils/creep/calcBodyPart";
+import { removeSelfGroup } from "@/utils/creep/removeSelfGroup";
 
 /**
  * PowerBank 攻击单位

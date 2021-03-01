@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import { getName } from "../../../../src/utils/global/getName";
+import { getName } from "@/utils/global/getName";
 
 describe("getName", () => {
   it("基地中心旗帜名", () => {

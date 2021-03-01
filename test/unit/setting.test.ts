@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import { bodyConfigs } from "../../src/setting";
+import { bodyConfigs } from "@/setting";
 
 describe("setting", () => {
   it("bodyConfigs 存在", () => {

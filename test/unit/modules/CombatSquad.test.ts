@@ -1,5 +1,5 @@
-import { CombatSquad } from "../../../src/modules/CombatSquad/CombatSquad";
-import CreepMock from "../mock/CreepMock";
+import { CombatSquad } from "@/modules/CombatSquad/CombatSquad";
+import CreepMock from "@mock/CreepMock";
 import { assert } from "chai";
 
 describe("CombatSquad", () => {

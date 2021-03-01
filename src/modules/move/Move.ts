@@ -1,6 +1,6 @@
 import { Cross } from "./Cross";
 import { WayPoint } from "./WayPoint";
-import { addCrossShardRequest } from "modules/crossShard";
+import { addCrossShardRequest } from "@/modules/crossShard";
 import crossRules from "./crossRules";
 
 export class Move {

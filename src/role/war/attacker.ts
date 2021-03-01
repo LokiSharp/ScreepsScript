@@ -1,7 +1,7 @@
-import { battleBase } from "utils/creep/battleBase";
-import { bodyConfigs } from "setting";
-import createBodyGetter from "utils/creep/createBodyGetter";
-import { inPlaceBase } from "utils/creep/inPlaceBase";
+import { battleBase } from "@/utils/creep/battleBase";
+import { bodyConfigs } from "@/setting";
+import createBodyGetter from "@/utils/creep/createBodyGetter";
+import { inPlaceBase } from "@/utils/creep/inPlaceBase";
 
 /**
  * 士兵

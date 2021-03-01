@@ -1,10 +1,10 @@
-import { BOOST_RESOURCE, ENERGY_SHARE_LIMIT, boostEnergyReloadLimit, boostResourceReloadLimit } from "../../setting";
-import { confirmBasePos, findBaseCenterPos, setBaseCenter } from "../../modules/autoPlanning/planBasePos";
-import { manageStructure, releaseCreep } from "../../modules/autoPlanning";
-import createRoomLink from "../../utils/console/createRoomLink";
-import { creepApi } from "../../modules/creepController/creepApi";
-import log from "../../utils/console/log";
-import { updateStructure } from "../../modules/shortcut/updateStructure";
+import { BOOST_RESOURCE, ENERGY_SHARE_LIMIT, boostEnergyReloadLimit, boostResourceReloadLimit } from "@/setting";
+import { confirmBasePos, findBaseCenterPos, setBaseCenter } from "@/modules/autoPlanning/planBasePos";
+import { manageStructure, releaseCreep } from "@/modules/autoPlanning";
+import createRoomLink from "@/utils/console/createRoomLink";
+import { creepApi } from "@/modules/creepController/creepApi";
+import log from "@/utils/console/log";
+import { updateStructure } from "@/modules/shortcut/updateStructure";
 
 export default class RoomExtension extends Room {
   /**

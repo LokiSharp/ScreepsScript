@@ -1,5 +1,5 @@
-import { bodyConfigs, minerHarvestLimit } from "setting";
-import createBodyGetter from "utils/creep/createBodyGetter";
+import { bodyConfigs, minerHarvestLimit } from "@/setting";
+import createBodyGetter from "@/utils/creep/createBodyGetter";
 
 /**
  * 矿工

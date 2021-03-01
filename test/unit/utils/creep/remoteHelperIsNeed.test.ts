@@ -1,10 +1,10 @@
-import GameMock from "../../mock/GameMock";
-import MemoryMock from "../../mock/MemoryMock";
-import RoomMock from "../../mock/RoomMock";
-import StructureControllerMock from "../../mock/StructureControllerMock";
-import StructureSpawnMock from "../../mock/StructureSpawnMock";
+import GameMock from "@mock/GameMock";
+import MemoryMock from "@mock/MemoryMock";
+import RoomMock from "@mock/RoomMock";
+import StructureControllerMock from "@mock/StructureControllerMock";
+import StructureSpawnMock from "@mock/StructureSpawnMock";
 import { assert } from "chai";
-import remoteHelperIsNeed from "../../../../src/utils/creep/remoteHelperIsNeed";
+import remoteHelperIsNeed from "@/utils/creep/remoteHelperIsNeed";
 
 describe("remoteHelperIsNeed", () => {
   beforeEach(() => {

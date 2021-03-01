@@ -1,7 +1,7 @@
-import { bodyConfigs } from "setting";
-import createBodyGetter from "utils/creep/createBodyGetter";
-import { getRoomAvailableSource } from "../../modules/energyController";
-import remoteHelperIsNeed from "utils/creep/remoteHelperIsNeed";
+import { bodyConfigs } from "@/setting";
+import createBodyGetter from "@/utils/creep/createBodyGetter";
+import { getRoomAvailableSource } from "@/modules/energyController/energyController";
+import remoteHelperIsNeed from "@/utils/creep/remoteHelperIsNeed";
 
 /**
  * 支援建造者

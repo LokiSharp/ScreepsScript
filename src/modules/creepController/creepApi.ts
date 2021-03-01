@@ -1,5 +1,5 @@
-import colorful from "utils/console/colorful";
-import creepWorks from "role";
+import colorful from "@/utils/console/colorful";
+import creepWorks from "@/role";
 
 /**
  * creep 发布 api

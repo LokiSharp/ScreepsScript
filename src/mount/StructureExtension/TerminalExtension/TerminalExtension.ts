@@ -1,5 +1,5 @@
-import { DEAL_RATIO, terminalChannels, terminalModes } from "setting";
-import { setRoomStats } from "../../../modules/stateCollector";
+import { DEAL_RATIO, terminalChannels, terminalModes } from "@/setting";
+import { setRoomStats } from "@/modules/stats";
 
 /**
  * 全局缓存的订单价格表
@@ -16,7 +16,7 @@ const resourcePrice = {};
  * 资源监听由玩家自行发布，包括资源数量、来源和数量，在条件不满足（数量低于限制等）时会尝试从来源（market等）获取该资源
  */
 export default class TerminalExtension extends StructureTerminal {
-  public work(): void {
+  public onWork(): void {
     // 没有冷却好或者不到 10 tick 就跳过
     if (this.cooldown !== 0 || Game.time % 10 || !this.isActive()) return;
 

@@ -1,6 +1,6 @@
-import { bodyConfigs } from "setting";
-import calcBodyPart from "utils/creep/calcBodyPart";
-import createBodyGetter from "utils/creep/createBodyGetter";
+import { bodyConfigs } from "@/setting";
+import calcBodyPart from "@/utils/creep/calcBodyPart";
+import createBodyGetter from "@/utils/creep/createBodyGetter";
 
 /**
  * 升级者
