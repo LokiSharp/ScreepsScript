@@ -1,4 +1,4 @@
-import { creepApi } from "../creepController/creepApi";
+import { creepApi } from "./creepApi";
 import creepWorks from "@/role";
 import log from "@/utils/console/log";
 

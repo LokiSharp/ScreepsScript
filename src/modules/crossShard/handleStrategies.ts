@@ -1,4 +1,4 @@
-import { handleNotExistCreep } from "./handleNotExistCreep";
+import { handleNotExistCreep } from "../creepController/creepHandle";
 
 /**
  * 其他 shard 发来的请求的处理策略

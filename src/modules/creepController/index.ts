@@ -1,12 +1,26 @@
-import { addCrossShardRequest } from "../crossShard";
-import { handleNotExistCreep } from "../crossShard/handleNotExistCreep";
-
 /**
- * creep 的数量控制器
- * 负责发现死去的 creep 并检查其是否需要再次孵化
+ * creep 控制模块
+ *
+ * 负责 creep 的新增、删除及修改，creep 死后也会由该模块负责回收或再孵化
  */
 
-export default function creepNumberListener(): void {
+import { addCrossShardRequest } from "../crossShard";
+import { handleNotExistCreep } from "./creepHandle";
+
+/**
+ * 上个 tick 的 Game.creeps
+ * 用于和本 tick 进行比对，初步确定是否有 creep 死亡
+ */
+let lastGameCreepNumber = 0;
+
+function creepNumberListener(): void {
+  const nowGameCreepNumber = Object.keys(Game.creeps).length;
+  // 本 tick creep 数量没变，不用执行检查
+  if (nowGameCreepNumber === lastGameCreepNumber) {
+    lastGameCreepNumber = nowGameCreepNumber;
+    return;
+  }
+
   // 遍历所有 creep 内存，检查其是否存在
   for (const name in Memory.creeps) {
     if (name in Game.creeps) continue;
@@ -19,7 +33,8 @@ export default function creepNumberListener(): void {
       continue;
     }
 
-    const { fromShard } = Memory.creeps[name];
+    const creepMemory = Memory.creeps[name];
+    const { fromShard } = creepMemory;
 
     // 有 fromShard 这个字段说明是跨 shard creep，只要不是自己 shard 的，统统发送跨 shard 重生任务
     // 有 fromShard 字段并且该字段又等于自己 shard 的名字，说明该跨 shard creep 死在了本 shard 的路上
@@ -34,7 +49,7 @@ export default function creepNumberListener(): void {
     }
 
     // 如果 creep 凉在了本 shard
-    else handleNotExistCreep(name, Memory.creeps[name]);
+    else handleNotExistCreep(name, creepMemory);
   }
 }
 
