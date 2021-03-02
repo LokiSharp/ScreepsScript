@@ -1,5 +1,5 @@
 import { LEVEL_BUILD_RAMPART } from "@/setting";
-import { countEnergyChangeRatio } from "@/modules/energyController/energyController";
+import { countEnergyChangeRatio } from "@/modules/energyController";
 import { creepApi } from "@/modules/creepController/creepApi";
 import { setRoomStats } from "@/modules/stats";
 import { whiteListFilter } from "@/utils/global/whiteListFilter";
@@ -89,7 +89,7 @@ export default class ControllerExtension extends StructureController {
     });
 
     // 统计本房间能量状态
-    countEnergyChangeRatio(this.room.name);
+    countEnergyChangeRatio(this.room);
     this.structureScanner();
 
     return hasLevelChange;
