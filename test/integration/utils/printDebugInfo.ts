@@ -8,7 +8,7 @@ const debugInfos: Record<number, unknown> = {};
 export function printDebugInfo(memory: Memory, gameTime: number): void {
   const debugInfo = getDebugInfo(memory, gameTime);
   console.log(debugInfo);
-  debugInfos[debugInfo.tick as number] = debugInfo;
+  debugInfos[debugInfo.tick as number] = memory;
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
   fs.writeFileSync(LOG_PATH, JSON.stringify(debugInfos));
 }

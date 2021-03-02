@@ -40,7 +40,7 @@ export default class RoomExtension extends Room {
     updateStructure(this.name, STRUCTURE_CONTAINER, container.id);
 
     // 触发对应的 creep 发布规划
-    this.releaseCreep("manager", this.memory.sourceContainersIds.length * 3);
+    this.releaseCreep("manager", this.memory.sourceContainersIds.length);
     this.releaseCreep("upgrader");
 
     return OK;

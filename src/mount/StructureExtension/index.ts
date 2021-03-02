@@ -1,8 +1,10 @@
+export { ContainerExtension } from "./ContainerExtension";
 export { ControllerExtension } from "./ControllerExtension";
 export { SpawnExtension } from "./SpawnExtension";
 export { TowerExtension } from "./TowerExtension";
 export { LinkExtension, LinkHelp } from "./LinkExtension";
 export { ExtractorExtension } from "./ExtractorExtension";
+export { SourceExtension } from "./SourceExtension";
 export { StorageExtension, StorageConsole } from "./StorageExtension";
 export { NukerExtension } from "./NukerExtension";
 export { PowerSpawnExtension, PowerSpawnConsole, PowerSpawnHelp } from "./PowerSpawnExtension";

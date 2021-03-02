@@ -1,3 +1,10 @@
+interface Memory {
+  /**
+   * 延迟任务存储
+   */
+  delayTasks: string;
+}
+
 /**
  * 延迟任务的数据
  */
@@ -14,9 +21,31 @@ interface DelayTaskData {
  */
 interface DelayTaskTypes {
   /**
-   * 维修工延迟孵化
+   * 刷墙工延迟孵化任务
    */
-  repairer: DelayTaskData;
+  spawnFiller: DelayTaskData;
+  /**
+   * 挖矿工延迟孵化任务
+   */
+  spawnMiner: DelayTaskData;
+  /**
+   * 升级工延迟孵化任务
+   */
+  spawnUpgrader: DelayTaskData;
+  /**
+   * 建筑任务发布
+   * 因为建筑必须在下个 tick 才能获取到其 id
+   */
+  addBuildTask: DelayTaskData & {
+    /**
+     * 该建筑工地应该位于的位置
+     */
+    pos: [number, number, string];
+    /**
+     * 该建筑的类型
+     */
+    type: BuildableStructureConstant;
+  };
 }
 
 /**
@@ -32,26 +61,24 @@ type AllDelayTaskName = keyof DelayTaskTypes;
  */
 type DelayTaskCallback<K extends AllDelayTaskName> = (room: Room | undefined, data: DelayTaskTypes[K]) => void;
 
-interface DelayTaskMemory {
+/**
+ * 延迟任务数据
+ */
+interface DelayTask<T extends AllDelayTaskName = AllDelayTaskName> {
   /**
-   * 该任务被调用的 Game.time
+   * 该任务的名称
+   * 会根据这个名称触发对应的回调
    */
-  call: number;
+  name: T;
   /**
    * 被 JSON.stringify 压缩成字符串的任务数据，其值为任务名 + 空格 + 任务数据
    */
-  data: string;
+  data: DelayTaskTypes[T];
 }
 
-interface DelayTaskTypes {
+interface Game {
   /**
-   * 维修工延迟孵化
-   * 维修工延迟孵化任务
+   * 本 tick 是否需要保存延迟任务队列的数据
    */
-  repairer: DelayTaskData;
-  spawnRepairer: DelayTaskData;
-  /**
-   * 挖矿工延迟孵化任务
-   */
-  spawnMiner: DelayTaskData;
+  _needSaveDelayQueueData?: true;
 }

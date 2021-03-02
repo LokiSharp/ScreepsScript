@@ -1,4 +1,5 @@
 import {
+  ContainerExtension,
   ControllerExtension,
   ExtractorExtension,
   FactoryConsole,
@@ -14,6 +15,7 @@ import {
   PowerSpawnConsole,
   PowerSpawnExtension,
   PowerSpawnHelp,
+  SourceExtension,
   SpawnExtension,
   StorageConsole,
   StorageExtension,
@@ -41,7 +43,9 @@ export const mountList: [AnyClass, AnyClass][] = [
   [RoomPosition, RoomPostionExtension],
   [Creep, CreepExtension],
   [PowerCreep, PowerCreepExtension],
+  [Source, SourceExtension],
   [Structure, StructureExtension],
+  [StructureContainer, ContainerExtension],
   [StructureController, ControllerExtension],
   [StructureSpawn, SpawnExtension],
   [StructureTower, TowerExtension],
@@ -73,9 +77,6 @@ function initStorage() {
   if (!Memory.rooms) Memory.rooms = {};
   else delete Memory.rooms.undefined;
 
-  if (!Memory.stats) Memory.stats = { rooms: {} };
-  if (!Memory.delayTasks) Memory.delayTasks = [];
-  if (!Memory.creepConfigs) Memory.creepConfigs = {};
   if (!Memory.resourceSourceMap) Memory.resourceSourceMap = {};
 }
 

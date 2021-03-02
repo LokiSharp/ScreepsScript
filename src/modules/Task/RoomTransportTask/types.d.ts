@@ -1,3 +1,22 @@
+interface Room {
+  /**
+   * 房间物流 api
+   */
+  transport: InterfaceTransportTaskController;
+}
+
+interface RoomMemory {
+  /**
+   * 房间物流任务的备份数据
+   * 会在全局重置时通过该数据重建物流任务
+   */
+  transportTasks: string;
+  /**
+   * 正在执行房间物流任务的 creep 的数据
+   */
+  transportCreeps: string;
+}
+
 /**
  * 所有的物流任务类型
  */
@@ -86,77 +105,19 @@ interface TransportTasks {
 }
 
 /**
- * 物流任务基础信息
- */
-interface RoomTask<T extends string> {
-  /**
-   * 该物流任务的类型
-   */
-  type: T;
-  /**
-   * 该物流任务的优先级
-   * 若为空则按照发布顺序进行排序
-   */
-  priority?: number;
-  /**
-   * 正在执行该任务的搬运工 id
-   */
-  executor?: Id<Creep>[];
-  /**
-   * 该任务的唯一索引
-   */
-  key?: number;
-}
-
-/**
  * 从内存 transport 字段解析出来的存储格式
  */
 type TransportData = TransportTasks[AllTransportTaskType][];
 
-interface TransportAction {
+interface InterfaceTransportTaskController extends InterfaceTaskController<AllTransportTaskType, AllRoomTransportTask> {
   /**
-   * creep 工作时执行的方法
+   * 填写新的房间物流任务
    */
-  target: () => boolean;
-  /**
-   * creep 非工作(收集资源时)执行的方法
-   */
-  source: () => boolean;
-}
-
-interface RoomTransportType {
-  /**
-   * 本物流对象所处的房间名
-   */
-  readonly roomName: string;
-
-  /**
-   * 当前正在执行的所有物流任务
-   */
-  tasks: TransportTasks[AllTransportTaskType][];
-
-  /**
-   * 本房间的搬运工总生命时长
-   */
-  totalLifeTime: number;
-
-  /**
-   * 本房间的搬运工总工作时长
-   */
-  totalWorkTime: number;
-  /**
-   * 填写一个新的房间物流任务
-   *
-   * @param task 要添加的物流任务
-   * @param canRepeat 任务类型能否重复
-   * @param disableDispatchTask 是否禁用重分配（测试用）
-   * @returns taskKey 该任务的唯一索引
-   */
-  addTask(task: AllRoomTransportTask, canRepeat?: boolean, disableDispatchTask?: boolean): number;
+  addTask(task: AllRoomTransportTask, opt?: AddTaskOpt): number;
   /**
    * 获取应该执行的任务
    */
-  getWork(creep: Creep): TransportAction;
+  getWork(creep: Creep): RoomTaskAction;
   /**
    * 是否存在某个任务
    */
@@ -164,7 +125,7 @@ interface RoomTransportType {
   /**
    * 移除一个任务
    */
-  removeTask(taskKey: number): OK | ERR_NOT_FOUND;
+  removeTask(taskKey: number | AllTransportTaskType): OK | ERR_NOT_FOUND;
   /**
    * 获取该房间的搬运工调整期望
    */
@@ -181,5 +142,5 @@ interface RoomTransportType {
 type TransportActionGenerator<T extends AllTransportTaskType = AllTransportTaskType> = (
   creep: Creep<"manager">,
   task: TransportTasks[T],
-  transportController: RoomTransportType
-) => TransportAction;
+  transportController: InterfaceTransportTaskController
+) => RoomTaskAction;
