@@ -36,9 +36,4 @@ interface Memory {
 
   // 启动 powerSpawn 的房间名列表
   psRooms: string[];
-
-  /**
-   * 延迟任务存储
-   */
-  delayTasks: DelayTaskMemory[];
 }

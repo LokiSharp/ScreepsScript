@@ -88,7 +88,7 @@ export function findBaseCenterPos(roomName: string, baseSize = 11): RoomPosition
       // 发现该正方形已经可以满足要求了
       if (dp[i][j].len >= baseSize) {
         // 获取正方形右上侧的三个区域
-        // eslint-disable-next-line no-shadow
+        // eslint-disable-next-line @typescript-eslint/no-shadow
         const { topLeft, top, left } = getOtherArea(dp, i, j, baseSize);
         // 计算出当前区域内的沼泽数量
         const currentSwamp = dp[i][j].swamp - top.swamp - left.swamp + topLeft.swamp;

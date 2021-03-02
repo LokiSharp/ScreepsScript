@@ -37,6 +37,13 @@ type StructureWithStore =
   | StructureTerminal
   | StructureNuker;
 
+/**
+ * 所有包含 id 字段的游戏对象
+ */
+interface ObjectWithId<T extends unknown = unknown> extends RoomObject {
+  id: Id<T>;
+}
+
 type CenterStructures = STRUCTURE_STORAGE | STRUCTURE_TERMINAL | STRUCTURE_FACTORY | "centerLink";
 
 interface AnyObject {

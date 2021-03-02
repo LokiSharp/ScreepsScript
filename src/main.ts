@@ -3,6 +3,7 @@ import App from "@/modules/framework";
 import { constructionAppPlugin } from "@/modules/ConstructionController";
 import { creepNumberControlAppPlugin } from "@/modules/creepController/creepNumberListener";
 import { crossShardAppPlugin } from "@/modules/crossShard";
+import { delayQueueAppPlugin } from "@/modules/delayQueue";
 import { errorMapper } from "@/utils/global/ErrorMapper";
 import { generatePixelAppPlugin } from "@/utils/global/generatePixel";
 import { stateScannerAppPlugin } from "@/modules/stats";
@@ -26,7 +27,7 @@ app.on(creepNumberControlAppPlugin);
 app.on(constructionAppPlugin);
 
 // 注册延迟任务管理模块
-// app.on(delayQueueAppPlugin);
+app.on(delayQueueAppPlugin);
 
 // 注册搓 pixel 任务
 app.on(generatePixelAppPlugin);

@@ -1,9 +1,10 @@
 import { MIN_WALL_HITS, repairSetting } from "@/setting";
 import { Move, WayPoint } from "@/modules/move";
+import { buildCompleteSite, getNearSite } from "@/modules/ConstructionController";
 import { creepApi } from "@/modules/creepController/creepApi";
 import creepWorks from "@/role";
 import { getMemoryFromCrossShard } from "@/modules/crossShard";
-import { updateStructure } from "@/modules/shortcut/updateStructure";
+import { useCache } from "@/utils/global/useCache";
 
 export class CreepExtension extends Creep {
   /**
@@ -168,53 +169,63 @@ export class CreepExtension extends Creep {
   }
 
   /**
-   * 建设房间内存在的建筑工地
-   * @param constructionSiteId 手动指定建造的工地
+   * 建筑目标获取
+   * 优先级：指定的目标 > 自己保存的目标 > 房间内保存的目标
    */
-  public buildStructure(
-    constructionSiteId: Id<ConstructionSite> = undefined
-  ): CreepActionReturnCode | ERR_NOT_ENOUGH_RESOURCES | ERR_RCL_NOT_ENOUGH | ERR_NOT_FOUND {
-    if (constructionSiteId) this.memory.constructionSiteId = constructionSiteId;
-    // 新建目标建筑工地
-    let target: ConstructionSite;
-    // 检查是否有缓存
-    if (this.room.memory.constructionSiteId) {
-      target = Game.getObjectById(this.room.memory.constructionSiteId);
-      // 如果缓存中的工地不存在则说明建筑完成
-      if (!target) {
-        // 获取曾经工地的位置
-        const constructionSitePos = new RoomPosition(
-          this.room.memory.constructionSitePos[0],
-          this.room.memory.constructionSitePos[1],
-          this.room.name
-        );
-        // 检查上面是否有已经造好的同类型建筑
-        const structure = _.find(
-          constructionSitePos.lookFor(LOOK_STRUCTURES),
-          s => s.structureType === this.room.memory.constructionSiteType
-        );
-        if (structure) {
-          updateStructure(this.room.name, structure.structureType, structure.id);
-          // 如果有的话就执行回调
-          if (structure.onBuildComplete) structure.onBuildComplete();
+  private getBuildTarget(target?: ConstructionSite): ConstructionSite | undefined {
+    // 指定了目标，直接用，并且把 id 备份一下
+    if (target) {
+      this.memory.constructionSiteId = target.id;
+      return target;
+    }
+    // 没有指定目标，或者指定的目标消失了，从本地内存查找
+    else {
+      const selfKeepTarget = Game.getObjectById(this.memory.constructionSiteId);
+      if (selfKeepTarget) return selfKeepTarget;
+      // 本地内存里保存的 id 找不到工地了，检查下是不是造好了
+      else {
+        const structure = buildCompleteSite[this.memory.constructionSiteId];
 
-          // 如果刚修好的是墙的话就记住该墙的 id，然后把血量刷高一点（相关逻辑见 builder.target()）
-          if (structure.structureType === STRUCTURE_WALL || structure.structureType === STRUCTURE_RAMPART) {
-            this.memory.fillWallId = structure.id as Id<StructureWall | StructureRampart>;
-          }
-          // 如果修好的是 source container 的话，就执行注册
-          else if (structure instanceof StructureContainer && this.room.source.find(s => structure.pos.isNearTo(s))) {
-            this.room.registerContainer(structure);
-          }
+        // 如果刚修好的是墙的话就记住该墙的 id，然后把血量刷高一点）
+        if (
+          structure &&
+          (structure.structureType === STRUCTURE_WALL || structure.structureType === STRUCTURE_RAMPART)
+        ) {
+          this.memory.fillWallId = structure.id as Id<StructureWall | StructureRampart>;
         }
 
-        // 获取下个建筑目标
-        target = this.updateConstructionSite();
+        delete this.memory.constructionSiteId;
       }
     }
-    // 没缓存就直接获取
-    else target = this.updateConstructionSite();
+
+    // 自己内存里没找到，去房间内存里查找，房间内存没有的话就搜索并缓存到房间
+    const roomKeepTarget =
+      Game.getObjectById(this.room.memory.constructionSiteId) ||
+      useCache(() => getNearSite(this.pos), this.room.memory, "constructionSiteId");
+
+    // 找到了，保存到自己内存里
+    if (roomKeepTarget) {
+      this.memory.constructionSiteId = this.room.memory.constructionSiteId;
+      return roomKeepTarget;
+    } else delete this.room.memory.constructionSiteId;
+
+    return undefined;
+  }
+
+  /**
+   * 建设房间内存在的建筑工地
+   * @param targetConstruction 手动指定建造的工地
+   */
+  public buildStructure(
+    targetConstruction?: ConstructionSite
+  ): CreepActionReturnCode | ERR_NOT_ENOUGH_RESOURCES | ERR_RCL_NOT_ENOUGH | ERR_NOT_FOUND {
+    // 新建目标建筑工地
+    const target = this.getBuildTarget(targetConstruction);
+
     if (!target) return ERR_NOT_FOUND;
+    // 上面发现有墙要刷了，这个 tick 就不再造建造了
+    // 防止出现造好一个 rampart，然后直接造下一个 rampart，造好后又扭头去刷第一个 rampart 的小问题出现
+    if (this.memory.fillWallId) return ERR_BUSY;
 
     // 建设
     const buildResult = this.build(target);

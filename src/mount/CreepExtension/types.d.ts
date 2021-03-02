@@ -79,9 +79,9 @@ interface CreepMemory<Role extends CreepRoleConstant = CreepRoleConstant> {
   // manager 特有，当前正在执行的物流任务索引
   transportTaskKey?: number;
   /**
-   * worker 特有，当前正在执行的工作任务类型
+   * 运营单位特有，当前正在执行的物流 / 工作任务索引
    */
-  workTaskType?: AllWorkTaskType;
+  taskKey?: number;
 }
 
 /**
@@ -105,7 +105,7 @@ interface Creep<Role extends CreepRoleConstant = CreepRoleConstant> {
   upgrade(): ScreepsReturnCode;
 
   buildStructure(
-    constructionSiteId?: Id<ConstructionSite>
+    targetConstruction?: ConstructionSite
   ): CreepActionReturnCode | ERR_NOT_ENOUGH_RESOURCES | ERR_RCL_NOT_ENOUGH | ERR_NOT_FOUND;
 
   steadyWall(): OK | ERR_NOT_FOUND;

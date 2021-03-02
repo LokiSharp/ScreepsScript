@@ -1,4 +1,3 @@
-import { addDelayCallback, addDelayTask } from "@/modules/delayQueue";
 import { bodyConfigs } from "@/setting";
 import createBodyGetter from "@/utils/creep/createBodyGetter";
 
@@ -13,22 +12,11 @@ import createBodyGetter from "@/utils/creep/createBodyGetter";
 export const repairer: CreepConfig<"repairer"> = {
   // 根据敌人威胁决定是否继续生成
   isNeed: (room, preMemory) => {
-    // cpu 快吃完了就不孵化
-    if (Game.cpu.bucket < 700) {
-      addSpawnRepairerTask(room.name);
-      return false;
-    }
-
     // 房间里有威胁就孵化
     if (room.controller.checkEnemyThreat()) return true;
 
     // RCL 到 7 就不孵化了，因为要拿能量去升级（到 8 时会有其他模块重新发布 repairer）
     if (room.controller.level === 7) return false;
-    // RCL 8 之后 1000 tick 孵化一次
-    else if (room.controller.level >= 8) {
-      addSpawnRepairerTask(room.name);
-      return false;
-    }
 
     // 如果能量来源没了就重新规划
     if (!Game.getObjectById(preMemory.data.sourceId)) {
@@ -73,21 +61,3 @@ export const repairer: CreepConfig<"repairer"> = {
   },
   bodys: createBodyGetter(bodyConfigs.worker)
 };
-
-/**
- * 给指定房间添加 repairer 的延迟孵化任务
- *
- * @param roomName 添加到的房间名
- */
-function addSpawnRepairerTask(roomName: string): void {
-  addDelayTask("spawnRepairer", { roomName }, Game.time + 1000);
-}
-
-/**
- * 注册 repairer 的延迟孵化任务
- */
-addDelayCallback("spawnRepairer", room => {
-  // cpu 还是不够的话就延迟发布
-  if (Game.cpu.bucket < 700) return addSpawnRepairerTask(room.name);
-  if (room) room.releaseCreep("repairer");
-});

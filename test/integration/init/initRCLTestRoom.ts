@@ -47,7 +47,6 @@ export async function initRCLTestRoom(helper: IntegrationTestHelper, RCL: number
     "main.js.map": readFileSync(DIST_MAIN_JS_MAP).toString()
   };
   helper.user = await helper.server.world.addBot({ username: "tester", room: "W0N0", x: 21, y: 26, modules });
-  await helper.user.console(`Memory.rooms.W0N0.center = [24, 24]`);
 
   const rclProgressPercent = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 90 };
   await db["rooms.objects"].update(
