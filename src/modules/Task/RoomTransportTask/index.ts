@@ -5,7 +5,7 @@
  * 但是该模块不负责中央集群的物流任务
  */
 
-import RoomTransport from "./RoomTransport";
+import RoomTransport from "./taskController";
 
 /**
  * 所有的房间物流对象都被存放到这里

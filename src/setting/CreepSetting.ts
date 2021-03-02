@@ -220,3 +220,16 @@ export const specialBodyConfig: { [type in SepicalBodyType]: BodyPartGenerator }
    */
   upgrade8: () => calcBodyPart({ [WORK]: 15, [CARRY]: 6, [MOVE]: 12 })
 };
+
+/**
+ * source 采集单位的行为模式
+ */
+export const HARVEST_MODE: {
+  START: HarvestModeStart;
+  SIMPLE: HarvestModeSimple;
+  TRANSPORT: HarvestModeTransport;
+} = {
+  START: 1,
+  SIMPLE: 2,
+  TRANSPORT: 3
+};

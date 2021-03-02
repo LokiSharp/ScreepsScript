@@ -250,7 +250,25 @@ interface DataWithWayPoint {
   wayPoint?: string;
 }
 
+// 三种采集单位行为
+
 /**
- * 特殊身体类型
+ * 采集行为：启动模式
+ * 会采集能量然后运送会 spawn 和 extension
  */
-type SepicalBodyType = "upgrade7" | "upgrade8";
+type HarvestModeStart = 1;
+/**
+ * 采集行为：简单模式
+ * 会无脑采集能量，配合 container 使用
+ */
+type HarvestModeSimple = 2;
+/**
+ * 采集行为：转移模式
+ * 会采集能量然后存放到指定建筑，配合 link 使用
+ */
+type HarvestModeTransport = 3;
+
+/**
+ * 所有能量采集单位的行为模式
+ */
+type HarvestMode = HarvestModeStart | HarvestModeSimple | HarvestModeTransport;

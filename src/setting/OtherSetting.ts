@@ -64,3 +64,9 @@ export const minerHarvestLimit = 200000;
 
 // pc 空闲时会搓 ops，下面是搓的上限
 export const maxOps = 50000;
+
+/**
+ * miner 的矿物采集上限
+ * 当 terminal 中的资源多余这个值时，miner 将不再继续采矿
+ */
+export const MINE_LIMIT = 200000;
