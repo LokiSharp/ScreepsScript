@@ -1,8 +1,9 @@
 /* istanbul ignore file */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { findStrategy, getRoomEnergyTarget } from "@/modules/energyController";
 import { boostResourceReloadLimit } from "@/setting";
 import { clearCarryingResource } from "@/utils/creep/clearCarryingResource";
-import { getRoomAvailableSource } from "../../energyController/energyController";
+import { useCache } from "@/utils/global/useCache";
 
 /**
  * 没有任务时的行为逻辑
@@ -59,28 +60,32 @@ const clearCarryingRecources = function (creep: Creep, excludeResourceType?: Res
  * @returns 身上是否已经有足够的能量了
  */
 const getEnergy = function (creep: Creep<"manager">, transport: InterfaceTransportTaskController): boolean {
+  transport.countWorkTime();
   if (creep.store[RESOURCE_ENERGY] > 10) return true;
   if (!clearCarryingRecources(creep, RESOURCE_ENERGY)) return false;
 
-  // 从内存中找到缓存的能量来源
-  const { sourceId, workRoom } = creep.memory.data;
-  let sourceStructure = Game.getObjectById(sourceId);
+  // 从工作房间查询并缓存能量来源
+  const source = useCache<EnergySourceStructure | Resource<RESOURCE_ENERGY>>(
+    () => {
+      const { getClosestTo } = findStrategy;
+      return getRoomEnergyTarget(creep.room, getClosestTo(creep.pos));
+    },
+    creep.memory,
+    "sourceId"
+  );
 
-  // 来源建筑不可用，更新来源
-  if (!sourceStructure || sourceStructure.store[RESOURCE_ENERGY] <= 300) {
-    sourceStructure = getRoomAvailableSource(Game.rooms[workRoom], { includeSource: false, ignoreLimit: true });
-    // 更新失败，现在房间里没有可用的能量源，挂机
-    if (!sourceStructure) {
-      creep.say("⛳");
-      return false;
-    }
-
-    creep.memory.data.sourceId = sourceStructure.id;
+  if (
+    !source ||
+    (source instanceof Structure && source.store[RESOURCE_ENERGY] <= 0) ||
+    (source instanceof Resource && source.amount <= 0)
+  ) {
+    creep.say("😯没能量呀");
+    delete creep.memory.sourceId;
+    return false;
   }
 
   // 获取能量
-  const result = creep.getEngryFrom(sourceStructure);
-  transport.countWorkTime();
+  const result = creep.getEngryFrom(source);
   return result === OK;
 };
 
@@ -483,14 +488,12 @@ export const actions: {
       transport.countWorkTime();
       // 如果身上有对应资源的话就直接去填充
       if (creep.store[task.resourceType] > 0) return true;
-      if (!clearCarryingRecources(creep, task.resourceType)) return false;
 
+      const { sourceId } = creep.memory.data;
       // 获取资源存储建筑
-      let sourceStructure: StructureWithStore | Ruin;
+      let sourceStructure: StructureWithStore;
       if (task.resourceType === RESOURCE_ENERGY)
-        sourceStructure = creep.room.storage
-          ? creep.room.storage
-          : getRoomAvailableSource(creep.room, { includeSource: false });
+        sourceStructure = sourceId ? Game.getObjectById(sourceId) : creep.room.storage;
       else sourceStructure = creep.room.terminal;
       // 获取 powerspawn
       const powerspawn = Game.getObjectById(task.id);
@@ -648,13 +651,9 @@ export const actions: {
     source: () => {
       transport.countWorkTime();
       if (creep.store[RESOURCE_ENERGY] > 0) return true;
-      if (!clearCarryingRecources(creep, RESOURCE_ENERGY)) return false;
-      const result = creep.getEngryFrom(
-        creep.room.storage?.store.energy > 10000
-          ? creep.room.storage
-          : getRoomAvailableSource(creep.room, { includeSource: false })
-      );
-      return result === OK;
+      const { sourceId } = creep.memory.data;
+      creep.getEngryFrom(sourceId ? Game.getObjectById(sourceId) : creep.room.storage);
+      return true;
     },
     target: () => {
       transport.countWorkTime();

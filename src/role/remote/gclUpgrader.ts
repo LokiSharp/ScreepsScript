@@ -1,7 +1,7 @@
 import { TRANSFER_DEATH_LIMIT } from "@/setting";
 import calcBodyPart from "@/utils/creep/calcBodyPart";
 import deathPrepare from "@/utils/creep/deathPrepare";
-import { getRoomAvailableSource } from "@/modules/energyController/energyController";
+import { getRoomEnergyTarget } from "@/modules/energyController";
 
 /**
  * 强化协助建造者
@@ -47,7 +47,7 @@ export const gclUpgrader: CreepConfig<"gclUpgrader"> = {
         10000
     ) {
       if (!creep.memory.sourceId) {
-        source = getRoomAvailableSource(Game.rooms[creep.memory.data.spawnRoom], { includeSource: false });
+        source = source = getRoomEnergyTarget(creep.room);
         if (!source) {
           creep.say("没能量了，歇会");
           return false;

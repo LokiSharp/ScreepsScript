@@ -1,6 +1,6 @@
 import { bodyConfigs } from "@/setting";
 import createBodyGetter from "@/utils/creep/createBodyGetter";
-import { getRoomAvailableSource } from "@/modules/energyController/energyController";
+import { getRoomEnergyTarget } from "@/modules/energyController";
 import remoteHelperIsNeed from "@/utils/creep/remoteHelperIsNeed";
 
 /**
@@ -47,7 +47,7 @@ export const remoteUpgrader: CreepConfig<"remoteUpgrader"> = {
     // 获取有效的能量来源
     let source: AllEnergySource;
     if (!creep.memory.sourceId) {
-      source = getRoomAvailableSource(creep.room);
+      source = getRoomEnergyTarget(creep.room);
       if (!source) {
         creep.say("没能量了，歇会");
         return false;

@@ -1,6 +1,6 @@
 import { MAX_HARVESTER_NUM, MAX_UPGRADER_NUM, UPGRADE_WITH_STORAGE } from "@/setting";
 import { creepApi } from "@/modules/creepController/creepApi";
-import { getRoomAvailableSource } from "@/modules/energyController/energyController";
+import { getRoomEnergyTarget } from "@/modules/energyController";
 
 // 在 Function 原型上挂载 setNextPlan 方法来完成 creep 发布的职责链
 declare global {
@@ -297,7 +297,7 @@ function releaseUpgrader(room: Room): OK {
  */
 function releaseBuilder(room: Room, releaseNumber = 2): OK {
   for (let i = 0; i < releaseNumber; i++) {
-    const source = getRoomAvailableSource(room, { includeSource: false });
+    const source = getRoomEnergyTarget(room);
     creepApi.add(
       `${room.name} builder${i}`,
       "builder",
