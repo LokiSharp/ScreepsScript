@@ -30,12 +30,14 @@ import { repairer } from "./base/repairer";
 import { reserver } from "./remote/reserver";
 import { signer } from "./remote/signer";
 import { upgrader } from "./base/upgrader";
+import { worker } from "./base/worker";
 
 const creepWorks: CreepWork = {
   /**
    * 初级房间运维角色组
    * 包括了在没有 Storage 和 Link 的房间内运维所需的角色
    */
+  worker,
   harvester,
   upgrader,
   builder,
