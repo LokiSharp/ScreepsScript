@@ -50,6 +50,8 @@ interface CreepMemory<Role extends CreepRoleConstant = CreepRoleConstant> {
   sourceId?: Id<AllEnergySource>;
   // 要存放到的目标建筑
   targetId?: Id<Source | StructureWithStore | ConstructionSite>;
+  // 要维修的建筑 id，维修单位特有
+  repairStructureId?: Id<AnyStructure>;
   // deposit 采集者特有，deposit 的类型
   depositType?: DepositConstant;
   // 要填充的墙 id

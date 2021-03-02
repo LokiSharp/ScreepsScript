@@ -216,9 +216,6 @@ interface Room {
 
   spawnPbCarrierGroup(flagName: string, releaseNumber: number): void;
 
-  /**
-   * 下述方法在 @see /src/mount.room.ts 中定义
-   */
   // 孵化队列 api
   addSpawnTask(taskName: string): number | ERR_NAME_EXISTS;
 
@@ -226,14 +223,6 @@ interface Room {
 
   clearSpawnTask(): void;
   hangSpawnTask(): void;
-
-  // 房间任务 api
-  transport: RoomTransportType;
-
-  /**
-   * 房间工作 api
-   */
-  work: RoomWorkType;
 
   // 中央物流 api
   addCenterTask(task: ITransferTask, priority?: number): number;
