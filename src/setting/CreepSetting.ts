@@ -7,6 +7,19 @@ export const MAX_HARVESTER_NUM = 4;
 export const TRANSFER_DEATH_LIMIT = 20;
 
 /**
+ * terminal 中能量和对应发布的 upgrader 数量
+ * upgrader 自动发布时会优先使用 terminal 中的能量，不满足下表 [0] 的能量标准时才会去使用 storage 里的能量
+ * 请确保最少有一条内容
+ */
+export const UPGRADE_WITH_TERMINAL = [
+  { energy: 60000, num: 6 },
+  { energy: 50000, num: 5 },
+  { energy: 40000, num: 4 },
+  { energy: 30000, num: 3 },
+  { energy: 20000, num: 2 }
+];
+
+/**
  * storage 中的能量和对应发布的 upgrader 数量
  */
 export const UPGRADE_WITH_STORAGE = [
@@ -16,6 +29,12 @@ export const UPGRADE_WITH_STORAGE = [
   { energy: 300000, num: 5 },
   { energy: 100000, num: 3 }
 ];
+
+/**
+ * 8级时只要 cpu 足够，依旧会孵化一个 upgrader 进行升级
+ * 这个限制代表了在房间 8 级时 storage 里的能量大于多少才会持续孵化 upgarder
+ */
+export const UPGRADER_WITH_ENERGY_LEVEL_8 = 700000;
 
 export const bodyConfigs: BodyConfigs = {
   /**

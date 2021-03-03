@@ -11,7 +11,11 @@ import log from "@/utils/console/log";
  */
 
 export const handleNotExistCreep = function (creepName: string, creepMemory: CreepMemory): void {
+  if (Memory.creeps[creepName].role === "worker") {
+    Game.rooms[(Memory.creeps[creepName].data as WorkerData).workRoom].work.getUnit();
+  }
   const creepConfig = Memory.creepConfigs[creepName];
+
   // 获取配置项
   if (!creepConfig) {
     log(`死亡 ${creepName} 未找到对应 creepConfig, 已删除`, ["creepController"]);
@@ -28,7 +32,6 @@ export const handleNotExistCreep = function (creepName: string, creepMemory: Cre
   }
 
   const creepWork = creepWorks[creepConfig.role];
-
   // 通过 isNeed 阶段判断该 creep 是否要继续孵化
   // 没有提供 isNeed 阶段的话则默认需要重新孵化
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment

@@ -134,6 +134,10 @@ interface InterfaceTransportTaskController extends InterfaceTaskController<AllTr
    * 搬运工工作时长 + 1
    */
   countWorkTime(): void;
+  /**
+   * 搬运工工作时长 - 1
+   */
+  deCountWorkTime(): void;
 }
 
 /**

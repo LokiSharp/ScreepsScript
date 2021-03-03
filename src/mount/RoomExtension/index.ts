@@ -1,8 +1,7 @@
-import CreepControl from "./CreepControl";
 import RoomConsole from "./RoomConsole";
 import RoomExtension from "./RoomExtension";
 import RoomHelp from "./RoomHelp";
-import assignPrototype from "@/utils/global/assignPrototype";
+import mountCreepRelease from "@/modules/creepController/CreepRelease";
 import mountShortcut from "@/modules/shortcut/mountShortcut";
 import mountTransport from "@/modules/Task/RoomTransportTask";
 import mountWork from "@/modules/Task/RoomWorkTask";
@@ -15,9 +14,9 @@ export { RoomExtension, RoomConsole, RoomHelp };
 export default function mountRoom(): void {
   // 挂载快捷方式
   mountShortcut();
+  // 挂载 creep 发布
+  mountCreepRelease();
   // 挂载任务队列
   mountTransport();
   mountWork();
-
-  assignPrototype(Room, CreepControl);
 }

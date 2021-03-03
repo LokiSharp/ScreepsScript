@@ -17,6 +17,7 @@ const resourcePrice = {};
  */
 export default class TerminalExtension extends StructureTerminal {
   public onWork(): void {
+    if (!this.room.controller.owner) return;
     // 没有冷却好或者不到 10 tick 就跳过
     if (this.cooldown !== 0 || Game.time % 10 || !this.isActive()) return;
 
@@ -26,8 +27,6 @@ export default class TerminalExtension extends StructureTerminal {
     // 优先执行共享任务
     this.execShareTask();
 
-    this.energyCheck();
-
     // 执行终端工作
     const resource = this.getResourceByIndex();
     // 没有配置监听任务的话就跳过
@@ -35,6 +34,18 @@ export default class TerminalExtension extends StructureTerminal {
 
     // 只有 dealOrder 下命令了才能继续执行 resourceListener
     if (this.dealOrder(resource)) this.resourceListener(resource);
+  }
+
+  /**
+   * 建造完成回调
+   * 修改 miner 的存放位置
+   */
+  public onBuildComplete(): void {
+    // 有 extractor 了，发布矿工并添加对应的共享协议
+    if (this.room.extractor) {
+      this.room.work.updateTask({ type: "mine", priority: 0 });
+      this.addTask(this.room.mineral.mineralType, 30000, terminalModes.put, terminalChannels.share);
+    }
   }
 
   /**
@@ -101,6 +112,7 @@ export default class TerminalExtension extends StructureTerminal {
 
       if (sendResult === OK) {
         delete this.room.memory.shareTask;
+        this.energyCheck();
       } else if (sendResult === ERR_INVALID_ARGS) {
         this.log(`共享任务参数异常，无法执行传送，已移除`, "yellow");
         delete this.room.memory.shareTask;
@@ -185,6 +197,7 @@ export default class TerminalExtension extends StructureTerminal {
       delete this.room.memory.targetOrderId;
 
       this.setNextIndex();
+      this.energyCheck();
 
       return false; // 把这个改成 true 可以加快交易速度
     } else if (dealResult === ERR_INVALID_ARGS) delete this.room.memory.targetOrderId;

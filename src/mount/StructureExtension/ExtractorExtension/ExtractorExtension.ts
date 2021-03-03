@@ -1,6 +1,3 @@
-import { creepApi } from "@/modules/creepController/creepApi";
-import { minerHarvestLimit } from "@/setting";
-
 /**
  * Extractor 拓展
  *
@@ -8,30 +5,8 @@ import { minerHarvestLimit } from "@/setting";
  * 并在资源来源表里注册自己
  */
 export default class ExtractorExtension extends StructureExtractor {
-  public work(): void {
-    // 如果 mineral 冷却好了并且 terminal 还有空间就重新发布 miner
-    if (Game.time > this.room.memory.mineralCooldown) {
-      if (this.room.terminal && this.room.terminal.store.getUsedCapacity() < minerHarvestLimit) {
-        delete this.room.memory.mineralCooldown;
-
-        creepApi.add(
-          `${this.room.name} miner`,
-          "miner",
-          {
-            sourceId: this.room.mineral.id,
-            targetId: this.room.terminal ? this.room.terminal.id : this.room.storage.id
-          },
-          this.room.name
-        );
-      } else this.room.memory.mineralCooldown = Game.time + 10000;
-    }
-  }
-
-  /**
-   * 更新 mineral id
-   */
   public onBuildComplete(): void {
-    // 如果终端造好了就发布矿工
-    if (this.room.terminal) this.room.releaseCreep("miner");
+    // 如果终端造好了就发布挖矿任务
+    if (this.room.terminal) this.room.work.updateTask({ type: "mine", need: 1, priority: 0 });
   }
 }

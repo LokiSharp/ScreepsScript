@@ -47,7 +47,8 @@ export default class PowerSpawnExtension extends StructurePowerSpawn {
       this.room.transport.addTask({
         type: "fillPowerSpawn",
         id: this.id,
-        resourceType: resource
+        resourceType: resource,
+        priority: 0
       });
     }
 

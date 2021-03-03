@@ -49,7 +49,7 @@ export default class StructureTerminalMock extends RoomObjectMock {
   }
 
   @pushMethodCallInfoToCalled
-  public work(): void {
+  public onWork(): void {
     // PASS
   }
 

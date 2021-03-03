@@ -93,11 +93,9 @@ export function cpuUsageScanner(key: string): void {
 }
 
 /**
- * 生成 pixel 的框架插件
+ * 状态收集的框架插件
  */
 export const stateScannerAppPlugin: AppLifecycleCallbacks = {
-  reset: () => {
-    if (!Memory.stats) Memory.stats = { rooms: {} };
-  },
+  reset: initGlobalStats,
   tickEnd: stateScanner
 };

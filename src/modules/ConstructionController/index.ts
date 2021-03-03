@@ -72,17 +72,20 @@ const planSite = function () {
 
   const cantPlaceSites = preparePlaceSites.filter(site => {
     const { pos, type } = site;
-    const result = pos.createConstructionSite(type);
 
-    if (result === ERR_INVALID_TARGET) {
-      // log(`工地 ${type} 重复放置，已放弃，位置 [${pos}]`, ['建造控制器'], 'yellow')
-      return false;
-    }
-    // 放置失败，下次重试
-    else if (result !== OK && result !== ERR_FULL && result !== ERR_RCL_NOT_ENOUGH) {
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      log(`工地 ${type} 无法放置，位置 [${pos}]，createConstructionSite 结果 ${result}`, ["建造控制器"], "yellow");
-      return true;
+    if (pos) {
+      const result = pos?.createConstructionSite(type);
+
+      if (result === ERR_INVALID_TARGET) {
+        // log(`工地 ${type} 重复放置，已放弃，位置 [${pos}]`, ['建造控制器'], 'yellow')
+        return false;
+      }
+      // 放置失败，下次重试
+      else if (result !== OK && result !== ERR_FULL && result !== ERR_RCL_NOT_ENOUGH) {
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        log(`工地 ${type} 无法放置，位置 [${pos}]，createConstructionSite 结果 ${result}`, ["建造控制器"], "yellow");
+        return true;
+      }
     }
 
     return false;

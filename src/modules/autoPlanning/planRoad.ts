@@ -107,7 +107,7 @@ export default function planRoad(
   // 到 Source 的路径
   const pathToSource: RoomPosition[] = [];
   for (const source of room.source) {
-    const resultPos = findPath(source.pos);
+    const resultPos = findPath(source.pos, 1);
 
     // 这么操作实际上两条路可能是有重复的 pos 的，不过问题不大
     pathToSource.push(...resultPos);

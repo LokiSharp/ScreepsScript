@@ -28,7 +28,7 @@ import {
 
 import { PowerCreepExtension, mountPowerToRoom } from "./PowerCreepExtension";
 import mountCreep, { CreepExtension } from "./CreepExtension";
-import mountRoom, { RoomConsole, RoomExtension } from "./RoomExtension";
+import mountRoom, { RoomConsole, RoomExtension, RoomHelp } from "./RoomExtension";
 import { RoomPostionExtension } from "./RoomPostionExtension";
 import log from "@/utils/console/log";
 import mountGlobal from "./GlobalExtension";
@@ -40,6 +40,7 @@ import { setBornCenter } from "@/modules/autoPlanning/planBasePos";
 export const mountList: [AnyClass, AnyClass][] = [
   [Room, RoomExtension],
   [Room, RoomConsole],
+  [Room, RoomHelp],
   [RoomPosition, RoomPostionExtension],
   [Creep, CreepExtension],
   [PowerCreep, PowerCreepExtension],

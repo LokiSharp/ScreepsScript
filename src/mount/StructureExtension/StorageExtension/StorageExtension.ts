@@ -7,23 +7,16 @@ import { DEFAULT_ENERGY_KEEP_AMOUNT, DEFAULT_ENERGY_KEEP_LIMIT } from "@/setting
  * 就将自己注册到资源来源表中为其他房间提供能量
  */
 export default class StorageExtension extends StructureStorage {
-  public work(): void {
+  public onWork(): void {
     if (Game.time % 20) return;
 
     this.energyKeeper();
-
-    if (Game.time % 1000) return;
-    // 定时运行规划
-    this.room.releaseCreep("upgrader");
   }
 
   /**
    * 建筑完成时以自己为中心发布新的 creep 运维组
    */
   public onBuildComplete(): void {
-    this.room.releaseCreep("harvester");
-    this.room.releaseCreep("upgrader");
-
     this.room.source.forEach(source => {
       const container = source.getContainer();
       // 添加从 container 到自己的能量搬运任务
@@ -34,7 +27,8 @@ export default class StorageExtension extends StructureStorage {
           type: "transport",
           from: container.id,
           to: this.id,
-          resourceType: RESOURCE_ENERGY
+          resourceType: RESOURCE_ENERGY,
+          priority: 0
         });
     });
   }

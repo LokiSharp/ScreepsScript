@@ -58,8 +58,10 @@ interface CreepMemory<Role extends CreepRoleConstant = CreepRoleConstant> {
   fillWallId?: Id<StructureWall | StructureRampart>;
   // manager 特有 要填充能量的建筑 id
   fillStructureId?: Id<StructureWithStore>;
-  // 建筑工特有，当前缓存的建筑工地（目前只有外矿采集者在用）
+  // 建筑工特有，当前缓存的建筑工地
   constructionSiteId?: Id<ConstructionSite>;
+  constructionSitePos?: number[];
+  constructionSiteType?: StructureConstant;
   // 可以执行建筑的单位特有，当该值为 true 时将不会尝试建造
   dontBuild?: boolean;
   // 远程寻路缓存
@@ -73,6 +75,9 @@ interface CreepMemory<Role extends CreepRoleConstant = CreepRoleConstant> {
     // 缓存路径的目标，该目标发生变化时刷新路径, 形如"14/4E14S1"
     targetPos?: string;
   };
+  // collector 允许自己再次尝试发布 power 强化 Soruce 任务的时间
+  // 在 Game.time 小于该值时不会尝试发布强化任务
+  regenSource?: number;
   // 移动到某位置需要的时间
   // 例如：miner 会用它来保存移动到 mineral 的时间
   travelTime?: number;
@@ -84,6 +89,10 @@ interface CreepMemory<Role extends CreepRoleConstant = CreepRoleConstant> {
    * 运营单位特有，当前正在执行的物流 / 工作任务索引
    */
   taskKey?: number;
+  /**
+   * 能量采集单位特有，当前的采集模式
+   */
+  harvestMode?: HarvestMode;
 }
 
 /**

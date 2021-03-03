@@ -14,9 +14,10 @@ import { getRoomStats } from "@/modules/stats";
 const WORK_PROPORTION_TO_EXPECT = [
   { rate: 50, expect: 2 },
   { rate: 10, expect: 1 },
-  { rate: -10, expect: 0 },
-  { rate: -50, expect: -1 },
-  { rate: -100, expect: -2 }
+  { rate: 0, expect: 0 },
+  { rate: -10, expect: -1 },
+  { rate: -50, expect: -2 },
+  { rate: -100, expect: -3 }
 ];
 
 export default class RoomWork

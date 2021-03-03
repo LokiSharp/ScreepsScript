@@ -55,7 +55,7 @@ export default class StructureSpawnMock extends RoomObjectMock {
     return undefined;
   }
 
-  public work(): void {
+  public onWork(): void {
     // PASS
   }
 }

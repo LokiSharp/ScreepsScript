@@ -3,7 +3,14 @@ import BaseMock from "./BaseMock";
 export default class RoomMemoryMock extends BaseMock implements RoomMemory {
   public workTasks: string;
   public upgrade?: Record<string, unknown>;
+  public source: {
+    [p: string]: { dropped?: string; containerId?: Id<StructureContainer>; LinkId?: Id<StructureLink> };
+  };
+  public upgradePosInfos: Record<string, UpgradePosInfo>;
+  public transportCreeps: string;
   public transporterNumber?: number;
+  public workCreeps: string;
+  public workerNumber: number;
   public removeTime?: number;
   public spawnList?: string[];
   public delayCSList: string[];

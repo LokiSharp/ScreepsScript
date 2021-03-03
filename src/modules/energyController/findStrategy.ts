@@ -3,7 +3,7 @@
  */
 const ENERGY_USE_LIMIT = {
   [STRUCTURE_TERMINAL]: 10000,
-  [STRUCTURE_STORAGE]: 100000,
+  [STRUCTURE_STORAGE]: 10000,
   [STRUCTURE_CONTAINER]: 400,
   // 一个 carry 50 容积，至少要保证能有一个 carry 的能量给填充单位用
   [RESOURCE_ENERGY]: 100
@@ -12,7 +12,7 @@ const ENERGY_USE_LIMIT = {
 /**
  * 获取目标中的能量数量，用于抹平差异
  */
-const getEnergyAmount = function (target: EnergyTarget) {
+const getEnergyAmount = function (target: EnergyTarget): number {
   if ("store" in target) return target.store[RESOURCE_ENERGY];
   else if ("amount" in target) return target.amount;
   else return 0;
@@ -48,4 +48,4 @@ export const withLimit: EnergyTargetFilter = targets => {
   return targets.filter(target => getEnergyAmount(target) > ENERGY_USE_LIMIT[getTargetType(target)]);
 };
 
-export default { getMax, getClosestTo, withLimit };
+export default { getMax, getClosestTo, withLimit, getEnergyAmount };
