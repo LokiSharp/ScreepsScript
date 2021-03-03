@@ -167,7 +167,7 @@ export const PowerTasks: IPowerTaskConfigs = {
         delete creep.memory.sourceIndex;
         return OK;
       } else if (actionResult === ERR_NOT_IN_RANGE) {
-        creep.goTo(creep.room.factory.pos);
+        creep.goTo(target.pos);
         return ERR_BUSY;
       } else {
         creep.log(

@@ -1,9 +1,9 @@
 import { MIN_WALL_HITS, repairSetting } from "@/setting";
 import { Move, WayPoint } from "@/modules/move";
-import { buildCompleteSite, getNearSite } from "@/modules/ConstructionController";
 import { creepApi } from "@/modules/creepController/creepApi";
 import creepWorks from "@/role";
 import { getMemoryFromCrossShard } from "@/modules/crossShard";
+import { getNearSite } from "@/modules/ConstructionController";
 import { useCache } from "@/utils/global/useCache";
 
 export class CreepExtension extends Creep {
@@ -176,6 +176,8 @@ export class CreepExtension extends Creep {
     // 指定了目标，直接用，并且把 id 备份一下
     if (target) {
       this.memory.constructionSiteId = target.id;
+      this.memory.constructionSitePos = [target.pos.x, target.pos.y];
+      this.memory.constructionSiteType = target.structureType;
       return target;
     }
     // 没有指定目标，或者指定的目标消失了，从本地内存查找
@@ -183,9 +185,18 @@ export class CreepExtension extends Creep {
       const selfKeepTarget = Game.getObjectById(this.memory.constructionSiteId);
       if (selfKeepTarget) return selfKeepTarget;
       // 本地内存里保存的 id 找不到工地了，检查下是不是造好了
-      else {
-        const structure = buildCompleteSite[this.memory.constructionSiteId];
-
+      else if (this.memory.constructionSitePos) {
+        // 获取曾经工地的位置
+        const constructionSitePos = new RoomPosition(
+          this.memory.constructionSitePos[0],
+          this.memory.constructionSitePos[1],
+          this.room.name
+        );
+        // 检查上面是否有已经造好的同类型建筑
+        const structure = _.find(
+          constructionSitePos.lookFor(LOOK_STRUCTURES),
+          s => s.structureType === this.memory.constructionSiteType
+        );
         // 如果刚修好的是墙的话就记住该墙的 id，然后把血量刷高一点）
         if (
           structure &&

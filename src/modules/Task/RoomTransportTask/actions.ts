@@ -62,13 +62,16 @@ const clearCarryingRecources = function (creep: Creep, excludeResourceType?: Res
 const getEnergy = function (creep: Creep<"manager">, transport: InterfaceTransportTaskController): boolean {
   transport.countWorkTime();
   if (creep.store[RESOURCE_ENERGY] > 10) return true;
+
   if (!clearCarryingRecources(creep, RESOURCE_ENERGY)) return false;
 
   // 从工作房间查询并缓存能量来源
   const source = useCache<EnergySourceStructure | Resource<RESOURCE_ENERGY>>(
     () => {
-      const { getClosestTo } = findStrategy;
-      return getRoomEnergyTarget(creep.room, getClosestTo(creep.pos));
+      const { getClosestTo, getEnergyAmount } = findStrategy;
+      return getRoomEnergyTarget(creep.room, getClosestTo(creep.pos), targets =>
+        targets.filter(target => getEnergyAmount(target) > 100)
+      );
     },
     creep.memory,
     "sourceId"
@@ -80,6 +83,7 @@ const getEnergy = function (creep: Creep<"manager">, transport: InterfaceTranspo
     (source instanceof Resource && source.amount <= 0)
   ) {
     creep.say("😯没能量呀");
+    transport.deCountWorkTime();
     delete creep.memory.sourceId;
     return false;
   }
@@ -198,8 +202,8 @@ export const actions: {
       }
     },
     target: () => {
-      transport.countWorkTime();
       if (creep.store[task.resourceType] <= 0) return true;
+      transport.countWorkTime();
       // 是 id，存放到只当建筑
       if (typeof task.to === "string") {
         // 获取目标建筑
@@ -232,6 +236,7 @@ export const actions: {
   fillExtension: (creep, task, transport) => ({
     source: () => getEnergy(creep, transport),
     target: () => {
+      if (creep.store[RESOURCE_ENERGY] === 0) return true;
       transport.countWorkTime();
       const result = fillSpawnStructure(creep);
 
@@ -250,8 +255,8 @@ export const actions: {
   fillTower: (creep, task, transport) => ({
     source: () => getEnergy(creep, transport),
     target: () => {
-      transport.countWorkTime();
       if (creep.store[RESOURCE_ENERGY] === 0) return true;
+      transport.countWorkTime();
       let target: StructureTower;
 
       // 有缓存的话
@@ -299,10 +304,9 @@ export const actions: {
    */
   fillNuker: (creep, task, transport) => ({
     source: () => {
-      transport.countWorkTime();
       // 如果身上有对应资源的话就直接去填充
       if (creep.store[task.resourceType] > 0) return true;
-
+      transport.countWorkTime();
       // 获取资源存储建筑
       let sourceStructure: StructureStorage | StructureTerminal;
       if (task.resourceType === RESOURCE_ENERGY) sourceStructure = creep.room.storage;
@@ -340,8 +344,8 @@ export const actions: {
       return false;
     },
     target: () => {
-      transport.countWorkTime();
       if (creep.store[task.resourceType] === 0) return true;
+      transport.countWorkTime();
       // 获取 nuker 及兜底
       const target = Game.getObjectById(task.id);
       if (!target) {

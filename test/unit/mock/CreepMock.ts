@@ -140,7 +140,7 @@ export default class CreepMock extends RoomObjectMock {
     // PASS
   }
   @pushMethodCallInfoToCalled
-  public work(): void {
+  public OnWork(): void {
     // PASS
   }
   @pushMethodCallInfoToCalled

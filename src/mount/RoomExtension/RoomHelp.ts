@@ -160,17 +160,6 @@ export default class RoomHelp extends RoomExtension {
           "包含本房间的一些基础接口，本模块的大多数 API 都已实现自动调用，除非房间运转出现问题，否则不需要手动进行调用。",
         api: [
           {
-            title: "发布 creep",
-            describe: "发布房间运营需要的角色，已自动化",
-            params: [
-              {
-                name: "roleName",
-                desc: "BaseRoleConstant 和 AdvancedRoleConstant 中的所有角色名 (定义于 index.d.ts 中)"
-              }
-            ],
-            functionName: "releaseCreep"
-          },
-          {
             title: "运行建筑布局",
             describe: "本方法依赖于 setcenter 方法，已自动化，默认在 controller 升级时调用",
             functionName: "planLayout"

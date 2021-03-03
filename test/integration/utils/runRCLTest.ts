@@ -24,7 +24,6 @@ export async function runRCLTest(RCL: number, _RCL: number, tickNum: number): Pr
     const { db } = helper.server.common.storage;
     await db["rooms.objects"].update({ room: "W0N0", type: "constructionSite" }, { $set: { progress: 99999 } });
     await db["rooms.objects"].update({ room: "W0N0", type: "rampart" }, { $set: { hits: 3000000 } });
-    await db["rooms.objects"].update({ room: "W0N0", type: "storage" }, { $set: { store: { energy: 950000 } } });
 
     _.each(await helper.user.newNotifications, ({ message }) => console.log("[notification]", message));
   }

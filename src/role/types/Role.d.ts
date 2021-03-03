@@ -14,11 +14,6 @@ interface RoleDatas {
    */
   worker: WorkerData;
   harvester: HarvesterData;
-  collector: HarvesterData;
-  miner: MinerData;
-  upgrader: WorkerData;
-  builder: WorkerData;
-  repairer: WorkerData;
 
   /**
    * 房间高级运营
@@ -78,24 +73,24 @@ interface EmptyData {}
  * 执行从 sourceId 处采集东西，并转移至 targetId 处（不一定使用，每个角色都有自己固定的目标例如 storage 或者 terminal）
  */
 interface HarvesterData {
-  // 要采集的 source id
+  /**
+   * 要采集的 Source 索引
+   */
   sourceId: Id<Source>;
-  // 把采集到的资源存到哪里存在哪里
-  targetId?: Id<EnergySourceStructure>;
-}
-
-/**
- * 矿工 data
- */
-interface MinerData {
   /**
-   * 要采集的 mineral id
+   * 该 creep 的工作房间
+   * 能量采集单位会先抵达该房间然后开始采集
    */
-  sourceId: Id<Mineral>;
+  harvestRoom: string;
   /**
-   * 把采集到的资源存到哪里存在哪里
+   * 能量要存储/应用到的房间
    */
-  targetId?: Id<EnergySourceStructure>;
+  useRoom: string;
+  /**
+   * 要站立到的采集能量的位置
+   * 在采集单位第一次到达 source 旁确定
+   */
+  standPos?: string;
 }
 
 /**

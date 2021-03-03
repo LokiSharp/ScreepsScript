@@ -58,7 +58,7 @@ delayQueue.addDelayCallback("spawnFiller", room => {
   // cpu 还是不够的话就延迟发布
   if (Game.cpu.bucket < 700) return addSpawnRepairerTask(room.name);
 
-  room.work.updateTask({ type: "fillWall" });
+  room.work.updateTask({ type: "fillWall", priority: 0 });
 });
 
 /**
@@ -77,7 +77,7 @@ delayQueue.addDelayCallback("spawnMiner", room => {
   )
     return addSpawnMinerTask(room.name, 1000);
 
-  room.work.updateTask({ type: "mine", need: 1 });
+  room.work.updateTask({ type: "mine", need: 1, priority: 0 });
 });
 
 /**

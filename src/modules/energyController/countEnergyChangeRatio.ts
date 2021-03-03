@@ -9,7 +9,7 @@ import { setRoomStats } from "@/modules/stats";
 export const countEnergyChangeRatio = function (room: Room): OK | ERR_NOT_FOUND {
   setRoomStats(room.name, oldStats => {
     // 收集房间建筑内的可用总能量
-    const structureEnergy = [room.terminal, room.storage, ...room[STRUCTURE_CONTAINER]]
+    const structureEnergy = [room.terminal, room.storage, ...room[STRUCTURE_CONTAINER], ...room[STRUCTURE_LINK]]
       .filter(Boolean)
       // 拿到需要进行统计的能量数量
       .map(c => c.store[RESOURCE_ENERGY] || 0);

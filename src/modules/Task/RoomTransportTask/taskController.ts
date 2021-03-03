@@ -95,4 +95,11 @@ export default class RoomTransport
   public countWorkTime(): void {
     this.totalWorkTime += 1;
   }
+
+  /**
+   * 用于 actions 中 creep 统计工作时长
+   */
+  public deCountWorkTime(): void {
+    this.totalWorkTime -= 1;
+  }
 }

@@ -18,23 +18,21 @@ export default class LinkExtension extends StructureLink {
    * 分配默认职责，玩家不同意默认职责的话也可以手动调用 .as... 方法重新分配职责
    */
   public onBuildComplete(): void {
-    // 如果附近有 Source 就转换为 SourceLink
-    const inRangeSources = this.pos.findInRange(FIND_SOURCES, 2);
-    if (inRangeSources.length > 0) {
-      this.asSource();
+    // 如果附近有 controller 就转换为 UpgradeLink
+    if (this.room.controller.pos.inRangeTo(this, 2)) {
+      this.asUpgrade();
       return;
     }
 
     // 在基地中心附近就转换为 CenterLink
     const center = this.room.memory.center;
     if (center && this.pos.isNearTo(new RoomPosition(center[0], center[1], this.room.name))) {
-      this.room.releaseCreep("processor");
       this.asCenter();
       return;
     }
 
-    // 否则就默认转换为 UpgraderLink
-    this.asUpgrade();
+    // 否则就默认转换为 SourceLink（因为有外矿 link，而这种 link 边上是没有 source 的）
+    this.asSource();
   }
 
   /**
@@ -43,8 +41,11 @@ export default class LinkExtension extends StructureLink {
   public asSource(): string {
     this.clearRegister();
 
-    // 更新 harvester
-    this.room.releaseCreep("harvester");
+    // 找到身边第一个没有设置 link 的 source，并把自己绑定上去
+    const nearSource = this.pos.findInRange(FIND_SOURCES, 2, {
+      filter: source => !source.getLink()
+    });
+    if (nearSource[0]) nearSource[0].setLink(this);
 
     return `${this.id} 已注册为源 link，已重定向对应 harvester 的存放目标`;
   }
@@ -57,8 +58,7 @@ export default class LinkExtension extends StructureLink {
     this.room.memory.centerLinkId = this.id;
 
     // 注册中央 link 的同时发布 processor
-    this.room.releaseCreep("processor");
-    this.room.releaseCreep("harvester");
+    this.room.release.processor();
 
     return `${this.id} 已注册为中央 link，发布 processor 并调整采集单位`;
   }
@@ -73,7 +73,6 @@ export default class LinkExtension extends StructureLink {
     this.clearRegister();
 
     this.room.memory.upgradeLinkId = this.id;
-    this.room.releaseCreep("upgrader");
     return `${this.id} 已注册为升级 link`;
   }
 

@@ -188,8 +188,13 @@ export const transportActions: {
         // 优先建设任务中指定的工地
         const taskTarget = Game.getObjectById(task.targetId);
         if (creep.buildStructure(taskTarget) === ERR_NOT_FOUND) {
-          workController.removeTask(task.key);
-          return true;
+          const newTarget = creep.pos.findClosestByRange(FIND_CONSTRUCTION_SITES);
+          if (creep.buildStructure(newTarget) === ERR_NOT_FOUND) {
+            workController.removeTask(task.key);
+            return true;
+          } else {
+            task.targetId = newTarget.id;
+          }
         }
       }
       return false;
@@ -267,7 +272,10 @@ export const transportActions: {
         if (actionResult === ERR_NOT_IN_RANGE) creep.goTo(creep.room.importantWall.pos);
       }
       // 否则就按原计划维修
-      else creep.fillDefenseStructure();
+      else {
+        creep.fillDefenseStructure();
+        delete creep.memory.fillWallId;
+      }
 
       return creep.store.getUsedCapacity() === 0;
     }

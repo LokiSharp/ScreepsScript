@@ -35,7 +35,8 @@ export default class NukerExtension extends StructureNuker {
       this.room.transport.addTask({
         type: "fillNuker",
         id: this.id,
-        resourceType: resource
+        resourceType: resource,
+        priority: 0
       });
     }
 

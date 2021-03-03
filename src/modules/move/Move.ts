@@ -298,8 +298,8 @@ export class Move {
             };
 
             // 给建筑和工地添加 cost
-            room.find(FIND_STRUCTURES).forEach(addCost);
             room.find(FIND_CONSTRUCTION_SITES).forEach(addCost);
+            room.find(FIND_STRUCTURES).forEach(addCost);
 
             this.costCache[room.name] = costs.clone();
           }

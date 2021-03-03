@@ -6,6 +6,7 @@ interface Room {
 }
 
 interface RoomMemory {
+  workerNumber: number;
   /**
    * 房间工作任务的备份数据
    * 会在全局重置时通过该数据重建工作任务

@@ -54,7 +54,7 @@ interface InterfaceCreepRelease {
   /**
    * 发布支援角色组
    */
-  remoteHelper(remoteRoomName: string): void;
+  remoteHelper(remoteRoomName: string, wayPointFlagName?: string): void;
   /**
    * 孵化 pbCarrier 小组
    */
