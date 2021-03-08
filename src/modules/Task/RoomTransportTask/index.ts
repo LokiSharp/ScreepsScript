@@ -6,25 +6,23 @@
  */
 
 import RoomTransport from "./taskController";
+import createGetter from "@/utils/global/createGetter";
 
 /**
  * 所有的房间物流对象都被存放到这里
  */
-const transportManagers: { [roomName: string]: RoomTransport } = {};
+const transportControllers: { [roomName: string]: RoomTransport } = {};
 
 /**
  * 向房间原型挂载物流对象
+ *
+ * @param key 要挂载到 Room 的哪个键上
  */
-export default function (): void {
-  Object.defineProperty(Room.prototype, "transport", {
-    get() {
-      if (!((this as Room).name in transportManagers)) {
-        transportManagers[(this as Room).name] = new RoomTransport((this as Room).name);
-      }
-
-      return transportManagers[(this as Room).name];
-    },
-    enumerable: false,
-    configurable: true
+export default function (key = "transport"): void {
+  createGetter(Room, key, function () {
+    if (!((this as Room).name in transportControllers)) {
+      transportControllers[(this as Room).name] = new RoomTransport((this as Room).name);
+    }
+    return transportControllers[(this as Room).name];
   });
 }
