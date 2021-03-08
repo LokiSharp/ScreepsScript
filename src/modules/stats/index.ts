@@ -25,6 +25,7 @@ export function setRoomStats(roomName: string, getNewStats: (stats: RoomStats) =
       totalEnergy: 0,
       energyCalcTime: 0,
       energyGetRate: NaN,
+      energyGetRates: [],
       commRes: {},
       resources: {}
     };

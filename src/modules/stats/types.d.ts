@@ -48,6 +48,7 @@ interface RoomStats {
    * 例如 100 代表 100 点能量/tick，值为负代表负增长
    */
   energyGetRate: number;
+  energyGetRates: number[];
   /**
    * 搬运工的工作时长
    */

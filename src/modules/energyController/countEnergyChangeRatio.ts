@@ -22,15 +22,20 @@ export const countEnergyChangeRatio = function (room: Room): OK | ERR_NOT_FOUND 
 
     // 计算能量总数
     const totalEnergy = [...structureEnergy, ...droppedEnergy].reduce((pre, next) => pre + next, 0);
+    const energyGetRates = oldStats.energyGetRates;
+
+    while (energyGetRates.length >= 100) energyGetRates.shift();
+    energyGetRates.push((totalEnergy - oldStats.totalEnergy) / (Game.time - oldStats.energyCalcTime));
 
     // 计算能量获取速率，如果 energyGetRate 为 NaN 的话代表之前还未进行过统计，先设置为 0
     const energyGetRate = _.isNaN(oldStats.energyGetRate)
       ? 0
-      : (totalEnergy - oldStats.totalEnergy) / (Game.time - oldStats.energyCalcTime);
+      : energyGetRates.reduce((a, b) => a + b) / energyGetRates.length;
 
     return {
       totalEnergy,
       energyGetRate,
+      energyGetRates,
       energyCalcTime: Game.time
     };
   });
