@@ -1,12 +1,10 @@
 import CreateElement from "@/utils/console/createElement";
-import GameMock from "@mock/GameMock";
 import { assert } from "chai";
+import { refreshGlobalMock } from "@mock/index";
 
 describe("CreateElement", () => {
   beforeEach(() => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore : allow adding Game to global
-    global.Game = new GameMock();
+    refreshGlobalMock();
   });
   it("CreateElement 可以初始化", () => {
     const createElement = new CreateElement();

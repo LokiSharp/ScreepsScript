@@ -1,29 +1,23 @@
-import CreepMock from "@mock/CreepMock";
-import MemoryMock from "@mock/MemoryMock";
-import OwnerMock from "@mock/OwnerMock";
 import { assert } from "chai";
+import { getMockCreep } from "@mock/CreepMock";
+import { refreshGlobalMock } from "@mock/index";
 import { whiteListFilter } from "@/utils/global/whiteListFilter";
 
 describe("whiteListFilter", () => {
   beforeEach(() => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore : allow adding Memory to global
-    global.Memory = new MemoryMock();
+    refreshGlobalMock();
+    Memory.whiteList = { UserInWhiteList: 0 };
   });
 
   it("Memory.whiteList 不存在时直接返回 true", () => {
-    const userInWhiteList = new OwnerMock("UserInWhiteList");
-    const testCreep = new CreepMock("" as Id<CreepMock>, 0, 0);
-    testCreep.owner = userInWhiteList;
+    const testCreep = getMockCreep({ owner: { username: "UserInWhiteList" } });
     delete Memory.whiteList;
     const result = whiteListFilter((testCreep as unknown) as Creep);
     assert.isTrue(result);
   });
 
   it("Owner 在白名单中返回 false 并计数", () => {
-    const userInWhiteList = new OwnerMock("UserInWhiteList");
-    const testCreep = new CreepMock("" as Id<CreepMock>, 0, 0);
-    testCreep.owner = userInWhiteList;
+    const testCreep = getMockCreep({ owner: { username: "UserInWhiteList" } });
     Memory.whiteList.UserInWhiteList = 0;
     const result = whiteListFilter((testCreep as unknown) as Creep);
     assert.isFalse(result);
@@ -35,9 +29,7 @@ describe("whiteListFilter", () => {
   });
 
   it("Owner 不在白名单中返回 true", () => {
-    const userNotInWhiteList = new OwnerMock("userNotInWhiteList");
-    const testCreep = new CreepMock("" as Id<CreepMock>, 0, 0);
-    testCreep.owner = userNotInWhiteList;
+    const testCreep = getMockCreep({ owner: { username: "userNotInWhiteList" } });
     const result = whiteListFilter((testCreep as unknown) as Creep);
     assert.isTrue(result);
   });

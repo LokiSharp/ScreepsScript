@@ -1,5 +1,5 @@
-import GameMock from "@mock/GameMock";
 import { assert } from "chai";
+import { getMockGame } from "@mock/GameMock";
 import log from "@/utils/console/log";
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -23,7 +23,7 @@ describe("log", () => {
   beforeEach(() => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore : allow adding Game to global
-    global.Game = new GameMock();
+    global.Game = getMockGame();
     out = undefined;
   });
 

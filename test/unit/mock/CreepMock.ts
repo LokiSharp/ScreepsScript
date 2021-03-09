@@ -1,27 +1,19 @@
-import RoomObjectMock from "./RoomObjectMock";
-import { pushMethodCallInfoToCalled } from "./pushMethodCallInfoToCalled";
-export default class CreepMock extends RoomObjectMock {
-  public constructor(id: Id<CreepMock>, x: number, y: number) {
-    super(x, y);
-    this.id = id;
-  }
+import { RoomObjectMock } from "./RoomObjectMock";
+import { getMock } from "@mock/utils";
+import { getMockRoom } from "@mock/RoomMock";
+import { pushMethodCallInfoToCalled } from "@mock/pushMethodCallInfoToCalled";
 
-  public body: BodyPartDefinition[];
-  public carry: StoreDefinition;
-  public carryCapacity: number;
-  public fatigue: number;
-  public hits: number;
-  public hitsMax: number;
-  public id: Id<CreepMock>;
-  public memory: CreepMemory;
-  public my: boolean;
-  public name: string;
-  public owner: Owner;
-  public room: Room;
-  public spawning: boolean;
+export class CreepMock extends RoomObjectMock {
+  public body = [{ type: MOVE, hits: 100 }];
+  public fatigue = 0;
+  public hits = 100;
+  public hitsMax = 100;
+  public name = "";
+  public room = getMockRoom({ name: "W1N1" });
+  public spawning = false;
   public saying: string;
   public store: StoreDefinition;
-  public ticksToLive: number | undefined;
+  public ticksToLive = 1500;
 
   @pushMethodCallInfoToCalled
   public attack(): CreepActionReturnCode {
@@ -208,11 +200,18 @@ export default class CreepMock extends RoomObjectMock {
   public rangedAttackNearHostileStructures(): OK | ERR_NOT_FOUND {
     return undefined;
   }
-
+  @pushMethodCallInfoToCalled
   public getHostileCreepsWithCache(): AnyCreep[] {
     return undefined;
   }
+  @pushMethodCallInfoToCalled
   public getHostileStructuresWithCache(): Structure<StructureConstant>[] {
     return undefined;
   }
 }
+
+/**
+ * 伪造一个 Creep
+ * @param props 属性
+ */
+export const getMockCreep = getMock<Creep>(CreepMock);

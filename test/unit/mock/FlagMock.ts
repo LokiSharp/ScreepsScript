@@ -1,29 +1,14 @@
-import RoomObjectMock from "./RoomObjectMock";
-import { pushMethodCallInfoToCalled } from "./pushMethodCallInfoToCalled";
+import { RoomObjectMock } from "./RoomObjectMock";
+import { getMock } from "@mock/utils";
 
-export default class FlagMock extends RoomObjectMock {
-  public constructor(id: Id<FlagMock>, x: number, y: number) {
-    super(x, y);
-    this.id = id;
-  }
-
-  public id: Id<FlagMock>;
+export class FlagMock extends RoomObjectMock {
   public color: ColorConstant;
-  public memory: FlagMemory;
-
-  public name: string;
   public secondaryColor: ColorConstant;
-
-  @pushMethodCallInfoToCalled
-  public remove(): OK {
-    return undefined;
-  }
-  @pushMethodCallInfoToCalled
-  public setColor(): OK | ERR_INVALID_ARGS {
-    return undefined;
-  }
-  @pushMethodCallInfoToCalled
-  public setPosition(): OK | ERR_INVALID_ARGS {
-    return undefined;
-  }
+  public name: string;
 }
+
+/**
+ * 伪造一个 Flag
+ * @param props 属性
+ */
+export const getMockFlag = getMock<Flag>(FlagMock);

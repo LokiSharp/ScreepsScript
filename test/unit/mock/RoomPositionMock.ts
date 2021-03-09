@@ -1,15 +1,18 @@
-import BaseMock from "./BaseMock";
+import { BaseMock } from "./BaseMock";
+import { getMock } from "@mock/utils";
 
-export default class RoomPositionMock extends BaseMock {
-  public roomName: string;
-  public x: number;
-  public y: number;
+export class RoomPositionMock extends BaseMock {
+  public roomName = "";
+  public x = 0;
+  public y = 0;
+
   public isEqualTo(x: number, y: number): boolean {
-    return x === this.x && y === this.y ? true : false;
-  }
-  public constructor(x: number, y: number) {
-    super();
-    this.x = x;
-    this.y = y;
+    return x === this.x && y === this.y;
   }
 }
+
+/**
+ * 伪造一个 RoomPosition
+ * @param props 属性
+ */
+export const getMockRoomPosition = getMock<RoomPosition>(RoomPositionMock);
