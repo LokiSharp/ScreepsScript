@@ -1,6 +1,7 @@
+import { CreepMock, getMockCreep } from "@mock/CreepMock";
 import { CombatSquad } from "@/modules/CombatSquad/CombatSquad";
-import CreepMock from "@mock/CreepMock";
 import { assert } from "chai";
+import { getMockRoomPosition } from "@mock/RoomPositionMock";
 
 describe("CombatSquad", () => {
   it("CombatSquad 可以初始化", () => {
@@ -110,11 +111,9 @@ describe("CombatSquad", () => {
 function initSquadMember(squad: SquadMember, squadMembersDef: (string | number[] | CalledRecord[])[][]): SquadMember {
   squadMembersDef.forEach(
     item =>
-      (squad[item[0] as string] = (new CreepMock(
-        "" as Id<CreepMock>,
-        item[1][0] as number,
-        item[1][1] as number
-      ) as unknown) as Creep)
+      (squad[item[0] as string] = (getMockCreep({
+        pos: getMockRoomPosition({ x: item[1][0] as number, y: item[1][1] as number })
+      }) as unknown) as Creep)
   );
   return squad;
 }

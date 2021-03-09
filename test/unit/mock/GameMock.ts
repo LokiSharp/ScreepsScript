@@ -1,39 +1,21 @@
-import BaseMock from "./BaseMock";
-import CPUMock from "./CPUMock";
-import CreepMock from "./CreepMock";
-import GlobalControlLevelMock from "./GlobalControlLevelMock";
-import GlobalPowerLevelMock from "./GlobalPowerLevelMock";
-import MarketMock from "./MarketMock";
-import RoomMock from "./RoomMock";
-import RoomObjectMock from "./RoomObjectMock";
-import ShardMock from "./ShardMock";
+import { BaseMock } from "./BaseMock";
+import { getMock } from "@mock/utils";
+import { getMockCPU } from "./CPUMock";
+import { getMockMarket } from "./MarketMock";
+import { getMockShard } from "./ShardMock";
 import { pushMethodCallInfoToCalled } from "./pushMethodCallInfoToCalled";
 
-export default class GameMock extends BaseMock {
-  public cpu: CPUMock;
-  public flags: { [flagName: string]: Flag };
-  public gcl: GlobalControlLevelMock;
-  public gpl: GlobalPowerLevelMock;
-  public market: MarketMock;
-  public time: number;
-  public shard: ShardMock;
-  public rooms: Record<string, RoomMock>;
-  public creeps: Record<string, CreepMock>;
-  public roomObjects: Record<string, RoomObjectMock>;
-
-  public constructor() {
-    super();
-    this.cpu = new CPUMock();
-    this.flags = {};
-    this.gcl = new GlobalControlLevelMock();
-    this.gpl = new GlobalPowerLevelMock();
-    this.market = new MarketMock();
-    this.shard = new ShardMock();
-
-    this.rooms = {};
-    this.creeps = {};
-    this.roomObjects = {};
-  }
+export class GameMock extends BaseMock {
+  public cpu = getMockCPU();
+  public flags = {};
+  public gcl = 1;
+  public gpl = 1;
+  public market = getMockMarket();
+  public time = 0;
+  public shard = getMockShard();
+  public rooms = {};
+  public creeps = {};
+  public roomObjects = {};
 
   @pushMethodCallInfoToCalled
   public notify(): void {
@@ -45,3 +27,9 @@ export default class GameMock extends BaseMock {
     // PASS
   }
 }
+
+/**
+ * 伪造一个 CPU
+ * @param props 属性
+ */
+export const getMockGame = getMock<Game>(GameMock);

@@ -1,13 +1,16 @@
-import BaseMock from "./BaseMock";
-import RoomPositionMock from "./RoomPositionMock";
+import { GameObjectMock } from "./GameObjectMock";
+import { getMock } from "@mock/utils";
+import { getMockRoom } from "@mock/RoomMock";
+import { getMockRoomPosition } from "./RoomPositionMock";
 
-export default class RoomObjectMock extends BaseMock {
-  public effects: RoomObjectEffect[];
-  public pos: RoomPositionMock;
-  public room: Room | undefined;
-
-  public constructor(x = 0, y = 0) {
-    super();
-    this.pos = new RoomPositionMock(x, y);
-  }
+export class RoomObjectMock extends GameObjectMock {
+  public effects = [];
+  public pos = getMockRoomPosition();
+  public room = getMockRoom({ name: "W1N1" });
 }
+
+/**
+ * 伪造一个 RoomObject
+ * @param props 属性
+ */
+export const getMockRoomObject = getMock<RoomObject>(RoomObjectMock);

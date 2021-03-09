@@ -1,12 +1,10 @@
-import GameMock from "@mock/GameMock";
 import { assert } from "chai";
 import createRoomLink from "@/utils/console/createRoomLink";
+import { refreshGlobalMock } from "@mock/index";
 
 describe("createRoomLink", () => {
   beforeEach(() => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore : allow adding Game to global
-    global.Game = new GameMock();
+    refreshGlobalMock();
   });
 
   it("可以生成房间链接", () => {

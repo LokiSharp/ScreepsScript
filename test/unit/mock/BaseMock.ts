@@ -1,4 +1,4 @@
-export default class BaseMock {
+export class BaseMock {
   public calledRecords: CalledRecord[];
 
   public constructor() {

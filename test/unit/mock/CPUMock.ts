@@ -1,24 +1,18 @@
-import BaseMock from "./BaseMock";
+import { BaseMock } from "./BaseMock";
+import { getMock } from "@mock/utils";
 import { pushMethodCallInfoToCalled } from "./pushMethodCallInfoToCalled";
 
-export default class CPUMock extends BaseMock {
-  public cpuUsed: number;
+export class CPUMock extends BaseMock {
+  public cpuUsed = 0;
 
-  public limit: number;
-  public tickLimit: number;
-  public bucket: number;
-  public shardLimits: CPUShardLimits;
-  public unlocked: boolean;
-  public unlockedTime: number | undefined;
+  public limit = 100;
+  public tickLimit = 100;
+  public bucket = 10000;
+  public shardLimits = 20;
+  public unlocked = true;
+  public unlockedTime = 0;
 
-  public constructor() {
-    super();
-    this.cpuUsed = 0;
-    this.limit = 0;
-    this.tickLimit = 0;
-    this.bucket = 0;
-  }
-
+  @pushMethodCallInfoToCalled
   public getUsed(): number {
     return this.cpuUsed;
   }
@@ -43,3 +37,9 @@ export default class CPUMock extends BaseMock {
     return undefined;
   }
 }
+
+/**
+ * 伪造一个 CPU
+ * @param props 属性
+ */
+export const getMockCPU = getMock<CPU>(CPUMock);
