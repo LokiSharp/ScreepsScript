@@ -1,4 +1,3 @@
-import { assert } from "chai";
 import { getMockCreep } from "@mock/CreepMock";
 import { refreshGlobalMock } from "@mock/index";
 import { whiteListFilter } from "@/utils/global/whiteListFilter";
@@ -13,24 +12,24 @@ describe("whiteListFilter", () => {
     const testCreep = getMockCreep({ owner: { username: "UserInWhiteList" } });
     delete Memory.whiteList;
     const result = whiteListFilter((testCreep as unknown) as Creep);
-    assert.isTrue(result);
+    expect(result).toBeTruthy();
   });
 
   it("Owner 在白名单中返回 false 并计数", () => {
     const testCreep = getMockCreep({ owner: { username: "UserInWhiteList" } });
     Memory.whiteList.UserInWhiteList = 0;
     const result = whiteListFilter((testCreep as unknown) as Creep);
-    assert.isFalse(result);
-    assert.equal(Memory.whiteList.UserInWhiteList, 1);
+    expect(result).toBeFalsy();
+    expect(Memory.whiteList.UserInWhiteList).toEqual(1);
     for (let i = 0; i < 100; i++) {
       whiteListFilter((testCreep as unknown) as Creep);
     }
-    assert.equal(Memory.whiteList.UserInWhiteList, 101);
+    expect(Memory.whiteList.UserInWhiteList).toEqual(101);
   });
 
   it("Owner 不在白名单中返回 true", () => {
     const testCreep = getMockCreep({ owner: { username: "userNotInWhiteList" } });
     const result = whiteListFilter((testCreep as unknown) as Creep);
-    assert.isTrue(result);
+    expect(result).toBeTruthy();
   });
 });

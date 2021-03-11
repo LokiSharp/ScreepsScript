@@ -1,9 +1,8 @@
-import { assert } from "chai";
 import { bodyConfigs } from "@/setting";
 
 describe("setting", () => {
   it("bodyConfigs 存在", () => {
-    assert.isDefined(bodyConfigs);
+    expect(bodyConfigs).toBeDefined();
   });
 
   it("bodyConfigs 中每个等级的 Body 能量花费是否合理", () => {
@@ -21,7 +20,7 @@ describe("setting", () => {
         const bodyPartConstants = bodyConfig[energyLevel] as BodyPartConstant[];
         let energyCost = 0;
         bodyPartConstants.forEach(bodyPartConstant => (energyCost += BODYPART_COST[bodyPartConstant]));
-        assert.isTrue(energyCost <= Number(energyLevel), `能量花费检查 ${bodyConfigName} ${energyLevel} ${energyCost}`);
+        expect(energyCost <= Number(energyLevel)).toBeTruthy();
       }
     }
   });
@@ -48,10 +47,7 @@ describe("setting", () => {
             ? (fatigueGenerate += 0)
             : (fatigueGenerate += 2)
         );
-        assert.isTrue(
-          fatigueGenerate <= fatigueDecrease,
-          `移动疲劳检查 ${bodyConfigName} ${fatigueGenerate} ${fatigueDecrease}`
-        );
+        expect(fatigueGenerate <= fatigueDecrease).toBeTruthy();
       }
     }
   });

@@ -44,13 +44,10 @@ export const helper = new IntegrationTestHelper();
 
 beforeEach(async () => {
   await helper.beforeEach();
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+  stdHooks.hookWrite();
 });
 
 afterEach(() => {
   helper.afterEach();
-});
-
-before(() => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-  stdHooks.hookWrite();
 });

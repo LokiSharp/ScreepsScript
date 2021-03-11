@@ -1,4 +1,3 @@
-import { assert } from "chai";
 import { getMockRoom } from "@mock/RoomMock";
 import { getMockRoomMemory } from "@mock/RoomMemoryMock";
 import { getMockStore } from "@mock/StoreMock";
@@ -17,8 +16,7 @@ describe("getRoomFactoryState", () => {
       terminal: getMockStructureTerminal(),
       memory: getMockRoomMemory()
     });
-    assert.equal(
-      getRoomFactoryState((testRoom as unknown) as Room),
+    expect(getRoomFactoryState((testRoom as unknown) as Room)).toEqual(
       '<text style=" font-weight: bolder;">  - [<a href="https://screeps.com/a/#!/room/TestShard/testRoom" target="_self">testRoom</a>] </text>工厂未设置等级'
     );
   });
@@ -37,8 +35,7 @@ describe("getRoomFactoryState", () => {
       })
     });
 
-    assert.equal(
-      getRoomFactoryState((testRoom as unknown) as Room),
+    expect(getRoomFactoryState((testRoom as unknown) as Room)).toEqual(
       '<text style=" font-weight: bolder;">  - [<a href="https://screeps.com/a/#!/room/TestShard/testRoom" target="_self">testRoom</a>] </text>工厂未设置生产线'
     );
   });
@@ -58,8 +55,7 @@ describe("getRoomFactoryState", () => {
       })
     });
 
-    assert.equal(
-      getRoomFactoryState((testRoom as unknown) as Room),
+    expect(getRoomFactoryState((testRoom as unknown) as Room)).toEqual(
       '<text style=" font-weight: bolder;">  - [<a href="https://screeps.com/a/#!/room/TestShard/testRoom" target="_self">testRoom</a>] </text><text style="color: #6b9955; ">工作中</text> [当前状态]  [任务数量] 0 [产物数量] concentrate*1'
     );
   });
@@ -80,8 +76,7 @@ describe("getRoomFactoryState", () => {
       })
     });
 
-    assert.equal(
-      getRoomFactoryState((testRoom as unknown) as Room),
+    expect(getRoomFactoryState((testRoom as unknown) as Room)).toEqual(
       '<text style=" font-weight: bolder;">  - [<a href="https://screeps.com/a/#!/room/TestShard/testRoom" target="_self">testRoom</a>] </text><text style="color: #c5c599; ">暂停中</text> [当前状态]  [任务数量] 0 [产物数量] concentrate*1'
     );
   });
@@ -103,8 +98,7 @@ describe("getRoomFactoryState", () => {
       })
     });
 
-    assert.equal(
-      getRoomFactoryState((testRoom as unknown) as Room),
+    expect(getRoomFactoryState((testRoom as unknown) as Room)).toEqual(
       '<text style=" font-weight: bolder;">  - [<a href="https://screeps.com/a/#!/room/TestShard/testRoom" target="_self">testRoom</a>] </text><text style="color: #c5c599; ">Test 休眠中 剩余10t</text> [当前状态]  [任务数量] 0 [产物数量] concentrate*1'
     );
   });
@@ -124,8 +118,7 @@ describe("getRoomFactoryState", () => {
       })
     });
 
-    assert.equal(
-      getRoomFactoryState((testRoom as unknown) as Room),
+    expect(getRoomFactoryState((testRoom as unknown) as Room)).toEqual(
       '<text style=" font-weight: bolder;">  - [<a href="https://screeps.com/a/#!/room/TestShard/testRoom" target="_self">testRoom</a>] </text><text style="color: #6b9955; ">工作中</text> [当前状态]  [任务数量] 1 [任务目标] concentrate*1000 [产物数量] concentrate*1'
     );
   });
@@ -146,8 +139,7 @@ describe("getRoomFactoryState", () => {
       })
     });
 
-    assert.equal(
-      getRoomFactoryState((testRoom as unknown) as Room),
+    expect(getRoomFactoryState((testRoom as unknown) as Room)).toEqual(
       '<text style=" font-weight: bolder;">  - [<a href="https://screeps.com/a/#!/room/TestShard/testRoom" target="_self">testRoom</a>] </text><text style="color: #6b9955; ">工作中</text> [当前状态]  [任务数量] 1 [任务目标] concentrate*1000 [共享任务] 目标 TestTargetRoom 资源 concentrate 数量 1000 [产物数量] concentrate*1'
     );
   });
@@ -166,8 +158,7 @@ describe("getRoomFactoryState", () => {
       })
     });
 
-    assert.equal(
-      getRoomFactoryState((testRoom as unknown) as Room),
+    expect(getRoomFactoryState((testRoom as unknown) as Room)).toEqual(
       '<text style=" font-weight: bolder;">  - [<a href="https://screeps.com/a/#!/room/TestShard/testRoom" target="_self">testRoom</a>] </text><text style="color: #6b9955; ">工作中</text> [当前状态]  [任务数量] 0 异常!未发现终端'
     );
   });

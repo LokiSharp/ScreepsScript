@@ -12,7 +12,7 @@ import { getMockStore } from "./StoreMock";
 import { getMockStructureController } from "./StructureControllerMock";
 import { getMockStructureSpawn } from "./StructureSpawnMock";
 import { getMockStructureTerminal } from "./StructureTerminalMock";
-import { spy } from "sinon";
+import { mockGetObjectById } from "./utils";
 
 export {
   getMockCPU,
@@ -28,7 +28,8 @@ export {
   getMockStore,
   getMockStructureController,
   getMockStructureSpawn,
-  getMockStructureTerminal
+  getMockStructureTerminal,
+  mockGetObjectById
 };
 /**
  * 刷新游戏环境
@@ -39,13 +40,4 @@ export function refreshGlobalMock(): void {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore : allow adding Memory to global
   global.Memory = getMockMemory();
-}
-
-/**
- * 创建 Game.getObjectById
- * @param items 用于搜索的对象数组，每个对象都应包含 id
- */
-export function mockGetObjectById(items: ObjectWithId[]): any {
-  // eslint-disable-next-line deprecation/deprecation
-  return (Game.getObjectById = spy((id: string) => items.find(item => item.id === id)));
 }

@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
-import { assert } from "chai";
 import { helper } from "../helper";
 import { initBattleTestRoom } from "../init/initBattleTestRoom";
 import { setCreep } from "./setCreep";
@@ -57,8 +56,8 @@ export async function runBattleTest(): Promise<void> {
     const userAttackerResult = await db["rooms.objects"].findOne({ name: userAttacker.name });
     const targetAttackerResult = await db["rooms.objects"].findOne({ name: targetAttacker.name });
     if (!userAttackerResult || !targetAttackerResult) {
-      assert.isNotNull(userAttackerResult);
-      assert.isNull(targetAttackerResult);
+      expect(userAttackerResult).toBeDefined();
+      expect(targetAttackerResult).toBeNull();
       break;
     }
     await helper.server.tick();

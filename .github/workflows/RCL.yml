@@ -39,7 +39,7 @@ jobs:
 
       - run: npm install
       - run: npm run build
-      - run: npx mocha test/integration/RCLTest/${{ matrix.RCL }}.RCLTest.ts
+      - run: npx jest --runTestsByPath test/RCLTest/${{ matrix.RCL }}.RCLTest.test.ts
 
       - name: Update Server Artifact
         uses: actions/upload-artifact@v1

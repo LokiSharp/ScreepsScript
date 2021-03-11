@@ -1,4 +1,3 @@
-import { assert } from "chai";
 import assignPrototype from "@/utils/global/assignPrototype";
 
 export class TestPrototypeExtension extends Object {
@@ -16,7 +15,7 @@ export class TestPrototypeExtension extends Object {
 describe("assignPrototype", () => {
   it("可以挂载方法", () => {
     assignPrototype(Object, TestPrototypeExtension);
-    assert.isTrue(Object.methodIsAssignable());
-    assert.isTrue(Object.getterIsAssignable);
+    expect(Object.methodIsAssignable()).toBeTruthy();
+    expect(Object.getterIsAssignable).toBeTruthy();
   });
 });

@@ -1,45 +1,26 @@
-import { assert } from "chai";
 import { getMockGame } from "@mock/GameMock";
 import log from "@/utils/console/log";
 
-// eslint-disable-next-line @typescript-eslint/unbound-method
-const stdout = process.stdout.write;
-
-let out: string;
-
-function hookWrite(): void {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  process.stdout.write = function (message: string): boolean {
-    out = message;
-  };
-}
-
-function resetWrite(): void {
-  process.stdout.write = stdout;
-}
+const consoleLogMock = jest.spyOn(console, "log").mockImplementation(() => true);
 
 describe("log", () => {
   beforeEach(() => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore : allow adding Game to global
     global.Game = getMockGame();
-    out = undefined;
   });
 
   it("可以打印日志", () => {
-    hookWrite();
     log("TestLogContent", [], "red", true);
-    assert.equal(out, '<text style="color: #ef9a9a; font-weight: bolder;"></text>TestLogContent\n');
+    expect(consoleLogMock).toHaveBeenCalledWith(
+      '<text style="color: #ef9a9a; font-weight: bolder;"></text>TestLogContent'
+    );
     log("TestLogContent");
-    assert.equal(out, '<text style=" font-weight: bolder;"></text>TestLogContent\n');
-    resetWrite();
+    expect(consoleLogMock).toHaveBeenCalledWith('<text style=" font-weight: bolder;"></text>TestLogContent');
   });
 
   it("可以打印日志并添加前缀", () => {
-    hookWrite();
     log("TestLogContent", ["TestLogPrefix"], "red", true);
-    assert.equal(out, '<text style="color: #ef9a9a; font-weight: bolder;">【TestLogPrefix】 </text>TestLogContent\n');
-    resetWrite();
+    expect(consoleLogMock).toHaveBeenCalledWith(
+      '<text style="color: #ef9a9a; font-weight: bolder;">【TestLogPrefix】 </text>TestLogContent'
+    );
   });
 });
