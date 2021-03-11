@@ -1,7 +1,5 @@
-import "mocha";
-import { getMockCreep, mockGetObjectById, refreshGlobalMock } from "@mock/index";
+import { getMockCreep, mockGetObjectById } from "@mock/index";
 import baseTaskController from "@/modules/Task/BaseTaskController";
-import { expect } from "chai";
 
 describe("房间任务核心测试", function () {
   // 获取指定优先级的任务
@@ -16,8 +14,6 @@ describe("房间任务核心测试", function () {
   const getSpecialCreep = (specialType: string): Creep => {
     return getMockCreep({ memory: { bodyType: specialType as SepicalBodyType } as CreepMemory });
   };
-
-  beforeEach(refreshGlobalMock);
 
   it("可以从 Memory 中初始化任务", function () {
     const taskKey = 123;
@@ -43,7 +39,7 @@ describe("房间任务核心测试", function () {
     const doingTask = controller.getUnitTask(creep);
 
     // 可以获取到已关联的目标任务
-    expect(doingTask).to.deep.equal(task);
+    expect(doingTask).toEqual(task);
   });
 
   it("可以给任务分配工人", function () {
@@ -62,8 +58,8 @@ describe("房间任务核心测试", function () {
 
     // 工人应该获取到新任务
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    expect(doingTask).to.be.exist;
-    expect(doingTask.type).to.equal("test");
+    expect(doingTask).toBeDefined();
+    expect(doingTask.type).toEqual("test");
   });
 
   it("按照优先级分配工人" /** 且不受任务添加顺序影响 */, function () {
@@ -78,19 +74,19 @@ describe("房间任务核心测试", function () {
 
     // 新工人应按照优先级获取任务
     let doingTask = controller.getUnitTask(getMockCreep());
-    expect(doingTask.type).to.be.equal("10");
+    expect(doingTask.type).toEqual("10");
     doingTask = controller.getUnitTask(getMockCreep());
-    expect(doingTask.type).to.be.equal("5");
+    expect(doingTask.type).toEqual("5");
     doingTask = controller.getUnitTask(getMockCreep());
-    expect(doingTask.type).to.be.equal("3");
+    expect(doingTask.type).toEqual("3");
 
     controller.addTask(getTask(undefined));
     controller.addTask(getTask(11));
 
     doingTask = controller.getUnitTask(getMockCreep());
-    expect(doingTask.type).to.be.equal("11");
+    expect(doingTask.type).toEqual("11");
     doingTask = controller.getUnitTask(getMockCreep());
-    expect(doingTask.type).to.be.equal("undefined");
+    expect(doingTask.type).toEqual("undefined");
   });
 
   it("溢出后将被分配到优先级最高的任务", function () {
@@ -112,7 +108,7 @@ describe("房间任务核心测试", function () {
     controller.getUnitTask(getMockCreep());
     const doingTask = controller.getUnitTask(getMockCreep());
     // 这两个 creep 会被分配到优先级最高的任务上，此时优先级最高的任务一共有三个人做
-    expect(doingTask).to.be.includes({ type: "10", need: 1, unit: 3 });
+    expect(doingTask).toMatchObject({ type: "10", need: 1, unit: 3 });
   });
 
   it("特殊体型的工人只会被分配到对应的任务上" /** 且不同类型的特殊任务互不干扰 */, function () {
@@ -133,14 +129,14 @@ describe("房间任务核心测试", function () {
 
     // 特殊工人去领任务，每个人都应该领到对应类型的任务
     const doingTaskA = controller.getUnitTask(getSpecialCreep(specialTypeA));
-    expect(doingTaskA).to.be.includes({ type: "5", need: 1, unit: 1, require: specialTypeA, requireUnit: 1 });
+    expect(doingTaskA).toMatchObject({ type: "5", need: 1, unit: 1, require: specialTypeA, requireUnit: 1 });
     const doingTaskB = controller.getUnitTask(getSpecialCreep(specialTypeB));
-    expect(doingTaskB).to.be.includes({ type: "6", need: 1, unit: 1, require: specialTypeB, requireUnit: 1 });
+    expect(doingTaskB).toMatchObject({ type: "6", need: 1, unit: 1, require: specialTypeB, requireUnit: 1 });
 
     // 这个特殊工人没有对应的特殊任务，所以它什么都获取不到
     const doingTaskC = controller.getUnitTask(getSpecialCreep("noneType"));
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    expect(doingTaskC).to.not.exist;
+    expect(doingTaskC).toBeUndefined();
   });
 
   it("普通工人可以干特殊任务", function () {
@@ -156,9 +152,9 @@ describe("房间任务核心测试", function () {
 
     // 普通工人去领特殊任务，将无视任务类型，仅按照优先级领任务
     const doingTaskA = controller.getUnitTask(getMockCreep());
-    expect(doingTaskA).to.be.includes({ type: "10", need: 1, unit: 1, require: specialTypeB });
+    expect(doingTaskA).toMatchObject({ type: "10", need: 1, unit: 1, require: specialTypeB });
     const doingTaskB = controller.getUnitTask(getMockCreep());
-    expect(doingTaskB).to.be.includes({ type: "5", need: 1, unit: 1, require: specialTypeA });
+    expect(doingTaskB).toMatchObject({ type: "5", need: 1, unit: 1, require: specialTypeA });
   });
 
   it("特殊工人可以挤占普通工人的工作" /** 如果没有优先级更高的同类型特殊任务的话 */, function () {
@@ -176,13 +172,13 @@ describe("房间任务核心测试", function () {
     controller.getUnitTask(normalCreep);
     // 特殊工人找工作，由于比普通工人更符合，所以会挤占普通工人的任务
     const doingTask = controller.getUnitTask(getSpecialCreep(specialType));
-    expect(doingTask).to.be.includes({ type: "5", need: 1, unit: 1, require: specialType, requireUnit: 1 });
+    expect(doingTask).toMatchObject({ type: "5", need: 1, unit: 1, require: specialType, requireUnit: 1 });
 
     // 添加一个低优先级任务
     controller.addTask(getTask(3));
     // 由于特殊工人挤占了普通工人的工作，并且特殊任务需要的人已经满了，所以丢掉工作的普通工人会领到这个任务
     const newTask = controller.getUnitTask(normalCreep);
-    expect(newTask).to.be.includes({ type: "3" });
+    expect(newTask).toMatchObject({ type: "3" });
   });
 
   it("可以分配指定数量的单位到任务", function () {
@@ -206,22 +202,22 @@ describe("房间任务核心测试", function () {
     // 添加特殊任务 A 对应数量的特殊工人
     for (let i = 0; i < taskANeed; i++) {
       const task = controller.getUnitTask(getSpecialCreep(specialTaskA.require));
-      expect(task).to.be.includes({ type: specialTaskA.type, requireUnit: i + 1, unit: i + 1 });
+      expect(task).toMatchObject({ type: specialTaskA.type, requireUnit: i + 1, unit: i + 1 });
     }
 
     // 添加普通任务 A 对应数量的普通工人
     for (let i = 0; i < taskBNeed; i++) {
       const task = controller.getUnitTask(getMockCreep());
-      expect(task).to.be.includes({ type: "6", unit: i + 1 });
+      expect(task).toMatchObject({ type: "6", unit: i + 1 });
     }
 
     // 再添加一个普通工人，由于任务 A 人够了，所以这个工人会被分配到任务 B 上
     let task = controller.getUnitTask(getMockCreep());
-    expect(task).to.be.includes({ type: "3", unit: 1 });
+    expect(task).toMatchObject({ type: "3", unit: 1 });
 
     // 再添加一个普通工人，由于所有任务人都够了，所以他会被溢出到优先级最高的特殊任务 A 上
     task = controller.getUnitTask(getMockCreep());
-    expect(task).to.be.includes({ type: specialTaskA.type, unit: taskANeed + 1, requireUnit: taskANeed });
+    expect(task).toMatchObject({ type: specialTaskA.type, unit: taskANeed + 1, requireUnit: taskANeed });
   });
 
   it("任务完成后对应的工人会分配到新任务", function () {
@@ -241,6 +237,6 @@ describe("房间任务核心测试", function () {
     const newTask = controller.getUnitTask(creep);
 
     // creep 应该被分配到新的任务上
-    expect(newTask).to.be.includes({ type: "3" });
+    expect(newTask).toMatchObject({ type: "3" });
   });
 });

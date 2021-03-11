@@ -1,4 +1,3 @@
-import { assert } from "chai";
 import { clearFlag } from "@/utils/global/clearFlag";
 import { getMockFlag } from "@mock/FlagMock";
 import { getMockRoomPosition } from "@mock/RoomPositionMock";
@@ -19,10 +18,10 @@ describe("clearFlag", () => {
     testFlagIsDefined.forEach(name => (Memory.flags[name] = {} as FlagMemory));
     testFlagIsUndefined.forEach(name => (Memory.flags[name] = {} as FlagMemory));
 
-    testFlagIsDefined.forEach(name => assert.isDefined(Memory.flags[name]));
-    testFlagIsUndefined.forEach(name => assert.isDefined(Memory.flags[name]));
+    testFlagIsDefined.forEach(name => expect(Memory.flags[name]).toBeDefined());
+    testFlagIsUndefined.forEach(name => expect(Memory.flags[name]).toBeDefined());
     clearFlag();
-    testFlagIsDefined.forEach(name => assert.isDefined(Memory.flags[name]));
-    testFlagIsUndefined.forEach(name => assert.isUndefined(Memory.flags[name]));
+    testFlagIsDefined.forEach(name => expect(Memory.flags[name]).toBeDefined());
+    testFlagIsUndefined.forEach(name => expect(Memory.flags[name]).not.toBeDefined());
   });
 });

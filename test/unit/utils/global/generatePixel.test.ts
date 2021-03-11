@@ -1,5 +1,4 @@
 import { CPUMock } from "@mock/CPUMock";
-import { assert } from "chai";
 import generatePixel from "@/utils/global/generatePixel";
 import { refreshGlobalMock } from "@mock/index";
 
@@ -11,7 +10,7 @@ describe("generatePixel", () => {
   it("当 bucket 足够时生成 Pixel", () => {
     Game.cpu.bucket = 10000;
     generatePixel();
-    assert.deepEqual(((Game.cpu as unknown) as CPUMock).calledRecords, [
+    expect(((Game.cpu as unknown) as CPUMock).calledRecords).toEqual([
       { name: "generatePixel", arguments: [], result: undefined }
     ]);
   });
@@ -19,15 +18,15 @@ describe("generatePixel", () => {
   it("当 bucket 不足不生成 Pixel", () => {
     Game.cpu.bucket = 0;
     generatePixel();
-    assert.deepEqual(((Game.cpu as unknown) as CPUMock).calledRecords, []);
+    expect(((Game.cpu as unknown) as CPUMock).calledRecords).toEqual([]);
   });
 
   it("可以调整 bucket 限制值", () => {
     Game.cpu.bucket = 5000;
     generatePixel(Game.cpu.bucket + 1000);
-    assert.deepEqual(((Game.cpu as unknown) as CPUMock).calledRecords, []);
+    expect(((Game.cpu as unknown) as CPUMock).calledRecords).toEqual([]);
     generatePixel(Game.cpu.bucket - 1000);
-    assert.deepEqual(((Game.cpu as unknown) as CPUMock).calledRecords, [
+    expect(((Game.cpu as unknown) as CPUMock).calledRecords).toEqual([
       { name: "generatePixel", arguments: [], result: undefined }
     ]);
   });
