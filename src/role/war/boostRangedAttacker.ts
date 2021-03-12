@@ -41,6 +41,7 @@ export const boostRangedAttacker: CreepConfig<"boostRangedAttacker"> = {
         if (creep.rangedAttack(structures[0]) === ERR_NOT_IN_RANGE) creep.moveTo(structures[0]);
       } else if (creep.rangedAttackNearestHostileCreeps() === OK) return false;
       else if (creep.rangedAttackNearHostileStructures() === OK) return false;
+      else creep.rangedMassAttack();
     } else {
       creep.log(`不在指定房间，切入迁徙模式`);
       return true;

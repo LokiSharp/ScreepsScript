@@ -122,7 +122,6 @@ export const gclUpgrader: CreepConfig<"gclUpgrader"> = {
     }
 
     creep.upgrade();
-    // 没有就建其他工地
     return creep.store.getUsedCapacity() === 0;
   },
   bodys: () => calcBodyPart({ [WORK]: 26, [CARRY]: 11, [MOVE]: 13 })

@@ -117,7 +117,7 @@ export default class LabExtension extends StructureLab {
     }
     // 否则就发布任务
     else if (!this.room.transport.hasTask("boostGetResource")) {
-      this.room.transport.addTask({ type: "boostGetResource", priority: 5 });
+      this.room.transport.addTask({ type: "boostGetResource", priority: 15 });
     }
   }
 
@@ -145,7 +145,7 @@ export default class LabExtension extends StructureLab {
         !this.room.transport.hasTask("boostGetEnergy")
       ) {
         // 有 lab 能量不满的话就发布任务
-        this.room.transport.addTask({ type: "boostGetEnergy", priority: 5 });
+        this.room.transport.addTask({ type: "boostGetEnergy", priority: 10 });
         return;
       }
     }

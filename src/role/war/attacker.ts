@@ -20,8 +20,13 @@ export const attacker: CreepConfig<"attacker"> = {
       creep.say("旗呢?");
       return false;
     }
-
-    return creep.room.name !== targetFlag.pos.roomName;
+    if (creep.room.name !== targetFlag.pos.roomName) return true;
+    else {
+      creep.goTo(targetFlag.pos, {
+        checkTarget: true
+      });
+      return false;
+    }
   },
   bodys: createBodyGetter(bodyConfigs.attacker)
 };

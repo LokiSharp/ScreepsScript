@@ -76,17 +76,17 @@ interface InterfaceCreepRelease {
    */
   boostRangedAttacker(bearTowerNum?: 0 | 1 | 3 | 5 | 2 | 4 | 6, targetFlagName?: string, keepSpawn?: boolean): string;
   /**
-   * 孵化进攻一体机
-   */
-  rangedAttacker(targetFlagName?: string, keepSpawn?: boolean): string;
-  /**
    * 孵化 boost 拆墙小组
    */
   dismantleGroup(targetFlagName?: string, keepSpawn?: boolean): string;
   /**
+   * 孵化进攻一体机
+   */
+  rangedAttacker(targetFlagName?: string, num?: number, keepSpawn?: boolean): string;
+  /**
    * 孵化基础进攻单位
    */
-  attacker(targetFlagName?: string, num?: number): string;
+  attacker(targetFlagName?: string, num?: number, keepSpawn?: boolean): string;
   /**
    * 孵化基础拆除单位
    * 一般用于清除中立房间中挡路的墙壁

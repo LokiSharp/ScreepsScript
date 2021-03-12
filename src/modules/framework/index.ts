@@ -90,7 +90,7 @@ export default class App {
   /**
    * 关闭生命周期回调监听
    *
-   * @param index 要取消监听的分组索引
+   * @param deleteTarget 要取消监听的分组索引
    */
   public close(deleteTarget: number): App {
     // 遍历所有的回调
@@ -165,7 +165,7 @@ export default class App {
 
   /**
    * 执行指定生命周期阶段回调
-   * @param type 要执行的生命周期回调名称
+   * @param lifecycleType 要执行的生命周期回调名称
    */
   private execLifecycleCallback(lifecycleType: keyof AppLifecycleCallbacks) {
     // 遍历执行 work

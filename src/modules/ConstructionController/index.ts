@@ -51,10 +51,8 @@ export function initConstructionController(): void {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
   waitingConstruction = JSON.parse(Memory[SAVE_KEY] || "[]").map(({ pos, type }) => {
     // 这里把位置重建出来
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const { x, y, roomName } = pos;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    return { pos: new RoomPosition(x, y, roomName), type };
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
+    return { pos: new RoomPosition(pos.x, pos.y, pos.roomName), type };
   });
 }
 

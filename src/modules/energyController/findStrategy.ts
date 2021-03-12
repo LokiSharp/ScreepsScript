@@ -12,7 +12,7 @@ const ENERGY_USE_LIMIT = {
 /**
  * 获取目标中的能量数量，用于抹平差异
  */
-const getEnergyAmount = function (target: EnergyTarget): number {
+export const getEnergyAmount = function (target: EnergyTarget): number {
   if ("store" in target) return target.store[RESOURCE_ENERGY];
   else if ("amount" in target) return target.amount;
   else return 0;
@@ -21,7 +21,7 @@ const getEnergyAmount = function (target: EnergyTarget): number {
 /**
  * 获取目标的类型，用于抹平差异
  */
-const getTargetType = function (target: EnergyTarget) {
+export const getTargetType = function (target: EnergyTarget) {
   if ("structureType" in target) return target.structureType;
   else if ("resourceType" in target) return target.resourceType;
   else return undefined;

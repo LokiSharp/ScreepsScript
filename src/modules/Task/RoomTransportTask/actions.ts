@@ -173,7 +173,7 @@ export const actions: {
 
         // 移动到目的地，获取资源
         creep.goTo(targetStructure.pos, { range: 1 });
-        transport.countWorkTime();
+        if (task.endWith) transport.countWorkTime();
         const result = creep.withdraw(targetStructure, task.resourceType);
         return result === OK;
       }
@@ -196,14 +196,14 @@ export const actions: {
 
         // 移动到目的地，捡起资源
         creep.goTo(targetPos, { range: 1 });
-        transport.countWorkTime();
+        if (task.endWith) transport.countWorkTime();
         const result = creep.pickup(targetRes);
         return result === OK;
       }
     },
     target: () => {
       if (creep.store[task.resourceType] <= 0) return true;
-      transport.countWorkTime();
+      if (task.endWith) transport.countWorkTime();
       // 是 id，存放到只当建筑
       if (typeof task.to === "string") {
         // 获取目标建筑
@@ -421,6 +421,7 @@ export const actions: {
       const result = creep.transferTo(targetLab, targetResource.type);
       // 正常转移资源则更新任务
       if (result === OK) return true;
+      else if (result === ERR_NOT_ENOUGH_RESOURCES) transport.removeTask(task.key);
       else if (result !== ERR_NOT_IN_RANGE) creep.say(`labInB ${result}`);
       return false;
     }

@@ -172,7 +172,7 @@ export class CreepExtension extends Creep {
    * 建筑目标获取
    * 优先级：指定的目标 > 自己保存的目标 > 房间内保存的目标
    */
-  private getBuildTarget(target?: ConstructionSite): ConstructionSite | undefined {
+  private getBuildTarget(target?: ConstructionSite): ConstructionSite {
     // 指定了目标，直接用，并且把 id 备份一下
     if (target) {
       this.memory.constructionSiteId = target.id;
@@ -219,6 +219,14 @@ export class CreepExtension extends Creep {
       this.memory.constructionSiteId = this.room.memory.constructionSiteId;
       return roomKeepTarget;
     } else delete this.room.memory.constructionSiteId;
+
+    const selfFindTarget = this.pos.findClosestByRange(FIND_CONSTRUCTION_SITES);
+
+    // 找到了，保存到自己内存里
+    if (selfFindTarget) {
+      this.memory.constructionSiteId = selfFindTarget.id;
+      return selfFindTarget;
+    }
 
     return undefined;
   }
@@ -381,8 +389,9 @@ export class CreepExtension extends Creep {
     const hostils = this.getHostileCreepsWithCache();
     if (hostils.length > 0) {
       // 找到最近的 creep
-      target = this.pos.findClosestByRange(hostils);
-    } else {
+      target = hostils.find(hostil => Math.abs(hostil.pos.x - this.pos.x) + Math.abs(hostil.pos.y - this.pos.y) === 1);
+    }
+    if (!target) {
       // 没有的话再攻击 structure
       const structures = attackFlag.pos.lookFor(LOOK_STRUCTURES);
       if (structures.length > 0) {
@@ -543,6 +552,20 @@ export class CreepExtension extends Creep {
       else return target.hits;
     });
   }
+  /**
+   *
+   * RA 攻击单位并保持距离
+   *
+   * @param target 目标
+   * @param range 距离
+   */
+  public rangedAttackTargetWithRange(target: AnyCreep, range = 1): OK | ERR_NOT_FOUND {
+    if (target) {
+      this.rangedAttack(target);
+      this.moveTo(target, { range });
+      return OK;
+    } else return ERR_NOT_FOUND;
+  }
 
   /**
    * RA 攻击血量最低的敌方单位
@@ -551,13 +574,32 @@ export class CreepExtension extends Creep {
    */
   public rangedAttackLowestHitsHostileCreeps(hostils?: AnyCreep[]): OK | ERR_NOT_FOUND {
     if (!hostils) hostils = this.getHostileCreepsWithCache();
-    const targets = this.pos.findInRange(hostils, 3);
-    if (targets.length > 0) {
+    if (hostils.length > 0) {
       // 找到血量最低的 creep
-      const target = this.getMinHitsTarget(targets);
+      const target = hostils.find(creep => creep);
 
-      if (target && this.rangedAttack(target) === ERR_NOT_IN_RANGE) this.moveTo(target);
-      return OK;
+      return this.rangedAttackTargetWithRange(target);
+    }
+
+    return ERR_NOT_FOUND;
+  }
+
+  /**
+   * RA 攻击有治疗能力的敌方单位
+   *
+   * @param hostils 敌方目标
+   */
+  public rangedAttackHostileHealCreeps(hostils?: AnyCreep[]): OK | ERR_NOT_FOUND {
+    if (!hostils) hostils = this.getHostileCreepsWithCache();
+    const targets = this.pos.findInRange(hostils, 6) as Creep[];
+    if (targets.length > 0) {
+      // 找到有治疗能力的 creep
+      const target = targets.find(creep => {
+        if (creep.body) return creep.body.find(part => part.type === HEAL);
+        else return false;
+      });
+
+      return this.rangedAttackTargetWithRange(target);
     }
 
     return ERR_NOT_FOUND;
@@ -572,10 +614,7 @@ export class CreepExtension extends Creep {
     if (!hostils) hostils = this.getHostileCreepsWithCache();
     const target = this.pos.findClosestByPath(hostils);
 
-    if (target && this.rangedAttack(target) === ERR_NOT_IN_RANGE) this.moveTo(target);
-    else return ERR_NOT_FOUND;
-
-    return OK;
+    return this.rangedAttackTargetWithRange(target);
   }
 
   /**
