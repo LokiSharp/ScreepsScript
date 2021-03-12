@@ -86,6 +86,11 @@ export default class RoomTransport
       return this.totalWorkTime / this.totalLifeTime >= opt.proportion;
     });
 
+    if (currentExpect.expect !== 0) {
+      this.totalWorkTime = 0;
+      this.totalLifeTime = 0;
+    }
+
     return currentExpect?.expect !== undefined ? currentExpect.expect : -2;
   }
 
