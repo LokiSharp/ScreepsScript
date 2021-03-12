@@ -310,7 +310,7 @@ class CreepRelease implements InterfaceCreepRelease {
    * @param targetFlagName 目标旗帜名称
    * @param keepSpawn 是否持续生成
    */
-  public rangedAttacker(
+  public boostRangedAttacker(
     bearTowerNum: 0 | 1 | 3 | 5 | 2 | 4 | 6 = 6,
     targetFlagName: string = DEFAULT_FLAG_NAME.ATTACK,
     keepSpawn = false
@@ -321,7 +321,7 @@ class CreepRelease implements InterfaceCreepRelease {
     if (!room.memory.boost) return `发布失败，未启动 Boost 进程，执行 ${room.name}.war() 来启动战争状态`;
     if (room.memory.boost.state !== "waitBoost") return `无法发布，Boost 材料未准备就绪`;
 
-    const creepName = `${room.name} apocalypse ${Game.time}`;
+    const creepName = `${room.name} boostRangedAttacker ${Game.time}`;
     creepApi.add(
       creepName,
       "boostRangedAttacker",
@@ -334,6 +334,32 @@ class CreepRelease implements InterfaceCreepRelease {
     );
 
     return `已发布进攻一体机 [${creepName}] [扛塔等级] ${bearTowerNum} [进攻旗帜名称] ${targetFlagName} ${
+      keepSpawn ? "" : "不"
+    }持续生成，GoodLuck Commander`;
+  }
+
+  /**
+   * 孵化 boost 进攻一体机
+   *
+   * @param targetFlagName 目标旗帜名称
+   * @param keepSpawn 是否持续生成
+   */
+  public rangedAttacker(targetFlagName: string = DEFAULT_FLAG_NAME.ATTACK, keepSpawn = false): string {
+    const room = Game.rooms[this.roomName];
+    if (!room) return `错误，无法访问的房间 ${this.roomName}`;
+
+    const creepName = `${room.name} RangedAttacker ${Game.time}`;
+    creepApi.add(
+      creepName,
+      "rangedAttacker",
+      {
+        targetFlagName: targetFlagName || DEFAULT_FLAG_NAME.ATTACK,
+        keepSpawn
+      },
+      room.name
+    );
+
+    return `已发布进攻一体机 [${creepName}] [进攻旗帜名称] ${targetFlagName} ${
       keepSpawn ? "" : "不"
     }持续生成，GoodLuck Commander`;
   }
@@ -377,12 +403,48 @@ class CreepRelease implements InterfaceCreepRelease {
   }
 
   /**
+   * 孵化攻击小组
+   *
+   * @param targetFlagName 进攻旗帜名称
+   * @param keepSpawn 是否持续生成
+   */
+  public spawnAttackGroup(targetFlagName = "", keepSpawn = false): string {
+    const room = Game.rooms[this.roomName];
+    if (!room) return `错误，无法访问的房间 ${this.roomName}`;
+
+    const attackerName = `${room.name} attacker ${Game.time}`;
+    const healerName = `${room.name} healer ${Game.time}`;
+    creepApi.add(
+      attackerName,
+      "attacker",
+      {
+        targetFlagName: targetFlagName || DEFAULT_FLAG_NAME.ATTACK,
+        healerName,
+        keepSpawn
+      },
+      room.name
+    );
+    creepApi.add(
+      healerName,
+      "healer",
+      {
+        creepName: attackerName,
+        keepSpawn
+      },
+      room.name
+    );
+
+    return `已发布攻击小组，正在孵化，GoodLuck Commander`;
+  }
+
+  /**
    * 孵化基础进攻单位
    *
    * @param targetFlagName 进攻旗帜名称
    * @param num 要孵化的数量
+   * @param keepSpawn 是否持续生成
    */
-  public soldier(targetFlagName = "", num = 1): string {
+  public attacker(targetFlagName = "", num = 1, keepSpawn = false): string {
     if (num <= 0 || num > 10) num = 1;
 
     for (let i = 0; i < num; i++) {
@@ -391,7 +453,7 @@ class CreepRelease implements InterfaceCreepRelease {
         "attacker",
         {
           targetFlagName: targetFlagName || DEFAULT_FLAG_NAME.ATTACK,
-          keepSpawn: false
+          keepSpawn
         },
         this.roomName
       );
