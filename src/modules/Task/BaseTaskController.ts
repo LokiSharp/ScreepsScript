@@ -298,6 +298,7 @@ export default class TaskController<
       // 匹配成功，把单位设置到该任务并结束分派
       if (result === TaskMatchResult.Ok || result === TaskMatchResult.NeedRmoveNormal) {
         this.setTaskUnit(checkTask, creep);
+        creep.memory.working = true;
         // creep.log(`领取任务 ${i} ${JSON.stringify(checkTask)}`)
         return checkTask;
       }

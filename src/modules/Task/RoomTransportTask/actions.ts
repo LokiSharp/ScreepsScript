@@ -641,6 +641,7 @@ export const actions: {
       }
       // resource 有问题的话就再返回 source 阶段处理
       else if (result === ERR_INVALID_ARGS) return true;
+      else if (result === ERR_NOT_ENOUGH_RESOURCES) return true;
       else if (result !== ERR_NOT_IN_RANGE) creep.say(`boostTarget 错误! ${result}`);
       return false;
     }
@@ -652,13 +653,7 @@ export const actions: {
    * 将给指定的 lab 填满能量
    */
   boostGetEnergy: (creep, task, transport) => ({
-    source: () => {
-      transport.countWorkTime();
-      if (creep.store[RESOURCE_ENERGY] > 0) return true;
-      const { sourceId } = creep.memory.data;
-      creep.getEngryFrom(sourceId ? Game.getObjectById(sourceId) : creep.room.storage);
-      return true;
-    },
+    source: () => getEnergy(creep, transport),
     target: () => {
       transport.countWorkTime();
       const boostLabs = Object.values(creep.room.memory.boost.lab);
@@ -683,6 +678,7 @@ export const actions: {
       creep.goTo(targetLab.pos);
       const result = creep.transfer(targetLab, RESOURCE_ENERGY);
       if (result === OK) return true;
+      else if (result === ERR_NOT_ENOUGH_RESOURCES) return true;
       // 正常转移资源则更新任务
       else if (result !== ERR_NOT_IN_RANGE) creep.say(`强化能量 ${result}`);
       return false;
