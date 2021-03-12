@@ -45,7 +45,7 @@ interface PowerCreepMemory {
   disableCross?: boolean;
 
   // 要添加 REGEN_SOURCE 的 souce 在 room.sources 中的索引值
-  sourceIndex?: number;
+  targetIndex?: number;
 }
 
 /**

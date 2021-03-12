@@ -48,11 +48,26 @@ export default class SpawnExtension extends StructureSpawn {
     // 进行生成
     const spawnResult: MySpawnReturnCode = this.mySpawnCreep(creepName);
 
-    // 生成成功后移除任务
-    if (spawnResult === OK) this.room.memory.spawnList.splice(index === -1 ? 0 : index, 1);
-    // 能量不足就挂起任务，但是如果是重要角色的话就会卡住然后优先孵化
-    else if (spawnResult === ERR_NOT_ENOUGH_ENERGY && !importantRoles.includes(Memory.creepConfigs[creepName].role))
-      this.room.hangSpawnTask();
+    if (spawnResult === OK) {
+      // 如果满足下列条件就重新发送 regen_source 任务
+      if (
+        // spawn 上没有效果
+        !this.effects ||
+        !this.effects[PWR_OPERATE_SPAWN]
+      ) {
+        // 并且房间内的 pc 支持这个任务
+        if (this.room.memory.powers && this.room.memory.powers.split(" ").includes(String(PWR_OPERATE_SPAWN))) {
+          // 添加 power 任务，设置重新尝试时间
+          this.room.addPowerTask(PWR_OPERATE_SPAWN);
+        }
+      }
+
+      // 生成成功后移除任务
+      if (spawnResult === OK) this.room.memory.spawnList.splice(index === -1 ? 0 : index, 1);
+      // 能量不足就挂起任务，但是如果是重要角色的话就会卡住然后优先孵化
+      else if (spawnResult === ERR_NOT_ENOUGH_ENERGY && !importantRoles.includes(Memory.creepConfigs[creepName].role))
+        this.room.hangSpawnTask();
+    }
   }
 
   /**
