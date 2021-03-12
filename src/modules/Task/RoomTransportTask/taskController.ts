@@ -33,11 +33,6 @@ export default class RoomTransport
   public readonly roomName: string;
 
   /**
-   * 当前正在执行的所有物流任务
-   */
-  public tasks: TransportTasks[AllTransportTaskType][] = [];
-
-  /**
    * 本房间的搬运工总生命时长
    */
   public totalLifeTime = 0;
@@ -85,11 +80,6 @@ export default class RoomTransport
     const currentExpect = WORK_PROPORTION_TO_EXPECT.find(opt => {
       return this.totalWorkTime / this.totalLifeTime >= opt.proportion;
     });
-
-    if (currentExpect.expect !== 0) {
-      this.totalWorkTime = 0;
-      this.totalLifeTime = 0;
-    }
 
     return currentExpect?.expect !== undefined ? currentExpect.expect : -2;
   }

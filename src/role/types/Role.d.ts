@@ -52,6 +52,8 @@ interface RoleDatas {
   rangedAttacker: RangedAttackerData;
   boostRangedAttacker: RangedAttackerData;
   defender: EmptyData;
+  scout: WarUnitData;
+  controllerArracker: RemoteDeclarerData;
 }
 
 /**

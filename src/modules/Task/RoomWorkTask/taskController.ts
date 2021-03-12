@@ -15,9 +15,9 @@ const WORK_PROPORTION_TO_EXPECT = [
   { rate: 100, expect: 3 },
   { rate: 50, expect: 2 },
   { rate: 10, expect: 1 },
-  { rate: -10, expect: -1 },
-  { rate: -50, expect: -2 },
-  { rate: -100, expect: -3 }
+  { rate: -10, expect: 0 },
+  { rate: -50, expect: -1 },
+  { rate: -100, expect: -2 }
 ];
 
 export default class RoomWork

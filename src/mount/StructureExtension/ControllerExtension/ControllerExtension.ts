@@ -202,9 +202,11 @@ export default class ControllerExtension extends StructureController {
     if (this.level === 8)
       this.room.release.changeBaseUnit(
         "worker",
-        this.room.memory.workerNumber === 3 ? 0 : 3 - this.room.memory.workerNumber
+        this.room.memory.workerNumber >= 3 ? 0 : 3 - this.room.memory.workerNumber
       );
-    else this.room.release.changeBaseUnit("worker", this.room.work.getExpect());
+    else {
+      this.room.release.changeBaseUnit("worker", this.room.work.getExpect());
+    }
   }
   /**
    * 重新占领，刷 RCL 用

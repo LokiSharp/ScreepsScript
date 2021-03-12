@@ -57,12 +57,14 @@ class CreepRelease implements InterfaceCreepRelease {
     const memoryKey = type === "worker" ? "workerNumber" : "transporterNumber";
     // 单位对应存在的最少数量
     const min = type === "worker" ? room.source.length : 1;
+    const max = type === "worker" ? 20 : 5;
 
     const oldNumber = room.memory[memoryKey] || 0;
     // 计算真实的调整量，保证最少有 min 人
     let realAdjust: number;
     // 调整完了人数还够，直接用
     if (oldNumber + adjust >= min) realAdjust = adjust;
+    else if (oldNumber + adjust > max) realAdjust = 0;
     // 调整值导致人数不够了，根据最小值调整
     else realAdjust = oldNumber > min ? oldNumber - min : min - oldNumber;
 
@@ -83,7 +85,7 @@ class CreepRelease implements InterfaceCreepRelease {
     room.memory[memoryKey] = oldNumber + realAdjust;
 
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    room.log(`调整 ${type} 单位数量 [修正] ${adjust} [修正后数量] ${room.memory[memoryKey]}`);
+    room.log(`调整 ${type} 单位数量 [修正] ${realAdjust} [修正后数量] ${room.memory[memoryKey]}`);
     return OK;
   }
 
@@ -339,32 +341,6 @@ class CreepRelease implements InterfaceCreepRelease {
   }
 
   /**
-   * 孵化 boost 进攻一体机
-   *
-   * @param targetFlagName 目标旗帜名称
-   * @param keepSpawn 是否持续生成
-   */
-  public rangedAttacker(targetFlagName: string = DEFAULT_FLAG_NAME.ATTACK, keepSpawn = false): string {
-    const room = Game.rooms[this.roomName];
-    if (!room) return `错误，无法访问的房间 ${this.roomName}`;
-
-    const creepName = `${room.name} RangedAttacker ${Game.time}`;
-    creepApi.add(
-      creepName,
-      "rangedAttacker",
-      {
-        targetFlagName: targetFlagName || DEFAULT_FLAG_NAME.ATTACK,
-        keepSpawn
-      },
-      room.name
-    );
-
-    return `已发布进攻一体机 [${creepName}] [进攻旗帜名称] ${targetFlagName} ${
-      keepSpawn ? "" : "不"
-    }持续生成，GoodLuck Commander`;
-  }
-
-  /**
    * 孵化 boost 拆墙小组
    *
    * @param targetFlagName 进攻旗帜名称
@@ -435,6 +411,34 @@ class CreepRelease implements InterfaceCreepRelease {
     );
 
     return `已发布攻击小组，正在孵化，GoodLuck Commander`;
+  }
+
+  /**
+   * 孵化进攻一体机
+   *
+   * @param targetFlagName 目标旗帜名称
+   * @param num 要孵化的数量
+   * @param keepSpawn 是否持续生成
+   */
+  public rangedAttacker(targetFlagName: string = DEFAULT_FLAG_NAME.ATTACK, num = 1, keepSpawn = false): string {
+    const room = Game.rooms[this.roomName];
+    if (!room) return `错误，无法访问的房间 ${this.roomName}`;
+    for (let i = 0; i < num; i++) {
+      const creepName = `${room.name} RangedAttacker ${Game.time}-${i}`;
+      creepApi.add(
+        creepName,
+        "rangedAttacker",
+        {
+          targetFlagName: targetFlagName || DEFAULT_FLAG_NAME.ATTACK,
+          keepSpawn
+        },
+        room.name
+      );
+    }
+
+    return `已发布进攻一体机*${num} [进攻旗帜名称] ${targetFlagName} ${
+      keepSpawn ? "" : "不"
+    }持续生成，GoodLuck Commander`;
   }
 
   /**
@@ -513,6 +517,31 @@ class CreepRelease implements InterfaceCreepRelease {
     return `[${room.name}] 掠夺者 ${reiverName} 已发布, 目标旗帜名称 ${
       sourceFlagName || DEFAULT_FLAG_NAME.REIVER
     }, 将搬运至 ${targetStructureId ? targetStructureId : room.name + " Terminal"}`;
+  }
+
+  /**
+   * 孵化斥候单位
+   *
+   * @param targetFlagName 进攻旗帜名称
+   * @param num 要孵化的数量
+   * @param keepSpawn 是否持续生成
+   */
+  public scout(targetFlagName = "", num = 1, keepSpawn = false): string {
+    if (num <= 0 || num > 100) num = 1;
+
+    for (let i = 0; i < num; i++) {
+      creepApi.add(
+        `${this.roomName} scout ${Game.time}-${i}`,
+        "scout",
+        {
+          targetFlagName: targetFlagName || DEFAULT_FLAG_NAME.SCOUT,
+          keepSpawn
+        },
+        this.roomName
+      );
+    }
+
+    return `已发布 scout*${num}，正在孵化`;
   }
 }
 

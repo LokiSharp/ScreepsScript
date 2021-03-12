@@ -14,6 +14,9 @@ export const handleNotExistCreep = function (creepName: string, creepMemory: Cre
   if (Memory.creeps[creepName].role === "worker") {
     Game.rooms[(Memory.creeps[creepName].data as WorkerData).workRoom].work.getUnit();
   }
+  if (Memory.creeps[creepName].role === "manager") {
+    Game.rooms[(Memory.creeps[creepName].data as ManagerData).workRoom].transport.getUnit();
+  }
   const creepConfig = Memory.creepConfigs[creepName];
 
   // 获取配置项

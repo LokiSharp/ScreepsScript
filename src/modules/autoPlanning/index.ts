@@ -97,22 +97,25 @@ const planStaticStructure = function (room: Room): ERR_NOT_FOUND | StructurePlan
   // 房间保存的中心位置
   const center = room.memory.center;
   if (!center) return ERR_NOT_FOUND;
+
   const centerPos = new RoomPosition(center[0], center[1], room.name);
 
   // 计算基地内的建筑点位
   const result: StructurePlanningResult = planBase(room, centerPos);
 
-  // 执行自动墙壁规划，获取 rampart 位置
-  const wallsPos = planWall(room, centerPos);
+  if (Game.shard.name !== "shardSeason") {
+    // 执行自动墙壁规划，获取 rampart 位置
+    const wallsPos = planWall(room, centerPos);
 
-  wallsPos.forEach((walls, index) => {
-    // 获取要放置 rampart 的等级
-    let placeLevel = LEVEL_BUILD_RAMPART[index] || LEVEL_BUILD_RAMPART[LEVEL_BUILD_RAMPART.length - 1];
-    // 如果 LEVEL_BUILD_RAMPART 设置的太高会导致超过 8 级，这里检查下
-    if (placeLevel > 8) placeLevel = 8;
+    wallsPos.forEach((walls, index) => {
+      // 获取要放置 rampart 的等级
+      let placeLevel = LEVEL_BUILD_RAMPART[index] || LEVEL_BUILD_RAMPART[LEVEL_BUILD_RAMPART.length - 1];
+      // 如果 LEVEL_BUILD_RAMPART 设置的太高会导致超过 8 级，这里检查下
+      if (placeLevel > 8) placeLevel = 8;
 
-    mergeStructurePlan(result, walls, placeLevel as AvailableLevel, STRUCTURE_RAMPART);
-  });
+      mergeStructurePlan(result, walls, placeLevel as AvailableLevel, STRUCTURE_RAMPART);
+    });
+  }
 
   // 执行自动道路规划，获取基地之外的 road 位置
   const roadPos = planRoad(room, centerPos, result);

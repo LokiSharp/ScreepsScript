@@ -5,6 +5,7 @@ import { boostHealer } from "./war/boostHealer";
 import { boostRangedAttacker } from "./war/boostRangedAttacker";
 import { buildHelper } from "./remote/buildHelper";
 import { claimer } from "./remote/claimer";
+import { controllerArracker } from "./war/controllerArracker";
 import { defender } from "./war/defender";
 import { depositHarvester } from "./remote/depositHarvester";
 import { dismantler } from "./war/dismantler";
@@ -24,6 +25,7 @@ import { remoteBuilder } from "./remote/remoteBuilder";
 import { remoteHarvester } from "./remote/remoteHarvester";
 import { remoteUpgrader } from "./remote/remoteUpgrader";
 import { reserver } from "./remote/reserver";
+import { scout } from "./war/scout";
 import { signer } from "./remote/signer";
 import { worker } from "./base/worker";
 
@@ -72,7 +74,9 @@ const creepWorks: CreepWork = {
   boostDismantler,
   boostHealer,
   boostAttacker,
-  boostRangedAttacker
+  boostRangedAttacker,
+  scout,
+  controllerArracker
 };
 
 /**

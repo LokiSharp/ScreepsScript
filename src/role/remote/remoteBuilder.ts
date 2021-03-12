@@ -1,6 +1,6 @@
 import { bodyConfigs } from "@/setting";
 import createBodyGetter from "@/utils/creep/createBodyGetter";
-import { getRoomEnergyTarget } from "@/modules/energyController";
+import { inPlaceBase } from "@/utils/creep/inPlaceBase";
 import remoteHelperIsNeed from "@/utils/creep/remoteHelperIsNeed";
 
 /**
@@ -15,55 +15,20 @@ export const remoteBuilder: CreepConfig<"remoteBuilder"> = {
     // 如果房间造好了 terminal，自己的使命就完成了
     return remoteHelperIsNeed(room, target, () => target.terminal && target.terminal.my);
   },
-  // 向指定房间移动
-  prepare: creep => {
-    const { targetRoomName, wayPoint } = creep.memory.data;
-    // 设定路径点
-    if (wayPoint && !creep.memory.fromShard) {
-      creep.setWayPoint(wayPoint);
-      creep.memory.fromShard = Game.shard.name as ShardName;
-    }
-
-    // 只要进入房间则准备结束
-    if (creep.room.name !== targetRoomName) {
-      if (wayPoint && creep.memory.fromShard) {
-        creep.goTo(undefined, {
-          checkTarget: true,
-          range: 0
-        });
-      } else {
-        creep.goTo(new RoomPosition(25, 25, targetRoomName));
-      }
-
-      return false;
-    } else {
-      delete creep.memory.moveInfo;
-      return true;
-    }
-  },
-  // 下面是正常的建造者逻辑
+  ...inPlaceBase(),
   source: creep => {
-    if (creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) return true;
-
-    // 获取有效的能量来源
-    let source: AllEnergySource;
-    if (!creep.memory.sourceId) {
-      source = getRoomEnergyTarget(creep.room);
-      if (!source) {
-        creep.say("没能量了，歇会");
-        return false;
+    if (creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
+      const { targetRoomName } = creep.memory.data;
+      creep.goTo(new RoomPosition(25, 25, targetRoomName));
+      // 只要进入房间则准备结束
+      if (creep.room.name !== targetRoomName) return false;
+      else {
+        delete creep.memory.moveInfo;
+        return true;
       }
+    }
 
-      creep.memory.sourceId = source.id;
-    } else source = Game.getObjectById(creep.memory.sourceId);
-    // 之前的来源建筑里能量不够了就更新来源
-    if (
-      !source ||
-      (source instanceof Structure && source.store[RESOURCE_ENERGY] < 300) ||
-      (source instanceof Source && source.energy === 0) ||
-      (source instanceof Ruin && source.store[RESOURCE_ENERGY] === 0)
-    )
-      delete creep.memory.sourceId;
+    const source = Game.getObjectById(creep.memory.data.sourceId);
 
     creep.getEngryFrom(source);
     return false;
@@ -78,5 +43,5 @@ export const remoteBuilder: CreepConfig<"remoteBuilder"> = {
 
     return creep.store.getUsedCapacity() === 0;
   },
-  bodys: createBodyGetter(bodyConfigs.remoteHelper)
+  bodys: createBodyGetter(bodyConfigs.worker)
 };

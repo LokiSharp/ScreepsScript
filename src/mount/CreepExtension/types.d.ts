@@ -127,7 +127,9 @@ interface Creep<Role extends CreepRoleConstant = CreepRoleConstant> {
   healTo(creep: Creep): void;
   dismantleFlag(flagName: string, healerName?: string): boolean;
 
+  rangedAttackTargetWithRange(target: AnyCreep, range?: number): OK | ERR_NOT_FOUND;
   rangedAttackLowestHitsHostileCreeps(hostils?: AnyCreep[]): OK | ERR_NOT_FOUND;
+  rangedAttackHostileHealCreeps(hostils?: AnyCreep[]): OK | ERR_NOT_FOUND;
   rangedAttackNearestHostileCreeps(hostils?: AnyCreep[]): OK | ERR_NOT_FOUND;
   rangedAttackLowestHitsHostileStructures(): OK | ERR_NOT_FOUND;
   rangedAttackNearHostileStructures(): OK | ERR_NOT_FOUND;

@@ -9,7 +9,9 @@ export const DEFAULT_FLAG_NAME = {
   // 待命
   STANDBY: "standBy",
   // 掠夺
-  REIVER: "reiver"
+  REIVER: "reiver",
+  // 侦察
+  SCOUT: "scout"
 };
 
 // 在执行了第一次移除操作之后，玩家需要在多少 tick 内重新执行移除操作才能真正发起移除请求

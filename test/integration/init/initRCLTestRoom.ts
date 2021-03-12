@@ -48,7 +48,7 @@ export async function initRCLTestRoom(helper: IntegrationTestHelper, RCL: number
   };
   helper.user = await helper.server.world.addBot({ username: "tester", room: "W0N0", x: 21, y: 26, modules });
 
-  const rclProgressPercent = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 90 };
+  const rclProgressPercent = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 90, 7: 90 };
   await db["rooms.objects"].update(
     { _id: controller._id },
     { $set: { level: RCL, progress: (C.CONTROLLER_LEVELS[RCL] / 100) * rclProgressPercent[RCL] } }

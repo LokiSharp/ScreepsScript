@@ -1,5 +1,5 @@
-import { bodyConfigs } from "@/setting";
-import createBodyGetter from "@/utils/creep/createBodyGetter";
+import { getClosestTo, getEnergyAmount } from "@/modules/energyController/findStrategy";
+import calcBodyPart from "@/utils/creep/calcBodyPart";
 import { getRoomEnergyTarget } from "@/modules/energyController";
 
 /**
@@ -9,8 +9,8 @@ import { getRoomEnergyTarget } from "@/modules/energyController";
 export const buildHelper: CreepConfig<"buildHelper"> = {
   // 下面是正常的建造者逻辑
   source: creep => {
+    const { spawnRoom, targetRoomName } = creep.memory.data;
     if (creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
-      const { targetRoomName } = creep.memory.data;
       if (creep.room.name !== targetRoomName) {
         creep.goTo(new RoomPosition(25, 25, targetRoomName));
         return false;
@@ -20,25 +20,18 @@ export const buildHelper: CreepConfig<"buildHelper"> = {
         return true;
       }
     }
-    // 获取有效的能量来源
-    let source: AllEnergySource;
-    if (!creep.memory.sourceId) {
-      source = source = getRoomEnergyTarget(creep.room);
-      if (!source) {
-        creep.say("没能量了，歇会");
-        return false;
-      }
 
-      creep.memory.sourceId = source.id;
-    } else source = Game.getObjectById(creep.memory.sourceId);
-    // 之前的来源建筑里能量不够了就更新来源
-    if (
-      !source ||
-      (source instanceof Structure && source.store[RESOURCE_ENERGY] < 300) ||
-      (source instanceof Source && source.energy === 0) ||
-      (source instanceof Ruin && source.store[RESOURCE_ENERGY] === 0)
-    )
-      delete creep.memory.sourceId;
+    // 获取有效的能量来源
+    let source: AllEnergySource = getRoomEnergyTarget(Game.rooms[targetRoomName], getClosestTo(creep.pos), targets =>
+      targets.filter(target => getEnergyAmount(target) > 10000)
+    );
+    if (!source) source = getRoomEnergyTarget(Game.rooms[spawnRoom]);
+    if (!source) {
+      creep.say("没能量了，歇会");
+      return false;
+    }
+
+    creep.memory.sourceId = source.id;
 
     creep.getEngryFrom(source);
     return false;
@@ -65,5 +58,5 @@ export const buildHelper: CreepConfig<"buildHelper"> = {
 
     return creep.store.getUsedCapacity() === 0;
   },
-  bodys: createBodyGetter(bodyConfigs.remoteHelper)
+  bodys: () => calcBodyPart({ [WORK]: 16, [CARRY]: 16, [MOVE]: 16 })
 };

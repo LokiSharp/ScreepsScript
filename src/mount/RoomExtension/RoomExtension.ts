@@ -276,11 +276,11 @@ export default class RoomExtension extends Room {
     for (const resourceType in this.memory.boost.lab) {
       const lab = Game.getObjectById(this.memory.boost.lab[resourceType]);
       if (lab?.store[RESOURCE_ENERGY] <= boostEnergyReloadLimit) {
-        if (!this.transport.hasTask("boostGetEnergy")) this.transport.addTask({ type: "boostGetEnergy", priority: 5 });
+        if (!this.transport.hasTask("boostGetEnergy")) this.transport.addTask({ type: "boostGetEnergy", priority: 10 });
         return ERR_BUSY;
       } else if (lab?.store[resourceType] <= boostResourceReloadLimit) {
-        if (!this.transport.hasTask("boostGetEnergy"))
-          this.transport.addTask({ type: "boostGetResource", priority: 5 });
+        if (!this.transport.hasTask("boostGetResource"))
+          this.transport.addTask({ type: "boostGetResource", priority: 15 });
         return ERR_BUSY;
       }
       // 这里没有直接终止进程是为了避免 lab 集群已经部分被摧毁而导致整个 boost 进程无法执行
