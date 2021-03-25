@@ -1,17 +1,14 @@
-/* eslint-disable no-underscore-dangle */
-/* eslint-disable @typescript-eslint/no-var-requires */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-import { getMyCode } from "@test/moduleUtils";
-import { getServer } from "../../serverUtils";
+import { getMyCode } from "@test/integration/utils/moduleUtils";
+import { getServer } from "@test/integration/utils/serverUtils";
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires,@typescript-eslint/no-unsafe-assignment
 const { TerrainMatrix } = require("screeps-server-mockup");
 
 export async function initBattleTestRoom(): Promise<void> {
   const roomName = "W1N1";
   const server = await getServer();
-  const terrain = new TerrainMatrix();
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  const terrain = new TerrainMatrix() as TerrainMatrix;
 
   await server.world.addRoom(roomName);
   await server.world.setTerrain(roomName, terrain);

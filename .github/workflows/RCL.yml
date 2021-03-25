@@ -39,7 +39,7 @@ jobs:
 
       - run: npm install
       - run: npm run build
-      - run: npx jest --runTestsByPath test/RCLTest/${{ matrix.RCL }}.RCLTest.test.ts
+      - run: npx cross-env NODE_ENV=mockup jest --runTestsByPath test/RCLTest/${{ matrix.RCL }}.RCLTest.test.ts
 
       - name: Update Server Artifact
         if: ${{ always() }}

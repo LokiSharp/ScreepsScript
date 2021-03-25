@@ -1,4 +1,4 @@
-import { getServer } from "../../serverUtils";
+import { getServer } from "./serverUtils";
 
 export async function setCreep(
   role: string,
@@ -8,7 +8,7 @@ export async function setCreep(
   y: number,
   data: CreepData,
   userId: string
-): Promise<any> {
+): Promise<DBRoomObject> {
   const server = await getServer();
   const storage = server.common.storage;
   const creep = await server.world.addRoomObject(roomName, "creep", x, y, {
