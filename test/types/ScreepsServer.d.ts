@@ -4,7 +4,8 @@ declare interface ScreepServerOptions {
   port: number;
   modfile?: string;
 }
-declare class Server {
+declare class ScreepsServer {
+  public users: User[];
   public driver: Driver;
   public config: CommonConfig;
   public common: Common;
@@ -27,7 +28,7 @@ declare class Server {
    * 设置服务器选项，用自定义服务器选项覆盖默认值
    * @param opts 自定义选项
    */
-  public setOpts(opts: ScreepServerOptions): Server;
+  public setOpts(opts: ScreepServerOptions): ScreepsServer;
   /**
    * 获取服务器选项
    */
@@ -35,11 +36,11 @@ declare class Server {
   /**
    * 启动 storage 进程并连接到 driver
    */
-  public connect(): Promise<Server>;
+  public connect(): Promise<ScreepsServer>;
   /**
    * 运行一个 tick
    */
-  public tick(): Promise<Server>;
+  public tick(): Promise<ScreepsServer>;
   /**
    * 启动一个带环境变量的子进程
    * @param name 进程名
@@ -50,6 +51,9 @@ declare class Server {
   /**
    * 启动进程并连接到 driver.
    */
-  public start(): Promise<Server>;
-  public stop(): Server;
+  public start(): Promise<ScreepsServer>;
+  public stop(): Promise<ScreepsServer>;
+  public removeListener(type, listener): Promise<ScreepsServer>;
+  public on(type, listener): Promise<ScreepsServer>;
+  public emit(event): Promise<ScreepsServer>;
 }
