@@ -29,7 +29,7 @@ declare interface SerializedRoomObject {
 }
 declare class World {
   private server;
-  public constructor(server: Server);
+  public constructor(server: ScreepsServer);
   public get gameTime(): Promise<number>;
   /**
    * 连接到服务器并返回 constants, database, env 和 pubsub 对象
@@ -81,7 +81,7 @@ declare class World {
   /**
    * 重置世界数据
    */
-  public reset(): Promise<void>;
+  public reset(): Promise<ScreepsServer>;
   /**
    * 创建一个拥有 sources, minerals 和 controllers 的 9 个房间的基础世界
    */

@@ -14,7 +14,8 @@ export function printDebugInfo(memory: Memory, gameTime: number): void {
 }
 
 function getDebugInfo(memory: Memory, gameTime: number): Record<string, unknown> {
-  const roomMemory = memory.stats.rooms.W0N0;
+  const roomName = "W1N1";
+  const roomMemory = memory.stats.rooms[roomName];
   return {
     tick: gameTime,
     controllerRatio: roomMemory.controllerRatio,
