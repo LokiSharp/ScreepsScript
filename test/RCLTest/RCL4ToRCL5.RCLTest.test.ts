@@ -1,9 +1,14 @@
 import { runRCLTest } from "../integration/utils/runRCLTest";
-const TICK_NUM = 100000;
-const RCL = 4;
+const TICK_NUM = 25 * 1000;
+const TIME_OUT = 30 * 60 * 1000;
+const RCL = 5;
 
 describe(`测试 RCL4 -> RCL5`, () => {
-  it(`测试 RCL4 -> RCL5`, async () => {
-    await runRCLTest(RCL, RCL + 1, TICK_NUM);
-  }, 43200000);
+  it(
+    `测试 RCL4 -> RCL5`,
+    async () => {
+      await runRCLTest(RCL, TICK_NUM);
+    },
+    TIME_OUT
+  );
 });

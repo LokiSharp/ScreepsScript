@@ -1,7 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { getServer } from "../../serverUtils";
+import { getServer } from "./serverUtils";
 import { initBattleTestRoom } from "../init/initBattleTestRoom";
 import { setCreep } from "./setCreep";
 

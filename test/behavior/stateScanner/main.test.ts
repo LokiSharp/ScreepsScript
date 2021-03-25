@@ -1,5 +1,5 @@
-import { getServer, setBaseRoom } from "@test/serverUtils";
-import { build } from "@test/moduleUtils";
+import { getServer, setBaseRoom } from "@test/integration/utils/serverUtils";
+import { build } from "@test/integration/utils/moduleUtils";
 import { resolve } from "path";
 
 it("全局状态扫描可用", async () => {

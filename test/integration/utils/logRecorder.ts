@@ -97,17 +97,17 @@ export default class LogRecorder {
         this.logs[tick][key] = newLog[key];
       });
     }
+    if (tick % 1000 === 0) void this.save(tick);
   }
 
   /**
    * 保存日志到本地
    */
-  public async save(): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    await outputJson(resolve(LOG_DIR, `${this.name}.json`), this.logs, {
+  public async save(tick = 0): Promise<void> {
+    await outputJson(resolve(LOG_DIR, `${this.name}-${tick}.json`), this.logs, {
       spaces: 4
     });
     // 主动移除内存中的日志，加速垃圾回收
-    this.logs = [];
+    this.logs = {};
   }
 }
