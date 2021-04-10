@@ -573,34 +573,15 @@ export const actions: {
 
       // 从缓存中读取要拿取的资源
       let resource = creep.memory.taskResource;
+      if (!clearCarryingRecources(creep, resource)) return false;
       // 没有缓存的话就找到第一个需要的强化材料，然后从终端拿出
       if (!resource) {
         resource = Object.keys(boostConfig.lab).find(res => {
           // 如果这个材料已经用完了就检查下一个
-          if (!terminal.store[res] || terminal.store[res] === 0) {
-            const sourceRoomInfo = _.filter(Game.rooms, room => room.controller?.my)
-              .map(room => {
-                // 无法正常接收的不参与计算
-                if (!room || !room.terminal) return { room, num: null };
-
-                return {
-                  room,
-                  num: room.terminal.store[resource]
-                };
-              })
-              // 移除掉所有不参与计算的房间
-              .filter(info => info.num !== null)
-              // 找到 power 数量最小的房间
-              .reduce((prev, next) => {
-                if (prev.num > next.num) return next;
-                else return prev;
-              });
-            if (sourceRoomInfo.num > 3000) sourceRoomInfo.room.shareAdd(creep.room.name, resource, 3000);
-            return false;
-          }
+          if (!terminal.store[res] || terminal.store[res] === 0) return false;
           const lab = Game.getObjectById(boostConfig.lab[res]);
           // lab 里的资源不达标就进行运输
-          return lab && lab.store[res] <= boostResourceReloadLimit;
+          return lab && lab.store[res] < boostResourceReloadLimit;
         }) as ResourceConstant;
 
         if (resource) creep.memory.taskResource = resource;
@@ -610,8 +591,6 @@ export const actions: {
           return false;
         }
       }
-
-      if (!clearCarryingRecources(creep, resource)) return false;
 
       // 获取转移数量
       const getAmount = Math.min(creep.store.getFreeCapacity(resource), terminal.store[resource]);
