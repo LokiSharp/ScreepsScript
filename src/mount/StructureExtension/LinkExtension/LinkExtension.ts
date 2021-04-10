@@ -116,7 +116,7 @@ export default class LinkExtension extends StructureLink {
     if (!source) return;
 
     // 以 centerLink 的名义发布中央物流任务
-    this.room.addCenterTask({
+    this.room.centerTransport.addTask({
       submit: "centerLink",
       source: source.structureType,
       target: "centerLink",
@@ -139,9 +139,9 @@ export default class LinkExtension extends StructureLink {
     if (this.supportUpgradeLink()) return;
 
     // 之前发的转移任务没有处理好的话就先挂机
-    if (this.room.hasCenterTask("centerLink") || !this.room.storage) return;
+    if (this.room.centerTransport.hasTask("centerLink") || !this.room.storage) return;
 
-    this.room.addCenterTask({
+    this.room.centerTransport.addTask({
       submit: "centerLink",
       source: "centerLink",
       target: STRUCTURE_STORAGE,
