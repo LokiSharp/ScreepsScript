@@ -1,5 +1,5 @@
 import { getMockCreep, mockGetObjectById } from "@mock/index";
-import baseTaskController from "@/modules/Task/BaseTaskController";
+import baseTaskController from "@/modules/room/task/BaseTaskController";
 
 describe("房间任务核心测试", function () {
   // 获取指定优先级的任务
