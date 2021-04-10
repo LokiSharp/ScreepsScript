@@ -2,9 +2,9 @@ import RoomConsole from "./RoomConsole";
 import RoomExtension from "./RoomExtension";
 import RoomHelp from "./RoomHelp";
 import mountCreepRelease from "@/modules/creepController/CreepRelease";
-import mountShortcut from "@/modules/shortcut/mountShortcut";
-import mountTransport from "@/modules/Task/RoomTransportTask";
-import mountWork from "@/modules/Task/RoomWorkTask";
+import mountShortcut from "@/modules/room/shortcut/mountShortcut";
+import mountTransport from "@/modules/room/task/RoomTransportTask";
+import mountWork from "@/modules/room/task/RoomWorkTask";
 
 export { RoomExtension, RoomConsole, RoomHelp };
 

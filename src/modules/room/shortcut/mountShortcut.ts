@@ -1,7 +1,7 @@
 import { MULTIPLE_STRUCTURES } from "./MULTIPLE_STRUCTURES";
 import { SINGLE_STRUCTURES } from "./SINGLE_STRUCTURES";
 import { centerLinkGetter } from "./centerLinkGetter";
-import createGetter from "@/utils/global/createGetter";
+import createGetter from "../../../utils/global/createGetter";
 import { setShortcut } from "./setShortcut";
 import { sourceContainersGetter } from "./sourceContainersGetter";
 
