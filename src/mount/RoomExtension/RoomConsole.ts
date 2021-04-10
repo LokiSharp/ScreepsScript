@@ -99,9 +99,8 @@ export default class RoomConsole extends RoomExtension {
     resourceType: ResourceConstant,
     amount: number
   ): string {
-    if (!this.memory.centerTransferTasks) this.memory.centerTransferTasks = [];
-    const addResult = this.addCenterTask({
-      submit: this.memory.centerTransferTasks.length,
+    const addResult = this.centerTransport.addTask({
+      submit: this.memory.centerTasks.length,
       target,
       source,
       resourceType,
@@ -116,8 +115,8 @@ export default class RoomConsole extends RoomExtension {
    * @param amount 要转移的能量数量, 默认 100k
    */
   public pute(amount = 100000): string {
-    const addResult = this.addCenterTask({
-      submit: this.memory.centerTransferTasks.length,
+    const addResult = this.centerTransport.addTask({
+      submit: this.centerTransport.tasks.length,
       target: STRUCTURE_TERMINAL,
       source: STRUCTURE_STORAGE,
       resourceType: RESOURCE_ENERGY,
@@ -135,8 +134,8 @@ export default class RoomConsole extends RoomExtension {
     if (!this.terminal) return `未找到 ${this.name} 中的终端`;
     if (amount === null) amount = this.terminal.store[RESOURCE_ENERGY];
 
-    const addResult = this.addCenterTask({
-      submit: this.memory.centerTransferTasks.length,
+    const addResult = this.centerTransport.addTask({
+      submit: this.centerTransport.tasks.length,
       target: STRUCTURE_STORAGE,
       source: STRUCTURE_TERMINAL,
       resourceType: RESOURCE_ENERGY,

@@ -32,8 +32,6 @@ interface ObjectWithId<T extends unknown = unknown> extends RoomObject {
   id: Id<T>;
 }
 
-type CenterStructures = STRUCTURE_STORAGE | STRUCTURE_TERMINAL | STRUCTURE_FACTORY | "centerLink";
-
 interface AnyObject {
   [key: string]: any;
 }
