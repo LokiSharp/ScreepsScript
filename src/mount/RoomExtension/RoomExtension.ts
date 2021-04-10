@@ -1,4 +1,4 @@
-import { BOOST_RESOURCE, ENERGY_SHARE_LIMIT, boostEnergyReloadLimit, boostResourceReloadLimit } from "@/setting";
+import { BOOST_RESOURCE, boostEnergyReloadLimit, boostResourceReloadLimit } from "@/setting";
 import { confirmBasePos, findBaseCenterPos, setBaseCenter } from "@/modules/autoPlanning/planBasePos";
 import createRoomLink from "@/utils/console/createRoomLink";
 import { creepApi } from "@/modules/creepController/creepApi";
@@ -462,76 +462,6 @@ export default class RoomExtension extends Room {
   }
 
   /**
-   * 向其他房间请求资源共享
-   *
-   * @param resourceType 请求的资源类型
-   * @param amount 请求的数量
-   */
-  public shareRequest(resourceType: ResourceConstant, amount: number): boolean {
-    const targetRoom = this.shareGetSource(resourceType);
-    if (!targetRoom) return false;
-
-    return targetRoom.shareAdd(this.name, resourceType, amount);
-  }
-
-  /**
-   * 将本房间添加至资源来源表中
-   *
-   * @param resourceType 添加到的资源类型
-   */
-  public shareAddSource(resourceType: ResourceConstant): boolean {
-    if (!(resourceType in Memory.resourceSourceMap)) Memory.resourceSourceMap[resourceType] = [];
-
-    const alreadyRegister = Memory.resourceSourceMap[resourceType].find(name => name === this.name);
-    // 如果已经被添加过了就返回 false
-    if (alreadyRegister) return false;
-
-    Memory.resourceSourceMap[resourceType].push(this.name);
-    return true;
-  }
-
-  /**
-   * 从资源来源表中移除本房间房间
-   *
-   * @param resourceType 从哪种资源类型中移除
-   */
-  public shareRemoveSource(resourceType: ResourceConstant): void {
-    // 没有该资源就直接停止
-    if (!(resourceType in Memory.resourceSourceMap)) return;
-
-    // 获取该房间在资源来源表中的索引
-    _.pull(Memory.resourceSourceMap[resourceType], this.name);
-    // 列表为空了就直接移除
-    if (Memory.resourceSourceMap[resourceType].length <= 0) delete Memory.resourceSourceMap[resourceType];
-  }
-
-  /**
-   * 向本房间添加资源共享任务
-   *
-   * @param targetRoom 资源发送到的房间
-   * @param resourceType 共享资源类型
-   * @param amount 共享资源数量
-   * @returns 是否成功添加
-   */
-  public shareAdd(targetRoom: string, resourceType: ResourceConstant, amount: number): boolean {
-    if (this.memory.shareTask || !this.terminal) return false;
-    // 如果是能量的话就把来源建筑设为 storage，这里做了个兜底，如果 storage 没了就检查 terminal 里的能量
-    const sourceStructure = resourceType === RESOURCE_ENERGY ? this.storage || this.terminal : this.terminal;
-    // 终端能发送的最大数量（路费以最大发送量计算）
-    const freeSpace =
-      this.terminal.store.getFreeCapacity() - Game.market.calcTransactionCost(amount, this.name, targetRoom);
-    // 期望发送量、当前存量、能发送的最大数量中找最小的
-    const sendAmount = Math.min(amount, sourceStructure.store[resourceType], freeSpace);
-
-    this.memory.shareTask = {
-      target: targetRoom,
-      resourceType,
-      amount: sendAmount
-    };
-    return true;
-  }
-
-  /**
    * 切换为升级状态
    * 需要提前插好名为 [房间名 + Boost] 的旗帜，并保证其周围有足够数量的 lab
    *
@@ -558,51 +488,6 @@ export default class RoomExtension extends Room {
     delete this.memory.upgrade;
 
     return OK;
-  }
-
-  /**
-   * 根据资源类型查找来源房间
-   *
-   * @param resourceType 要查找的资源类型
-   * @returns 找到的目标房间，没找到返回 null
-   */
-  private shareGetSource(resourceType: ResourceConstant): Room | null {
-    // 兜底
-    if (!Memory.resourceSourceMap) {
-      Memory.resourceSourceMap = {};
-      return null;
-    }
-    const SourceRoomsName = Memory.resourceSourceMap[resourceType];
-    if (!SourceRoomsName) return null;
-
-    // 寻找合适的房间
-    let targetRoom: Room = null;
-    // 变量房间名数组，注意，这里会把所有无法访问的房间筛选出来
-    const roomWithEmpty = SourceRoomsName.map(roomName => {
-      const room = Game.rooms[roomName];
-
-      if (!room || !room.terminal) return "";
-      // 该房间有任务或者就是自己，不能作为共享来源
-      if (room.memory.shareTask || room.name === this.name) return roomName;
-
-      // 如果请求共享的是能量
-      if (resourceType === RESOURCE_ENERGY) {
-        if (!room.storage) return "";
-        // 该房间 storage 中能量低于要求的话，就从资源提供列表中移除该房间
-        if (room.storage.store[RESOURCE_ENERGY] < ENERGY_SHARE_LIMIT) return "";
-      } else {
-        // 如果请求的资源已经没有的话就暂时跳过（因为无法确定之后是否永远无法提供该资源）
-        if ((room.terminal.store[resourceType] || 0) <= 0) return roomName;
-      }
-
-      // 接受任务的房间就是你了！
-      targetRoom = room;
-      return roomName;
-    });
-
-    // 把上面筛选出来的空字符串元素去除
-    Memory.resourceSourceMap[resourceType] = roomWithEmpty.filter(roomName => roomName);
-    return targetRoom;
   }
 
   /**

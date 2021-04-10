@@ -41,10 +41,15 @@ export default class ControllerExtension extends StructureController {
   private drawEnergyHarvestInfo() {
     const { totalEnergy, energyGetRate } = getRoomStats(this.room.name);
     const { x, y } = this.pos;
-    this.room.visual.text(`可用能量 ${totalEnergy || 0} 获取速率 ${energyGetRate.toFixed(2) || 0}`, x + 1, y + 0.25, {
-      align: "left",
-      opacity: 0.5
-    });
+    this.room.visual.text(
+      `可用能量 ${totalEnergy || 0} 获取速率 ${energyGetRate ? energyGetRate.toFixed(2) : 0}`,
+      x + 1,
+      y + 0.25,
+      {
+        align: "left",
+        opacity: 0.5
+      }
+    );
   }
 
   /**
@@ -272,7 +277,8 @@ delayQueue.addDelayCallback("spawnUpgrader", room => {
     // cpu 不够
     Game.cpu.bucket < 700 ||
     // 能量不足
-    room.storage.store[RESOURCE_ENERGY] < UPGRADER_WITH_ENERGY_LEVEL_8
+    room.storage.store[RESOURCE_ENERGY] < UPGRADER_WITH_ENERGY_LEVEL_8 ||
+    room.controller.ticksToDowngrade < 10000
   )
     return delayQueue.addDelayTask("spawnUpgrader", { roomName: room.name }, 10000);
 
