@@ -1,6 +1,6 @@
 const SAVE_KEY = "centerTasks";
 
-export default class RoomCenterTaskController implements InterfaceCenterTaskController {
+export default class RoomCenterTaskController {
   public readonly roomName: string;
 
   public constructor(roomName: string) {

@@ -1,4 +1,5 @@
 import { ENERGY_SHARE_LIMIT } from "@/setting";
+import RoomAccessor from "@/modules/room/RoomAccessor";
 
 /**
  * 该模块的数据保存在房间的哪个键上
@@ -10,18 +11,16 @@ const SAVE_KEY = "shareTask";
  */
 const RESOURCE_SOURCE_SAVE_KEY = "resourceSourceMap";
 
-export default class RoomShareController implements InterfaceShareController {
-  public readonly roomName: string;
-
+export default class RoomShareController extends RoomAccessor<RoomShareTask> {
   public constructor(roomName: string) {
-    this.roomName = roomName;
+    super("roomShare", roomName, "shareTask", undefined);
   }
 
   /**
    * 允许外部模块获取当前的共享任务
    */
   public get task(): RoomShareTask {
-    return Memory.rooms?.[this.roomName]?.[SAVE_KEY];
+    return this.memory;
   }
 
   /**
@@ -54,6 +53,7 @@ export default class RoomShareController implements InterfaceShareController {
     const targetRoom = this.getSource(resourceType);
     if (!targetRoom) return false;
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-member-access
     return targetRoom.share.handle(this.roomName, resourceType, amount);
   }
 
