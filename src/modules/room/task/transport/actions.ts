@@ -1,5 +1,4 @@
-/* istanbul ignore file */
-/* eslint-disable @typescript-eslint/no-unused-vars */
+import RoomTransportTaskController, { TransportActionGenerator } from "@/modules/room/task/transport/taskController";
 import { findStrategy, getRoomEnergyTarget } from "@/modules/energyController";
 import { boostResourceReloadLimit } from "@/setting";
 import { clearCarryingResource } from "@/utils/creep/clearCarryingResource";
@@ -59,7 +58,7 @@ const clearCarryingRecources = function (creep: Creep, excludeResourceType?: Res
  * @param transport 物流任务对象
  * @returns 身上是否已经有足够的能量了
  */
-const getEnergy = function (creep: Creep<"manager">, transport: InterfaceTransportTaskController): boolean {
+const getEnergy = function (creep: Creep<"manager">, transport: RoomTransportTaskController): boolean {
   transport.countWorkTime();
   if (creep.store[RESOURCE_ENERGY] > 10) return true;
 

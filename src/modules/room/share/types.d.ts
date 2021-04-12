@@ -42,48 +42,17 @@ interface ResourceSourceMap {
   [resourceType: string]: string[];
 }
 
-interface Memory {
-  resourceSourceMap: ResourceSourceMap;
-}
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+declare global {
+  interface RoomMemory {
+    /**
+     * 该房间要执行的资源共享任务
+     */
+    shareTask: RoomShareTask;
+  }
 
-interface Room {
-  /**
-   * 房间共享协议 - 控制器
-   */
-  share: InterfaceShareController;
-}
-
-interface InterfaceShareController {
-  /**
-   * 当前的共享任务
-   */
-  task: RoomShareTask;
-  /**
-   * 向其他房间请求资源共享
-   *
-   * @param resourceType 请求的资源类型
-   * @param amount 请求的数量
-   */
-  request(resourceType: ResourceConstant, amount: number): boolean;
-  /**
-   * 将本房间添加至资源来源表中
-   *
-   * @param resourceType 添加到的资源类型
-   */
-  becomeSource(resourceType: ResourceConstant): boolean;
-  /**
-   * 从资源来源表中移除本房间
-   *
-   * @param resourceType 从哪种资源类型中移除
-   */
-  leaveSource(resourceType: ResourceConstant): void;
-  /**
-   * 让本房间处理共享任务
-   *
-   * @param targetRoom 资源发送到的房间
-   * @param resourceType 共享资源类型
-   * @param amount 共享资源数量
-   * @returns 是否成功添加
-   */
-  handle(targetRoom: string, resourceType: ResourceConstant, amount: number): boolean;
+  interface Memory {
+    resourceSourceMap: ResourceSourceMap;
+  }
 }
