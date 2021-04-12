@@ -389,6 +389,8 @@ export const actions: {
         return false;
       }
 
+      if (creep.store.getUsedCapacity(targetResource.type) > 0) return true;
+
       if (targetResource.type && !clearCarryingRecources(creep, targetResource.type)) return false;
 
       creep.goTo(terminal.pos);
