@@ -1,9 +1,10 @@
 import { BOOST_RESOURCE, boostEnergyReloadLimit, boostResourceReloadLimit } from "@/setting";
 import { confirmBasePos, findBaseCenterPos, setBaseCenter } from "@/modules/autoPlanning/planBasePos";
+import { GetName } from "@/modules/room/spawn/nameGetter";
 import createRoomLink from "@/utils/console/createRoomLink";
-import { creepApi } from "@/modules/creepController/creepApi";
 import log from "@/utils/console/log";
 import { manageStructure } from "@/modules/autoPlanning";
+import { removeCreep } from "@/modules/creep/utils";
 
 export default class RoomExtension extends Room {
   /**
@@ -105,52 +106,6 @@ export default class RoomExtension extends Room {
   }
 
   /**
-   * 向生产队列里推送一个生产任务
-   *
-   * @param taskName config.creep.ts 文件里 creepConfigs 中定义的任务名
-   * @returns 当前任务在队列中的排名
-   */
-  public addSpawnTask(taskName: string): number | ERR_NAME_EXISTS {
-    if (!this.memory.spawnList) this.memory.spawnList = [];
-    // 先检查下任务是不是已经在队列里了
-    if (!this.hasSpawnTask(taskName)) {
-      // 任务加入队列
-      this.memory.spawnList.push(taskName);
-      return this.memory.spawnList.length - 1;
-    }
-    // 如果已经有的话返回异常
-    else return ERR_NAME_EXISTS;
-  }
-
-  /**
-   * 检查生产队列中是否包含指定任务
-   *
-   * @param taskName 要检查的任务名
-   * @returns true/false 有/没有
-   */
-  public hasSpawnTask(taskName: string): boolean {
-    if (!this.memory.spawnList) this.memory.spawnList = [];
-    return this.memory.spawnList.indexOf(taskName) > -1;
-  }
-
-  /**
-   * 清空任务队列
-   * 非测试情况下不要调用！
-   */
-  public clearSpawnTask(): void {
-    this.memory.spawnList = [];
-  }
-
-  /**
-   * 将当前任务挂起
-   * 任务会被移动至队列末尾
-   */
-  public hangSpawnTask(): void {
-    const task = this.memory.spawnList.shift();
-    this.memory.spawnList.push(task);
-  }
-
-  /**
    * 危险操作：执行本 api 将会直接将本房间彻底移除
    */
   public dangerousRemove(): string {
@@ -168,16 +123,7 @@ export default class RoomExtension extends Room {
     });
 
     // 移除 creep config
-    creepApi.batchRemove(this.name);
-
-    // 移除 creep
-    for (const name in Game.creeps) {
-      const creep = Game.creeps[name];
-      if (creep.name.includes(this.name)) {
-        creep.suicide();
-        delete creep.memory;
-      }
-    }
+    removeCreep(this.name, { batch: true, immediate: true });
 
     // 移除内存
     delete this.memory;
@@ -322,16 +268,11 @@ export default class RoomExtension extends Room {
    * @param signText 新房间的签名
    */
   public claimRoom(targetRoomName: string, signText = ""): OK {
-    creepApi.add(
-      `${targetRoomName} Claimer`,
-      "claimer",
-      {
-        targetRoomName,
-        spawnRoom: this.name,
-        signText
-      },
-      this.name
-    );
+    this.spawner.addTask({
+      name: GetName.claimer(targetRoomName),
+      role: "claimer",
+      data: { targetRoomName, signText }
+    });
 
     return OK;
   }
@@ -349,7 +290,7 @@ export default class RoomExtension extends Room {
     // 添加对应的键值对
     this.memory.remote[remoteRoomName] = { targetId: this.storage.id };
 
-    this.release.remoteCreepGroup(remoteRoomName);
+    this.spawner.release.remoteCreepGroup(remoteRoomName);
     return OK;
   }
 
@@ -373,11 +314,11 @@ export default class RoomExtension extends Room {
       if (!(flagName in Game.flags)) return;
 
       if (removeFlag) Game.flags[flagName].remove();
-      creepApi.remove(`${remoteRoomName} remoteHarvester${index}`);
+      removeCreep(GetName.remoteHarvester(remoteRoomName, index));
     });
 
     // 移除预定者
-    creepApi.remove(`${remoteRoomName} reserver`);
+    removeCreep(GetName.reserver(remoteRoomName));
 
     return OK;
   }

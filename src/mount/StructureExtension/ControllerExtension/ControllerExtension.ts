@@ -1,7 +1,6 @@
 import { LEVEL_BUILD_RAMPART, UPGRADER_WITH_ENERGY_LEVEL_8 } from "@/setting";
 import { getRoomStats, setRoomStats } from "@/modules/stats";
 import { countEnergyChangeRatio } from "@/modules/energyController";
-import { creepApi } from "@/modules/creepController/creepApi";
 import { delayQueue } from "@/modules/delayQueue";
 import { whiteListFilter } from "@/utils/global/whiteListFilter";
 
@@ -29,7 +28,7 @@ export default class ControllerExtension extends StructureController {
         // 如果发现入侵者已经老死了，就移除对应属性并重新发布外矿角色组
         if (this.room.memory.remote[remoteRoomName].disableTill <= Game.time) {
           delete this.room.memory.remote[remoteRoomName].disableTill;
-          this.room.release.remoteCreepGroup(remoteRoomName);
+          this.room.spawner.release.remoteCreepGroup(remoteRoomName);
         }
       }
     }
@@ -60,9 +59,9 @@ export default class ControllerExtension extends StructureController {
   public onLevelChange(level: number): void {
     // 刚占领，添加工作单位
     if (level === 1) {
-      this.room.release.harvester();
-      this.room.release.changeBaseUnit("manager", 1);
-      this.room.release.changeBaseUnit("worker", 2);
+      this.room.spawner.release.harvester();
+      this.room.spawner.release.changeBaseUnit("manager", 1);
+      this.room.spawner.release.changeBaseUnit("worker", 2);
     } else if (level === LEVEL_BUILD_RAMPART[0] || level === 4) {
       // 开始刷墙后就开始执行刷墙任务
       this.room.work.updateTask({ type: "fillWall", priority: 0 });
@@ -203,21 +202,25 @@ export default class ControllerExtension extends StructureController {
   private adjustCreep(): void {
     if (Game.time % 500) return;
 
-    this.room.release.changeBaseUnit("manager", this.room.transport.getExpect());
+    this.room.spawner.release.changeBaseUnit("manager", this.room.transport.getExpect());
     if (this.level === 8)
-      this.room.release.changeBaseUnit(
+      this.room.spawner.release.changeBaseUnit(
         "worker",
         this.room.memory.workerNumber >= 3 ? 0 : 3 - this.room.memory.workerNumber
       );
     else {
-      this.room.release.changeBaseUnit("worker", this.room.work.getExpect());
+      this.room.spawner.release.changeBaseUnit("worker", this.room.work.getExpect());
     }
   }
   /**
    * 重新占领，刷 RCL 用
    */
   private reClaim(): void {
-    creepApi.add(`${this.room.name} reClaimer`, "reClaimer", { targetRoomName: this.room.name }, this.room.name);
+    this.room.spawner.addTask({
+      name: `${this.room.name} reClaimer`,
+      role: "reClaimer",
+      data: { targetRoomName: this.room.name }
+    });
   }
 
   private upgradePosInfosFiltered = false;
@@ -258,7 +261,10 @@ export default class ControllerExtension extends StructureController {
       if (!info) info = _.find(unusedPosInfo, item => item.rangeToStorage === range || item.rangeToTerminal === range);
     }
     if (!info) info = _.find(unusedPosInfo, item => item);
-    if (creep.memory.role === "gclUpgrader") (creep as Creep<"gclUpgrader">).memory.data.upgradePosInfo = info;
+    if (creep.memory.role === "gclUpgrader")
+      if ("upgradePosInfo" in (creep as Creep<"gclUpgrader">).memory.data) {
+        (creep as Creep<"gclUpgrader">).memory.data.upgradePosInfo = info;
+      }
 
     this.room.memory.upgradePosInfos[`${info.x},${info.y}`].creepId = creep.id;
     return new RoomPosition(info.x, info.y, this.room.name);

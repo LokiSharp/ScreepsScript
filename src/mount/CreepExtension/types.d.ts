@@ -3,6 +3,16 @@
  */
 interface CreepMemory<Role extends CreepRoleConstant = CreepRoleConstant> {
   /**
+   * 是否禁止重新孵化
+   */
+  cantRespawn?: boolean;
+
+  /**
+   * 孵化该 creep 的房间
+   */
+  spawnRoom: string;
+
+  /**
    * 移动缓存
    */
   moveInfo?: MoveInfo;
@@ -15,7 +25,7 @@ interface CreepMemory<Role extends CreepRoleConstant = CreepRoleConstant> {
   /**
    * 来自的 shard
    * 在死后会向这个 shard 发送孵化任务
-   * creepController 会通过这个字段检查一个 creep 是不是跨 shard creep
+   * creep 会通过这个字段检查一个 creep 是不是跨 shard creep
    */
   fromShard?: ShardName;
 

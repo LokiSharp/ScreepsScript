@@ -1,9 +1,3 @@
-/**
- * creep 控制模块
- *
- * 负责 creep 的新增、删除及修改，creep 死后也会由该模块负责回收或再孵化
- */
-
 import { addCrossShardRequest } from "../crossShard";
 import { handleNotExistCreep } from "./creepHandle";
 
@@ -13,7 +7,7 @@ import { handleNotExistCreep } from "./creepHandle";
  */
 let lastGameCreepNumber = 0;
 
-function creepNumberListener(): void {
+export function creepNumberListener(): void {
   const nowGameCreepNumber = Object.keys(Game.creeps).length;
   // 本 tick creep 数量没变，不用执行检查
   if (nowGameCreepNumber === lastGameCreepNumber) {
@@ -52,13 +46,3 @@ function creepNumberListener(): void {
     else handleNotExistCreep(name, creepMemory);
   }
 }
-
-/**
- * creep 数量控制模块注册插件
- */
-export const creepNumberControlAppPlugin: AppLifecycleCallbacks = {
-  reset: () => {
-    if (!Memory.creepConfigs) Memory.creepConfigs = {};
-  },
-  tickStart: creepNumberListener
-};

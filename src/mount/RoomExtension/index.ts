@@ -1,9 +1,9 @@
 import RoomCenterTaskController from "@/modules/room/task/center/taskController";
 import RoomConsole from "./RoomConsole";
-import RoomCreepReleaseController from "@/modules/creepController/CreepRelease";
 import RoomExtension from "./RoomExtension";
 import RoomHelp from "./RoomHelp";
 import RoomShareController from "@/modules/room/share/controller";
+import RoomSpawnController from "@/modules/room/spawn";
 import RoomTransportTaskController from "@/modules/room/task/transport/taskController";
 import RoomWorkTaskController from "@/modules/room/task/work/taskController";
 import createGetter from "@/utils/global/createGetter";
@@ -36,12 +36,23 @@ declare global {
     /**
      * 资源共享模块
      */
-
     share: RoomShareController;
-    transport: RoomTransportTaskController;
-    centerTransport: RoomCenterTaskController;
+    /**
+     * 工作任务模块
+     */
     work: RoomWorkTaskController;
-    release: RoomCreepReleaseController;
+    /**
+     * 物流任务模块
+     */
+    transport: RoomTransportTaskController;
+    /**
+     * 中央物流任务模块
+     */
+    centerTransport: RoomCenterTaskController;
+    /**
+     * 孵化控制模块
+     */
+    spawner: RoomSpawnController;
   }
 }
 
@@ -58,7 +69,7 @@ export default function mountRoom(): void {
     ["centerTransport", RoomCenterTaskController],
     ["transport", RoomTransportTaskController],
     ["work", RoomWorkTaskController],
-    ["release", RoomCreepReleaseController]
+    ["spawner", RoomSpawnController]
   ];
 
   // 房间插件实例化后会被分类保存到这里

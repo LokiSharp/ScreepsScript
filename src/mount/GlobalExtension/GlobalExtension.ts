@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
+import { hasCreep, removeCreep, showCreep } from "@/modules/creep/utils";
 import { baseLayout } from "@/setting";
 import { createHelp } from "@/modules/help";
-import { creepApi } from "@/modules/creepController/creepApi";
 import { findBaseCenterPos } from "@/modules/autoPlanning/planBasePos";
 
 // 全局拓展对象
@@ -344,6 +344,11 @@ export default {
       });
     }
   },
-  // 将 creepApi 挂载到全局方便手动发布或取消 creep
-  creepApi
+
+  // 将 creepApi 挂载到全局方便手动操作
+  creep: {
+    show: showCreep,
+    remove: removeCreep,
+    has: hasCreep
+  }
 };
