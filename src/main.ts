@@ -1,7 +1,7 @@
 import { extensionAppPlugin, mountList } from "@/mount";
 import App from "@/modules/framework";
 import { constructionAppPlugin } from "@/modules/ConstructionController";
-import { creepNumberControlAppPlugin } from "@/modules/creepController";
+import { creepNumberControlAppPlugin } from "./modules/creep";
 import { crossShardAppPlugin } from "@/modules/crossShard";
 import { delayQueueAppPlugin } from "@/modules/delayQueue";
 import { errorMapper } from "@/utils/global/ErrorMapper";

@@ -59,16 +59,19 @@ export const claimer: CreepConfig<"claimer"> = {
     const claimResult = creep.claimController(controller);
     if (claimResult === ERR_NOT_IN_RANGE) creep.goTo(controller.pos);
     else if (claimResult === OK) {
-      const { targetRoomName, signText, spawnRoom: spawnRoomName, wayPoint } = creep.memory.data;
+      const {
+        spawnRoom: spawnRoomName,
+        data: { targetRoomName, signText, wayPoint }
+      } = creep.memory;
       creep.log(`新房间 ${targetRoomName} 占领成功！已向源房间 ${spawnRoomName} 请求支援单位`, "green");
 
       // 占领成功，发布支援组
       const spawnRoom = Game.rooms[spawnRoomName];
       if (spawnRoom) {
         if (wayPoint) {
-          spawnRoom.release.remoteHelper(targetRoomName, wayPoint);
+          spawnRoom.spawner.release.remoteHelper(targetRoomName, wayPoint);
         } else {
-          spawnRoom.release.remoteHelper(targetRoomName);
+          spawnRoom.spawner.release.remoteHelper(targetRoomName);
         }
       }
 
