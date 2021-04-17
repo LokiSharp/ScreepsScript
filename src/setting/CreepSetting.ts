@@ -94,7 +94,7 @@ export const bodyConfigs: BodyConfigs = {
     { [CARRY]: 20, [MOVE]: 10 },
     { [CARRY]: 20, [MOVE]: 10 },
     { [CARRY]: 20, [MOVE]: 10 },
-    { [CARRY]: 20, [MOVE]: 10 }
+    { [CARRY]: 30, [MOVE]: 15 }
   ),
 
   /**

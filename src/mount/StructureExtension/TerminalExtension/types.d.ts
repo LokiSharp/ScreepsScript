@@ -13,6 +13,7 @@ interface StructureTerminal {
     channel?: TerminalChannels,
     priceLimit?: number
   ): string;
+  energyCheck();
   removeByType(type: ResourceConstant, mod: TerminalModes, channel: TerminalChannels): void;
   remove(index: number): string;
   show(): string;
