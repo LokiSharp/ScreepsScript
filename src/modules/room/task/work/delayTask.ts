@@ -36,7 +36,7 @@ export const addBuildTask = function (
  *
  * @param roomName 添加到的房间名
  */
-export const addSpawnRepairerTask = function (roomName: string): void {
+export const addSpawnFillerTask = function (roomName: string): void {
   delayQueue.addDelayTask("spawnFiller", { roomName }, Game.time + 5000);
 };
 
@@ -56,7 +56,7 @@ delayQueue.addDelayCallback("spawnFiller", room => {
   if (!room) return;
 
   // cpu 还是不够的话就延迟发布
-  if (Game.cpu.bucket < 700) return addSpawnRepairerTask(room.name);
+  if (Game.cpu.bucket < 700) return addSpawnFillerTask(room.name);
 
   room.work.updateTask({ type: "fillWall", priority: 0 });
 });

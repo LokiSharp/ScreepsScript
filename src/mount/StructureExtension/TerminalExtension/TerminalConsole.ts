@@ -38,29 +38,12 @@ export default class TerminalConsole extends TerminalExtension {
    * @param hard 设为 true 来移除其默认值中不包含的监听资源
    */
   public reset(hard = false): string {
-    // 要添加的默认资源
-    const defaultResource = [
-      RESOURCE_OXYGEN,
-      RESOURCE_HYDROGEN,
-      RESOURCE_KEANIUM,
-      RESOURCE_LEMERGIUM,
-      RESOURCE_UTRIUM,
-      RESOURCE_ZYNTHIUM,
-      RESOURCE_CATALYST
-    ];
-
     if (hard) this.room.memory.terminalTasks = [];
     this.room.memory.terminalIndex = 0;
-
-    // 默认选项为从资源共享协议获取所有的基础元素各 5000
-    defaultResource.forEach(res => this.addTask(res, 5000, terminalModes.get, terminalChannels.share));
 
     // 在本房间产出的元素超过 10000 时，从资源共享协议发送，超过 100000 时拍单贩卖
     this.addTask(this.room.mineral.mineralType, 10000, terminalModes.put, terminalChannels.share);
     this.addTask(this.room.mineral.mineralType, 100000, terminalModes.put, terminalChannels.take);
-
-    // 在本房间产出的 OPS 超过 10000 时拍单贩卖
-    this.addTask(RESOURCE_OPS, 10000, terminalModes.put, terminalChannels.take);
 
     return `已重置，当前监听任务如下:\n${this.show()}`;
   }

@@ -143,7 +143,7 @@ export default class TerminalExtension extends StructureTerminal {
    * 能量检查
    * 如果 terminal 中能量过多会返还至 storage
    */
-  private energyCheck(): void {
+  public energyCheck(): void {
     if (this.store[RESOURCE_ENERGY] > 30000)
       this.room.centerTransport.addTask({
         submit: STRUCTURE_TERMINAL,
