@@ -12,3 +12,17 @@ export const creepDefaultMemory: CreepMemory = {
   working: false,
   spawnRoom: ""
 };
+
+/**
+ * 房间运营单位的限制，自动调整时不会超过这个区间
+ */
+export const BASE_ROLE_LIMIT: RoomBaseUnitLimit = {
+  worker: {
+    MAX: 20,
+    MIN: 1
+  },
+  manager: {
+    MAX: 5,
+    MIN: 1
+  }
+};

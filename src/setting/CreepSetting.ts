@@ -2,33 +2,7 @@ import calcBodyPart from "@/utils/creep/calcBodyPart";
 import getBodyConfig from "../utils/creep/getBodyConfig";
 
 // 每个房间最多同时存在多少单位
-export const MAX_UPGRADER_NUM = 24;
-export const MAX_HARVESTER_NUM = 4;
 export const TRANSFER_DEATH_LIMIT = 20;
-
-/**
- * terminal 中能量和对应发布的 upgrader 数量
- * upgrader 自动发布时会优先使用 terminal 中的能量，不满足下表 [0] 的能量标准时才会去使用 storage 里的能量
- * 请确保最少有一条内容
- */
-export const UPGRADE_WITH_TERMINAL = [
-  { energy: 60000, num: 6 },
-  { energy: 50000, num: 5 },
-  { energy: 40000, num: 4 },
-  { energy: 30000, num: 3 },
-  { energy: 20000, num: 2 }
-];
-
-/**
- * storage 中的能量和对应发布的 upgrader 数量
- */
-export const UPGRADE_WITH_STORAGE = [
-  { energy: 900000, num: 10 },
-  { energy: 700000, num: 9 },
-  { energy: 500000, num: 7 },
-  { energy: 300000, num: 5 },
-  { energy: 100000, num: 3 }
-];
 
 /**
  * 8级时只要 cpu 足够，依旧会孵化一个 upgrader 进行升级
@@ -63,23 +37,8 @@ export const bodyConfigs: BodyConfigs = {
     { [WORK]: 5, [CARRY]: 5, [MOVE]: 5 },
     { [WORK]: 8, [CARRY]: 8, [MOVE]: 8 },
     { [WORK]: 10, [CARRY]: 10, [MOVE]: 10 },
-    { [WORK]: 16, [CARRY]: 16, [MOVE]: 16 },
-    { [WORK]: 18, [CARRY]: 18, [MOVE]: 18 }
-  ),
-
-  /**
-   * 升级单位
-   * 最大的身体部件只包含 12 个 WORK
-   */
-  upgrader: getBodyConfig(
-    { [WORK]: 1, [CARRY]: 1, [MOVE]: 2 },
-    { [WORK]: 2, [CARRY]: 2, [MOVE]: 4 },
-    { [WORK]: 3, [CARRY]: 3, [MOVE]: 6 },
-    { [WORK]: 5, [CARRY]: 5, [MOVE]: 5 },
-    { [WORK]: 8, [CARRY]: 8, [MOVE]: 8 },
-    { [WORK]: 10, [CARRY]: 10, [MOVE]: 10 },
-    { [WORK]: 16, [CARRY]: 16, [MOVE]: 16 },
-    { [WORK]: 12, [CARRY]: 12, [MOVE]: 12 }
+    { [WORK]: 15, [CARRY]: 15, [MOVE]: 15 },
+    { [WORK]: 15, [CARRY]: 15, [MOVE]: 15 }
   ),
 
   /**
@@ -94,7 +53,7 @@ export const bodyConfigs: BodyConfigs = {
     { [CARRY]: 20, [MOVE]: 10 },
     { [CARRY]: 20, [MOVE]: 10 },
     { [CARRY]: 20, [MOVE]: 10 },
-    { [CARRY]: 30, [MOVE]: 15 }
+    { [CARRY]: 20, [MOVE]: 10 }
   ),
 
   /**
@@ -109,7 +68,7 @@ export const bodyConfigs: BodyConfigs = {
     { [CARRY]: 24, [MOVE]: 12 },
     { [CARRY]: 28, [MOVE]: 14 },
     { [CARRY]: 30, [MOVE]: 15 },
-    { [CARRY]: 30, [MOVE]: 15 }
+    { [CARRY]: 20, [MOVE]: 10 }
   ),
 
   /**

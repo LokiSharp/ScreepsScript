@@ -1,9 +1,10 @@
+import { BASE_ROLE_LIMIT } from "@/modules/room/spawn/constant";
 import { DEFAULT_FLAG_NAME } from "@/setting";
 import { GetName } from "@/modules/room/spawn/nameGetter";
 import RoomSpawnController from "@/modules/room/spawn/index";
+import { WayPoint } from "@/modules/move";
 import log from "@/utils/console/log";
 import { removeCreep } from "@/modules/creep/utils";
-import { WayPoint } from "@/modules/move";
 
 /**
  * creep 发布工具
@@ -55,22 +56,27 @@ export default class RoomCreepReleaseController {
 
     // 单位对应在房间内存中保存的键
     const memoryKey = type === "worker" ? "workerNumber" : "transporterNumber";
-    // 单位对应存在的最少数量
-    const min = type === "worker" ? room.source.length : 1;
-    const max = type === "worker" ? 20 : 5;
+
+    // 获取对应的最大数量和最小数量
+    let { MIN, MAX } =
+      (JSON.parse(this.spawner.room.memory.baseUnitLimit || "{}") as RoomBaseUnitLimit)[type] || BASE_ROLE_LIMIT[type];
+
+    if (room.controller.level >= 8) MIN = MAX = 1;
 
     const oldNumber = room.memory[memoryKey] || 0;
     // 计算真实的调整量，保证最少有 min 人
     let realAdjust: number;
-    // 调整完了人数还够，直接用
-    if (oldNumber + adjust >= min) realAdjust = adjust;
-    else if (oldNumber + adjust > max) realAdjust = 0;
+
+    // 调整完的人数超过限制了，就增加到最大值
+    if (oldNumber + adjust > MAX) realAdjust = MAX - oldNumber;
+    // 调整完了人数在正常区间，直接用
+    else if (oldNumber + adjust >= MIN) realAdjust = adjust;
     // 调整值导致人数不够了，根据最小值调整
-    else realAdjust = oldNumber > min ? oldNumber - min : min - oldNumber;
+    else realAdjust = oldNumber > MIN ? MIN - oldNumber : oldNumber - MIN;
 
     if (realAdjust >= 0) {
       // 添加新的单位
-      for (let i = oldNumber; i < oldNumber + adjust; i++) {
+      for (let i = oldNumber; i < oldNumber + realAdjust; i++) {
         const creepName = GetName[type](room.name, i);
         if (creepName in Game.creeps) continue;
         this.spawner.addTask({
@@ -80,8 +86,8 @@ export default class RoomCreepReleaseController {
         });
       }
     } else {
-      // 从末尾开始减少单位
-      for (let i = oldNumber - 1; i >= oldNumber + adjust; i--) {
+      // 从末尾开始减少单位，减少个数为实际调整值
+      for (let i = oldNumber - 1; i >= oldNumber + realAdjust; i--) {
         removeCreep(GetName[type](room.name, i));
       }
     }
