@@ -1,6 +1,6 @@
+import { addSpawnFillerTask, addSpawnMinerTask } from "./delayTask";
 import { findStrategy, getRoomEnergyTarget } from "@/modules/energyController";
 import { WorkActionGenerator } from "@/modules/room/task/work/taskController";
-import { addSpawnMinerTask } from "./delayTask";
 import { useCache } from "@/utils/global/useCache";
 
 /**
@@ -259,8 +259,16 @@ export const transportActions: {
   /**
    * 刷墙任务
    */
-  fillWall: creep => ({
-    source: () => getEnergy(creep),
+  fillWall: (creep, task, workController) => ({
+    source: () => {
+      if (Game.cpu.bucket < 700 || creep.ticksToLive <= 1) {
+        addSpawnFillerTask(creep.room.name);
+        workController.removeTask(task.key);
+        return true;
+      }
+
+      return getEnergy(creep);
+    },
     target: () => {
       let importantWall = creep.room.importantWall;
       // 先尝试获取焦点墙，有最新的就更新缓存，没有就用缓存中的墙

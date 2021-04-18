@@ -13,6 +13,14 @@ import {
  */
 export default class StorageExtension extends StructureStorage {
   public onWork(): void {
+    if (
+      this.store.getFreeCapacity() < 10000 &&
+      this.room.memory.powers &&
+      this.room.memory.powers.split(" ").includes(String(PWR_OPERATE_STORAGE)) &&
+      !(this.effects && this.effects[PWR_OPERATE_STORAGE] && this.effects[PWR_OPERATE_STORAGE])
+    )
+      this.requirePower();
+
     if (Game.time % 20) return;
 
     if (this.store[RESOURCE_ENERGY] <= FACTORY_ENERGY_LIMIT) {
@@ -25,6 +33,14 @@ export default class StorageExtension extends StructureStorage {
     if (Game.time % 10000) return;
     // 能量太多就提供资源共享
     if (this.store[RESOURCE_ENERGY] >= ENERGY_SHARE_LIMIT) this.room.share.becomeSource(RESOURCE_ENERGY);
+  }
+
+  /**
+   * 请求 power storage
+   */
+  private requirePower(): void {
+    if (this.room.controller.isPowerEnabled) this.room.addPowerTask(PWR_OPERATE_STORAGE);
+    else this.log(`请求 PWR_OPERATE_STORAGE, 但房间并未激活 power`, "yellow");
   }
 
   /**

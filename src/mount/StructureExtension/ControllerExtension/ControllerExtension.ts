@@ -203,14 +203,7 @@ export default class ControllerExtension extends StructureController {
     if (Game.time % 500) return;
 
     this.room.spawner.release.changeBaseUnit("manager", this.room.transport.getExpect());
-    if (this.level === 8)
-      this.room.spawner.release.changeBaseUnit(
-        "worker",
-        this.room.memory.workerNumber >= 3 ? 0 : 3 - this.room.memory.workerNumber
-      );
-    else {
-      this.room.spawner.release.changeBaseUnit("worker", this.room.work.getExpect());
-    }
+    this.room.spawner.release.changeBaseUnit("worker", this.room.work.getExpect());
   }
   /**
    * 重新占领，刷 RCL 用
@@ -284,7 +277,7 @@ delayQueue.addDelayCallback("spawnUpgrader", room => {
     Game.cpu.bucket < 700 ||
     // 能量不足
     room.storage.store[RESOURCE_ENERGY] < UPGRADER_WITH_ENERGY_LEVEL_8 ||
-    room.controller.ticksToDowngrade < 10000
+    room.controller.ticksToDowngrade < 100000
   )
     return delayQueue.addDelayTask("spawnUpgrader", { roomName: room.name }, 10000);
 

@@ -36,7 +36,6 @@ type BodyAutoConfigConstant =
   | "worker"
   | "transporter"
   | "processor"
-  | "upgrader"
   | "reserver"
   | "remoteHarvester"
   | "attacker"
