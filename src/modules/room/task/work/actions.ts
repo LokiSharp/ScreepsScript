@@ -261,7 +261,7 @@ export const transportActions: {
    */
   fillWall: (creep, task, workController) => ({
     source: () => {
-      if (Game.cpu.bucket < 700 || creep.ticksToLive <= 1) {
+      if (creep.room.controller.level >= 8 && (Game.cpu.bucket < 700 || creep.ticksToLive <= 1)) {
         addSpawnFillerTask(creep.room.name);
         workController.removeTask(task.key);
         return true;
