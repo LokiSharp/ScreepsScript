@@ -205,9 +205,9 @@ const actionStrategy: ActionStrategy = {
     source: (creep, source) => {
       if (creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) return true;
 
-      const result = creep.getEngryFrom(source);
+      creep.getEngryFrom(source);
 
-      if (result === ERR_NOT_ENOUGH_RESOURCES) {
+      if (source.energy < source.energyCapacity / 2) {
         // 如果满足下列条件就重新发送 regen_source 任务
         if (
           // creep 允许重新发布任务
