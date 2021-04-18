@@ -2,8 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import CreepExtension from "./CreepExtension";
-import assignPrototype from "utils/global/assignPrototype";
+export { CreepExtension } from "./CreepExtension";
 
 /**
  * 给指定方法包装“站定”功能
@@ -39,5 +38,4 @@ const standWrapper = function (funcNames: string[]) {
  */
 export default function mountCreep(): void {
   standWrapper(["harvest", "build", "dismantle", "repair", "upgradeController"]);
-  assignPrototype(Creep, CreepExtension);
 }

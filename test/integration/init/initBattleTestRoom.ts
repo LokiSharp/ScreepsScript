@@ -1,33 +1,27 @@
-/* eslint-disable no-underscore-dangle */
-/* eslint-disable @typescript-eslint/no-var-requires */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-import { IntegrationTestHelper } from "../helper";
+import { getMyCode } from "@test/integration/utils/moduleUtils";
+import { getServer } from "@test/integration/utils/serverUtils";
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires,@typescript-eslint/no-unsafe-assignment
 const { TerrainMatrix } = require("screeps-server-mockup");
-const { readFileSync } = require("fs");
 
-const DIST_MAIN_JS = "dist/main.js";
-const DIST_MAIN_JS_MAP = "dist/main.js.map.js";
+export async function initBattleTestRoom(): Promise<void> {
+  const roomName = "W1N1";
+  const server = await getServer();
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  const terrain = new TerrainMatrix() as TerrainMatrix;
 
-export async function initBattleTestRoom(helper: IntegrationTestHelper): Promise<void> {
-  const terrain = new TerrainMatrix();
+  await server.world.addRoom(roomName);
+  await server.world.setTerrain(roomName, terrain);
 
-  await helper.server.world.addRoom("W0N0");
-  await helper.server.world.setTerrain("W0N0", terrain);
+  await server.world.addRoom("W0N1");
+  await server.world.setTerrain("W0N1", terrain);
+  await server.world.addRoomObject("W0N1", "controller", 10, 10, { level: 1 });
 
-  await helper.server.world.addRoom("W0N1");
-  await helper.server.world.setTerrain("W0N1", terrain);
-  await helper.server.world.addRoomObject("W0N1", "controller", 10, 10, { level: 1 });
+  await server.world.addRoom("W0N2");
+  await server.world.setTerrain("W0N2", terrain);
+  await server.world.addRoomObject("W0N2", "controller", 10, 10, { level: 1 });
 
-  await helper.server.world.addRoom("W0N2");
-  await helper.server.world.setTerrain("W0N2", terrain);
-  await helper.server.world.addRoomObject("W0N2", "controller", 10, 10, { level: 1 });
-
-  const modules = {
-    main: readFileSync(DIST_MAIN_JS).toString(),
-    "main.js.map": readFileSync(DIST_MAIN_JS_MAP).toString()
-  };
-  helper.user = await helper.server.world.addBot({ username: "tester", room: "W0N1", x: 21, y: 26, modules });
-  helper.target = await helper.server.world.addBot({ username: "target", room: "W0N2", x: 21, y: 26, modules });
+  const modules = await getMyCode();
+  server.users[0] = await server.world.addBot({ username: "tester", room: "W0N1", x: 21, y: 26, modules });
+  server.users[1] = await server.world.addBot({ username: "target", room: "W0N2", x: 21, y: 26, modules });
 }

@@ -1,14 +1,14 @@
-import { Move, WayPoint } from "modules/move";
+import { Move, WayPoint } from "@/modules/move";
 import { PowerTasks } from "./PowerTasks";
-import log from "utils/console/log";
-import { maxOps } from "setting";
+import log from "@/utils/console/log";
+import { maxOps } from "@/setting";
 
 /**
  * PowerCreep 原型拓展
  * 遍历自己的 powers，并执行相应任务
  */
-export default class PowerCreepExtension extends PowerCreep {
-  public work(): void {
+export class PowerCreepExtension extends PowerCreep {
+  public onWork(): void {
     if (!this.keepAlive()) return;
 
     // 获取队列中的第一个任务并执行

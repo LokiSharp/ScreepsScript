@@ -39,9 +39,10 @@ jobs:
 
       - run: npm install
       - run: npm run build
-      - run: npx mocha test/integration/RCLTest/${{ matrix.RCL }}.RCLTest.ts
+      - run: npx cross-env NODE_ENV=mockup jest --runTestsByPath test/RCLTest/${{ matrix.RCL }}.RCLTest.test.ts
 
       - name: Update Server Artifact
+        if: ${{ always() }}
         uses: actions/upload-artifact@v1
         with:
           name: RCLtest-result-${{ matrix.RCL }}
@@ -63,5 +64,5 @@ jobs:
       - name: Update Result Artifact
         uses: actions/upload-artifact@v1
         with:
-          name: RCLresult-${{ matrix.RCL }}
+          name: RCLresult
           path: RCLtest-result

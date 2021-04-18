@@ -1,6 +1,6 @@
-import { battleBase } from "utils/creep/battleBase";
-import { bodyConfigs } from "setting";
-import createBodyGetter from "utils/creep/createBodyGetter";
+import { battleBase } from "@/utils/creep/battleBase";
+import { bodyConfigs } from "@/setting";
+import createBodyGetter from "@/utils/creep/createBodyGetter";
 
 /**
  * 拆除者

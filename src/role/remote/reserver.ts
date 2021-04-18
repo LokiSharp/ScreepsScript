@@ -1,5 +1,5 @@
-import { bodyConfigs } from "setting";
-import createBodyGetter from "utils/creep/createBodyGetter";
+import { bodyConfigs } from "@/setting";
+import createBodyGetter from "@/utils/creep/createBodyGetter";
 
 /**
  * 预定者
@@ -22,11 +22,7 @@ export const reserver: CreepConfig<"reserver"> = {
   },
   // 一直进行预定
   target: creep => {
-    const { targetRoomName, spawnRoom } = creep.memory.data;
-    const targetRoom = Game.rooms[targetRoomName];
-    if (!(`${targetRoomName} source0` in Game.flags)) {
-      Game.rooms[spawnRoom].addRemoteHarvester(targetRoomName);
-    }
+    const targetRoom = Game.rooms[creep.memory.data.targetRoomName];
     if (!targetRoom) return false;
     const controller = targetRoom.controller;
     if (!controller) return false;

@@ -5,14 +5,14 @@ import {
   factoryBlacklist,
   factoryEnergyLimit,
   factoryTopTargets
-} from "setting";
-import { setRoomStats } from "modules/stateCollector";
+} from "@/setting";
+import { setRoomStats } from "@/modules/stats";
 
 /**
  * Factory 原型拓展
  */
 export default class FactoryExtension extends StructureFactory {
-  public work(): void {
+  public onWork(): void {
     // 没有启用或者暂停了则跳过
     if (!this.room.memory.factory || this.room.memory.factory.pause) return;
     // 检查工厂是否在休眠
@@ -106,7 +106,7 @@ export default class FactoryExtension extends StructureFactory {
           ) {
             const requestAmount = subResAmount - this.room.terminal.store[resType];
             // 请求其他房间共享
-            this.room.shareRequest(resType as CommodityConstant, requestAmount);
+            this.room.share.request(resType as CommodityConstant, requestAmount);
 
             // 如果这时候只有这一个任务了，就进入待机状态
             if (this.room.memory.factory.taskList.length <= 1) this.gotoBed(50, `等待共享 ${resType}*${requestAmount}`);
@@ -169,7 +169,7 @@ export default class FactoryExtension extends StructureFactory {
    * 获取资源
    */
   private getResource(): void {
-    if (this.room.hasCenterTask(STRUCTURE_FACTORY)) return;
+    if (this.room.centerTransport.hasTask(STRUCTURE_FACTORY)) return;
 
     const task = this.getCurrentTask();
     // 一般到这一步是不会产生没有任务的问题
@@ -204,7 +204,7 @@ export default class FactoryExtension extends StructureFactory {
           }
 
           // 发布中央物流任务
-          this.room.addCenterTask({
+          this.room.centerTransport.addTask({
             submit: STRUCTURE_FACTORY,
             target: STRUCTURE_FACTORY,
             source,
@@ -280,7 +280,7 @@ export default class FactoryExtension extends StructureFactory {
    * 移出资源
    */
   private putResource(): void {
-    if (this.room.hasCenterTask(STRUCTURE_FACTORY)) return;
+    if (this.room.centerTransport.hasTask(STRUCTURE_FACTORY)) return;
 
     const task = this.getCurrentTask();
     // 一般到这一步是不会产生没有任务的问题
@@ -298,7 +298,7 @@ export default class FactoryExtension extends StructureFactory {
 
         // 资源不足，发布任务
         const target = resType === RESOURCE_ENERGY ? STRUCTURE_STORAGE : STRUCTURE_TERMINAL;
-        this.room.addCenterTask({
+        this.room.centerTransport.addTask({
           submit: STRUCTURE_FACTORY,
           target,
           source: STRUCTURE_FACTORY,
@@ -534,8 +534,8 @@ export default class FactoryExtension extends StructureFactory {
     depositTypes = depositTypes || [];
     depositTypes.forEach(type => {
       factoryTopTargets[type][level].forEach(resType => {
-        if (action === "register") this.room.shareAddSource(resType);
-        else this.room.shareRemoveSource(resType);
+        if (action === "register") this.room.share.becomeSource(resType);
+        else this.room.share.leaveSource(resType);
       });
     });
   }

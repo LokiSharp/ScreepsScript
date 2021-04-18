@@ -1,9 +1,23 @@
+import calcBodyPart from "@/utils/creep/calcBodyPart";
 import getBodyConfig from "../utils/creep/getBodyConfig";
 
 // 每个房间最多同时存在多少单位
 export const MAX_UPGRADER_NUM = 24;
 export const MAX_HARVESTER_NUM = 4;
 export const TRANSFER_DEATH_LIMIT = 20;
+
+/**
+ * terminal 中能量和对应发布的 upgrader 数量
+ * upgrader 自动发布时会优先使用 terminal 中的能量，不满足下表 [0] 的能量标准时才会去使用 storage 里的能量
+ * 请确保最少有一条内容
+ */
+export const UPGRADE_WITH_TERMINAL = [
+  { energy: 60000, num: 6 },
+  { energy: 50000, num: 5 },
+  { energy: 40000, num: 4 },
+  { energy: 30000, num: 3 },
+  { energy: 20000, num: 2 }
+];
 
 /**
  * storage 中的能量和对应发布的 upgrader 数量
@@ -15,6 +29,12 @@ export const UPGRADE_WITH_STORAGE = [
   { energy: 300000, num: 5 },
   { energy: 100000, num: 3 }
 ];
+
+/**
+ * 8级时只要 cpu 足够，依旧会孵化一个 upgrader 进行升级
+ * 这个限制代表了在房间 8 级时 storage 里的能量大于多少才会持续孵化 upgarder
+ */
+export const UPGRADER_WITH_ENERGY_LEVEL_8 = 700000;
 
 export const bodyConfigs: BodyConfigs = {
   /**
@@ -205,3 +225,30 @@ export const creepDefaultMemory: CreepMemory = {
 
 // 用于维持房间能量正常运转的重要角色
 export const importantRoles: CreepRoleConstant[] = ["harvester", "manager", "processor"];
+
+/**
+ * 特殊的身体部件类型及其对应的身体部件数组
+ */
+export const specialBodyConfig: { [type in SepicalBodyType]: BodyPartGenerator } = {
+  /**
+   * RCL7 时的升级单位身体部件，由于是从 link 中取能量所以 CARRY 较少
+   */
+  upgrade7: () => calcBodyPart({ [WORK]: 30, [CARRY]: 5, [MOVE]: 15 }),
+  /**
+   * RCL8 时的升级单位身体部件，升级受限，所以 WORK 是 15 个
+   */
+  upgrade8: () => calcBodyPart({ [WORK]: 15, [CARRY]: 6, [MOVE]: 12 })
+};
+
+/**
+ * source 采集单位的行为模式
+ */
+export const HARVEST_MODE: {
+  START: HarvestModeStart;
+  SIMPLE: HarvestModeSimple;
+  TRANSPORT: HarvestModeTransport;
+} = {
+  START: 1,
+  SIMPLE: 2,
+  TRANSPORT: 3
+};

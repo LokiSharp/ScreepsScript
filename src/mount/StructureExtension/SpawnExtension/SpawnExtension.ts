@@ -1,5 +1,5 @@
-import { creepDefaultMemory, importantRoles } from "setting";
-import creepWorks from "role";
+import { creepDefaultMemory, importantRoles } from "@/setting";
+import creepWorks from "@/role";
 
 /**
  * Spawn 原型拓展
@@ -8,7 +8,7 @@ export default class SpawnExtension extends StructureSpawn {
   /**
    * spawn 主要工作
    */
-  public work(): void {
+  public onWork(): void {
     if (this.spawning) {
       /**
        * 如果孵化已经开始了，就向物流队列推送任务
@@ -19,7 +19,8 @@ export default class SpawnExtension extends StructureSpawn {
        * mySpawnCreep 返回 OK > 推送填充任务 > creep 执行任务 > 发现能量都是满的 > **移除任务** > tick 末期开始孵化 > extension 扣除能量
        */
       if (this.spawning.needTime - this.spawning.remainingTime === 1) {
-        this.room.transport.addTask({ type: "fillExtension", priority: 10 });
+        if (!this.room.transport.hasTask("fillExtension"))
+          this.room.transport.addTask({ type: "fillExtension", priority: 10 });
 
         if (
           // 非战争状态下直接发布 power 填 extension 任务
@@ -32,17 +33,39 @@ export default class SpawnExtension extends StructureSpawn {
       return;
     }
     if (!this.room.memory.spawnList) this.room.memory.spawnList = [];
+
     // 生成中 / 生产队列为空 就啥都不干
     if (this.spawning || this.room.memory.spawnList.length === 0) return;
 
-    const task = this.room.memory.spawnList[0];
-    // 进行生成
-    const spawnResult: MySpawnReturnCode = this.mySpawnCreep(task);
+    let index = -1;
 
+    importantRoles.some(role => {
+      index = this.findCreepWithRole(role);
+      return index !== -1;
+    });
+
+    const creepName = index === -1 ? this.room.memory.spawnList[0] : this.room.memory.spawnList[index];
+    // 进行生成
+    const spawnResult: MySpawnReturnCode = this.mySpawnCreep(creepName);
+
+    if (spawnResult === OK && this.room.memory.spawnList.length > 3) {
+      // 如果满足下列条件就重新发送 regen_source 任务
+      if (
+        // spawn 上没有效果
+        !this.effects ||
+        !this.effects[PWR_OPERATE_SPAWN]
+      ) {
+        // 并且房间内的 pc 支持这个任务
+        if (this.room.memory.powers && this.room.memory.powers.split(" ").includes(String(PWR_OPERATE_SPAWN))) {
+          // 添加 power 任务，设置重新尝试时间
+          this.room.addPowerTask(PWR_OPERATE_SPAWN);
+        }
+      }
+    }
     // 生成成功后移除任务
-    if (spawnResult === OK) this.room.memory.spawnList.shift();
+    if (spawnResult === OK) this.room.memory.spawnList.splice(index === -1 ? 0 : index, 1);
     // 能量不足就挂起任务，但是如果是重要角色的话就会卡住然后优先孵化
-    else if (spawnResult === ERR_NOT_ENOUGH_ENERGY && !importantRoles.includes(Memory.creepConfigs[task].role))
+    else if (spawnResult === ERR_NOT_ENOUGH_ENERGY && !importantRoles.includes(Memory.creepConfigs[creepName].role))
       this.room.hangSpawnTask();
   }
 
@@ -84,5 +107,16 @@ export default class SpawnExtension extends StructureSpawn {
       // this.log(`生成失败, ${creepConfig.spawnRoom} 任务 ${configName} 挂起, 错误码 ${spawnResult}`, 'red')
       return spawnResult;
     }
+  }
+
+  /**
+   * 查找某种类型的 creep
+   *
+   * @returns 存在则返回索引，不存在返回 -1
+   */
+  public findCreepWithRole(creepRole: CreepRoleConstant): number {
+    return this.room.memory.spawnList.findIndex(creepName =>
+      Memory.creepConfigs[creepName] ? Memory.creepConfigs[creepName].role === creepRole : false
+    );
   }
 }

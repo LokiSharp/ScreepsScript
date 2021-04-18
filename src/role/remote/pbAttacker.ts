@@ -1,6 +1,6 @@
-import { PB_HARVEST_STATE } from "setting";
-import calcBodyPart from "utils/creep/calcBodyPart";
-import { removeSelfGroup } from "utils/creep/removeSelfGroup";
+import { PB_HARVEST_STATE } from "@/setting";
+import calcBodyPart from "@/utils/creep/calcBodyPart";
+import { removeSelfGroup } from "@/utils/creep/removeSelfGroup";
 
 /**
  * PowerBank 攻击单位
@@ -115,7 +115,7 @@ export const pbAttacker: CreepConfig<"pbAttacker"> = {
         }
 
         // 下面这个 1600 是 [ CARRY: 32, MOVE: 16 ] 的 pbCarrier 的最大运输量
-        spawnRoom.spawnPbCarrierGroup(sourceFlagName, Math.ceil(powerbank.power / 1600));
+        spawnRoom.release.pbCarrierGroup(sourceFlagName, Math.ceil(powerbank.power / 1600));
 
         // 设置为新状态
         targetFlag.memory.state = PB_HARVEST_STATE.PREPARE;

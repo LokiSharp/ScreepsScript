@@ -1,32 +1,44 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { expect } from "chai";
-import { helper } from "../helper";
+import { getServer } from "./serverUtils";
 import { initRCLTestRoom } from "../init/initRCLTestRoom";
-import { printDebugInfo } from "./printDebugInfo";
 
-export async function runRCLTest(RCL: number, _RCL: number, tickNum: number): Promise<void> {
-  await initRCLTestRoom(helper, RCL);
-
+export async function runRCLTest(RCL: number, tickNum: number): Promise<void> {
+  const roomName = "W1N1";
+  await initRCLTestRoom();
+  const server = await getServer();
+  const { db } = server.common.storage;
+  const C = server.constants;
+  const user = server.users[0];
   for (let gameTime = 1; gameTime <= tickNum; gameTime += 1) {
-    await helper.server.tick();
+    await server.tick();
+    const memory: Memory = JSON.parse(await user.memory) as Memory;
     if (gameTime % 100) continue;
-    const memory: Memory = JSON.parse(await helper.user.memory);
-    printDebugInfo(memory, gameTime);
 
-    const controllerLevel = memory.stats.rooms.W0N0.controllerLevel;
-    if (controllerLevel !== undefined && controllerLevel >= _RCL) {
-      console.log(`RCL${RCL} -> RCL${_RCL} ${gameTime} tick`);
-      break;
+    const controllerLevel = memory.stats.rooms[roomName].controllerLevel;
+    const controllerRatio = memory.stats.rooms[roomName].controllerRatio;
+    if (controllerLevel) {
+      if (controllerLevel >= RCL) {
+        console.log(`-> RCL${RCL} ${gameTime} tick`);
+        break;
+      } else {
+        const rclProgressPercent = 98;
+        if (controllerRatio < rclProgressPercent) {
+          console.log(`-> RCL${controllerLevel}`);
+          await db["rooms.objects"].update(
+            { room: roomName, type: "controller" },
+            {
+              $set: {
+                progress: (C.CONTROLLER_LEVELS[controllerLevel] / 100) * rclProgressPercent
+              }
+            }
+          );
+        }
+      }
     }
 
-    const { db } = helper.server.common.storage;
-    await db["rooms.objects"].update({ room: "W0N0", type: "constructionSite" }, { $set: { progress: 99999 } });
-    await db["rooms.objects"].update({ room: "W0N0", type: "rampart" }, { $set: { hits: 3000000 } });
-    await db["rooms.objects"].update({ room: "W0N0", type: "storage" }, { $set: { store: { energy: 950000 } } });
+    await db["rooms.objects"].update({ room: roomName, type: "constructionSite" }, { $set: { progress: 99999 } });
+    await db["rooms.objects"].update({ room: roomName, type: "rampart" }, { $set: { hits: 3000000 } });
 
-    _.each(await helper.user.newNotifications, ({ message }) => console.log("[notification]", message));
+    _.each(await user.newNotifications, ({ message }) => console.log("[notification]", message));
   }
-  expect((JSON.parse(await helper.user.memory) as Memory).stats.rooms.W0N0.controllerLevel).to.equal(_RCL);
+  expect((JSON.parse(await user.memory) as Memory).stats.rooms[roomName].controllerLevel).toEqual(RCL);
 }

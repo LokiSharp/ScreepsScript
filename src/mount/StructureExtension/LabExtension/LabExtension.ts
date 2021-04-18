@@ -5,7 +5,7 @@ import {
   boostResourceReloadLimit,
   labTarget,
   reactionSource
-} from "setting";
+} from "@/setting";
 
 /**
  * Lab 原型拓展
@@ -16,7 +16,7 @@ import {
  * 在战争状态结束后后自动清理 lab 中残留的强化材料并重新恢复化合物合成
  */
 export default class LabExtension extends StructureLab {
-  public work(): void {
+  public onWork(): void {
     // 房间没有初始化 lab 集群则检查下有没有 boost 后退出
     if (!this.room.memory.lab) {
       if (this.room.memory.boost && !this.room.hasRunLab) {
@@ -117,7 +117,7 @@ export default class LabExtension extends StructureLab {
     }
     // 否则就发布任务
     else if (!this.room.transport.hasTask("boostGetResource")) {
-      this.room.transport.addTask({ type: "boostGetResource" });
+      this.room.transport.addTask({ type: "boostGetResource", priority: 15 });
     }
   }
 
@@ -145,7 +145,7 @@ export default class LabExtension extends StructureLab {
         !this.room.transport.hasTask("boostGetEnergy")
       ) {
         // 有 lab 能量不满的话就发布任务
-        this.room.transport.addTask({ type: "boostGetEnergy" });
+        this.room.transport.addTask({ type: "boostGetEnergy", priority: 10 });
         return;
       }
     }
@@ -169,7 +169,7 @@ export default class LabExtension extends StructureLab {
       // mineralType 不为空就说明还有资源没拿出来
       if (lab && lab.mineralType && !this.room.transport.hasTask("boostClear")) {
         // 发布任务
-        this.room.transport.addTask({ type: "boostClear" });
+        this.room.transport.addTask({ type: "boostClear", priority: 5 });
         return;
       }
     }
@@ -385,12 +385,12 @@ export default class LabExtension extends StructureLab {
       }));
 
       // 发布任务
-      this.room.transport.addTask({ type, resource });
+      this.room.transport.addTask({ type, resource, priority: 5 });
       return true;
     }
     // 产物移出任务
     else if (type === "labOut") {
-      this.room.transport.addTask({ type });
+      this.room.transport.addTask({ type, priority: 5 });
       return true;
     } else return false;
   }

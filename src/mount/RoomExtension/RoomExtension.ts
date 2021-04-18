@@ -1,10 +1,9 @@
-import { BOOST_RESOURCE, ENERGY_SHARE_LIMIT, boostEnergyReloadLimit, boostResourceReloadLimit } from "../../setting";
-import { confirmBasePos, findBaseCenterPos, setBaseCenter } from "../../modules/autoPlanning/planBasePos";
-import { manageStructure, releaseCreep } from "../../modules/autoPlanning";
-import createRoomLink from "../../utils/console/createRoomLink";
-import { creepApi } from "../../modules/creepController/creepApi";
-import log from "../../utils/console/log";
-import { updateStructure } from "../../modules/shortcut/updateStructure";
+import { BOOST_RESOURCE, boostEnergyReloadLimit, boostResourceReloadLimit } from "@/setting";
+import { confirmBasePos, findBaseCenterPos, setBaseCenter } from "@/modules/autoPlanning/planBasePos";
+import createRoomLink from "@/utils/console/createRoomLink";
+import { creepApi } from "@/modules/creepController/creepApi";
+import log from "@/utils/console/log";
+import { manageStructure } from "@/modules/autoPlanning";
 
 export default class RoomExtension extends Room {
   /**
@@ -24,26 +23,85 @@ export default class RoomExtension extends Room {
   }
 
   /**
-   * 为本房间添加新的 source container
-   * 会触发 creep 发布
+   * 向房间中发布 power 请求任务
+   * 该方法已集成了 isPowerEnabled 判定，调用该方法之前无需额外添加房间是否启用 power 的逻辑
    *
-   * @param container 要登记的 container
+   * @param task 要添加的 power 任务
+   * @param priority 任务优先级位置，默认追加到队列末尾。例：该值为 0 时将无视队列长度直接将任务插入到第一个位置
+   * @returns OK 添加成功
+   * @returns ERR_NAME_EXISTS 已经有同名任务存在了
+   * @returns ERR_INVALID_TARGET 房间控制器未启用 power
    */
-  public registerContainer(container: StructureContainer): OK {
-    // 把 container 添加到房间基础服务
-    if (!this.memory.sourceContainersIds) this.memory.sourceContainersIds = [];
-    // 去重，防止推入了多个相同的 container，同时筛掉已经过期的 id
-    this.memory.sourceContainersIds = _.uniq([...this.memory.sourceContainersIds, container.id]).filter(containerId =>
-      Game.getObjectById(containerId)
-    );
-    // 更新建筑缓存
-    updateStructure(this.name, STRUCTURE_CONTAINER, container.id);
+  public addPowerTask(task: PowerConstant, priority: number = null): OK | ERR_NAME_EXISTS | ERR_INVALID_TARGET {
+    // 初始化时添加房间初始化任务（编号 -1）
+    if (!this.memory.powerTasks) this.memory.powerTasks = [-1 as PowerConstant];
+    if (!this.controller.isPowerEnabled) return ERR_INVALID_TARGET;
 
-    // 触发对应的 creep 发布规划
-    this.releaseCreep("manager", this.memory.sourceContainersIds.length * 3);
-    this.releaseCreep("upgrader");
+    // 有相同的就拒绝添加
+    if (this.hasPowerTask(task)) return ERR_NAME_EXISTS;
+
+    // 发布任务到队列
+    if (!priority) this.memory.powerTasks.push(task);
+    // 追加到队列指定位置
+    else this.memory.powerTasks.splice(priority, 0, task);
 
     return OK;
+  }
+
+  /**
+   * 检查是否已经存在指定任务
+   *
+   * @param task 要检查的 power 任务
+   */
+  private hasPowerTask(task: PowerConstant): boolean {
+    return !!this.memory.powerTasks.find(power => power === task);
+  }
+
+  /**
+   * 获取当前的 power 任务
+   */
+  public getPowerTask(): PowerConstant | undefined {
+    if (!this.memory.powerTasks || this.memory.powerTasks.length <= 0) return undefined;
+    else return this.memory.powerTasks[0];
+  }
+
+  /**
+   * 挂起当前任务
+   * 将会把最前面的 power 任务移动到队列末尾
+   */
+  public hangPowerTask(): void {
+    const task = this.memory.powerTasks.shift();
+    this.memory.powerTasks.push(task);
+  }
+
+  /**
+   * 移除第一个 power 任务
+   */
+  public deleteCurrentPowerTask(): void {
+    this.memory.powerTasks.shift();
+  }
+
+  /**
+   * 将指定位置序列化为字符串
+   * 形如: 12/32/E1N2
+   *
+   * @param pos 要进行压缩的位置
+   */
+  public serializePos(pos: RoomPosition): string {
+    return `${pos.x}/${pos.y}/${pos.roomName}`;
+  }
+
+  /**
+   * 将位置序列化字符串转换为位置
+   * 位置序列化字符串形如: 12/32/E1N2
+   *
+   * @param posStr 要进行转换的字符串
+   */
+  public unserializePos(posStr: string): RoomPosition | undefined {
+    // 形如 ["12", "32", "E1N2"]
+    const infos = posStr.split("/");
+
+    return infos.length === 3 ? new RoomPosition(Number(infos[0]), Number(infos[1]), infos[2]) : undefined;
   }
 
   /**
@@ -93,241 +151,42 @@ export default class RoomExtension extends Room {
   }
 
   /**
-   * 给本房间发布或重新规划指定的 creep 角色
-   * @param role 要发布的 creep 角色
-   * @param releaseNumber 孵化几个 creep
+   * 危险操作：执行本 api 将会直接将本房间彻底移除
    */
-  public releaseCreep(role: CreepRoleConstant, releaseNumber = 1): ScreepsReturnCode {
-    return releaseCreep(this, role, releaseNumber);
-  }
+  public dangerousRemove(): string {
+    // 移除建筑
+    this.find(FIND_STRUCTURES).forEach(s => {
+      if (
+        s.structureType === STRUCTURE_STORAGE ||
+        s.structureType === STRUCTURE_TERMINAL ||
+        s.structureType === STRUCTURE_WALL ||
+        s.structureType === STRUCTURE_RAMPART
+      )
+        return;
 
-  /**
-   * 将指定位置序列化为字符串
-   * 形如: 12/32/E1N2
-   *
-   * @param pos 要进行压缩的位置
-   */
-  public serializePos(pos: RoomPosition): string {
-    return `${pos.x}/${pos.y}/${pos.roomName}`;
-  }
-
-  /**
-   * 添加任务
-   *
-   * @param task 要提交的任务
-   * @param priority 任务优先级位置，默认追加到队列末尾。例：该值为 0 时将无视队列长度直接将任务插入到第一个位置
-   * @returns 任务的排队位置, 0 是最前面，负数为添加失败，-1 为已有同种任务,-2 为目标建筑无法容纳任务数量
-   */
-  public addCenterTask(task: ITransferTask, priority: number = null): number {
-    if (this.hasCenterTask(task.submit)) return -1;
-    // 由于这里的目标建筑限制型和非限制型存储都有，这里一律作为非限制性检查来减少代码量
-    if ((this[task.target]?.store as StoreDefinitionUnlimited)?.getFreeCapacity(task.resourceType) < task.amount)
-      return -2;
-
-    if (!priority) this.memory.centerTransferTasks.push(task);
-    else this.memory.centerTransferTasks.splice(priority, 0, task);
-
-    return this.memory.centerTransferTasks.length - 1;
-  }
-
-  /**
-   * 每个建筑同时只能提交一个任务
-   *
-   * @param submit 提交者的身份
-   * @returns 是否有该任务
-   */
-  public hasCenterTask(submit: CenterStructures | number): boolean {
-    if (!this.memory.centerTransferTasks) this.memory.centerTransferTasks = [];
-
-    const task = this.memory.centerTransferTasks.find(_task => _task.submit === submit);
-    return !!task;
-  }
-
-  /**
-   * 暂时挂起当前任务
-   * 会将任务放置在队列末尾
-   *
-   * @returns 任务的排队位置, 0 是最前面
-   */
-  public hangCenterTask(): number {
-    const task = this.memory.centerTransferTasks.shift();
-    this.memory.centerTransferTasks.push(task);
-
-    return this.memory.centerTransferTasks.length - 1;
-  }
-
-  /**
-   * 获取中央队列中第一个任务信息
-   *
-   * @returns 有任务返回任务, 没有返回 null
-   */
-  public getCenterTask(): ITransferTask | null {
-    if (!this.memory.centerTransferTasks) this.memory.centerTransferTasks = [];
-
-    if (this.memory.centerTransferTasks.length <= 0) {
-      return null;
-    } else {
-      return this.memory.centerTransferTasks[0];
-    }
-  }
-
-  /**
-   * 处理任务
-   *
-   * @param transferAmount 本次转移的数量
-   */
-  public handleCenterTask(transferAmount: number): void {
-    this.memory.centerTransferTasks[0].amount -= transferAmount;
-    if (this.memory.centerTransferTasks[0].amount <= 0) {
-      this.deleteCurrentCenterTask();
-    }
-  }
-
-  /**
-   * 移除当前中央运输任务
-   */
-  public deleteCurrentCenterTask(): void {
-    this.memory.centerTransferTasks.shift();
-  }
-
-  /**
-   * 将位置序列化字符串转换为位置
-   * 位置序列化字符串形如: 12/32/E1N2
-   *
-   * @param posStr 要进行转换的字符串
-   */
-  public unserializePos(posStr: string): RoomPosition | undefined {
-    // 形如 ["12", "32", "E1N2"]
-    const infos = posStr.split("/");
-
-    return infos.length === 3 ? new RoomPosition(Number(infos[0]), Number(infos[1]), infos[2]) : undefined;
-  }
-
-  /**
-   * 拓展新的外矿
-   *
-   * @param remoteRoomName 要拓展的外矿房间名
-   * @returns ERR_INVALID_TARGET targetId 找不到对应的建筑
-   * @returns ERR_NOT_FOUND 没有找到足够的 source 旗帜
-   */
-  public addRemote(remoteRoomName: string): OK | ERR_INVALID_TARGET | ERR_NOT_FOUND {
-    if (!this.memory.remote) this.memory.remote = {};
-
-    // 添加对应的键值对
-    this.memory.remote[remoteRoomName] = { targetId: this.storage.id };
-
-    this.addRemoteCreepGroup(remoteRoomName);
-    return OK;
-  }
-
-  /**
-   * 移除外矿
-   *
-   * @param remoteRoomName 要移除的外矿
-   * @param removeFlag 是否移除外矿的 source 旗帜
-   */
-  public removeRemote(remoteRoomName: string, removeFlag = false): OK | ERR_NOT_FOUND {
-    // 兜底
-    if (!this.memory.remote) return ERR_NOT_FOUND;
-    if (!(remoteRoomName in this.memory.remote)) return ERR_NOT_FOUND;
-
-    delete this.memory.remote[remoteRoomName];
-    if (Object.keys(this.memory.remote).length <= 0) delete this.memory.remote;
-
-    const sourceFlagsName = [`${remoteRoomName} source0`, `${remoteRoomName} source1`];
-    // 移除对应的旗帜和外矿采集单位
-    sourceFlagsName.forEach((flagName, index) => {
-      if (!(flagName in Game.flags)) return;
-
-      if (removeFlag) Game.flags[flagName].remove();
-      creepApi.remove(`${remoteRoomName} remoteHarvester${index}`);
+      s.destroy();
     });
 
-    // 移除预定者
-    creepApi.remove(`${remoteRoomName} reserver`);
+    // 移除 creep config
+    creepApi.batchRemove(this.name);
 
-    return OK;
-  }
+    // 移除 creep
+    for (const name in Game.creeps) {
+      const creep = Game.creeps[name];
+      if (creep.name.includes(this.name)) {
+        creep.suicide();
+        delete creep.memory;
+      }
+    }
 
-  /**
-   * 向其他房间请求资源共享
-   *
-   * @param resourceType 请求的资源类型
-   * @param amount 请求的数量
-   */
-  public shareRequest(resourceType: ResourceConstant, amount: number): boolean {
-    const targetRoom = this.shareGetSource(resourceType);
-    if (!targetRoom) return false;
+    // 移除内存
+    delete this.memory;
+    delete Memory.stats.rooms[this.name];
 
-    return targetRoom.shareAdd(this.name, resourceType, amount);
-  }
+    // 放弃房间
+    this.controller.unclaim();
 
-  /**
-   * 将本房间添加至资源来源表中
-   *
-   * @param resourceType 添加到的资源类型
-   */
-  public shareAddSource(resourceType: ResourceConstant): boolean {
-    if (!(resourceType in Memory.resourceSourceMap)) Memory.resourceSourceMap[resourceType] = [];
-
-    const alreadyRegister = Memory.resourceSourceMap[resourceType].find(name => name === this.name);
-    // 如果已经被添加过了就返回 false
-    if (alreadyRegister) return false;
-
-    Memory.resourceSourceMap[resourceType].push(this.name);
-    return true;
-  }
-
-  /**
-   * 从资源来源表中移除本房间房间
-   *
-   * @param resourceType 从哪种资源类型中移除
-   */
-  public shareRemoveSource(resourceType: ResourceConstant): void {
-    // 没有该资源就直接停止
-    if (!(resourceType in Memory.resourceSourceMap)) return;
-
-    // 获取该房间在资源来源表中的索引
-    _.pull(Memory.resourceSourceMap[resourceType], this.name);
-    // 列表为空了就直接移除
-    if (Memory.resourceSourceMap[resourceType].length <= 0) delete Memory.resourceSourceMap[resourceType];
-  }
-
-  /**
-   * 向本房间添加资源共享任务
-   *
-   * @param targetRoom 资源发送到的房间
-   * @param resourceType 共享资源类型
-   * @param amount 共享资源数量
-   * @returns 是否成功添加
-   */
-  public shareAdd(targetRoom: string, resourceType: ResourceConstant, amount: number): boolean {
-    if (this.memory.shareTask || !this.terminal) return false;
-    // 如果是能量的话就把来源建筑设为 storage，这里做了个兜底，如果 storage 没了就检查 terminal 里的能量
-    const sourceStructure = resourceType === RESOURCE_ENERGY ? this.storage || this.terminal : this.terminal;
-    // 终端能发送的最大数量（路费以最大发送量计算）
-    const freeSpace =
-      this.terminal.store.getFreeCapacity() - Game.market.calcTransactionCost(amount, this.name, targetRoom);
-    // 期望发送量、当前存量、能发送的最大数量中找最小的
-    const sendAmount = Math.min(amount, sourceStructure.store[resourceType], freeSpace);
-
-    this.memory.shareTask = {
-      target: targetRoom,
-      resourceType,
-      amount: sendAmount
-    };
-    return true;
-  }
-
-  /**
-   * 执行自动建筑规划
-   */
-  public planLayout(): string {
-    const result = manageStructure(this);
-
-    if (result === OK) return `自动规划完成`;
-    else if (result === ERR_NOT_OWNER) return `自动规划失败，房间没有控制权限`;
-    else return `未找到基地中心点位，请执行 Game.rooms.${this.name}.setcenter 以启用自动规划`;
+    return this.name + " 房间已移除";
   }
 
   /**
@@ -372,25 +231,14 @@ export default class RoomExtension extends Room {
   }
 
   /**
-   * 占领新房间
-   * 本方法只会发布占领单位，等到占领成功后 claimer 会自己发布支援单位
-   *
-   * @param targetRoomName 要占领的目标房间
-   * @param signText 新房间的签名
+   * 执行自动建筑规划
    */
-  public claimRoom(targetRoomName: string, signText = ""): OK {
-    creepApi.add(
-      `${targetRoomName} Claimer`,
-      "claimer",
-      {
-        targetRoomName,
-        spawnRoom: this.name,
-        signText
-      },
-      this.name
-    );
+  public planLayout(): string {
+    const result = manageStructure(this);
 
-    return OK;
+    if (result === OK) return `自动规划完成`;
+    else if (result === ERR_NOT_OWNER) return `自动规划失败，房间没有控制权限`;
+    else return `未找到基地中心点位，请执行 Game.rooms.${this.name}.setcenter 以启用自动规划`;
   }
 
   /**
@@ -428,10 +276,11 @@ export default class RoomExtension extends Room {
     for (const resourceType in this.memory.boost.lab) {
       const lab = Game.getObjectById(this.memory.boost.lab[resourceType]);
       if (lab?.store[RESOURCE_ENERGY] <= boostEnergyReloadLimit) {
-        this.transport.addTask({ type: "boostGetEnergy" });
+        if (!this.transport.hasTask("boostGetEnergy")) this.transport.addTask({ type: "boostGetEnergy", priority: 10 });
         return ERR_BUSY;
       } else if (lab?.store[resourceType] <= boostResourceReloadLimit) {
-        this.transport.addTask({ type: "boostGetResource" });
+        if (!this.transport.hasTask("boostGetResource"))
+          this.transport.addTask({ type: "boostGetResource", priority: 15 });
         return ERR_BUSY;
       }
       // 这里没有直接终止进程是为了避免 lab 集群已经部分被摧毁而导致整个 boost 进程无法执行
@@ -466,92 +315,71 @@ export default class RoomExtension extends Room {
   }
 
   /**
-   * 危险操作：执行本 api 将会直接将本房间彻底移除
-   */
-  public dangerousRemove(): string {
-    // 移除建筑
-    this.find(FIND_STRUCTURES).forEach(s => {
-      if (
-        s.structureType === STRUCTURE_STORAGE ||
-        s.structureType === STRUCTURE_TERMINAL ||
-        s.structureType === STRUCTURE_WALL ||
-        s.structureType === STRUCTURE_RAMPART
-      )
-        return;
-
-      s.destroy();
-    });
-
-    // 移除 creep config
-    creepApi.batchRemove(this.name);
-
-    // 移除 creep
-    for (const name in Game.creeps) {
-      const creep = Game.creeps[name];
-      if (creep.name.includes(this.name)) {
-        creep.suicide();
-        delete creep.memory;
-      }
-    }
-
-    // 移除内存
-    delete this.memory;
-    delete Memory.stats.rooms[this.name];
-
-    // 放弃房间
-    this.controller.unclaim();
-
-    return this.name + " 房间已移除";
-  }
-
-  /**
-   * 向房间中发布 power 请求任务
-   * 该方法已集成了 isPowerEnabled 判定，调用该方法之前无需额外添加房间是否启用 power 的逻辑
+   * 占领新房间
+   * 本方法只会发布占领单位，等到占领成功后 claimer 会自己发布支援单位
    *
-   * @param task 要添加的 power 任务
-   * @param priority 任务优先级位置，默认追加到队列末尾。例：该值为 0 时将无视队列长度直接将任务插入到第一个位置
-   * @returns OK 添加成功
-   * @returns ERR_NAME_EXISTS 已经有同名任务存在了
-   * @returns ERR_INVALID_TARGET 房间控制器未启用 power
+   * @param targetRoomName 要占领的目标房间
+   * @param signText 新房间的签名
    */
-  public addPowerTask(task: PowerConstant, priority: number = null): OK | ERR_NAME_EXISTS | ERR_INVALID_TARGET {
-    // 初始化时添加房间初始化任务（编号 -1）
-    if (!this.memory.powerTasks) this.memory.powerTasks = [-1 as PowerConstant];
-    if (!this.controller.isPowerEnabled) return ERR_INVALID_TARGET;
-
-    // 有相同的就拒绝添加
-    if (this.hasPowerTask(task)) return ERR_NAME_EXISTS;
-
-    // 发布任务到队列
-    if (!priority) this.memory.powerTasks.push(task);
-    // 追加到队列指定位置
-    else this.memory.powerTasks.splice(priority, 0, task);
+  public claimRoom(targetRoomName: string, signText = ""): OK {
+    creepApi.add(
+      `${targetRoomName} Claimer`,
+      "claimer",
+      {
+        targetRoomName,
+        spawnRoom: this.name,
+        signText
+      },
+      this.name
+    );
 
     return OK;
   }
 
   /**
-   * 获取当前的 power 任务
+   * 拓展新的外矿
+   *
+   * @param remoteRoomName 要拓展的外矿房间名
+   * @returns ERR_INVALID_TARGET targetId 找不到对应的建筑
+   * @returns ERR_NOT_FOUND 没有找到足够的 source 旗帜
    */
-  public getPowerTask(): PowerConstant | undefined {
-    if (!this.memory.powerTasks || this.memory.powerTasks.length <= 0) return undefined;
-    else return this.memory.powerTasks[0];
+  public addRemote(remoteRoomName: string): OK | ERR_INVALID_TARGET | ERR_NOT_FOUND {
+    if (!this.memory.remote) this.memory.remote = {};
+
+    // 添加对应的键值对
+    this.memory.remote[remoteRoomName] = { targetId: this.storage.id };
+
+    this.release.remoteCreepGroup(remoteRoomName);
+    return OK;
   }
 
   /**
-   * 挂起当前任务
-   * 将会把最前面的 power 任务移动到队列末尾
+   * 移除外矿
+   *
+   * @param remoteRoomName 要移除的外矿
+   * @param removeFlag 是否移除外矿的 source 旗帜
    */
-  public hangPowerTask(): void {
-    const task = this.memory.powerTasks.shift();
-    this.memory.powerTasks.push(task);
-  }
+  public removeRemote(remoteRoomName: string, removeFlag = false): OK | ERR_NOT_FOUND {
+    // 兜底
+    if (!this.memory.remote) return ERR_NOT_FOUND;
+    if (!(remoteRoomName in this.memory.remote)) return ERR_NOT_FOUND;
 
-  /**
-   * 移除第一个 power 任务
-   */
-  public deleteCurrentPowerTask(): void {
-    this.memory.powerTasks.shift();
+    delete this.memory.remote[remoteRoomName];
+    if (Object.keys(this.memory.remote).length <= 0) delete this.memory.remote;
+
+    const sourceFlagsName = [`${remoteRoomName} source0`, `${remoteRoomName} source1`];
+    // 移除对应的旗帜和外矿采集单位
+    sourceFlagsName.forEach((flagName, index) => {
+      if (!(flagName in Game.flags)) return;
+
+      if (removeFlag) Game.flags[flagName].remove();
+      creepApi.remove(`${remoteRoomName} remoteHarvester${index}`);
+    });
+
+    // 移除预定者
+    creepApi.remove(`${remoteRoomName} reserver`);
+
+    return OK;
   }
 
   /**
@@ -581,60 +409,6 @@ export default class RoomExtension extends Room {
     delete this.memory.upgrade;
 
     return OK;
-  }
-
-  /**
-   * 根据资源类型查找来源房间
-   *
-   * @param resourceType 要查找的资源类型
-   * @returns 找到的目标房间，没找到返回 null
-   */
-  private shareGetSource(resourceType: ResourceConstant): Room | null {
-    // 兜底
-    if (!Memory.resourceSourceMap) {
-      Memory.resourceSourceMap = {};
-      return null;
-    }
-    const SourceRoomsName = Memory.resourceSourceMap[resourceType];
-    if (!SourceRoomsName) return null;
-
-    // 寻找合适的房间
-    let targetRoom: Room = null;
-    // 变量房间名数组，注意，这里会把所有无法访问的房间筛选出来
-    const roomWithEmpty = SourceRoomsName.map(roomName => {
-      const room = Game.rooms[roomName];
-
-      if (!room || !room.terminal) return "";
-      // 该房间有任务或者就是自己，不能作为共享来源
-      if (room.memory.shareTask || room.name === this.name) return roomName;
-
-      // 如果请求共享的是能量
-      if (resourceType === RESOURCE_ENERGY) {
-        if (!room.storage) return "";
-        // 该房间 storage 中能量低于要求的话，就从资源提供列表中移除该房间
-        if (room.storage.store[RESOURCE_ENERGY] < ENERGY_SHARE_LIMIT) return "";
-      } else {
-        // 如果请求的资源已经没有的话就暂时跳过（因为无法确定之后是否永远无法提供该资源）
-        if ((room.terminal.store[resourceType] || 0) <= 0) return roomName;
-      }
-
-      // 接受任务的房间就是你了！
-      targetRoom = room;
-      return roomName;
-    });
-
-    // 把上面筛选出来的空字符串元素去除
-    Memory.resourceSourceMap[resourceType] = roomWithEmpty.filter(roomName => roomName);
-    return targetRoom;
-  }
-
-  /**
-   * 检查是否已经存在指定任务
-   *
-   * @param task 要检查的 power 任务
-   */
-  private hasPowerTask(task: PowerConstant): boolean {
-    return !!this.memory.powerTasks.find(power => power === task);
   }
 
   /**

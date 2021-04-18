@@ -1,11 +1,11 @@
-import { CombatSquad } from "../../../src/modules/CombatSquad/CombatSquad";
-import CreepMock from "../mock/CreepMock";
-import { assert } from "chai";
+import { CreepMock, getMockCreep } from "@mock/CreepMock";
+import { CombatSquad } from "@/modules/CombatSquad/CombatSquad";
+import { getMockRoomPosition } from "@mock/RoomPositionMock";
 
 describe("CombatSquad", () => {
   it("CombatSquad 可以初始化", () => {
     const combatSquad = new CombatSquad();
-    assert.isDefined(combatSquad);
+    expect(combatSquad).toBeDefined();
   });
 
   it("checkFormation 检查阵型正确时返回 False", () => {
@@ -20,7 +20,7 @@ describe("CombatSquad", () => {
 
     const result = CombatSquad.checkFormation((squad as unknown) as SquadMember);
 
-    assert.isFalse(result);
+    expect(result).toBeFalsy();
     assertSquadMember(squad, squadMembersDef);
   });
 
@@ -36,7 +36,7 @@ describe("CombatSquad", () => {
 
     const result = CombatSquad.checkFormation((squad as unknown) as SquadMember);
 
-    assert.isTrue(result);
+    expect(result).toBeTruthy();
     assertSquadMember(squad, squadMembersDef);
   });
 
@@ -53,7 +53,7 @@ describe("CombatSquad", () => {
 
     const result = CombatSquad.checkFormation((squad as unknown) as SquadMember);
 
-    assert.isTrue(result);
+    expect(result).toBeTruthy();
     assertSquadMember(squad, squadMembersDef);
   });
 
@@ -69,7 +69,7 @@ describe("CombatSquad", () => {
 
     const result = CombatSquad.regroup((squad as unknown) as SquadMember);
 
-    assert.isTrue(result);
+    expect(result).toBeTruthy();
     assertSquadMember(squad, squadMembersDef);
   });
 
@@ -85,7 +85,7 @@ describe("CombatSquad", () => {
 
     const result = CombatSquad.regroup((squad as unknown) as SquadMember);
 
-    assert.isFalse(result);
+    expect(result).toBeFalsy();
     assertSquadMember(squad, squadMembersDef);
   });
 
@@ -102,7 +102,7 @@ describe("CombatSquad", () => {
 
     const result = CombatSquad.regroup((squad as unknown) as SquadMember);
 
-    assert.isFalse(result);
+    expect(result).toBeFalsy();
     assertSquadMember(squad, squadMembersDef);
   });
 });
@@ -110,17 +110,15 @@ describe("CombatSquad", () => {
 function initSquadMember(squad: SquadMember, squadMembersDef: (string | number[] | CalledRecord[])[][]): SquadMember {
   squadMembersDef.forEach(
     item =>
-      (squad[item[0] as string] = (new CreepMock(
-        "" as Id<CreepMock>,
-        item[1][0] as number,
-        item[1][1] as number
-      ) as unknown) as Creep)
+      (squad[item[0] as string] = (getMockCreep({
+        pos: getMockRoomPosition({ x: item[1][0] as number, y: item[1][1] as number })
+      }) as unknown) as Creep)
   );
   return squad;
 }
 
 function assertSquadMember(squad: SquadMember, squadMembersDef: (string | number[] | CalledRecord[])[][]): void {
   squadMembersDef.forEach(item =>
-    assert.deepEqual(((squad[item[0] as string] as unknown) as CreepMock).calledRecords, item[2] as CalledRecord[])
+    expect(((squad[item[0] as string] as unknown) as CreepMock).calledRecords).toEqual(item[2] as CalledRecord[])
   );
 }

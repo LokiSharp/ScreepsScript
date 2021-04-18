@@ -143,12 +143,12 @@ export const PowerTasks: IPowerTaskConfigs = {
     source: (): OK | ERR_NOT_ENOUGH_RESOURCES | ERR_BUSY => OK,
     target: (creep: PowerCreep): OK | ERR_NOT_ENOUGH_RESOURCES | ERR_BUSY => {
       let target: Source;
-      if (!creep.memory.sourceIndex) {
+      if (!creep.memory.targetIndex) {
         // 如果有 source 没有 regen_source 任务，则将其选为目标
         target = creep.room.source.find((s, index) => {
           if (!s.effects || !s.effects.map(e => e.effect).includes(PWR_REGEN_SOURCE)) {
             // 缓存目标
-            creep.memory.sourceIndex = index;
+            creep.memory.targetIndex = index;
             return true;
           }
           return false;
@@ -156,7 +156,7 @@ export const PowerTasks: IPowerTaskConfigs = {
       }
 
       // 有缓存了就直接获取
-      else target = creep.room.source[creep.memory.sourceIndex];
+      else target = creep.room.source[creep.memory.targetIndex];
       // 两个 source 都有 regen_source 时将获取不到 target
       if (!target) return ERR_BUSY;
 
@@ -164,14 +164,59 @@ export const PowerTasks: IPowerTaskConfigs = {
 
       if (actionResult === OK) {
         // 移除缓存
-        delete creep.memory.sourceIndex;
+        delete creep.memory.targetIndex;
         return OK;
       } else if (actionResult === ERR_NOT_IN_RANGE) {
-        creep.goTo(creep.room.factory.pos);
+        creep.goTo(target.pos);
         return ERR_BUSY;
       } else {
         creep.log(
           `[${creep.room.name} ${creep.name}] 执行 PWR_REGEN_SOURCE target 时出错，错误码 ${actionResult}`,
+          "red"
+        );
+        return OK;
+      }
+    }
+  },
+  /**
+   * 强化 spawn
+   */
+  [PWR_OPERATE_SPAWN]: {
+    source: (creep: PowerCreep): OK | ERR_NOT_ENOUGH_RESOURCES | ERR_BUSY =>
+      creep.getOps(POWER_INFO[PWR_OPERATE_SPAWN].ops),
+    target: (creep: PowerCreep): OK | ERR_NOT_ENOUGH_RESOURCES | ERR_BUSY => {
+      // 资源不足直接执行 source
+      if (creep.store[RESOURCE_OPS] < POWER_INFO[PWR_OPERATE_SPAWN].ops) return ERR_NOT_ENOUGH_RESOURCES;
+      let target: StructureSpawn;
+      if (!creep.memory.targetIndex) {
+        // 如果有 spawn 没有 operate_spawn 任务，则将其选为目标
+        target = creep.room.spawn.find((s, index) => {
+          if (s.spawning && (!s.effects || !s.effects.map(e => e.effect).includes(PWR_OPERATE_SPAWN))) {
+            // 缓存目标
+            creep.memory.targetIndex = index;
+            return true;
+          }
+          return false;
+        });
+      }
+
+      // 有缓存了就直接获取
+      else target = creep.room.spawn[creep.memory.targetIndex];
+      // spawn 都有 operate_spawn 时将获取不到 target
+      if (!target) return ERR_BUSY;
+
+      const actionResult = creep.usePower(PWR_OPERATE_SPAWN, target);
+
+      if (actionResult === OK) {
+        // 移除缓存
+        delete creep.memory.targetIndex;
+        return OK;
+      } else if (actionResult === ERR_NOT_IN_RANGE) {
+        creep.goTo(target.pos);
+        return ERR_BUSY;
+      } else {
+        creep.log(
+          `[${creep.room.name} ${creep.name}] 执行 PWR_OPERATE_SPAWN target 时出错，错误码 ${actionResult}`,
           "red"
         );
         return OK;

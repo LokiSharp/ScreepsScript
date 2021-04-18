@@ -1,9 +1,9 @@
-import { Move } from "modules/move";
-import { clearFlag } from "utils/global/clearFlag";
-import colorful from "utils/console/colorful";
-import { createHelp } from "modules/help";
-import createRoomLink from "utils/console/createRoomLink";
-import getRoomFactoryState from "utils/global/getRoomFactoryState";
+import { Move } from "@/modules/move";
+import { clearFlag } from "@/utils/global/clearFlag";
+import colorful from "@/utils/console/colorful";
+import { createHelp } from "@/modules/help";
+import createRoomLink from "@/utils/console/createRoomLink";
+import getRoomFactoryState from "@/utils/global/getRoomFactoryState";
 import { resourcesHelp } from "./resourcesHelp";
 
 /**
@@ -197,7 +197,7 @@ export default [
       // 获取旗帜所在房间的访问链接
       const getFlagRoomLink = (flagName: string) => createRoomLink(Game.flags[flagName].pos.roomName);
 
-      const stats = Object.values(Game.rooms)
+      return Object.values(Game.rooms)
         .map(room => {
           if (!room.observer) return false;
 
@@ -224,8 +224,6 @@ export default [
         })
         .filter(Boolean)
         .join("\n");
-
-      return stats;
     }
   },
   // 统计当前所有房间的存储状态
@@ -242,7 +240,7 @@ export default [
        * 给数值添加颜色
        *
        * @param capacity 要添加颜色的容量数值
-       * @param warningLimit 报警的颜色等级
+       * @param structureType 建筑类型
        */
       const addColor = (capacity: number, structureType: STRUCTURE_TERMINAL | STRUCTURE_STORAGE): string => {
         if (!capacity) return colorful("无法访问", "red");

@@ -3,13 +3,13 @@
  *
  * 本文件包含了 Room 中用于控制台交互的方法
  */
-import { LAB_STATE, ROOM_REMOVE_INTERVAL, labTarget } from "setting";
+import { LAB_STATE, ROOM_REMOVE_INTERVAL, labTarget } from "@/setting";
 import RoomExtension from "./RoomExtension";
-import colorful from "utils/console/colorful";
-import createElement from "utils/console/createElement";
-import { getName } from "utils/global/getName";
-import { manageStructure } from "modules/autoPlanning";
-import { setBaseCenter } from "modules/autoPlanning/planBasePos";
+import colorful from "@/utils/console/colorful";
+import createElement from "@/utils/console/createElement";
+import { getName } from "@/utils/global/getName";
+import { manageStructure } from "@/modules/autoPlanning";
+import { setBaseCenter } from "@/modules/autoPlanning/planBasePos";
 
 export default class RoomConsole extends RoomExtension {
   /**
@@ -99,9 +99,8 @@ export default class RoomConsole extends RoomExtension {
     resourceType: ResourceConstant,
     amount: number
   ): string {
-    if (!this.memory.centerTransferTasks) this.memory.centerTransferTasks = [];
-    const addResult = this.addCenterTask({
-      submit: this.memory.centerTransferTasks.length,
+    const addResult = this.centerTransport.addTask({
+      submit: this.memory.centerTasks.length,
       target,
       source,
       resourceType,
@@ -116,8 +115,8 @@ export default class RoomConsole extends RoomExtension {
    * @param amount 要转移的能量数量, 默认 100k
    */
   public pute(amount = 100000): string {
-    const addResult = this.addCenterTask({
-      submit: this.memory.centerTransferTasks.length,
+    const addResult = this.centerTransport.addTask({
+      submit: this.centerTransport.tasks.length,
       target: STRUCTURE_TERMINAL,
       source: STRUCTURE_STORAGE,
       resourceType: RESOURCE_ENERGY,
@@ -135,8 +134,8 @@ export default class RoomConsole extends RoomExtension {
     if (!this.terminal) return `未找到 ${this.name} 中的终端`;
     if (amount === null) amount = this.terminal.store[RESOURCE_ENERGY];
 
-    const addResult = this.addCenterTask({
-      submit: this.memory.centerTransferTasks.length,
+    const addResult = this.centerTransport.addTask({
+      submit: this.centerTransport.tasks.length,
       target: STRUCTURE_STORAGE,
       source: STRUCTURE_TERMINAL,
       resourceType: RESOURCE_ENERGY,

@@ -1,13 +1,13 @@
-import { MAX_WALL_HITS, TOWER_FILL_WALL_LEVEL, repairSetting } from "setting";
-import { creepApi } from "modules/creepController/creepApi";
-import { whiteListFilter } from "utils/global/whiteListFilter";
+import { MAX_WALL_HITS, TOWER_FILL_WALL_LEVEL, repairSetting } from "@/setting";
+import { creepApi } from "@/modules/creepController/creepApi";
+import { whiteListFilter } from "@/utils/global/whiteListFilter";
 
 // Tower 原型拓展
 export default class TowerExtension extends StructureTower {
   /**
    * 主要任务
    */
-  public work(): void {
+  public onWork(): void {
     if (this.store[RESOURCE_ENERGY] < 10) return this.requireEnergy();
 
     // 根据当前状态执行对应的逻辑
@@ -183,19 +183,11 @@ export default class TowerExtension extends StructureTower {
 
           this.log(`墙体被攻击!孵化维修单位`, "yellow");
           // 小于七级的话无法生成 defender，所以会孵化更多的 repairer
-          const repairerList = this.room.controller.level >= 7 ? [1, 2, 3] : [1, 2, 3, 4, 5, 6, 7, 8];
-          // 如果没有维修者的话就进行发布
-          repairerList.forEach(index => {
-            creepApi.add(
-              `${repairCreepName} ${index}`,
-              "repairer",
-              {
-                sourceId: this.room.storage ? this.room.storage.id : undefined,
-                workRoom: this.room.name
-              },
-              this.room.name
-            );
-          });
+          const newWorkerNumber = this.room.controller.level >= 7 ? 3 : 8;
+          // 提高刷墙任务优先级并孵化额外工作单位
+          this.room.work.updateTask({ type: "fillWall", priority: 9 });
+          if (this.room.memory.workerNumber < newWorkerNumber)
+            this.room.release.changeBaseUnit("worker", newWorkerNumber);
         }
       }
     }
@@ -353,8 +345,8 @@ export default class TowerExtension extends StructureTower {
    * @param lowerLimit 能量下限，当自己能量低于该值时将发起请求
    */
   private requireEnergy(lowerLimit = 900): void {
-    if (this.store[RESOURCE_ENERGY] <= lowerLimit) {
-      this.room.transport.addTask({ type: "fillTower", id: this.id });
+    if (this.store[RESOURCE_ENERGY] <= lowerLimit && !this.room.transport.hasTask("fillTower")) {
+      this.room.transport.addTask({ type: "fillTower", id: this.id, priority: 5 });
     }
   }
 }

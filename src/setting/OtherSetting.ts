@@ -9,7 +9,9 @@ export const DEFAULT_FLAG_NAME = {
   // 待命
   STANDBY: "standBy",
   // 掠夺
-  REIVER: "reiver"
+  REIVER: "reiver",
+  // 侦察
+  SCOUT: "scout"
 };
 
 // 在执行了第一次移除操作之后，玩家需要在多少 tick 内重新执行移除操作才能真正发起移除请求
@@ -64,3 +66,9 @@ export const minerHarvestLimit = 200000;
 
 // pc 空闲时会搓 ops，下面是搓的上限
 export const maxOps = 50000;
+
+/**
+ * miner 的矿物采集上限
+ * 当 terminal 中的资源多余这个值时，miner 将不再继续采矿
+ */
+export const MINE_LIMIT = 200000;

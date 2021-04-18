@@ -1,4 +1,4 @@
-import { inPlaceBase } from "../../utils/creep/inPlaceBase";
+import { inPlaceBase } from "@/utils/creep/inPlaceBase";
 
 /**
  * 移动测试单位

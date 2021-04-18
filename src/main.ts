@@ -1,38 +1,41 @@
-import { cpuUsageScanner, roomTaskScanner, stateScanner } from "./modules/stateCollector";
-import { execShard, saveShardData } from "./modules/crossShard";
-import ErrorMapper from "./utils/global/ErrorMapper";
-import creepNumberListener from "modules/creepController/creepNumberListener";
-import doing from "./utils/global/doing";
-import generatePixel from "./utils/global/generatePixel";
-import mountExtension from "./mount";
+import { extensionAppPlugin, mountList } from "@/mount";
+import App from "@/modules/framework";
+import { constructionAppPlugin } from "@/modules/ConstructionController";
+import { creepNumberControlAppPlugin } from "@/modules/creepController";
+import { crossShardAppPlugin } from "@/modules/crossShard";
+import { delayQueueAppPlugin } from "@/modules/delayQueue";
+import { errorMapper } from "@/utils/global/ErrorMapper";
+import { generatePixelAppPlugin } from "@/utils/global/generatePixel";
+import { stateScannerAppPlugin } from "@/modules/stats";
 
-export const loop = ErrorMapper.wrapLoop(() => {
-  cpuUsageScanner("start");
+// 挂载所有的原型拓展
+const app = new App({ mountList });
 
-  // 挂载所有拓展
-  mountExtension();
-  cpuUsageScanner("mountExtension");
-  // 检查跨 shard 请求
-  execShard();
-  cpuUsageScanner("execShard");
-  // creep 数量控制
-  creepNumberListener();
-  cpuUsageScanner("creepNumberListener");
-  // 所有建筑、creep、powerCreep 执行工作
-  doing(Game.structures);
-  cpuUsageScanner("doingStructures");
-  doing(Game.creeps);
-  cpuUsageScanner("doingCreeps");
-  doing(Game.powerCreeps);
-  cpuUsageScanner("doingPowerCreeps");
-  // 搓 pixel
-  generatePixel();
-  cpuUsageScanner("generatePixel");
-  // // 保存自己的跨 shard 消息
-  saveShardData();
-  cpuUsageScanner("saveShardData");
-  stateScanner();
-  cpuUsageScanner("stateScanner");
-  roomTaskScanner();
-  cpuUsageScanner("roomTaskScanner");
-});
+// 使用 sourceMap 校正报错信息
+app.catcher = errorMapper;
+
+// 注册主拓展模块
+app.on(extensionAppPlugin);
+
+// 注册跨 shard 模块
+app.on(crossShardAppPlugin);
+
+// 注册 creep 数量控制
+app.on(creepNumberControlAppPlugin);
+
+// 注册建筑管理模块
+app.on(constructionAppPlugin);
+
+// 注册延迟任务管理模块
+app.on(delayQueueAppPlugin);
+
+// 注册搓 pixel 任务
+app.on(generatePixelAppPlugin);
+
+// 注册全局资源统计模块
+app.on(stateScannerAppPlugin);
+
+// 运行 bot
+export function loop(): void {
+  app.run();
+}

@@ -1,21 +1,16 @@
-import FlagMock from "../../mock/FlagMock";
-import GameMock from "../../mock/GameMock";
-import MemoryMock from "../../mock/MemoryMock";
-import { assert } from "chai";
-import { clearFlag } from "../../../../src/utils/global/clearFlag";
+import { clearFlag } from "@/utils/global/clearFlag";
+import { getMockFlag } from "@mock/FlagMock";
+import { getMockRoomPosition } from "@mock/RoomPositionMock";
+import { refreshGlobalMock } from "@mock/index";
 
 describe("clearFlag", () => {
   beforeEach(() => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore : allow adding Game to global
-    global.Game = new GameMock();
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore : allow adding Memory to global
-    global.Memory = new MemoryMock();
+    refreshGlobalMock();
+    Memory.flags = {};
   });
 
   it("旗帜不存在时返回删除残余内存", () => {
-    const flag = (new FlagMock("" as Id<FlagMock>, 0, 0) as unknown) as Flag;
+    const flag = getMockFlag({ pos: getMockRoomPosition({ x: 0, y: 0 }) });
     const testFlagIsDefined = [..."ABCD12345"].map(char => `testFlagIsDefined ${char}`);
     const testFlagIsUndefined = [..."ABCD12345"].map(char => `testFlagIsUndefined ${char}`);
 
@@ -23,10 +18,10 @@ describe("clearFlag", () => {
     testFlagIsDefined.forEach(name => (Memory.flags[name] = {} as FlagMemory));
     testFlagIsUndefined.forEach(name => (Memory.flags[name] = {} as FlagMemory));
 
-    testFlagIsDefined.forEach(name => assert.isDefined(Memory.flags[name]));
-    testFlagIsUndefined.forEach(name => assert.isDefined(Memory.flags[name]));
+    testFlagIsDefined.forEach(name => expect(Memory.flags[name]).toBeDefined());
+    testFlagIsUndefined.forEach(name => expect(Memory.flags[name]).toBeDefined());
     clearFlag();
-    testFlagIsDefined.forEach(name => assert.isDefined(Memory.flags[name]));
-    testFlagIsUndefined.forEach(name => assert.isUndefined(Memory.flags[name]));
+    testFlagIsDefined.forEach(name => expect(Memory.flags[name]).toBeDefined());
+    testFlagIsUndefined.forEach(name => expect(Memory.flags[name]).not.toBeDefined());
   });
 });

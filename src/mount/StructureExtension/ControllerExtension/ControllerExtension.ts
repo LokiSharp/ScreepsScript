@@ -1,35 +1,27 @@
-import { LEVEL_BUILD_RAMPART } from "../../../setting";
-import { countEnergyChangeRatio } from "../../../modules/energyController";
-import { creepApi } from "../../../modules/creepController/creepApi";
-import { setRoomStats } from "modules/stateCollector";
-import { whiteListFilter } from "utils/global/whiteListFilter";
+import { LEVEL_BUILD_RAMPART, UPGRADER_WITH_ENERGY_LEVEL_8 } from "@/setting";
+import { getRoomStats, setRoomStats } from "@/modules/stats";
+import { countEnergyChangeRatio } from "@/modules/energyController";
+import { creepApi } from "@/modules/creepController/creepApi";
+import { delayQueue } from "@/modules/delayQueue";
+import { whiteListFilter } from "@/utils/global/whiteListFilter";
 
 /**
  * Controller 拓展
  * 统计当前升级进度、移除无效的禁止通行点位
  */
 export default class ControllerExtension extends StructureController {
-  public work(): void {
+  public onWork(): void {
+    // 解除这两行的注释以显示队列信息
+    this.room.work.draw(1, 3);
+    this.room.transport.draw(1, 13);
+
+    this.drawEnergyHarvestInfo();
     if (Game.time % 20) return;
     // 如果等级发生变化了就运行 creep 规划
     if (this.stateScanner()) this.onLevelChange(this.level);
 
-    // 放置队列中的工地
-    this.constructionSiteScanner();
-
     // 调整运营 creep 数量
     this.adjustCreep();
-
-    // 8 级并且快掉级了就孵化 upgrader
-    if (this.level === 8 && this.ticksToDowngrade <= 100000) this.room.releaseCreep("upgrader");
-
-    const { storage, terminal } = this.room;
-    if (
-      this.room.memory.canReClaim &&
-      this.level >= 8 &&
-      storage.store.getUsedCapacity(RESOURCE_ENERGY) + terminal.store.getUsedCapacity(RESOURCE_ENERGY) >= 1000000
-    )
-      this.reClaim();
 
     // 检查外矿有没有被入侵的，有的话是不是可以重新发布 creep
     if (this.room.memory.remote) {
@@ -37,10 +29,27 @@ export default class ControllerExtension extends StructureController {
         // 如果发现入侵者已经老死了，就移除对应属性并重新发布外矿角色组
         if (this.room.memory.remote[remoteRoomName].disableTill <= Game.time) {
           delete this.room.memory.remote[remoteRoomName].disableTill;
-          this.room.addRemoteCreepGroup(remoteRoomName);
+          this.room.release.remoteCreepGroup(remoteRoomName);
         }
       }
     }
+  }
+
+  /**
+   * 临时 - 显示能量获取速率
+   */
+  private drawEnergyHarvestInfo() {
+    const { totalEnergy, energyGetRate } = getRoomStats(this.room.name);
+    const { x, y } = this.pos;
+    this.room.visual.text(
+      `可用能量 ${totalEnergy || 0} 获取速率 ${energyGetRate ? energyGetRate.toFixed(2) : 0}`,
+      x + 1,
+      y + 0.25,
+      {
+        align: "left",
+        opacity: 0.5
+      }
+    );
   }
 
   /**
@@ -49,22 +58,16 @@ export default class ControllerExtension extends StructureController {
    * @param level 当前的等级
    */
   public onLevelChange(level: number): void {
-    this.room.releaseCreep("harvester");
-
-    // 刚占领，添加最基础的角色组
+    // 刚占领，添加工作单位
     if (level === 1) {
-      // 多发布一个 build 协助建造
-      this.room.releaseCreep("builder", 1);
-    }
-    // 到达建墙等级，添加刷墙者
-    if (level === LEVEL_BUILD_RAMPART[0]) {
-      // 发布 repairer 刷墙
-      this.room.releaseCreep("repairer", 2);
-    }
-    // 8 级之后重新规划升级单位
-    else if (level === 8) {
-      this.room.releaseCreep("upgrader");
-      this.room.releaseCreep("repairer");
+      this.room.release.harvester();
+      this.room.release.changeBaseUnit("manager", 1);
+      this.room.release.changeBaseUnit("worker", 2);
+    } else if (level === LEVEL_BUILD_RAMPART[0] || level === 4) {
+      // 开始刷墙后就开始执行刷墙任务
+      this.room.work.updateTask({ type: "fillWall", priority: 0 });
+    } else if (level === 8) {
+      this.decideUpgradeWhenRCL8();
     }
 
     // 规划布局
@@ -72,11 +75,30 @@ export default class ControllerExtension extends StructureController {
   }
 
   /**
+   * 房间升到 8 级后的升级计划
+   */
+  private decideUpgradeWhenRCL8(): void {
+    // 满足以下条件就暂停升级
+    if (
+      Game.cpu.bucket < 700 ||
+      !this.room.storage ||
+      this.room.storage.store[RESOURCE_ENERGY] < UPGRADER_WITH_ENERGY_LEVEL_8
+    ) {
+      // 暂时停止升级计划
+      this.room.work.removeTask("upgrade");
+      delayQueue.addDelayTask("spawnUpgrader", { roomName: this.room.name }, 10000);
+    } else {
+      // 限制只需要一个单位升级
+      this.room.work.updateTask({ type: "upgrade", need: 1, priority: 5 });
+    }
+  }
+
+  /**
    * 统计自己的等级信息
    *
    * @returns 为 true 时说明自己等级发生了变化
    */
-  private stateScanner(): boolean {
+  public stateScanner(): boolean {
     let hasLevelChange = false;
     setRoomStats(this.room.name, stats => {
       hasLevelChange = stats.controllerLevel !== this.level;
@@ -89,7 +111,7 @@ export default class ControllerExtension extends StructureController {
     });
 
     // 统计本房间能量状态
-    countEnergyChangeRatio(this.room.name);
+    countEnergyChangeRatio(this.room);
     this.structureScanner();
 
     return hasLevelChange;
@@ -159,7 +181,7 @@ export default class ControllerExtension extends StructureController {
   /**
    * 扫描房间内建筑
    */
-  private structureScanner(): void {
+  public structureScanner(): void {
     const structures = this.room.find(FIND_STRUCTURES);
     const structureNums: { [structureName: string]: number } = {};
 
@@ -181,12 +203,15 @@ export default class ControllerExtension extends StructureController {
   private adjustCreep(): void {
     if (Game.time % 500) return;
 
-    const { transporterNumber } = this.room.memory;
-    if (!transporterNumber || transporterNumber <= 0) this.room.memory.transporterNumber = 1;
-
-    // 根据物流模块返回的期望调整当前搬运工数量
-    this.room.memory.transporterNumber += this.room.transport.getExpect();
-    this.room.releaseCreep("manager", this.room.memory.transporterNumber);
+    this.room.release.changeBaseUnit("manager", this.room.transport.getExpect());
+    if (this.level === 8)
+      this.room.release.changeBaseUnit(
+        "worker",
+        this.room.memory.workerNumber >= 3 ? 0 : 3 - this.room.memory.workerNumber
+      );
+    else {
+      this.room.release.changeBaseUnit("worker", this.room.work.getExpect());
+    }
   }
   /**
    * 重新占领，刷 RCL 用
@@ -239,3 +264,23 @@ export default class ControllerExtension extends StructureController {
     return new RoomPosition(info.x, info.y, this.room.name);
   }
 }
+
+/**
+ * 注册升级工的延迟孵化任务
+ */
+delayQueue.addDelayCallback("spawnUpgrader", room => {
+  // 房间或终端没了就不在孵化
+  if (!room || !room.storage) return;
+
+  // 满足以下条件时就延迟发布
+  if (
+    // cpu 不够
+    Game.cpu.bucket < 700 ||
+    // 能量不足
+    room.storage.store[RESOURCE_ENERGY] < UPGRADER_WITH_ENERGY_LEVEL_8 ||
+    room.controller.ticksToDowngrade < 10000
+  )
+    return delayQueue.addDelayTask("spawnUpgrader", { roomName: room.name }, 10000);
+
+  room.work.updateTask({ type: "upgrade", need: 1, priority: 5 });
+});

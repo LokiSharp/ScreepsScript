@@ -1,4 +1,4 @@
-import { getName } from "utils/global/getName";
+import { getName } from "@/utils/global/getName";
 
 /**
  * 占领者
@@ -66,9 +66,9 @@ export const claimer: CreepConfig<"claimer"> = {
       const spawnRoom = Game.rooms[spawnRoomName];
       if (spawnRoom) {
         if (wayPoint) {
-          spawnRoom.addRemoteHelper(targetRoomName, wayPoint);
+          spawnRoom.release.remoteHelper(targetRoomName, wayPoint);
         } else {
-          spawnRoom.addRemoteHelper(targetRoomName);
+          spawnRoom.release.remoteHelper(targetRoomName);
         }
       }
 

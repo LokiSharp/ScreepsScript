@@ -1,8 +1,8 @@
-import { setRoomStats } from "../../../modules/stateCollector";
+import { setRoomStats } from "@/modules/stats";
 
 // Nuker 拓展
 export default class NukerExtension extends StructureNuker {
-  public work(): void {
+  public onWork(): void {
     this.stateScanner();
 
     if (Game.time % 30) return;
@@ -31,11 +31,12 @@ export default class NukerExtension extends StructureNuker {
     if (this.store[resource] >= amount) return true;
 
     // 检查来源是否符合规则，符合则发布资源转移任务
-    if (source && source.store.getUsedCapacity(resource) > sourceLimit) {
+    if (source && source.store.getUsedCapacity(resource) > sourceLimit && !this.room.transport.hasTask("fillNuker")) {
       this.room.transport.addTask({
         type: "fillNuker",
         id: this.id,
-        resourceType: resource
+        resourceType: resource,
+        priority: 0
       });
     }
 

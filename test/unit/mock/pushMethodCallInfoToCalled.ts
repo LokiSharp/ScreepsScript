@@ -1,4 +1,4 @@
-import BaseMock from "./BaseMock";
+import { BaseMock } from "./BaseMock";
 
 export function pushMethodCallInfoToCalled(
   target: BaseMock,

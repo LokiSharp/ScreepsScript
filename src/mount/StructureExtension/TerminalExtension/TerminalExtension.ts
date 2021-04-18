@@ -1,5 +1,5 @@
-import { DEAL_RATIO, terminalChannels, terminalModes } from "setting";
-import { setRoomStats } from "../../../modules/stateCollector";
+import { DEAL_RATIO, terminalChannels, terminalModes } from "@/setting";
+import { setRoomStats } from "@/modules/stats";
 
 /**
  * 全局缓存的订单价格表
@@ -16,7 +16,8 @@ const resourcePrice = {};
  * 资源监听由玩家自行发布，包括资源数量、来源和数量，在条件不满足（数量低于限制等）时会尝试从来源（market等）获取该资源
  */
 export default class TerminalExtension extends StructureTerminal {
-  public work(): void {
+  public onWork(): void {
+    if (!this.room.controller.owner) return;
     // 没有冷却好或者不到 10 tick 就跳过
     if (this.cooldown !== 0 || Game.time % 10 || !this.isActive()) return;
 
@@ -26,8 +27,6 @@ export default class TerminalExtension extends StructureTerminal {
     // 优先执行共享任务
     this.execShareTask();
 
-    this.energyCheck();
-
     // 执行终端工作
     const resource = this.getResourceByIndex();
     // 没有配置监听任务的话就跳过
@@ -35,6 +34,18 @@ export default class TerminalExtension extends StructureTerminal {
 
     // 只有 dealOrder 下命令了才能继续执行 resourceListener
     if (this.dealOrder(resource)) this.resourceListener(resource);
+  }
+
+  /**
+   * 建造完成回调
+   * 修改 miner 的存放位置
+   */
+  public onBuildComplete(): void {
+    // 有 extractor 了，发布矿工并添加对应的共享协议
+    if (this.room.extractor) {
+      this.room.work.updateTask({ type: "mine", priority: 0 });
+      this.addTask(this.room.mineral.mineralType, 30000, terminalModes.put, terminalChannels.share);
+    }
   }
 
   /**
@@ -101,6 +112,7 @@ export default class TerminalExtension extends StructureTerminal {
 
       if (sendResult === OK) {
         delete this.room.memory.shareTask;
+        this.energyCheck();
       } else if (sendResult === ERR_INVALID_ARGS) {
         this.log(`共享任务参数异常，无法执行传送，已移除`, "yellow");
         delete this.room.memory.shareTask;
@@ -133,7 +145,7 @@ export default class TerminalExtension extends StructureTerminal {
    */
   private energyCheck(): void {
     if (this.store[RESOURCE_ENERGY] > 30000)
-      this.room.addCenterTask({
+      this.room.centerTransport.addTask({
         submit: STRUCTURE_TERMINAL,
         source: STRUCTURE_TERMINAL,
         target: STRUCTURE_STORAGE,
@@ -185,6 +197,7 @@ export default class TerminalExtension extends StructureTerminal {
       delete this.room.memory.targetOrderId;
 
       this.setNextIndex();
+      this.energyCheck();
 
       return false; // 把这个改成 true 可以加快交易速度
     } else if (dealResult === ERR_INVALID_ARGS) delete this.room.memory.targetOrderId;
@@ -236,8 +249,9 @@ export default class TerminalExtension extends StructureTerminal {
 
       // 进行共享
       case terminalChannels.share:
-        if (resource.mod === terminalModes.get) this.room.shareRequest(resource.type, resource.amount - resourceAmount);
-        else this.room.shareAddSource(resource.type);
+        if (resource.mod === terminalModes.get)
+          this.room.share.request(resource.type, resource.amount - resourceAmount);
+        else this.room.share.becomeSource(resource.type);
 
         return this.setNextIndex();
 
@@ -246,7 +260,7 @@ export default class TerminalExtension extends StructureTerminal {
         if (resource.mod === terminalModes.put) {
           // 向自己房间添加一个指向目标房间的资源共享任务来进行支援
           // 这里的容量直接 resourceAmount - resource.amount，因为 mod 为 put 时代码能走到这里证明现有的资源数量一定是大于阈值的，所以这个值一定为正数
-          this.room.shareAdd(resource.supportRoomName, resource.type, resourceAmount - resource.amount);
+          this.room.share.handle(resource.supportRoomName, resource.type, resourceAmount - resource.amount);
         } else this.log("支援渠道的资源监听任务，其物流方向必须为 put（提供）", "yellow");
 
         return this.setNextIndex();
@@ -497,7 +511,7 @@ export default class TerminalExtension extends StructureTerminal {
    */
   private getEnergy(amount: number): number {
     // 添加时会自动判断有没有对应的建筑，不会重复添加
-    return this.room.addCenterTask({
+    return this.room.centerTransport.addTask({
       submit: STRUCTURE_TERMINAL,
       source: STRUCTURE_STORAGE,
       target: STRUCTURE_TERMINAL,
@@ -652,7 +666,7 @@ export default class TerminalExtension extends StructureTerminal {
 
     // 添加共享任务
     if (!targetRoomInfo || !targetRoomInfo.room) return ERR_NOT_FOUND;
-    this.room.shareAdd(targetRoomInfo.room, RESOURCE_POWER, SHARE_LIMIE);
+    this.room.share.handle(targetRoomInfo.room, RESOURCE_POWER, SHARE_LIMIE);
 
     return OK;
   }

@@ -1,11 +1,12 @@
-import { MIN_WALL_HITS, repairSetting } from "setting";
-import { Move, WayPoint } from "modules/move";
-import { creepApi } from "../../modules/creepController/creepApi";
-import creepWorks from "role";
-import { getMemoryFromCrossShard } from "modules/crossShard";
-import { updateStructure } from "modules/shortcut/updateStructure";
+import { MIN_WALL_HITS, repairSetting } from "@/setting";
+import { Move, WayPoint } from "@/modules/move";
+import { creepApi } from "@/modules/creepController/creepApi";
+import creepWorks from "@/role";
+import { getMemoryFromCrossShard } from "@/modules/crossShard";
+import { getNearSite } from "@/modules/ConstructionController";
+import { useCache } from "@/utils/global/useCache";
 
-export default class CreepExtension extends Creep {
+export class CreepExtension extends Creep {
   /**
    * 发送日志
    *
@@ -20,7 +21,7 @@ export default class CreepExtension extends Creep {
   /**
    * creep 主要工作
    */
-  public work(): void {
+  public onWork(): void {
     // 检查 creep 内存中的角色是否存在
     if (!(this.memory.role in creepWorks)) {
       // 没有的话可能是放在跨 shard 暂存区了
@@ -168,53 +169,82 @@ export default class CreepExtension extends Creep {
   }
 
   /**
-   * 建设房间内存在的建筑工地
-   * @param constructionSiteId 手动指定建造的工地
+   * 建筑目标获取
+   * 优先级：指定的目标 > 自己保存的目标 > 房间内保存的目标
    */
-  public buildStructure(
-    constructionSiteId: Id<ConstructionSite> = undefined
-  ): CreepActionReturnCode | ERR_NOT_ENOUGH_RESOURCES | ERR_RCL_NOT_ENOUGH | ERR_NOT_FOUND {
-    if (constructionSiteId) this.memory.constructionSiteId = constructionSiteId;
-    // 新建目标建筑工地
-    let target: ConstructionSite;
-    // 检查是否有缓存
-    if (this.room.memory.constructionSiteId) {
-      target = Game.getObjectById(this.room.memory.constructionSiteId);
-      // 如果缓存中的工地不存在则说明建筑完成
-      if (!target) {
+  private getBuildTarget(target?: ConstructionSite): ConstructionSite {
+    // 指定了目标，直接用，并且把 id 备份一下
+    if (target) {
+      this.memory.constructionSiteId = target.id;
+      this.memory.constructionSitePos = [target.pos.x, target.pos.y];
+      this.memory.constructionSiteType = target.structureType;
+      return target;
+    }
+    // 没有指定目标，或者指定的目标消失了，从本地内存查找
+    else {
+      const selfKeepTarget = Game.getObjectById(this.memory.constructionSiteId);
+      if (selfKeepTarget) return selfKeepTarget;
+      // 本地内存里保存的 id 找不到工地了，检查下是不是造好了
+      else if (this.memory.constructionSitePos) {
         // 获取曾经工地的位置
         const constructionSitePos = new RoomPosition(
-          this.room.memory.constructionSitePos[0],
-          this.room.memory.constructionSitePos[1],
+          this.memory.constructionSitePos[0],
+          this.memory.constructionSitePos[1],
           this.room.name
         );
         // 检查上面是否有已经造好的同类型建筑
         const structure = _.find(
           constructionSitePos.lookFor(LOOK_STRUCTURES),
-          s => s.structureType === this.room.memory.constructionSiteType
+          s => s.structureType === this.memory.constructionSiteType
         );
-        if (structure) {
-          updateStructure(this.room.name, structure.structureType, structure.id);
-          // 如果有的话就执行回调
-          if (structure.onBuildComplete) structure.onBuildComplete();
-
-          // 如果刚修好的是墙的话就记住该墙的 id，然后把血量刷高一点（相关逻辑见 builder.target()）
-          if (structure.structureType === STRUCTURE_WALL || structure.structureType === STRUCTURE_RAMPART) {
-            this.memory.fillWallId = structure.id as Id<StructureWall | StructureRampart>;
-          }
-          // 如果修好的是 source container 的话，就执行注册
-          else if (structure instanceof StructureContainer && this.room.source.find(s => structure.pos.isNearTo(s))) {
-            this.room.registerContainer(structure);
-          }
+        // 如果刚修好的是墙的话就记住该墙的 id，然后把血量刷高一点）
+        if (
+          structure &&
+          (structure.structureType === STRUCTURE_WALL || structure.structureType === STRUCTURE_RAMPART)
+        ) {
+          this.memory.fillWallId = structure.id as Id<StructureWall | StructureRampart>;
         }
 
-        // 获取下个建筑目标
-        target = this.updateConstructionSite();
+        delete this.memory.constructionSiteId;
       }
     }
-    // 没缓存就直接获取
-    else target = this.updateConstructionSite();
+
+    // 自己内存里没找到，去房间内存里查找，房间内存没有的话就搜索并缓存到房间
+    const roomKeepTarget =
+      Game.getObjectById(this.room.memory.constructionSiteId) ||
+      useCache(() => getNearSite(this.pos), this.room.memory, "constructionSiteId");
+
+    // 找到了，保存到自己内存里
+    if (roomKeepTarget) {
+      this.memory.constructionSiteId = this.room.memory.constructionSiteId;
+      return roomKeepTarget;
+    } else delete this.room.memory.constructionSiteId;
+
+    const selfFindTarget = this.pos.findClosestByRange(FIND_CONSTRUCTION_SITES);
+
+    // 找到了，保存到自己内存里
+    if (selfFindTarget) {
+      this.memory.constructionSiteId = selfFindTarget.id;
+      return selfFindTarget;
+    }
+
+    return undefined;
+  }
+
+  /**
+   * 建设房间内存在的建筑工地
+   * @param targetConstruction 手动指定建造的工地
+   */
+  public buildStructure(
+    targetConstruction?: ConstructionSite
+  ): CreepActionReturnCode | ERR_NOT_ENOUGH_RESOURCES | ERR_RCL_NOT_ENOUGH | ERR_NOT_FOUND {
+    // 新建目标建筑工地
+    const target = this.getBuildTarget(targetConstruction);
+
     if (!target) return ERR_NOT_FOUND;
+    // 上面发现有墙要刷了，这个 tick 就不再造建造了
+    // 防止出现造好一个 rampart，然后直接造下一个 rampart，造好后又扭头去刷第一个 rampart 的小问题出现
+    if (this.memory.fillWallId) return ERR_BUSY;
 
     // 建设
     const buildResult = this.build(target);
@@ -359,8 +389,9 @@ export default class CreepExtension extends Creep {
     const hostils = this.getHostileCreepsWithCache();
     if (hostils.length > 0) {
       // 找到最近的 creep
-      target = this.pos.findClosestByRange(hostils);
-    } else {
+      target = hostils.find(hostil => Math.abs(hostil.pos.x - this.pos.x) + Math.abs(hostil.pos.y - this.pos.y) === 1);
+    }
+    if (!target) {
       // 没有的话再攻击 structure
       const structures = attackFlag.pos.lookFor(LOOK_STRUCTURES);
       if (structures.length > 0) {
@@ -521,6 +552,20 @@ export default class CreepExtension extends Creep {
       else return target.hits;
     });
   }
+  /**
+   *
+   * RA 攻击单位并保持距离
+   *
+   * @param target 目标
+   * @param range 距离
+   */
+  public rangedAttackTargetWithRange(target: AnyCreep, range = 1): OK | ERR_NOT_FOUND {
+    if (target) {
+      this.rangedAttack(target);
+      this.moveTo(target, { range });
+      return OK;
+    } else return ERR_NOT_FOUND;
+  }
 
   /**
    * RA 攻击血量最低的敌方单位
@@ -529,13 +574,32 @@ export default class CreepExtension extends Creep {
    */
   public rangedAttackLowestHitsHostileCreeps(hostils?: AnyCreep[]): OK | ERR_NOT_FOUND {
     if (!hostils) hostils = this.getHostileCreepsWithCache();
-    const targets = this.pos.findInRange(hostils, 3);
-    if (targets.length > 0) {
+    if (hostils.length > 0) {
       // 找到血量最低的 creep
-      const target = this.getMinHitsTarget(targets);
+      const target = hostils.find(creep => creep);
 
-      if (target && this.rangedAttack(target) === ERR_NOT_IN_RANGE) this.moveTo(target);
-      return OK;
+      return this.rangedAttackTargetWithRange(target);
+    }
+
+    return ERR_NOT_FOUND;
+  }
+
+  /**
+   * RA 攻击有治疗能力的敌方单位
+   *
+   * @param hostils 敌方目标
+   */
+  public rangedAttackHostileHealCreeps(hostils?: AnyCreep[]): OK | ERR_NOT_FOUND {
+    if (!hostils) hostils = this.getHostileCreepsWithCache();
+    const targets = this.pos.findInRange(hostils, 6) as Creep[];
+    if (targets.length > 0) {
+      // 找到有治疗能力的 creep
+      const target = targets.find(creep => {
+        if (creep.body) return creep.body.find(part => part.type === HEAL);
+        else return false;
+      });
+
+      return this.rangedAttackTargetWithRange(target);
     }
 
     return ERR_NOT_FOUND;
@@ -550,10 +614,7 @@ export default class CreepExtension extends Creep {
     if (!hostils) hostils = this.getHostileCreepsWithCache();
     const target = this.pos.findClosestByPath(hostils);
 
-    if (target && this.rangedAttack(target) === ERR_NOT_IN_RANGE) this.moveTo(target);
-    else return ERR_NOT_FOUND;
-
-    return OK;
+    return this.rangedAttackTargetWithRange(target);
   }
 
   /**

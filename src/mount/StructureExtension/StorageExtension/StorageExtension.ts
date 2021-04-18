@@ -1,4 +1,4 @@
-import { DEFAULT_ENERGY_KEEP_AMOUNT, DEFAULT_ENERGY_KEEP_LIMIT } from "setting";
+import { DEFAULT_ENERGY_KEEP_AMOUNT, DEFAULT_ENERGY_KEEP_LIMIT } from "@/setting";
 
 /**
  * Storage 拓展
@@ -7,36 +7,29 @@ import { DEFAULT_ENERGY_KEEP_AMOUNT, DEFAULT_ENERGY_KEEP_LIMIT } from "setting";
  * 就将自己注册到资源来源表中为其他房间提供能量
  */
 export default class StorageExtension extends StructureStorage {
-  public work(): void {
+  public onWork(): void {
     if (Game.time % 20) return;
 
     this.energyKeeper();
-
-    if (Game.time % 1000) return;
-    // 定时运行规划
-    this.room.releaseCreep("upgrader");
   }
 
   /**
    * 建筑完成时以自己为中心发布新的 creep 运维组
    */
   public onBuildComplete(): void {
-    this.room.releaseCreep("harvester");
-    this.room.releaseCreep("upgrader");
-
-    this.room.sourceContainers.forEach(container => {
+    this.room.source.forEach(source => {
+      const container = source.getContainer();
       // 添加从 container 到自己的能量搬运任务
       // 虽然没指定任务完成条件，但是后面 container 是会被主动摧毁的（link 造好后），这时对应的搬运任务就会被释放掉
       // 这里不指定任务完成时间的原因是在 storage 造好后 harvester 还是会用 container 好久，这个任务要一直持续到 container 消失
-      this.room.transport.addTask(
-        {
+      if (container)
+        this.room.transport.addTask({
           type: "transport",
           from: container.id,
           to: this.id,
-          resourceType: RESOURCE_ENERGY
-        },
-        true
-      );
+          resourceType: RESOURCE_ENERGY,
+          priority: 0
+        });
     });
   }
 
@@ -54,7 +47,7 @@ export default class StorageExtension extends StructureStorage {
       this.store[RESOURCE_ENERGY] >= info.terminal.limit
     ) {
       // 发布到 terminal 的能量转移任务
-      this.room.addCenterTask({
+      this.room.centerTransport.addTask({
         submit: STRUCTURE_FACTORY,
         source: STRUCTURE_STORAGE,
         target: STRUCTURE_TERMINAL,

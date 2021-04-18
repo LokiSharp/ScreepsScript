@@ -22,7 +22,7 @@ export const battleBase = <Role extends CreepRoleConstant>(): ICreepStage<Role> 
     creep.goTo(targetFlag.pos, { checkTarget: true });
     creep.say("🛴", true);
 
-    if (creep.room.name === targetFlag.pos.roomName) {
+    if (creep.pos.roomName === targetFlag.pos.roomName) {
       creep.log(`抵达指定房间，切入作战模式`, "green");
       return true;
     }

@@ -5,12 +5,17 @@
     "target": "es2017",
     "moduleResolution": "Node",
     "outDir": "dist",
-    "baseUrl": "src/",
+    "baseUrl": "./",
     "sourceMap": true,
     "experimentalDecorators": true,
     "noImplicitReturns": true,
     "allowSyntheticDefaultImports": true,
-    "allowUnreachableCode": false
+    "allowUnreachableCode": false,
+    "paths": {
+      "@/*": ["./src/*"],
+      "@test/*": ["./test/*"],
+      "@mock/*": ["./test/unit/mock/*"]
+    }
   },
   "exclude": ["node_modules"]
 }

@@ -1,7 +1,7 @@
-import { TRANSFER_DEATH_LIMIT } from "../../setting";
-import calcBodyPart from "../../utils/creep/calcBodyPart";
-import deathPrepare from "../../utils/creep/deathPrepare";
-import { getRoomAvailableSource } from "../../modules/energyController";
+import { TRANSFER_DEATH_LIMIT } from "@/setting";
+import calcBodyPart from "@/utils/creep/calcBodyPart";
+import deathPrepare from "@/utils/creep/deathPrepare";
+import { getRoomEnergyTarget } from "@/modules/energyController";
 
 /**
  * 强化协助建造者
@@ -11,12 +11,11 @@ export const gclUpgrader: CreepConfig<"gclUpgrader"> = {
   source: creep => {
     if (creep.ticksToLive <= TRANSFER_DEATH_LIMIT) return deathPrepare(creep);
     const { targetRoomName, upgradePosInfo } = creep.memory.data;
-    if (
-      creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0 ||
-      (creep.room.name === targetRoomName && (creep.pos.x !== upgradePosInfo.x || creep.pos.y !== upgradePosInfo.y))
-    ) {
+    if (creep.room.name !== targetRoomName || creep.pos.x !== upgradePosInfo.x || creep.pos.y !== upgradePosInfo.y) {
       creep.goTo(Game.rooms[targetRoomName].controller.getUpgradePos(creep), { range: 0 });
       return creep.room.name === targetRoomName && creep.pos.x === upgradePosInfo.x && creep.pos.y === upgradePosInfo.y;
+    } else if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
+      return true;
     }
     let source: AllEnergySource;
     source = ((creep.pos
@@ -48,7 +47,7 @@ export const gclUpgrader: CreepConfig<"gclUpgrader"> = {
         10000
     ) {
       if (!creep.memory.sourceId) {
-        source = getRoomAvailableSource(Game.rooms[creep.memory.data.spawnRoom], { includeSource: false });
+        source = source = getRoomEnergyTarget(creep.room);
         if (!source) {
           creep.say("没能量了，歇会");
           return false;
@@ -73,7 +72,6 @@ export const gclUpgrader: CreepConfig<"gclUpgrader"> = {
   target: creep => {
     const { targetRoomName } = creep.memory.data;
     if (
-      creep.store.getUsedCapacity(RESOURCE_ENERGY) <= 0 ||
       creep.room.name !== targetRoomName ||
       creep.pos.x !== creep.memory.data.upgradePosInfo.x ||
       creep.pos.y !== creep.memory.data.upgradePosInfo.y
@@ -124,8 +122,7 @@ export const gclUpgrader: CreepConfig<"gclUpgrader"> = {
     }
 
     creep.upgrade();
-    // 没有就建其他工地
     return creep.store.getUsedCapacity() === 0;
   },
-  bodys: () => calcBodyPart({ [WORK]: 20, [CARRY]: 12, [MOVE]: 16 })
+  bodys: () => calcBodyPart({ [WORK]: 26, [CARRY]: 11, [MOVE]: 13 })
 };

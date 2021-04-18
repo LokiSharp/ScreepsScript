@@ -31,14 +31,11 @@ const crossRules: CrossRules = {
 
   // 采集单位在工作时不允许任何 creep 对穿
   harvester: noCrossWithWork,
-  collector: noCrossWithWork,
 
   // upgrader / builder 和 remoteHelper 功能重叠，所以这里不会在工作时允许对方对穿
   // 其实下面四个的判断规则要复杂一点，例如 upgrader 允许正在建造的 builder 对穿，但是不允许升级控制器的 builder 对穿
   // 但是为了节省性能，这里直接一把梭，如果真有需求可以再添上
-  upgrader: noCrossWithWork,
   remoteUpgrader: noCrossWithWork,
-  builder: noCrossWithWork,
   remoteBuilder: noCrossWithWork,
   gclUpgrader: (creep, requireCreep) =>
     requireCreep.memory.role === creep.memory.role || requireCreep.memory.role === "reClaimer",

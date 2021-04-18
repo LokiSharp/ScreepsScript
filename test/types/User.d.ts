@@ -11,7 +11,7 @@ declare class User {
   private _username;
   private _server;
   public constructor(
-    server: Server,
+    server: ScreepsServer,
     data: {
       _id: string;
       username: string;
@@ -47,4 +47,7 @@ declare class User {
    * 初始化控制台
    */
   public init(): Promise<User>;
+  public removeListener(type, listener): Promise<ScreepsServer>;
+  public on(type, listener): Promise<ScreepsServer>;
+  public emit(event): Promise<ScreepsServer>;
 }

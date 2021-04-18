@@ -1,5 +1,4 @@
-import { assert } from "chai";
-import calcBodyPart from "../../../../src/utils/creep/calcBodyPart";
+import calcBodyPart from "@/utils/creep/calcBodyPart";
 
 describe("calcBodyPart", () => {
   it("可以展开 BodyPart", () => {
@@ -14,8 +13,10 @@ describe("calcBodyPart", () => {
       [CLAIM]: 2
     };
     const testBodyPartConstant = calcBodyPart(testBodySet);
-    assert.isDefined(testBodyPartConstant);
-    assert.equal(testBodyPartConstant.length, 16);
-    assert.includeMembers(testBodyPartConstant, [ATTACK, CARRY, CLAIM, HEAL, MOVE, RANGED_ATTACK, TOUGH, WORK]);
+    expect(testBodyPartConstant).toBeDefined();
+    expect(testBodyPartConstant.length).toEqual(16);
+    [WORK, CARRY, MOVE, ATTACK, RANGED_ATTACK, TOUGH, HEAL, CLAIM].forEach(item =>
+      expect(testBodyPartConstant).toContain(item)
+    );
   });
 });

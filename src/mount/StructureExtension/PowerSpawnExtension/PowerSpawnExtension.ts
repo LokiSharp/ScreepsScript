@@ -1,4 +1,4 @@
-import { powerSettings } from "setting";
+import { powerSettings } from "@/setting";
 
 /**
  * PowerSpawn 拓展
@@ -8,7 +8,7 @@ import { powerSettings } from "setting";
  * 可以随时通过原型上的指定方法来暂停/重启 ps，详见 .help()
  */
 export default class PowerSpawnExtension extends StructurePowerSpawn {
-  public work(): void {
+  public onWork(): void {
     // ps 未启用或者被暂停了就跳过
     if (this.room.memory.pausePS) return;
 
@@ -39,11 +39,16 @@ export default class PowerSpawnExtension extends StructurePowerSpawn {
     if (this.store[resource] >= amount) return true;
 
     // 检查来源是否符合规则，符合则发布资源转移任务
-    if (source && source.store.getUsedCapacity(resource) > sourceLimit) {
+    if (
+      source &&
+      source.store.getUsedCapacity(resource) > sourceLimit &&
+      !this.room.transport.hasTask("fillPowerSpawn")
+    ) {
       this.room.transport.addTask({
         type: "fillPowerSpawn",
         id: this.id,
-        resourceType: resource
+        resourceType: resource,
+        priority: 0
       });
     }
 

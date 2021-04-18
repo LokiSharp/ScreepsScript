@@ -1,4 +1,4 @@
-import { baseLayout } from "setting";
+import { baseLayout } from "@/setting";
 
 /**
  * 放置集中布局之外的 link

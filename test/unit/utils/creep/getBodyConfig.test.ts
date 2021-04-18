@@ -1,5 +1,4 @@
-import { assert } from "chai";
-import getBodyConfig from "../../../../src/utils/creep/getBodyConfig";
+import getBodyConfig from "@/utils/creep/getBodyConfig";
 
 describe("getBodyConfig", () => {
   it("可以解析 bodySets", () => {
@@ -13,7 +12,7 @@ describe("getBodyConfig", () => {
       { [WORK]: 12, [CARRY]: 1, [MOVE]: 6 },
       { [WORK]: 12, [CARRY]: 1, [MOVE]: 6 }
     );
-    assert.includeMembers(testBodyConfig[300], [CARRY, MOVE, WORK]);
-    assert.includeMembers(testBodyConfig[10000], [CARRY, MOVE, WORK]);
+    [CARRY, MOVE, WORK].forEach(item => expect(testBodyConfig[300]).toContain(item));
+    [CARRY, MOVE, WORK].forEach(item => expect(testBodyConfig[10000]).toContain(item));
   });
 });

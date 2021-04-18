@@ -1,6 +1,6 @@
 import PowerSpawnExtension from "./PowerSpawnExtension";
-import colorful from "utils/console/colorful";
-import { createHelp } from "modules/help";
+import colorful from "@/utils/console/colorful";
+import { createHelp } from "@/modules/help";
 
 export default class PowerSpawnHelp extends PowerSpawnExtension {
   /**

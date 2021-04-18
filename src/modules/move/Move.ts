@@ -1,6 +1,6 @@
 import { Cross } from "./Cross";
 import { WayPoint } from "./WayPoint";
-import { addCrossShardRequest } from "modules/crossShard";
+import { addCrossShardRequest } from "@/modules/crossShard";
 import crossRules from "./crossRules";
 
 export class Move {
@@ -298,8 +298,8 @@ export class Move {
             };
 
             // 给建筑和工地添加 cost
-            room.find(FIND_STRUCTURES).forEach(addCost);
             room.find(FIND_CONSTRUCTION_SITES).forEach(addCost);
+            room.find(FIND_STRUCTURES).forEach(addCost);
 
             this.costCache[room.name] = costs.clone();
           }
