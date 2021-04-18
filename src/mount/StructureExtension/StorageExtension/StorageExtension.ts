@@ -23,7 +23,7 @@ export default class StorageExtension extends StructureStorage {
 
     if (Game.time % 20) return;
 
-    if (this.store[RESOURCE_ENERGY] <= FACTORY_ENERGY_LIMIT) {
+    if (this.room.terminal && this.store[RESOURCE_ENERGY] <= FACTORY_ENERGY_LIMIT) {
       if (this.room.terminal.store[RESOURCE_ENERGY] > 30000) this.room.terminal.energyCheck();
       else this.room.share.request(RESOURCE_ENERGY, 50000);
     }
