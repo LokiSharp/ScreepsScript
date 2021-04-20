@@ -205,7 +205,7 @@ export function addCrossShardRequest<K extends CrossShardRequestType>(
  *
  * @param creepName 要取出内存的 creep 名字
  */
-export function getMemoryFromCrossShard(creepName: string): CreepMemory | PowerCreepMemory {
+export function getMemoryFromCrossShard(creepName: string): CreepMemory {
   if (!Memory.crossShardCreeps) return undefined;
 
   // 取出并清空暂存区

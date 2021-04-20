@@ -146,7 +146,7 @@ export class Move {
       // 移动到去其他 shard 的传送门上了，发送跨 shard 请求
       if (portal && !(portal.destination instanceof RoomPosition)) {
         WayPoint.updateWayPoint(creep);
-        const { name, memory } = creep;
+        const { name, memory } = creep as Creep;
         // 移除移动路径，到下个 shard 可以重新规划路径
         delete memory.moveInfo.path;
         console.log(`向 ${portal.destination.shard} 发送 sendCreep 任务`, JSON.stringify({ name, memory }));
@@ -156,7 +156,7 @@ export class Move {
           memory
         });
 
-        // 主动释放掉自己的内存，从而避免 creepController 认为自己去世了而直接重新孵化
+        // 主动释放掉自己的内存，从而避免 creep 认为自己去世了而直接重新孵化
         // 这里因为上面已经执行了 move，所以下个 tick 就直接到目标 shard 了，不会报错找不到自己内存
         delete Memory.creeps[creep.name];
 

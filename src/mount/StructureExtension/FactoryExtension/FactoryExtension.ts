@@ -1,9 +1,9 @@
 import {
+  FACTORY_ENERGY_LIMIT,
   FACTORY_LOCK_AMOUNT,
   FACTORY_STATE,
   commodityMax,
   factoryBlacklist,
-  factoryEnergyLimit,
   factoryTopTargets
 } from "@/setting";
 import { setRoomStats } from "@/modules/stats";
@@ -24,7 +24,7 @@ export default class FactoryExtension extends StructureFactory {
     // 执行 factory 工作
     if (this.runFactory()) {
       // 如果 storage 里能量不足了则休眠
-      if (this.room.storage && this.room.storage.store[RESOURCE_ENERGY] >= factoryEnergyLimit) return;
+      if (this.room.storage && this.room.storage.store[RESOURCE_ENERGY] >= FACTORY_ENERGY_LIMIT) return;
       else this.gotoBed(10000, "能量不足");
     }
   }

@@ -27,7 +27,7 @@ export const factoryBlacklist = [
 ];
 
 // 工厂在 storage 中能量低于该值时将暂停工作
-export const factoryEnergyLimit = 300000;
+export const FACTORY_ENERGY_LIMIT = 300000;
 
 /**
  * 工厂不同沉积物 1-5 等级对应的顶级产物

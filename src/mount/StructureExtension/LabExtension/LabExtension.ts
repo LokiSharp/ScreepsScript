@@ -252,9 +252,10 @@ export default class LabExtension extends StructureLab {
 
     // 检查底物是否足够
     const targetResource = labTarget[this.room.memory.lab.targetIndex].target;
-    const hasInsufficientResource = reactionSource[targetResource].find(
-      res => termial.store[res] < this.room.memory.lab.targetAmount
-    );
+    const hasInsufficientResource = reactionSource[targetResource].find(res => {
+      if (termial.store[res] < this.room.memory.lab.targetAmount)
+        this.room.share.request(res, this.room.memory.lab.targetAmount - termial.store[res]);
+    });
 
     // 有不足的底物, 重新查找目标
     if (hasInsufficientResource) {
@@ -356,9 +357,7 @@ export default class LabExtension extends StructureLab {
       this.log(`reactionSource 中未定义 ${resourceType}`, "yellow");
       return 0;
     }
-    const needResources = needResourcesName
-      .map(res => (this.room.terminal.store[res] as number) || 0)
-      .sort((a, b) => a - b);
+    const needResources = needResourcesName.map(res => this.room.terminal.store[res] || 0).sort((a, b) => a - b);
 
     // 找到能被5整除的最大底物数量
     if (needResources.length <= 0) return 0;
@@ -381,7 +380,7 @@ export default class LabExtension extends StructureLab {
       // 获取底物及其数量
       const resource = reactionSource[targetResource].map((res, index) => ({
         id: labMemory.inLab[index],
-        type: res as ResourceConstant
+        type: res
       }));
 
       // 发布任务

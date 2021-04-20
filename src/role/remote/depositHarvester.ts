@@ -83,7 +83,10 @@ export const depositHarvester: CreepConfig<"depositHarvester"> = {
     return false;
   },
   target: creep => {
-    const { sourceFlagName, spawnRoom } = creep.memory.data;
+    const {
+      spawnRoom,
+      data: { sourceFlagName }
+    } = creep.memory;
     const room = Game.rooms[spawnRoom];
     if (!room || !room.terminal) {
       creep.log(`[${creep.name}] 找不到存放建筑`, "yellow");

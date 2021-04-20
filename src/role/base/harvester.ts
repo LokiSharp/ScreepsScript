@@ -1,5 +1,6 @@
 import { HARVEST_MODE, bodyConfigs } from "@/setting";
 import { addConstructionSite } from "@/modules/ConstructionController";
+import calcBodyPart from "@/utils/creep/calcBodyPart";
 import createBodyGetter from "@/utils/creep/createBodyGetter";
 
 /**
@@ -204,9 +205,9 @@ const actionStrategy: ActionStrategy = {
     source: (creep, source) => {
       if (creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) return true;
 
-      const result = creep.getEngryFrom(source);
+      creep.getEngryFrom(source);
 
-      if (result === ERR_NOT_ENOUGH_RESOURCES) {
+      if (source.energy < source.energyCapacity / 2) {
         // 如果满足下列条件就重新发送 regen_source 任务
         if (
           // creep 允许重新发布任务
@@ -276,9 +277,9 @@ export const harvester: CreepConfig<"harvester"> = {
     const source = Game.getObjectById(data.sourceId);
 
     // 如果没视野或者边上没有 Link 的话，就用 harvester 标准的部件
-    const bodyConfig = !source || !source.getLink() ? bodyConfigs.harvester : bodyConfigs.worker;
-
-    return createBodyGetter(bodyConfig)(room, spawn);
+    return !source || !source.getLink()
+      ? createBodyGetter(bodyConfigs.harvester)(room, spawn)
+      : calcBodyPart({ [WORK]: 16, [CARRY]: 4, [MOVE]: 8 });
   }
 };
 

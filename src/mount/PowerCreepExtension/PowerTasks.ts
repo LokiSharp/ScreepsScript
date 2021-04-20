@@ -178,6 +178,7 @@ export const PowerTasks: IPowerTaskConfigs = {
       }
     }
   },
+
   /**
    * 强化 spawn
    */
@@ -217,6 +218,32 @@ export const PowerTasks: IPowerTaskConfigs = {
       } else {
         creep.log(
           `[${creep.room.name} ${creep.name}] 执行 PWR_OPERATE_SPAWN target 时出错，错误码 ${actionResult}`,
+          "red"
+        );
+        return OK;
+      }
+    }
+  },
+
+  /**
+   * 强化 spawn
+   */
+  [PWR_OPERATE_STORAGE]: {
+    source: (creep: PowerCreep): OK | ERR_NOT_ENOUGH_RESOURCES | ERR_BUSY =>
+      creep.getOps(POWER_INFO[PWR_OPERATE_STORAGE].ops),
+    target: (creep: PowerCreep): OK | ERR_NOT_ENOUGH_RESOURCES | ERR_BUSY => {
+      // 资源不足直接执行 source
+      if (creep.store[RESOURCE_OPS] < POWER_INFO[PWR_OPERATE_STORAGE].ops) return ERR_NOT_ENOUGH_RESOURCES;
+
+      const actionResult = creep.usePower(PWR_OPERATE_STORAGE, creep.room.storage);
+
+      if (actionResult === OK) return OK;
+      else if (actionResult === ERR_NOT_IN_RANGE) {
+        creep.goTo(creep.room.storage.pos);
+        return ERR_BUSY;
+      } else {
+        creep.log(
+          `[${creep.room.name} ${creep.name}] 执行 PWR_OPERATE_STORAGE target 时出错，错误码 ${actionResult}`,
           "red"
         );
         return OK;

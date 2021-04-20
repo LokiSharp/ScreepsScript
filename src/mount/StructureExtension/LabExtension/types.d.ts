@@ -15,5 +15,5 @@ interface LabMemory {
 
 // 反应底物表接口
 interface IReactionSource {
-  [targetResourceName: string]: string[];
+  [targetResourceName: string]: ResourceConstant[];
 }

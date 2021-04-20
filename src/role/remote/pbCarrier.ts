@@ -56,7 +56,10 @@ export const pbCarrier: CreepConfig<"pbCarrier"> = {
     return false;
   },
   target: creep => {
-    const { sourceFlagName, spawnRoom: spawnRoomName } = creep.memory.data;
+    const {
+      spawnRoom: spawnRoomName,
+      data: { sourceFlagName }
+    } = creep.memory;
     // 获取资源运输目标房间并兜底
     const room = Game.rooms[spawnRoomName];
     if (!room || !room.terminal) {

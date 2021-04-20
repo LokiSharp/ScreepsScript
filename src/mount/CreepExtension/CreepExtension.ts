@@ -1,6 +1,5 @@
 import { MIN_WALL_HITS, repairSetting } from "@/setting";
 import { Move, WayPoint } from "@/modules/move";
-import { creepApi } from "@/modules/creepController/creepApi";
 import creepWorks from "@/role";
 import { getMemoryFromCrossShard } from "@/modules/crossShard";
 import { getNearSite } from "@/modules/ConstructionController";
@@ -701,12 +700,5 @@ export class CreepExtension extends Creep {
     }
 
     return targets;
-  }
-
-  /**
-   * 呼叫防御力量
-   */
-  public callDefender(targetRoomName: string, targetFlagName: string, spawnRoomName: string): void {
-    creepApi.add(`${targetRoomName} remoteDefender`, "attacker", { targetFlagName, keepSpawn: false }, spawnRoomName);
   }
 }

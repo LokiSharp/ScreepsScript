@@ -9,10 +9,10 @@ interface Memory {
    * 等 creep 抵达后在由其亲自放在 creepConfigs 里
    *
    * 不能直接放在 creepConfigs
-   * 因为有可能出现内存到了但是 creep 还没到的情况，这时候 creepController 就会以为这个 creep 死掉了从而直接把内存回收掉
+   * 因为有可能出现内存到了但是 creep 还没到的情况，这时候 creep 就会以为这个 creep 死掉了从而直接把内存回收掉
    */
   crossShardCreeps: {
-    [creepName: string]: CreepMemory | PowerCreepMemory;
+    [creepName: string]: CreepMemory;
   };
 }
 
@@ -67,7 +67,7 @@ interface CrossShardDatas {
     /**
      * 要重新孵化的 creep 的内存
      */
-    memory: CreepMemory | PowerCreepMemory;
+    memory: CreepMemory;
   };
 }
 

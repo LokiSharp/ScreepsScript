@@ -6,7 +6,6 @@ interface RoomMemory {
   // 执行移除时会检查该时间，如果已经过期的话将不会执行移除操作
   removeTime?: number;
   // 该房间的生产队列，元素为 creepConfig 的键名
-  spawnList?: string[];
   // 需要放置的工地（CS）队列
   delayCSList: string[];
 
@@ -180,14 +179,6 @@ interface UpgradePosInfo {
  */
 interface Room {
   log(content: string, instanceName?: string, color?: Colors | undefined, notify?: boolean): void;
-
-  // 孵化队列 api
-  addSpawnTask(taskName: string): number | ERR_NAME_EXISTS;
-
-  hasSpawnTask(taskName: string): boolean;
-
-  clearSpawnTask(): void;
-  hangSpawnTask(): void;
 
   // pos 处理 api
   serializePos(pos: RoomPosition): string;

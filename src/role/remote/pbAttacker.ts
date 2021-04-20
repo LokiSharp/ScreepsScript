@@ -8,7 +8,10 @@ import { removeSelfGroup } from "@/utils/creep/removeSelfGroup";
  */
 export const pbAttacker: CreepConfig<"pbAttacker"> = {
   prepare: creep => {
-    const { sourceFlagName, healerCreepName, spawnRoom } = creep.memory.data;
+    const {
+      spawnRoom,
+      data: { sourceFlagName, healerCreepName }
+    } = creep.memory;
     const targetFlag = Game.flags[sourceFlagName];
     if (!targetFlag) {
       creep.say("旗呢？");
@@ -115,7 +118,7 @@ export const pbAttacker: CreepConfig<"pbAttacker"> = {
         }
 
         // 下面这个 1600 是 [ CARRY: 32, MOVE: 16 ] 的 pbCarrier 的最大运输量
-        spawnRoom.release.pbCarrierGroup(sourceFlagName, Math.ceil(powerbank.power / 1600));
+        spawnRoom.spawner.release.pbCarrierGroup(sourceFlagName, Math.ceil(powerbank.power / 1600));
 
         // 设置为新状态
         targetFlag.memory.state = PB_HARVEST_STATE.PREPARE;
