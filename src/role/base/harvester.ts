@@ -1,6 +1,5 @@
 import { HARVEST_MODE, bodyConfigs } from "@/setting";
 import { addConstructionSite } from "@/modules/ConstructionController";
-import calcBodyPart from "@/utils/creep/calcBodyPart";
 import createBodyGetter from "@/utils/creep/createBodyGetter";
 
 /**
@@ -273,14 +272,7 @@ export const harvester: CreepConfig<"harvester"> = {
     return actionStrategy[creep.memory.harvestMode].target(creep);
   },
 
-  bodys: (room, spawn, data) => {
-    const source = Game.getObjectById(data.sourceId);
-
-    // 如果没视野或者边上没有 Link 的话，就用 harvester 标准的部件
-    return !source || !source.getLink()
-      ? createBodyGetter(bodyConfigs.harvester)(room, spawn)
-      : calcBodyPart({ [WORK]: 16, [CARRY]: 4, [MOVE]: 8 });
-  }
+  bodys: (room, spawn) => createBodyGetter(bodyConfigs.harvester)(room, spawn)
 };
 
 type ActionStrategy = {
