@@ -22,8 +22,8 @@ export const bodyConfigs: BodyConfigs = {
     { [WORK]: 10, [CARRY]: 1, [MOVE]: 5 },
     { [WORK]: 12, [CARRY]: 1, [MOVE]: 6 },
     { [WORK]: 12, [CARRY]: 1, [MOVE]: 6 },
-    { [WORK]: 12, [CARRY]: 1, [MOVE]: 6 },
-    { [WORK]: 12, [CARRY]: 1, [MOVE]: 6 }
+    { [WORK]: 16, [CARRY]: 4, [MOVE]: 8 },
+    { [WORK]: 16, [CARRY]: 4, [MOVE]: 8 }
   ),
 
   /**
