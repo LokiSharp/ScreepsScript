@@ -272,37 +272,6 @@ export class CreepExtension extends Creep {
   }
 
   /**
-   * 获取下一个建筑工地
-   * 有的话将其 id 写入自己 memory.constructionSiteId
-   *
-   * @returns 下一个建筑工地，或者 null
-   */
-  private updateConstructionSite(): ConstructionSite | undefined {
-    const targets: ConstructionSite[] = this.room.find(FIND_MY_CONSTRUCTION_SITES);
-    if (targets.length > 0) {
-      let target: ConstructionSite;
-      // 优先建造 spawn，然后是 extension，想添加新的优先级就在下面的数组里追加即可
-      for (const type of [STRUCTURE_SPAWN, STRUCTURE_EXTENSION]) {
-        target = targets.find(cs => cs.structureType === type);
-        if (target) break;
-      }
-      // 优先建造的都完成了，按照距离建造
-      if (!target) target = this.pos.findClosestByRange(targets);
-
-      // 缓存工地信息，用于统一建造并在之后验证是否完成建造
-      this.room.memory.constructionSiteId = target.id;
-      this.room.memory.constructionSiteType = target.structureType;
-      this.room.memory.constructionSitePos = [target.pos.x, target.pos.y];
-      return target;
-    } else {
-      delete this.room.memory.constructionSiteId;
-      delete this.room.memory.constructionSiteType;
-      delete this.room.memory.constructionSitePos;
-      return undefined;
-    }
-  }
-
-  /**
    * 填充防御性建筑
    * 包括 wall 和 rempart
    */
@@ -697,5 +666,23 @@ export class CreepExtension extends Creep {
     }
 
     return targets;
+  }
+
+  /**
+   * 待命
+   * 移动到 [房间名 StandBy] 旗帜的位置
+   */
+  public standBy(): void {
+    // 如果已经在待命位置则原地不动
+    if (this.memory.isStanBy) return;
+    // 获取旗帜
+    const standByFlag = this.getFlag(`${this.name} StandBy`);
+    if (!standByFlag) {
+      this.say("去哪待命?");
+      return;
+    }
+    // 如果没到 就向旗帜移动
+    if (!this.pos.isEqualTo(standByFlag.pos)) this.goTo(standByFlag.pos, { range: 0 });
+    else this.memory.isStanBy = true;
   }
 }
