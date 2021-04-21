@@ -384,7 +384,7 @@ export default class RoomCreepReleaseController {
         name: rangedAttackerName,
         role: "rangedAttacker",
         data: {
-          targetFlagName: targetFlagName,
+          targetFlagName,
           creepName: rangedAttackerName,
           keepSpawn,
           wayPoint
