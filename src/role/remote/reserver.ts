@@ -16,7 +16,7 @@ export const reserver: CreepConfig<"reserver"> = {
     const { targetRoomName } = creep.memory.data;
     // 只要进入房间则准备结束
     if (creep.room.name !== targetRoomName) {
-      creep.goTo(new RoomPosition(25, 25, targetRoomName));
+      creep.goTo(new RoomPosition(25, 25, targetRoomName), { checkTarget: false });
       return false;
     } else return true;
   },
@@ -29,11 +29,11 @@ export const reserver: CreepConfig<"reserver"> = {
 
     // 如果房间的预订者不是自己, 就攻击控制器
     if (controller.reservation && controller.reservation.username !== creep.owner.username) {
-      if (creep.attackController(controller) === ERR_NOT_IN_RANGE) creep.goTo(controller.pos, { range: 1 });
+      if (creep.attackController(controller) === ERR_NOT_IN_RANGE) creep.goTo(controller.pos, { checkTarget: false });
     }
     // 房间没有预定满, 就继续预定
     if (!controller.reservation || controller.reservation.ticksToEnd < CONTROLLER_RESERVE_MAX) {
-      if (creep.reserveController(controller) === ERR_NOT_IN_RANGE) creep.goTo(controller.pos, { range: 1 });
+      if (creep.reserveController(controller) === ERR_NOT_IN_RANGE) creep.goTo(controller.pos, { checkTarget: false });
     }
     return false;
   },

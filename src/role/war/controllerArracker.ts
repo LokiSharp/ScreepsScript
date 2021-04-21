@@ -19,7 +19,6 @@ export const controllerArracker: CreepConfig<"controllerArracker"> = {
     if (creep.room.name !== targetRoomName) {
       if (wayPoint && creep.memory.fromShard) {
         creep.goTo(undefined, {
-          checkTarget: true,
           range: 0
         });
       } else {

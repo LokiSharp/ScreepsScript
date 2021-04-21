@@ -12,10 +12,10 @@ export const buildHelper: CreepConfig<"buildHelper"> = {
     const { spawnRoom, targetRoomName } = creep.memory.data;
     if (creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
       if (creep.room.name !== targetRoomName) {
-        creep.goTo(new RoomPosition(25, 25, targetRoomName));
+        creep.goTo(new RoomPosition(25, 25, targetRoomName), { checkTarget: false });
         return false;
       } else {
-        creep.goTo(new RoomPosition(25, 25, targetRoomName));
+        creep.goTo(new RoomPosition(25, 25, targetRoomName), { checkTarget: false });
         delete creep.memory.moveInfo;
         return true;
       }

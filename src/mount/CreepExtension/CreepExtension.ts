@@ -492,10 +492,7 @@ export class CreepExtension extends Creep {
     // 如果 creep 不在房间里 则一直向旗帜移动
     if (!attackFlag.room || (attackFlag.room && this.room.name !== attackFlag.room.name)) {
       // 如果 healer 存在则只会在 healer 相邻且可以移动时才进行移动
-      if (!healer || (healer && this.canMoveWith(healer)))
-        this.goTo(attackFlag.pos, {
-          checkTarget: true
-        });
+      if (!healer || (healer && this.canMoveWith(healer))) this.goTo(attackFlag.pos);
       return true;
     }
 

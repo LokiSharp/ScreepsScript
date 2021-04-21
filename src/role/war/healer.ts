@@ -23,7 +23,6 @@ export const healer: CreepConfig<"healer"> = {
     const { creepName } = creep.memory.data;
     if (creep.memory.moveInfo && creep.memory.moveInfo.wayPoints) {
       creep.goTo(undefined, {
-        checkTarget: true,
         range: 0
       });
     }

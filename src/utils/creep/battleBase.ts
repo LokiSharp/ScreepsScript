@@ -19,7 +19,7 @@ export const battleBase = <Role extends CreepRoleConstant>(): ICreepStage<Role> 
     }
 
     // 远程移动
-    creep.goTo(targetFlag.pos, { checkTarget: true });
+    creep.goTo(targetFlag.pos);
     creep.say("🛴", true);
 
     if (creep.pos.roomName === targetFlag.pos.roomName) {

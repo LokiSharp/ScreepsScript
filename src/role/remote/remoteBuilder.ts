@@ -19,7 +19,7 @@ export const remoteBuilder: CreepConfig<"remoteBuilder"> = {
   source: creep => {
     if (creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
       const { targetRoomName } = creep.memory.data;
-      creep.goTo(new RoomPosition(25, 25, targetRoomName));
+      creep.goTo(new RoomPosition(25, 25, targetRoomName), { checkTarget: false });
       // 只要进入房间则准备结束
       if (creep.room.name !== targetRoomName) return false;
       else {

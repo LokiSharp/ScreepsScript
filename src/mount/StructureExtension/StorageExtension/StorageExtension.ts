@@ -1,9 +1,4 @@
-import {
-  DEFAULT_ENERGY_KEEP_AMOUNT,
-  DEFAULT_ENERGY_KEEP_LIMIT,
-  ENERGY_SHARE_LIMIT,
-  FACTORY_ENERGY_LIMIT
-} from "@/setting";
+import { DEFAULT_ENERGY_KEEP_AMOUNT, DEFAULT_ENERGY_KEEP_LIMIT, ENERGY_SHARE_LIMIT } from "@/setting";
 
 /**
  * Storage 拓展
@@ -23,7 +18,7 @@ export default class StorageExtension extends StructureStorage {
 
     if (Game.time % 20) return;
 
-    if (this.room.terminal && this.store[RESOURCE_ENERGY] <= FACTORY_ENERGY_LIMIT) {
+    if (this.room.terminal && this.store[RESOURCE_ENERGY] <= 400000) {
       if (this.room.terminal.store[RESOURCE_ENERGY] > 30000) this.room.terminal.energyCheck();
       else this.room.share.request(RESOURCE_ENERGY, 50000);
     }

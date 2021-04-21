@@ -52,7 +52,7 @@ export const reiver: CreepConfig<"reiver"> = {
     }
 
     // 移动并统计移动时长
-    creep.goTo(flag.pos);
+    creep.goTo(flag.pos, { checkTarget: false });
     flag.memory.travelTime = flag.memory.travelTime === undefined ? 0 : flag.memory.travelTime + 1;
     return false;
   },

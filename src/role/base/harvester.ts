@@ -72,7 +72,7 @@ const goToDropPos = function (
   }
 
   // 执行移动
-  const result = creep.goTo(targetPos, { range });
+  const result = creep.goTo(targetPos, { range, checkTarget: false });
   return { result, targetPos, range };
 };
 
@@ -143,7 +143,7 @@ const actionStrategy: ActionStrategy = {
         return false;
       }
 
-      creep.goTo(targetSpawn.pos, { range: 1 });
+      creep.goTo(targetSpawn.pos, { checkTarget: false });
       creep.transferTo(targetSpawn, RESOURCE_ENERGY);
       return false;
     }
@@ -163,7 +163,7 @@ const actionStrategy: ActionStrategy = {
         return false;
       }
 
-      creep.goTo(container.pos, { range: 0 });
+      creep.goTo(container.pos, { range: 0, checkTarget: false });
       // 没抵达位置了就还没准备完成
       if (!creep.pos.inRangeTo(container, 0)) return false;
 
@@ -251,7 +251,7 @@ export const harvester: CreepConfig<"harvester"> = {
   prepare: creep => {
     const { harvestRoom, sourceId } = creep.memory.data;
     if (creep.room.name !== harvestRoom) {
-      creep.goTo(new RoomPosition(25, 25, harvestRoom));
+      creep.goTo(new RoomPosition(25, 25, harvestRoom), { checkTarget: false });
       return false;
     }
     const source = Game.getObjectById(sourceId);

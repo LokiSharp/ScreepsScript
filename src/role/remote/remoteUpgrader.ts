@@ -17,7 +17,7 @@ export const remoteUpgrader: CreepConfig<"remoteUpgrader"> = {
   // 向指定房间移动
   prepare: creep => {
     const { targetRoomName } = creep.memory.data;
-    creep.goTo(new RoomPosition(25, 25, targetRoomName));
+    creep.goTo(new RoomPosition(25, 25, targetRoomName), { checkTarget: false });
     // 只要进入房间则准备结束
     if (creep.room.name !== targetRoomName) return false;
     else {

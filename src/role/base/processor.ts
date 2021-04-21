@@ -12,7 +12,7 @@ export const processor: CreepConfig<"processor"> = {
 
     if (creep.pos.isEqualTo(x, y)) return true;
     else {
-      creep.goTo(new RoomPosition(x, y, creep.room.name), { range: 0 });
+      creep.goTo(new RoomPosition(x, y, creep.room.name), { range: 0, checkTarget: false });
       return false;
     }
   },
@@ -40,7 +40,7 @@ export const processor: CreepConfig<"processor"> = {
     // 资源不足就移除任务
     else if (result === ERR_NOT_ENOUGH_RESOURCES) creep.room.centerTransport.deleteCurrentTask();
     // 够不到就移动过去
-    else if (result === ERR_NOT_IN_RANGE) creep.goTo(structure.pos, { range: 1 });
+    else if (result === ERR_NOT_IN_RANGE) creep.goTo(structure.pos);
     else if (result === ERR_FULL) return true;
     else {
       creep.log(`source 阶段取出异常，错误码 ${result}`, "red");
@@ -65,7 +65,7 @@ export const processor: CreepConfig<"processor"> = {
       return false;
     }
 
-    const result = creep.transferTo(structure, task.resourceType, { range: 1 });
+    const result = creep.transferTo(structure, task.resourceType);
 
     // 如果转移完成则增加任务进度
     if (result === OK) {

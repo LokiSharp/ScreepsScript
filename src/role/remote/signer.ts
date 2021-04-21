@@ -15,9 +15,9 @@ export const signer: CreepConfig<"signer"> = {
         creep.room.controller.sign.username !== creep.owner.username)
     ) {
       if (creep.signController(creep.room.controller, signText) === ERR_NOT_IN_RANGE) {
-        creep.goTo(creep.room.controller.pos);
+        creep.goTo(creep.room.controller.pos, { checkTarget: false });
       } else creep.log(`目标房间 ${targetRoomName} 签名内容修改为：${signText}`);
-    } else creep.goTo(new RoomPosition(25, 25, targetRoomName));
+    } else creep.goTo(new RoomPosition(25, 25, targetRoomName), { checkTarget: false });
 
     return false;
   },

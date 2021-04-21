@@ -47,7 +47,7 @@ export const depositHarvester: CreepConfig<"depositHarvester"> = {
       // 旅途时间还没有计算完成
       else if (!targetFlag.memory.travelComplete) targetFlag.memory.travelTime++; // 增量
 
-      creep.goTo(targetFlag.pos, { range: 1 });
+      creep.goTo(targetFlag.pos, { checkTarget: false });
 
       return false;
     }
@@ -94,7 +94,7 @@ export const depositHarvester: CreepConfig<"depositHarvester"> = {
     }
 
     // 转移并检测返回值
-    const result = creep.transferTo(room.terminal, creep.memory.depositType, { range: 1 });
+    const result = creep.transferTo(room.terminal, creep.memory.depositType);
     if (result === OK || result === ERR_NOT_ENOUGH_RESOURCES) {
       // 获取旗帜，旗帜没了就自杀
       const targetFlag = Game.flags[sourceFlagName];

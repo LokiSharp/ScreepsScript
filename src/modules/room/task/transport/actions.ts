@@ -171,7 +171,7 @@ export const actions: {
         }
 
         // 移动到目的地，获取资源
-        creep.goTo(targetStructure.pos, { range: 1 });
+        creep.goTo(targetStructure.pos);
         if (task.endWith) transport.countWorkTime();
         const result = creep.withdraw(targetStructure, task.resourceType);
         return result === OK;
@@ -194,7 +194,7 @@ export const actions: {
         }
 
         // 移动到目的地，捡起资源
-        creep.goTo(targetPos, { range: 1 });
+        creep.goTo(targetPos);
         if (task.endWith) transport.countWorkTime();
         const result = creep.pickup(targetRes);
         return result === OK;
@@ -210,7 +210,7 @@ export const actions: {
         if (!targetStructure) transport.removeTask(task.key);
 
         // 移动到目的地，获取资源
-        creep.goTo(targetStructure.pos, { range: 1 });
+        creep.goTo(targetStructure.pos);
         const result = creep.transfer(targetStructure, task.resourceType);
         return result === OK;
       }
@@ -221,7 +221,7 @@ export const actions: {
         const targetPos = new RoomPosition(x, y, roomName);
 
         // 移动到目的地，捡起资源
-        creep.goTo(targetPos, { range: 1 });
+        creep.goTo(targetPos);
         const result = creep.drop(task.resourceType);
         return result === OK;
       }

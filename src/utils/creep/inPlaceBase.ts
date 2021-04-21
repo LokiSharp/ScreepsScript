@@ -11,7 +11,6 @@ export const inPlaceBase = <Role extends CreepRoleConstant>(): ICreepStage<Role>
   inPlace: creep => {
     if (creep.memory.moveInfo?.wayPoints) {
       creep.goTo(undefined, {
-        checkTarget: true,
         range: 0
       });
       return creep.memory.moveInfo?.wayPoints?.length <= 0;

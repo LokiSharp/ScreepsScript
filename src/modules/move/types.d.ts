@@ -36,7 +36,7 @@ interface MoveOpt {
 
   /**
    * 是否检查目标发生了变化，为 true 的话会每 tick 检查目标位置是否变化
-   * 一旦变化则会立刻重新规划
+   * 一旦变化则会立刻重新查找移动路线，默认为 true
    */
   checkTarget?: boolean;
 

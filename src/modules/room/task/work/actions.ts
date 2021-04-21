@@ -130,7 +130,7 @@ export const transportActions: {
         return false;
       }
 
-      creep.goTo(droppedEnergy.pos, { range: 1 });
+      creep.goTo(droppedEnergy.pos);
       creep.pickup(droppedEnergy);
       return true;
     },

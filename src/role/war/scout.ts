@@ -17,7 +17,6 @@ export const scout: CreepConfig<"scout"> = {
     const { targetFlagName } = creep.memory.data;
     const targetFlag = creep.getFlag(targetFlagName);
     creep.goTo(targetFlag.pos, {
-      checkTarget: true,
       range: 0
     });
 

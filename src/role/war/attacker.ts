@@ -22,9 +22,7 @@ export const attacker: CreepConfig<"attacker"> = {
     }
     if (creep.room.name !== targetFlag.pos.roomName) return true;
     else {
-      creep.goTo(targetFlag.pos, {
-        checkTarget: true
-      });
+      creep.goTo(targetFlag.pos);
       return false;
     }
   },

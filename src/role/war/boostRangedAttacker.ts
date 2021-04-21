@@ -29,9 +29,7 @@ export const boostRangedAttacker: CreepConfig<"boostRangedAttacker"> = {
     // 如果 creep 不在房间里 则一直向旗帜移动
     if (!targetFlag.room || (targetFlag.room && creep.room.name !== targetFlag.room.name)) {
       // 如果 healer 存在则只会在 healer 相邻且可以移动时才进行移动
-      creep.goTo(targetFlag.pos, {
-        checkTarget: true
-      });
+      creep.goTo(targetFlag.pos);
     }
 
     if (creep.room.name === targetFlag.pos.roomName) {

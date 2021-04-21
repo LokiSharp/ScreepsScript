@@ -18,7 +18,6 @@ export const moveTester: CreepConfig<"moveTester"> = {
   },
   target: creep => {
     const result = creep.goTo(undefined, {
-      checkTarget: true,
       range: 0
     });
     if (creep.memory.moveInfo) {
