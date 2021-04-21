@@ -343,7 +343,8 @@ export default [
             room =>
               room.nuker &&
               room.nuker.store[RESOURCE_ENERGY] >= NUKER_ENERGY_CAPACITY &&
-              room.nuker.store[RESOURCE_GHODIUM] >= NUKER_GHODIUM_CAPACITY
+              room.nuker.store[RESOURCE_GHODIUM] >= NUKER_GHODIUM_CAPACITY &&
+              room.nuker.cooldown <= 0
           )
           .map(room => room.name);
         if (hasNukerRoom.length <= 0) return `未找到 nuker，请确保有装填完成的 nuker`;

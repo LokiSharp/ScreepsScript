@@ -20,7 +20,7 @@ export async function runRCLTest(RCL: number, tickNum: number): Promise<void> {
         console.log(`-> RCL${RCL} ${gameTime} tick`);
         break;
       } else {
-        const rclProgressPercent = 98;
+        const rclProgressPercent = 99;
         if (controllerRatio < rclProgressPercent) {
           console.log(`-> RCL${controllerLevel}`);
           await db["rooms.objects"].update(
