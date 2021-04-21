@@ -26,7 +26,7 @@ const now = new Date();
  */
 const LOG_DIR = resolve(
   __dirname,
-  `../server/logs/${now.getFullYear()}-${
+  `../../../server/logs/${now.getFullYear()}-${
     now.getMonth() + 1
   }-${now.getDate()} ${now.getHours()}-${now.getMinutes()}-${now.getSeconds()}`
 );
