@@ -7,10 +7,10 @@ class SpawningMock {
   public needTime = 10;
   public remainingTime = 10;
   public spawn: StructureSpawn = getMockSpawn();
-  public cancel = () => {
+  public cancel = (): void => {
     // PASS
   };
-  public setDirections = () => {
+  public setDirections = (): void => {
     // PASS
   };
 }

@@ -9,6 +9,9 @@ export class RoomMock extends BaseMock {
   public energyCapacityAvailable = 0;
   public memory = {};
   public visual = getMockVisual();
+  public log = (): void => {
+    // PASS
+  };
 }
 
 /**

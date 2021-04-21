@@ -6,13 +6,13 @@ class StructureSpawnMock extends StructureMock {
   public name = "mockSpawn";
   public spawning: Spawning | null;
   public store: Store<RESOURCE_ENERGY, false>;
-  public spawnCreep = () => {
+  public spawnCreep = (): void => {
     // PASS
   };
-  public renewCreep = () => {
+  public renewCreep = (): void => {
     // PASS
   };
-  public recycleCreep = () => {
+  public recycleCreep = (): void => {
     // PASS
   };
 
