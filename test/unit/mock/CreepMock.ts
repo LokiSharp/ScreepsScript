@@ -152,7 +152,7 @@ export class CreepMock extends RoomObjectMock {
     return undefined;
   }
   @pushMethodCallInfoToCalled
-  public upgrade(): ScreepsReturnCode {
+  public upgradeRoom(): ScreepsReturnCode {
     return undefined;
   }
   @pushMethodCallInfoToCalled

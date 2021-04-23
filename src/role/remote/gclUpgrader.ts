@@ -121,7 +121,7 @@ export const gclUpgrader: CreepConfig<"gclUpgrader"> = {
       if (road.hits < road.hitsMax) creep.repair(road);
     }
 
-    creep.upgrade();
+    creep.upgradeRoom(targetRoomName);
     return creep.store.getUsedCapacity() === 0;
   },
   bodys: () => calcBodyPart({ [WORK]: 26, [CARRY]: 11, [MOVE]: 13 })

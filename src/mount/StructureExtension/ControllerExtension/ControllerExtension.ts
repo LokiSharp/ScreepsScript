@@ -70,7 +70,7 @@ export default class ControllerExtension extends StructureController {
     }
 
     // 规划布局
-    this.log(this.room.planLayout(), "green");
+    if (level !== 1) this.log(this.room.planLayout(), "green");
   }
 
   /**

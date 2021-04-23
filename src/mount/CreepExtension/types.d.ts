@@ -158,7 +158,7 @@ interface Creep<Role extends CreepRoleConstant = CreepRoleConstant> {
 
   transferTo(target: Structure, RESOURCE: ResourceConstant, moveOpt?: MoveOpt): ScreepsReturnCode;
 
-  upgrade(): ScreepsReturnCode;
+  upgradeRoom(roomName: string): ScreepsReturnCode;
 
   buildStructure(
     targetConstruction?: ConstructionSite
