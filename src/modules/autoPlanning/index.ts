@@ -1,4 +1,5 @@
 import { LEVEL_BUILD_RAMPART, LEVEL_BUILD_ROAD } from "@/setting";
+import { addBuildTask } from "@/modules/room/task/work/delayTask";
 import { addConstructionSite } from "@/modules/ConstructionController";
 import planBase from "./planBase";
 import planRoad from "./planRoad";
@@ -185,7 +186,7 @@ export const manageStructure = function (room: Room): OK | ERR_NOT_OWNER | ERR_N
       }));
       addConstructionSite(sitePosList);
       // 发布建造任务
-      room.work.updateTask({ type: "build", priority: 9 }, { dispath: true });
+      addBuildTask(room.name);
     });
   }
 
