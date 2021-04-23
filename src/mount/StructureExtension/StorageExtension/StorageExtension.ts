@@ -10,8 +10,8 @@ export default class StorageExtension extends StructureStorage {
   public onWork(): void {
     if (
       this.store.getFreeCapacity() < 10000 &&
-      this.room.memory.powers &&
-      this.room.memory.powers.split(" ").includes(String(PWR_OPERATE_STORAGE)) &&
+      this.room.power.powers &&
+      this.room.power.powers.includes(PWR_OPERATE_STORAGE) &&
       !(this.effects && this.effects[PWR_OPERATE_STORAGE] && this.effects[PWR_OPERATE_STORAGE])
     )
       this.requirePower();
@@ -34,7 +34,7 @@ export default class StorageExtension extends StructureStorage {
    * 请求 power storage
    */
   private requirePower(): void {
-    if (this.room.controller.isPowerEnabled) this.room.addPowerTask(PWR_OPERATE_STORAGE);
+    if (this.room.controller.isPowerEnabled) this.room.power.addTask(PWR_OPERATE_STORAGE);
     else this.log(`请求 PWR_OPERATE_STORAGE, 但房间并未激活 power`, "yellow");
   }
 

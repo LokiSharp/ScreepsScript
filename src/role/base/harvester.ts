@@ -215,9 +215,9 @@ const actionStrategy: ActionStrategy = {
           (!source.effects || !source.effects[PWR_REGEN_SOURCE])
         ) {
           // 并且房间内的 pc 支持这个任务
-          if (creep.room.memory.powers && creep.room.memory.powers.split(" ").includes(String(PWR_REGEN_SOURCE))) {
+          if (creep.room.power.powers && creep.room.power.powers.includes(PWR_REGEN_SOURCE)) {
             // 添加 power 任务，设置重新尝试时间
-            creep.room.addPowerTask(PWR_REGEN_SOURCE);
+            creep.room.power.addTask(PWR_REGEN_SOURCE);
             creep.memory.regenSource = Game.time + 300;
           } else creep.memory.regenSource = Game.time + 1000;
         }

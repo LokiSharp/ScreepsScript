@@ -101,14 +101,6 @@ interface RoomMemory {
   // powerSpawn 是否暂停
   pausePS?: boolean;
 
-  // power 任务请求队列
-  // 由建筑物发布，powerCreep 查找任务时会优先读取该队列
-  powerTasks: PowerConstant[];
-
-  // 由驻守在房间中的 pc 发布，包含了 pc 拥有对应的能力
-  // 形如: "1 3 13 14"，数字即为对应的 PWR_* 常量
-  powers?: string;
-
   // 工厂内存
   factory: {
     // 当前房间的等级，由用户指定
@@ -193,15 +185,6 @@ interface Room {
     boostConfig: IBoostConfig
   ): OK | ERR_NAME_EXISTS | ERR_NOT_FOUND | ERR_INVALID_ARGS | ERR_NOT_ENOUGH_RESOURCES;
   boostCreep(creep: Creep): OK | ERR_NOT_FOUND | ERR_BUSY | ERR_NOT_IN_RANGE;
-
-  // power 任务 api
-  addPowerTask(task: PowerConstant, priority?: number): OK | ERR_NAME_EXISTS | ERR_INVALID_TARGET;
-
-  deleteCurrentPowerTask(): void;
-
-  getPowerTask(): PowerConstant | undefined;
-
-  hangPowerTask(): void;
 
   // 战争相关
   startWar(boostType: BoostType): OK | ERR_NAME_EXISTS | ERR_NOT_FOUND | ERR_INVALID_TARGET;

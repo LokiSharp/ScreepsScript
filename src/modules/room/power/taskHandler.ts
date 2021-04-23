@@ -1,16 +1,58 @@
+import { PWR_ENABLE_ROOM } from "./constant";
+import RoomPowerController from "./controller";
+
+/**
+ * 所有 power 的任务配置列表
+ */
+interface PowerTaskConfigs {
+  [powerType: string]: PowerTaskConfig;
+}
+
+/**
+ * 每种 power 所对应的的任务配置项
+ * 状态机，执行逻辑类似于 creep 生命周期
+ */
+interface PowerTaskConfig {
+  /**
+   * power 的资源获取逻辑
+   *
+   * @returns OK 任务完成，将会执行下面的 target 方法
+   * @returns ERR_NOT_ENOUGH_RESOURCES 资源不足，将会强制切入 ops 生成任务
+   * @returns ERR_BUSY 任务未完成，保留工作状态，后续继续执行
+   */
+  source?: (creep: PowerCreep, controller: RoomPowerController) => OK | ERR_NOT_ENOUGH_RESOURCES | ERR_BUSY;
+  /**
+   * power 的具体工作逻辑
+   *
+   * @returns OK 任务完成，将会继续检查后续 power
+   * @returns ERR_NOT_ENOUGH_RESOURCES 资源不足，将会执行上面的 source 方法，如果没有 source 的话就强制切入 ops 生成任务
+   * @returns ERR_BUSY 任务未完成，保留工作状态，后续继续执行
+   */
+  target: (creep: PowerCreep, controller: RoomPowerController) => OK | ERR_NOT_ENOUGH_RESOURCES | ERR_BUSY;
+}
+
 /**
  * 所有 power 的任务检查逻辑及工作逻辑
  *
  * @property PWR_* 常量之一，代表对应的任务
  * @value power 任务的具体配置项
  */
-export const PowerTasks: IPowerTaskConfigs = {
+export const PowerTasks: PowerTaskConfigs = {
   /**
    * 房间初始化任务，会在房间 power 任务队列初始化时同时添加
    * 该任务必定为房间的第一个 power 任务
    */
-  [-1]: {
-    target: (creep: PowerCreep): OK | ERR_NOT_ENOUGH_RESOURCES | ERR_BUSY => creep.enablePower()
+  [PWR_ENABLE_ROOM]: {
+    target: (creep: PowerCreep): OK | ERR_NOT_ENOUGH_RESOURCES | ERR_BUSY => {
+      creep.say("正在启用 Power");
+
+      const result = creep.enableRoom(creep.room.controller);
+      if (result === OK) return OK;
+      else if (result === ERR_NOT_IN_RANGE) {
+        creep.goTo(creep.room.controller.pos, { checkTarget: false });
+      }
+      return ERR_BUSY;
+    }
   },
 
   /**
@@ -21,11 +63,11 @@ export const PowerTasks: IPowerTaskConfigs = {
     /**
      * 搓 ops，搓够指定数量就存一下
      */
-    source: (creep: PowerCreep): OK | ERR_NOT_ENOUGH_RESOURCES | ERR_BUSY => {
+    source: (creep: PowerCreep, controller: RoomPowerController): OK | ERR_NOT_ENOUGH_RESOURCES | ERR_BUSY => {
       const actionResult = creep.usePower(PWR_GENERATE_OPS);
 
-      // 如果
-      if (actionResult === ERR_INVALID_ARGS) creep.enablePower();
+      // 如果搓不了，说明有可能房间没激活，添加激活任务
+      if (actionResult === ERR_INVALID_ARGS) controller.addTask(PWR_ENABLE_ROOM, 0);
       else if (actionResult !== OK) creep.log(`ops 生成异常, 错误码: ${actionResult}`, "red");
 
       // 数量够了就 target
@@ -60,8 +102,8 @@ export const PowerTasks: IPowerTaskConfigs = {
    */
   [PWR_OPERATE_EXTENSION]: {
     // 获取能量
-    source: (creep: PowerCreep): OK | ERR_NOT_ENOUGH_RESOURCES | ERR_BUSY =>
-      creep.getOps(POWER_INFO[PWR_OPERATE_EXTENSION].ops),
+    source: (creep: PowerCreep, controller: RoomPowerController): OK | ERR_NOT_ENOUGH_RESOURCES | ERR_BUSY =>
+      controller.giveOps(creep, POWER_INFO[PWR_OPERATE_EXTENSION].ops),
     // 进行填充
     target: (creep: PowerCreep): OK | ERR_NOT_ENOUGH_RESOURCES | ERR_BUSY => {
       // 资源不足直接执行 source
@@ -104,8 +146,8 @@ export const PowerTasks: IPowerTaskConfigs = {
    * 强化 factory
    */
   [PWR_OPERATE_FACTORY]: {
-    source: (creep: PowerCreep): OK | ERR_NOT_ENOUGH_RESOURCES | ERR_BUSY =>
-      creep.getOps(POWER_INFO[PWR_OPERATE_FACTORY].ops),
+    source: (creep: PowerCreep, controller: RoomPowerController): OK | ERR_NOT_ENOUGH_RESOURCES | ERR_BUSY =>
+      controller.giveOps(creep, POWER_INFO[PWR_OPERATE_EXTENSION].ops),
     target: (creep: PowerCreep): OK | ERR_NOT_ENOUGH_RESOURCES | ERR_BUSY => {
       // 资源不足直接执行 source
       if (creep.store[RESOURCE_OPS] < POWER_INFO[PWR_OPERATE_FACTORY].ops) return ERR_NOT_ENOUGH_RESOURCES;
@@ -143,12 +185,12 @@ export const PowerTasks: IPowerTaskConfigs = {
     source: (): OK | ERR_NOT_ENOUGH_RESOURCES | ERR_BUSY => OK,
     target: (creep: PowerCreep): OK | ERR_NOT_ENOUGH_RESOURCES | ERR_BUSY => {
       let target: Source;
-      if (!creep.memory.targetIndex) {
+      if (!creep.memory.sourceIndex) {
         // 如果有 source 没有 regen_source 任务，则将其选为目标
         target = creep.room.source.find((s, index) => {
           if (!s.effects || !s.effects.map(e => e.effect).includes(PWR_REGEN_SOURCE)) {
             // 缓存目标
-            creep.memory.targetIndex = index;
+            creep.memory.sourceIndex = index;
             return true;
           }
           return false;
@@ -156,7 +198,7 @@ export const PowerTasks: IPowerTaskConfigs = {
       }
 
       // 有缓存了就直接获取
-      else target = creep.room.source[creep.memory.targetIndex];
+      else target = creep.room.source[creep.memory.sourceIndex];
       // 两个 source 都有 regen_source 时将获取不到 target
       if (!target) return ERR_BUSY;
 
@@ -164,7 +206,7 @@ export const PowerTasks: IPowerTaskConfigs = {
 
       if (actionResult === OK) {
         // 移除缓存
-        delete creep.memory.targetIndex;
+        delete creep.memory.sourceIndex;
         return OK;
       } else if (actionResult === ERR_NOT_IN_RANGE) {
         creep.goTo(target.pos);
@@ -183,18 +225,18 @@ export const PowerTasks: IPowerTaskConfigs = {
    * 强化 spawn
    */
   [PWR_OPERATE_SPAWN]: {
-    source: (creep: PowerCreep): OK | ERR_NOT_ENOUGH_RESOURCES | ERR_BUSY =>
-      creep.getOps(POWER_INFO[PWR_OPERATE_SPAWN].ops),
+    source: (creep: PowerCreep, controller: RoomPowerController): OK | ERR_NOT_ENOUGH_RESOURCES | ERR_BUSY =>
+      controller.giveOps(creep, POWER_INFO[PWR_OPERATE_EXTENSION].ops),
     target: (creep: PowerCreep): OK | ERR_NOT_ENOUGH_RESOURCES | ERR_BUSY => {
       // 资源不足直接执行 source
       if (creep.store[RESOURCE_OPS] < POWER_INFO[PWR_OPERATE_SPAWN].ops) return ERR_NOT_ENOUGH_RESOURCES;
       let target: StructureSpawn;
-      if (!creep.memory.targetIndex) {
+      if (!creep.memory.spawnIndex) {
         // 如果有 spawn 没有 operate_spawn 任务，则将其选为目标
         target = creep.room.spawn.find((s, index) => {
           if (s.spawning && (!s.effects || !s.effects.map(e => e.effect).includes(PWR_OPERATE_SPAWN))) {
             // 缓存目标
-            creep.memory.targetIndex = index;
+            creep.memory.spawnIndex = index;
             return true;
           }
           return false;
@@ -202,7 +244,7 @@ export const PowerTasks: IPowerTaskConfigs = {
       }
 
       // 有缓存了就直接获取
-      else target = creep.room.spawn[creep.memory.targetIndex];
+      else target = creep.room.spawn[creep.memory.spawnIndex];
       // spawn 都有 operate_spawn 时将获取不到 target
       if (!target) return ERR_BUSY;
 
@@ -210,7 +252,7 @@ export const PowerTasks: IPowerTaskConfigs = {
 
       if (actionResult === OK) {
         // 移除缓存
-        delete creep.memory.targetIndex;
+        delete creep.memory.spawnIndex;
         return OK;
       } else if (actionResult === ERR_NOT_IN_RANGE) {
         creep.goTo(target.pos);
@@ -229,8 +271,8 @@ export const PowerTasks: IPowerTaskConfigs = {
    * 强化 spawn
    */
   [PWR_OPERATE_STORAGE]: {
-    source: (creep: PowerCreep): OK | ERR_NOT_ENOUGH_RESOURCES | ERR_BUSY =>
-      creep.getOps(POWER_INFO[PWR_OPERATE_STORAGE].ops),
+    source: (creep: PowerCreep, controller: RoomPowerController): OK | ERR_NOT_ENOUGH_RESOURCES | ERR_BUSY =>
+      controller.giveOps(creep, POWER_INFO[PWR_OPERATE_EXTENSION].ops),
     target: (creep: PowerCreep): OK | ERR_NOT_ENOUGH_RESOURCES | ERR_BUSY => {
       // 资源不足直接执行 source
       if (creep.store[RESOURCE_OPS] < POWER_INFO[PWR_OPERATE_STORAGE].ops) return ERR_NOT_ENOUGH_RESOURCES;

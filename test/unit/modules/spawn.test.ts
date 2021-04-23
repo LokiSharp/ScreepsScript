@@ -1,4 +1,5 @@
 import RoomSpawnController, { SpawnTask } from "@/modules/room/spawn/index";
+import RoomPowerController from "@/modules/room/power/controller";
 import RoomTransportTaskController from "@/modules/room/task/transport/taskController";
 import { creepDefaultMemory } from "@/modules/room/spawn/constant";
 import { getMockRoom } from "@test/unit/mock/RoomMock";
@@ -111,7 +112,7 @@ describe("spawn 任务队列核心测试", () => {
       name: "W1N1",
       // mock 一个物流模块
       transport: ({ updateTask: updateTransportTask } as unknown) as RoomTransportTaskController,
-      addPowerTask: jest.fn()
+      power: ({ addTask: jest.fn() } as unknown) as RoomPowerController
     });
     // 创建一个刚开始孵化的 spawn
     const spawn = getMockSpawn({

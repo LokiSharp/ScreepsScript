@@ -7,6 +7,6 @@ export { PowerCreepExtension } from "./PowerCreepExtension";
 export function mountPowerToRoom(): void {
   Object.values(Game.powerCreeps).forEach(pc => {
     if (!pc.room) return;
-    pc.updatePowerToRoom();
+    pc.room.power.addSkill(pc);
   });
 }

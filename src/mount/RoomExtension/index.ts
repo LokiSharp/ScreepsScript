@@ -2,6 +2,7 @@ import RoomCenterTaskController from "@/modules/room/task/center/taskController"
 import RoomConsole from "./RoomConsole";
 import RoomExtension from "./RoomExtension";
 import RoomHelp from "./RoomHelp";
+import RoomPowerController from "@/modules/room/power/controller";
 import RoomShareController from "@/modules/room/share/controller";
 import RoomSpawnController from "@/modules/room/spawn";
 import RoomTransportTaskController from "@/modules/room/task/transport/taskController";
@@ -53,6 +54,10 @@ declare global {
      * 孵化控制模块
      */
     spawner: RoomSpawnController;
+    /**
+     * power 管理模块
+     */
+    power: RoomPowerController;
   }
 }
 
@@ -69,7 +74,8 @@ export default function mountRoom(): void {
     ["centerTransport", RoomCenterTaskController],
     ["transport", RoomTransportTaskController],
     ["work", RoomWorkTaskController],
-    ["spawner", RoomSpawnController]
+    ["spawner", RoomSpawnController],
+    ["power", RoomPowerController]
   ];
 
   // 房间插件实例化后会被分类保存到这里
