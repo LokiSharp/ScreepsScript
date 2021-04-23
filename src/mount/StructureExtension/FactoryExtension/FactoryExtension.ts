@@ -86,7 +86,7 @@ export default class FactoryExtension extends StructureFactory {
       // eslint-disable-next-line no-prototype-builtins
       if (subResources.hasOwnProperty(resType)) {
         // 首先得保证这个东西是能合成的，不然推进去一个 energy 或者原矿的合成任务就尴尬了
-        if (factoryBlacklist.includes(resType as MineralConstant) || !(resType in COMMODITIES)) continue;
+        if (FactoryExtension.inBlacklist(resType as ResourceConstant)) continue;
 
         // 底物所需的数量
         // 由于反应可能会生成不止一个产物，所以需要除一下并向上取整
@@ -96,27 +96,8 @@ export default class FactoryExtension extends StructureFactory {
           resType as ResourceConstant
         );
 
-        // 所需底物数量不足就拆分任务
         if (this.room.terminal.store[resType] < subResAmount) {
-          // 如果自己的等级无法合成该产品
-          if (
-            "level" in COMMODITIES[resType] &&
-            COMMODITIES[resType as CommodityConstant | MineralConstant | RESOURCE_GHODIUM].level !==
-              this.room.memory.factory.level
-          ) {
-            const requestAmount = subResAmount - this.room.terminal.store[resType];
-            // 请求其他房间共享
-            this.room.share.request(resType as CommodityConstant, requestAmount);
-
-            // 如果这时候只有这一个任务了，就进入待机状态
-            if (this.room.memory.factory.taskList.length <= 1) this.gotoBed(50, `等待共享 ${resType}*${requestAmount}`);
-          }
-          // 能合成的话就添加新任务，数量为需要数量 - 已存在数量
-          else
-            this.addTask({
-              target: resType as CommodityConstant,
-              amount: subResAmount - this.room.terminal.store[resType]
-            });
+          this.handleInsufficientResource(resType as ResourceConstant, subResAmount);
 
           // 挂起当前任务
           return this.hangTask();
@@ -126,6 +107,45 @@ export default class FactoryExtension extends StructureFactory {
 
     // 通过了底物检查就说明可以合成，进入下个阶段
     this.room.memory.factory.state = FACTORY_STATE.GET_RESOURCE;
+  }
+
+  /**
+   * 检查资源是否位于黑名单中
+   *
+   * 因为有些基础资源也是有合成任务的，而自动任务规划里就需要避开这些任务
+   * 不然就会自动拆分出很多重复的任务，比如：发现需要能量 > 添加电池合成任务 > 添加能量合成任务 > ...
+   */
+  private static inBlacklist(resType: ResourceConstant): boolean {
+    return factoryBlacklist.includes(resType as MineralConstant) || !(resType in COMMODITIES);
+  }
+
+  /**
+   * 处理数量不足的资源
+   * 如果该资源自己可以合成的话，就会自动添加新任务
+   *
+   * @param resType 数量不足的资源
+   * @param amount 需要的数量
+   */
+  private handleInsufficientResource(resType: ResourceConstant, amount: number) {
+    // 如果自己的等级无法合成该产品
+    if (
+      "level" in COMMODITIES[resType] &&
+      COMMODITIES[resType as CommodityConstant | MineralConstant | RESOURCE_GHODIUM].level !==
+        this.room.memory.factory.level
+    ) {
+      const requestAmount = amount - this.room.terminal.store[resType];
+      // 请求其他房间共享
+      this.room.share.request(resType as CommodityConstant, requestAmount);
+
+      // 如果这时候只有这一个任务了，就进入待机状态
+      if (this.room.memory.factory.taskList.length <= 1) this.gotoBed(50, `等待共享 ${resType}*${requestAmount}`);
+    }
+    // 能合成的话就添加新任务，数量为需要数量 - 已存在数量
+    else
+      this.addTask({
+        target: resType as CommodityConstant,
+        amount: amount - this.room.terminal.store[resType]
+      });
   }
 
   /**
@@ -198,7 +218,13 @@ export default class FactoryExtension extends StructureFactory {
           // 准备阶段会重新拆出来一个低级任务，如果底物缺失很久的话，会导致循环拆分从而堆积很多相同任务
           if (source === STRUCTURE_TERMINAL && this.room.terminal) {
             if (this.room.terminal.store[resType] < needAmount) {
-              this.gotoBed(100, `缺少 ${resType}*${needAmount}`);
+              // 不在黑名单里就尝试自己合成
+              if (FactoryExtension.inBlacklist(resType as ResourceConstant)) {
+                this.handleInsufficientResource(resType as ResourceConstant, needAmount);
+                this.log(`发现底物不足，进行拆分：${resType} ${needAmount}`, "yellow", true);
+              }
+              // 缺少的是基础资源，等一等
+              else this.gotoBed(100, `缺少 ${resType}*${needAmount}`);
               // return this.log(`合成暂停，缺少 ${resType}*${needAmount}`, 'yellow')
             }
           }
