@@ -45,7 +45,12 @@ export default class LinkExtension extends StructureLink {
     const nearSource = this.pos.findInRange(FIND_SOURCES, 2, {
       filter: source => !source.getLink()
     });
-    if (nearSource[0]) nearSource[0].setLink(this);
+    if (nearSource[0]) {
+      nearSource[0].setLink(this);
+      // 如果旁边有 container 的话就执行摧毁，因为有了 link 就不需要 container 了
+      const nearContainer = nearSource[0].getContainer();
+      if (nearContainer) nearContainer.destroy();
+    }
 
     return `${this.id} 已注册为源 link，已重定向对应 harvester 的存放目标`;
   }
