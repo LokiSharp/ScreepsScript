@@ -101,6 +101,22 @@ export default class RoomCreepReleaseController {
   }
 
   /**
+   * 设置基地运维角色数量
+   *
+   * @param type 要设置的单位角色
+   * @param limit 设置的限制
+   */
+  public setBaseUnitLimit(type: BaseUnits, limit: Partial<BaseUnitLimit>): void {
+    // 获取当前房间的设置
+    const existLimit =
+      (JSON.parse(this.spawner.room.memory.baseUnitLimit || "{}") as RoomBaseUnitLimit) || BASE_ROLE_LIMIT;
+    // 更新配置
+    const realLimit = _.defaults(limit, existLimit[type], BASE_ROLE_LIMIT[type]);
+    // 把新配置覆写保存进内存
+    this.spawner.room.memory.baseUnitLimit = JSON.stringify(_.defaults({ [type]: realLimit }, existLimit));
+  }
+
+  /**
    * 发布中央运输单位
    */
   public processor(): OK | ERR_NOT_FOUND {

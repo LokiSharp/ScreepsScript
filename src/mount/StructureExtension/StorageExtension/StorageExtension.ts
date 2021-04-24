@@ -42,6 +42,10 @@ export default class StorageExtension extends StructureStorage {
    * 建筑完成时以自己为中心发布新的 creep 运维组
    */
   public onBuildComplete(): void {
+    // storage 建造完成后就把 worker 的最大值调低点
+    // 因为这段时间要让搬运工能把能量都充分的填到 storage 里
+    this.room.spawner.release.setBaseUnitLimit("worker", { MAX: 6 });
+
     this.room.source.forEach(source => {
       const container = source.getContainer();
       // 添加从 container 到自己的能量搬运任务
