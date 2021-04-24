@@ -428,7 +428,7 @@ export default class TaskController<
    * 不调用的话也不影响模块运行（任务调度时会自行清理）
    * 在对应工作单位去世时主动调用可以获得更准确的任务分派
    *
-   * @param creepName 要移除的 creep id
+   * @param creepName 要移除的 creep 名称
    */
   public removeCreep(creepName: string): void {
     this.removeTaskUnit(this.getTask(this.creeps[creepName].doing));

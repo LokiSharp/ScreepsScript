@@ -161,9 +161,8 @@ describe("房间任务核心测试", function () {
     const roomName = "W1N1";
     const specialType = "special";
     const normalCreep = getMockCreep();
+    Game.creeps[normalCreep.name] = normalCreep;
     Memory.rooms = { [roomName]: {} as RoomMemory };
-    // 因为模块内部会使用 Game.getObjectById 获取普通工人，所以这里需要伪造一下
-    mockGetObjectById([normalCreep]);
 
     const controller = new baseTaskController(roomName, "transport");
     // 添加一个特殊任务
