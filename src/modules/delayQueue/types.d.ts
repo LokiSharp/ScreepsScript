@@ -37,6 +37,14 @@ interface DelayTaskTypes {
    * 因为建筑必须在下个 tick 才能获取到其 id
    */
   addBuildTask: DelayTaskData;
+  /**
+   * map 库初始化任务
+   */
+  mapLibraryInit: DelayTaskData;
+  /**
+   * map 库保存任务
+   */
+  mapLibrarySave: DelayTaskData;
 }
 
 /**

@@ -23,7 +23,7 @@ interface StructurePlanningCache {
   [roomName: string]: StructurePlanningResult;
 }
 
-type AvailableLevel = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+type AllRoomControlLevel = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
 interface Memory {
   /**
@@ -33,7 +33,7 @@ interface Memory {
   /**
    * 用于标记布局获取到了那一等级
    */
-  layoutLevel?: AvailableLevel;
+  layoutLevel?: AllRoomControlLevel;
 }
 
 // 房间中用于发布 upgrader 所需要的信息
