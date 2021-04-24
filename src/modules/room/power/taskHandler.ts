@@ -268,11 +268,11 @@ export const PowerTasks: PowerTaskConfigs = {
   },
 
   /**
-   * 强化 spawn
+   * 强化 storage
    */
   [PWR_OPERATE_STORAGE]: {
     source: (creep: PowerCreep, controller: RoomPowerController): OK | ERR_NOT_ENOUGH_RESOURCES | ERR_BUSY =>
-      controller.giveOps(creep, POWER_INFO[PWR_OPERATE_EXTENSION].ops),
+      controller.giveOps(creep, POWER_INFO[PWR_OPERATE_STORAGE].ops),
     target: (creep: PowerCreep): OK | ERR_NOT_ENOUGH_RESOURCES | ERR_BUSY => {
       // 资源不足直接执行 source
       if (creep.store[RESOURCE_OPS] < POWER_INFO[PWR_OPERATE_STORAGE].ops) return ERR_NOT_ENOUGH_RESOURCES;
