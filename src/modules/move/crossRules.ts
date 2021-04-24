@@ -29,8 +29,9 @@ const crossRules: CrossRules = {
   manager: () => true,
   processor: () => true,
 
-  // 采集单位在工作时不允许任何 creep 对穿
-  harvester: noCrossWithWork,
+  // 采集单位在采集能量时不允许对穿
+  // （采集能量都在 source 阶段，也就是 ↓ working 为 false 的时候）
+  harvester: creep => creep.memory.working,
 
   // upgrader / builder 和 remoteHelper 功能重叠，所以这里不会在工作时允许对方对穿
   // 其实下面四个的判断规则要复杂一点，例如 upgrader 允许正在建造的 builder 对穿，但是不允许升级控制器的 builder 对穿

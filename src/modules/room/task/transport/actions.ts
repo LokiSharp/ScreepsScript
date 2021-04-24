@@ -59,7 +59,6 @@ const clearCarryingRecources = function (creep: Creep, excludeResourceType?: Res
  * @returns 身上是否已经有足够的能量了
  */
 const getEnergy = function (creep: Creep<"manager">, transport: RoomTransportTaskController): boolean {
-  transport.countWorkTime();
   if (creep.store[RESOURCE_ENERGY] > 10) return true;
 
   if (!clearCarryingRecources(creep, RESOURCE_ENERGY)) return false;
@@ -81,14 +80,16 @@ const getEnergy = function (creep: Creep<"manager">, transport: RoomTransportTas
     (source instanceof Structure && source.store[RESOURCE_ENERGY] <= 0) ||
     (source instanceof Resource && source.amount <= 0)
   ) {
-    creep.say("😯没能量呀");
-    transport.deCountWorkTime();
+    // 先移动到目标附件待命
+    if (source) creep.goTo(source.pos, { range: 3 });
+    else creep.say("😯没能量呀");
     delete creep.memory.sourceId;
     return false;
   }
 
   // 获取能量
   const result = creep.getEngryFrom(source);
+  transport.countWorkTime();
   return result === OK;
 };
 
@@ -235,14 +236,14 @@ export const actions: {
   fillExtension: (creep, task, transport) => ({
     source: () => getEnergy(creep, transport),
     target: () => {
-      if (creep.store[RESOURCE_ENERGY] === 0) return true;
+      if (creep.store[RESOURCE_ENERGY] === 0) return creep.backToGetEnergy();
       transport.countWorkTime();
       const result = fillSpawnStructure(creep);
 
       if (result === ERR_NOT_FOUND) {
         transport.removeTask(task.key);
-        return true;
-      } else if (result === ERR_NOT_ENOUGH_ENERGY) return true;
+        return creep.backToGetEnergy();
+      } else if (result === ERR_NOT_ENOUGH_ENERGY) return creep.backToGetEnergy();
       return false;
     }
   }),
@@ -254,7 +255,7 @@ export const actions: {
   fillTower: (creep, task, transport) => ({
     source: () => getEnergy(creep, transport),
     target: () => {
-      if (creep.store[RESOURCE_ENERGY] === 0) return true;
+      if (creep.store[RESOURCE_ENERGY] === 0) return creep.backToGetEnergy();
       transport.countWorkTime();
       let target: StructureTower;
 
@@ -280,7 +281,7 @@ export const actions: {
           // 如果还没找到的话就算完成任务了
           if (towers.length <= 0) {
             transport.removeTask(task.key);
-            return true;
+            return creep.backToGetEnergy();
           }
           target = creep.pos.findClosestByRange(towers);
         }

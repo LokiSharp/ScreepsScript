@@ -136,6 +136,18 @@ export class CreepExtension extends Creep {
   }
 
   /**
+   * 切换为能量获取状态
+   * 应在 target 阶段能量不足时调用
+   *
+   * @returns boolean
+   */
+  public backToGetEnergy(): boolean {
+    // 移除能量来源缓存，便于重新查找最近的
+    delete this.memory.sourceId;
+    return true;
+  }
+
+  /**
    * 转移资源到建筑
    * 包含移动逻辑
    *
@@ -143,7 +155,11 @@ export class CreepExtension extends Creep {
    * @param RESOURCE 要转移的资源类型
    * @param moveOpt 移动参数
    */
-  public transferTo(target: Structure, RESOURCE: ResourceConstant, moveOpt: MoveOpt = {}): ScreepsReturnCode {
+  public transferTo(
+    target: AnyCreep | Structure,
+    RESOURCE: ResourceConstant,
+    moveOpt: MoveOpt = {}
+  ): ScreepsReturnCode {
     this.goTo(target.pos, moveOpt);
     return this.transfer(target, RESOURCE);
   }
