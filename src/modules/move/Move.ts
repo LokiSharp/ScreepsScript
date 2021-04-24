@@ -84,6 +84,7 @@ export class Move {
           delete moveMemory.path;
           delete moveMemory.prePos;
           delete this.costCache[creep.room.name];
+          this.routeCache = {};
           return ERR_INVALID_TARGET;
         }
         // 尝试对穿，如果自己禁用了对穿的话则直接重新寻路
@@ -112,10 +113,8 @@ export class Move {
       delete moveMemory.lastMove;
     }
 
-    // 如果路走完了就要重新寻路
-    if (!moveMemory.path && !moveMemory.lastMove) {
-      moveMemory.path = this.findPath(creep, target, options);
-    }
+    // 如果没有路径的话就重新发起搜索
+    if (!moveMemory.path) moveMemory.path = this.findPath(creep, target, options);
 
     // 还为空的话就是没找到路径或者已经到了
     if (!creep.memory.moveInfo.path) {
@@ -171,24 +170,19 @@ export class Move {
 
     // 移动成功，更新路径
     if (goResult === OK) {
-      // 移动到终端了，不需要再检查位置是否重复了
+      // 移动到终点了，不需要再检查位置是否重复
       if (moveMemory.path.length === 0) {
         delete moveMemory.lastMove;
-        delete moveMemory.prePos;
       } else {
-        moveMemory.prePos = currentPos;
-        moveMemory.lastMove = Number(moveMemory.path.substr(0, 1)) as DirectionConstant;
+        moveMemory.lastMove = Number(moveMemory.path[0]) as DirectionConstant;
         moveMemory.path = moveMemory.path.substr(1);
       }
     }
-    // 如果发生撞停或者参数异常的话说明缓存可能存在问题，移除缓存
-    else if (goResult === ERR_BUSY) {
-      delete moveMemory.path;
-      delete moveMemory.prePos;
-      delete this.costCache[creep.room.name];
-    }
     // 其他异常直接报告
     else if (goResult !== ERR_TIRED) creep.say(`寻路 ${goResult}`);
+
+    // 更新最后位置
+    moveMemory.prePos = currentPos;
 
     return goResult;
   }
