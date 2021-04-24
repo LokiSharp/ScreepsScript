@@ -17,7 +17,7 @@ export const addBuildTask = function (handleRoomName: string): void {
     {
       roomName: handleRoomName
     },
-    Game.time + 1
+    Game.time + 2
   );
 };
 

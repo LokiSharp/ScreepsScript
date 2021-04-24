@@ -31,10 +31,10 @@ export function saveMapLibrary(): void {
  * map 库初始化回调
  */
 addDelayCallback("mapLibraryInit", () => {
-  if (!(RAW_MEMORY_ID in RawMemory.segments) || !RawMemory.segments[RAW_MEMORY_ID]) return initMapLibrary();
+  if (!(RAW_MEMORY_ID in RawMemory.segments)) return initMapLibrary();
 
   const data = RawMemory.segments[RAW_MEMORY_ID];
-  mapLibrary = JSON.parse(data) as MapLibrary;
+  mapLibrary = JSON.parse(data || "{}") as MapLibrary;
 });
 
 /**
