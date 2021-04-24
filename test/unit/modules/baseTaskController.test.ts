@@ -30,7 +30,7 @@ describe("房间任务核心测试", function () {
     };
     const roomMemory = {
       transportTasks: JSON.stringify([task]),
-      transportCreeps: JSON.stringify({ [creep.id]: { doing: taskKey } })
+      transportCreeps: JSON.stringify({ [creep.name]: { doing: taskKey } })
     } as RoomMemory;
     Memory.rooms = { [roomName]: roomMemory };
 
@@ -43,11 +43,11 @@ describe("房间任务核心测试", function () {
   });
 
   it("可以给任务分配工人", function () {
-    const creepId = "testCreepId" as Id<Creep>;
+    const creepName = "testCreepName";
     const roomName = "W1N1";
 
     // 构建测试场景：一个新工人和一个新任务
-    const creep = getMockCreep({ id: creepId });
+    const creep = getMockCreep({ name: creepName });
     const task: RoomTask<"test"> = { type: "test" };
     Memory.rooms = { [roomName]: {} as RoomMemory };
 

@@ -8,7 +8,7 @@ export class CreepMock extends RoomObjectMock {
   public fatigue = 0;
   public hits = 100;
   public hitsMax = 100;
-  public name = "";
+  public name = this.id;
   public room = getMockRoom({ name: "W1N1" });
   public spawning = false;
   public saying: string;
