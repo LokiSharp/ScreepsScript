@@ -76,7 +76,7 @@ export default class RoomCreepReleaseController {
 
     if (realAdjust >= 0) {
       // 添加新的单位
-      for (let i = oldNumber; i < oldNumber + realAdjust; i++) {
+      for (let i = 0; i < oldNumber + realAdjust; i++) {
         const creepName = GetName[type](room.name, i);
         if (creepName in Game.creeps) continue;
         this.spawner.addTask({
