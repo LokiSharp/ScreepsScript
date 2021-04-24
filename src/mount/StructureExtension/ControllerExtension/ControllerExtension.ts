@@ -145,39 +145,6 @@ export default class ControllerExtension extends StructureController {
   }
 
   /**
-   * 扫描房间内工地
-   *
-   * @returns 为 true 时说明自己房间内有工地
-   */
-  private constructionSiteScanner(): boolean {
-    let hasConstructionSites = false;
-    const constructionSites = this.room.find(FIND_CONSTRUCTION_SITES);
-
-    const constructionSiteIds: Id<ConstructionSite>[] = [];
-    const constructionSiteNums: { [structureName: string]: number } = {};
-
-    if (constructionSites.length > 0) {
-      hasConstructionSites = true;
-      Object.values(constructionSites).forEach(constructionSite => {
-        constructionSiteIds.push(constructionSite.id);
-
-        if (
-          constructionSiteNums &&
-          !Object.keys(constructionSiteNums).includes(constructionSite.structureType.toString())
-        ) {
-          constructionSiteNums[constructionSite.structureType.toString()] = 1;
-        } else {
-          constructionSiteNums[constructionSite.structureType.toString()] += 1;
-        }
-      });
-    }
-
-    Memory.rooms[this.room.name].constructionSiteIds = constructionSiteIds;
-    Memory.stats.rooms[this.room.name].constructionSiteNums = constructionSiteNums;
-    return hasConstructionSites;
-  }
-
-  /**
    * 扫描房间内建筑
    */
   public structureScanner(): void {
@@ -200,10 +167,12 @@ export default class ControllerExtension extends StructureController {
    * 根据房间情况调整运营单位的数量
    */
   private adjustCreep(): void {
-    if (Game.time % 500) return;
-
     this.room.spawner.release.changeBaseUnit("manager", this.room.transport.getExpect());
-    this.room.spawner.release.changeBaseUnit("worker", this.room.work.getExpect());
+    // 先更新房间能量使用情况，然后根据情况调整期望
+    const energyGetRate = countEnergyChangeRatio(this.room, true);
+    const workerChange = this.room.work.getExpect(energyGetRate);
+
+    this.room.spawner.release.changeBaseUnit("worker", workerChange);
   }
   /**
    * 重新占领，刷 RCL 用

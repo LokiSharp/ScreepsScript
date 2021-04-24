@@ -38,8 +38,8 @@ export const loop = (): void => {
 
   cost.set(1, 2, 3);
   cost.set(2, 2, 14);
-  // cost.set(3, 4, 14)
-  // cost.set(3, 5, 14)
+  cost.set(3, 4, 14);
+  cost.set(3, 5, 14);
 
   const data = serializeCost(cost);
   RawMemory.segments[1] = data;

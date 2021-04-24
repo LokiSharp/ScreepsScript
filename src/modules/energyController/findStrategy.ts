@@ -1,7 +1,7 @@
 /**
  * getAvailableSource 中，建筑存储中能量大于多少才会被当作目标
  */
-const ENERGY_USE_LIMIT = {
+export const ENERGY_USE_LIMIT = {
   [STRUCTURE_TERMINAL]: 10000,
   [STRUCTURE_STORAGE]: 10000,
   [STRUCTURE_CONTAINER]: 400,
@@ -21,11 +21,11 @@ export const getEnergyAmount = function (target: EnergyTarget): number {
 /**
  * 获取目标的类型，用于抹平差异
  */
-export const getTargetType = function (target: EnergyTarget) {
+export function getTargetType(target: EnergyTarget): "link" | "container" | "terminal" | "storage" | "energy" {
   if ("structureType" in target) return target.structureType;
   else if ("resourceType" in target) return target.resourceType;
   else return undefined;
-};
+}
 
 /**
  * 查找器 - 找到最多的能量来源
