@@ -15,7 +15,9 @@ export const pbHealer: CreepConfig<"pbHealer"> = {
     const targetCreep = Game.creeps[creepName];
     // 对象没了就殉情
     if (!targetCreep) {
+      if (!Memory.creeps[creepName]) creep.memory.cantRespawn = true;
       creep.suicide();
+
       return false;
     }
 
