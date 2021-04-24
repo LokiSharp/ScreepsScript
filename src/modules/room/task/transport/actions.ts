@@ -59,7 +59,7 @@ const clearCarryingRecources = function (creep: Creep, excludeResourceType?: Res
  * @returns 身上是否已经有足够的能量了
  */
 const getEnergy = function (creep: Creep<"manager">, transport: RoomTransportTaskController): boolean {
-  if (creep.store[RESOURCE_ENERGY] > 10) return true;
+  if (creep.store[RESOURCE_ENERGY] > 40) return true;
 
   if (!clearCarryingRecources(creep, RESOURCE_ENERGY)) return false;
 
@@ -81,7 +81,8 @@ const getEnergy = function (creep: Creep<"manager">, transport: RoomTransportTas
     (source instanceof Resource && source.amount <= 0)
   ) {
     // 先移动到目标附件待命
-    if (source) creep.goTo(source.pos, { range: 3 });
+    const target = source ? source : creep.room.source[0];
+    if (target) creep.goTo(target.pos, { range: 3 });
     else creep.say("😯没能量呀");
     delete creep.memory.sourceId;
     return false;

@@ -48,7 +48,7 @@ export default class RoomWorkTaskController extends TaskController<AllWorkTaskTy
     const actionGenerator: WorkActionGenerator = transportActions[task.type];
 
     const { x, y } = creep.pos;
-    creep.room.visual.text(task.type, x, y, { opacity: 0.4 });
+    creep.room.visual.text(task.type, x, y, { opacity: 0.5, font: 0.3 });
     // 分配完后获取任务执行逻辑
     return actionGenerator(creep, task, this);
   }
