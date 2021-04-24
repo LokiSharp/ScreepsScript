@@ -147,7 +147,7 @@ export const PowerTasks: PowerTaskConfigs = {
    */
   [PWR_OPERATE_FACTORY]: {
     source: (creep: PowerCreep, controller: RoomPowerController): OK | ERR_NOT_ENOUGH_RESOURCES | ERR_BUSY =>
-      controller.giveOps(creep, POWER_INFO[PWR_OPERATE_EXTENSION].ops),
+      controller.giveOps(creep, POWER_INFO[PWR_OPERATE_FACTORY].ops),
     target: (creep: PowerCreep): OK | ERR_NOT_ENOUGH_RESOURCES | ERR_BUSY => {
       // 资源不足直接执行 source
       if (creep.store[RESOURCE_OPS] < POWER_INFO[PWR_OPERATE_FACTORY].ops) return ERR_NOT_ENOUGH_RESOURCES;
@@ -226,7 +226,7 @@ export const PowerTasks: PowerTaskConfigs = {
    */
   [PWR_OPERATE_SPAWN]: {
     source: (creep: PowerCreep, controller: RoomPowerController): OK | ERR_NOT_ENOUGH_RESOURCES | ERR_BUSY =>
-      controller.giveOps(creep, POWER_INFO[PWR_OPERATE_EXTENSION].ops),
+      controller.giveOps(creep, POWER_INFO[PWR_OPERATE_SPAWN].ops),
     target: (creep: PowerCreep): OK | ERR_NOT_ENOUGH_RESOURCES | ERR_BUSY => {
       // 资源不足直接执行 source
       if (creep.store[RESOURCE_OPS] < POWER_INFO[PWR_OPERATE_SPAWN].ops) return ERR_NOT_ENOUGH_RESOURCES;
