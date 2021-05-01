@@ -31,7 +31,7 @@ export const remoteUpgrader: CreepConfig<"remoteUpgrader"> = {
 
     const source = Game.getObjectById(creep.memory.data.sourceId);
 
-    creep.getEngryFrom(source);
+    creep.getEnergyFrom(source);
     return false;
   },
   target: creep => {

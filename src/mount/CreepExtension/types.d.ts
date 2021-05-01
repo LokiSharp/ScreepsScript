@@ -154,7 +154,7 @@ interface Creep<Role extends CreepRoleConstant = CreepRoleConstant> {
 
   setWayPoint(target: string[] | string): ScreepsReturnCode;
 
-  getEngryFrom(target: Structure | Source | Ruin | Resource<RESOURCE_ENERGY>): ScreepsReturnCode;
+  getEnergyFrom(target: Structure | Source | Ruin | Resource<RESOURCE_ENERGY>): ScreepsReturnCode;
   backToGetEnergy(): boolean;
 
   transferTo(target: AnyCreep | Structure, RESOURCE: ResourceConstant, moveOpt?: MoveOpt): ScreepsReturnCode;

@@ -37,7 +37,7 @@ function getEnergy(creep: Creep<"worker">): boolean {
     return false;
   }
 
-  const result = creep.getEngryFrom(source);
+  const result = creep.getEnergyFrom(source);
 
   // 之前用的能量来源没能量了就更新来源
   if (result === OK) {
