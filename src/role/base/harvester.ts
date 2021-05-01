@@ -217,7 +217,10 @@ const actionStrategy: ActionStrategy = {
       }
 
       // 移动到 link 和 source 相交的位置，这样不用移动就可以传递能量
-      const targetPos = source.pos.getFreeSpace().find(pos => pos.isNearTo(link.pos));
+      const targetPos = source.pos
+        .getFreeSpace()
+        .filter(pos => !(pos.x === link.pos.x && pos.y === link.pos.y))
+        .find(pos => pos.isNearTo(link.pos));
       creep.goTo(targetPos, { range: 0 });
 
       return creep.pos.isEqualTo(targetPos);
