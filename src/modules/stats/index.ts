@@ -5,14 +5,17 @@
  * 该模块的数据被保存在 Memory.stats 中
  * 在使用前需要调用 initGlobalStats 方法
  */
-
 /**
- * 更新指定房间的统计数据
+ * 初始化指定房间的统计数据
  *
  * @param roomName 房间名
- * @param getNewStats 统计数据的获取回调，该方法提供房间现存的状态作为参数，且返回的值将被合并到房间的统计数据中
  */
-export function setRoomStats(roomName: string, getNewStats: (stats: RoomStats) => Partial<RoomStats>): void {
+export function initRoomStats(roomName: string): void {
+  if (!Memory.stats?.rooms) {
+    Memory.stats = { rooms: {} };
+    Game.rooms[roomName].controller.stateScanner();
+  }
+
   if (!Memory.stats.rooms[roomName]) {
     Memory.stats.rooms[roomName] = {
       nukerEnergy: 0,
@@ -29,6 +32,18 @@ export function setRoomStats(roomName: string, getNewStats: (stats: RoomStats) =
       commRes: {},
       resources: {}
     };
+  }
+}
+
+/**
+ * 更新指定房间的统计数据
+ *
+ * @param roomName 房间名
+ * @param getNewStats 统计数据的获取回调，该方法提供房间现存的状态作为参数，且返回的值将被合并到房间的统计数据中
+ */
+export function setRoomStats(roomName: string, getNewStats: (stats: RoomStats) => Partial<RoomStats>): void {
+  if (!Memory.stats.rooms[roomName]) {
+    initRoomStats(roomName);
   }
 
   _.assign(Memory.stats.rooms[roomName], getNewStats(Memory.stats.rooms[roomName]));
@@ -49,6 +64,9 @@ export function clearRoomStats(roomName: string): void {
  * @param roomName 要获取统计的房间名
  */
 export function getRoomStats(roomName: string): RoomStats {
+  if (!Memory.stats.rooms[roomName]) {
+    initRoomStats(roomName);
+  }
   return Memory.stats.rooms[roomName];
 }
 

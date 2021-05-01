@@ -5,6 +5,7 @@ import createRoomLink from "@/utils/console/createRoomLink";
 import log from "@/utils/console/log";
 import { manageStructure } from "@/modules/autoPlanning";
 import { removeCreep } from "@/modules/creep/utils";
+import { initRoomStats } from "@/modules/stats";
 
 export default class RoomExtension extends Room {
   /**
@@ -214,7 +215,7 @@ export default class RoomExtension extends Room {
       role: "claimer",
       data: { targetRoomName, signText }
     });
-
+    initRoomStats(targetRoomName);
     return OK;
   }
 
