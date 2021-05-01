@@ -96,9 +96,10 @@ export default class RoomCreepReleaseController {
     room.memory[memoryKey] = oldNumber + realAdjust;
 
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    room.log(
-      `调整 ${type} 单位数量 [修正] ${realAdjust} [上/下限] ${MAX}/${MIN}[修正后数量] ${room.memory[memoryKey]}`
-    );
+    if (adjust !== 0)
+      room.log(
+        `调整 ${type} 单位数量 [修正] ${realAdjust} [上/下限] ${MAX}/${MIN}[修正后数量] ${room.memory[memoryKey]}`
+      );
     return OK;
   }
 
