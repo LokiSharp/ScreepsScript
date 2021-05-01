@@ -129,6 +129,7 @@ export default class FactoryExtension extends StructureFactory {
   private handleInsufficientResource(resType: ResourceConstant, amount: number) {
     // 如果自己的等级无法合成该产品
     if (
+      COMMODITIES[resType] &&
       "level" in COMMODITIES[resType] &&
       COMMODITIES[resType as CommodityConstant | MineralConstant | RESOURCE_GHODIUM].level !==
         this.room.memory.factory.level
