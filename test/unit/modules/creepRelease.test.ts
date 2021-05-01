@@ -22,10 +22,11 @@ import { GetName } from "@/modules/room/spawn/nameGetter";
 import RoomCreepRelease from "@/modules/room/spawn/CreepRelease";
 import { getMockRoom } from "@test/unit/mock/RoomMock";
 import { getMockSource } from "@test/unit/mock/SourceMock";
+import { BASE_ROLE_LIMIT } from "@/modules/room/spawn/constant";
 
 let room: Room;
 let release: RoomCreepRelease;
-
+const { MIN, MAX } = BASE_ROLE_LIMIT.worker;
 describe("creep 发布核心测试", () => {
   beforeEach(() => {
     room = getMockRoom({
@@ -81,5 +82,7 @@ describe("creep 发布核心测试", () => {
       GetName.worker("W1N1", 2),
       GetName.worker("W1N1", 1)
     ]);
+    // workerNumber 不应小于MIN
+    expect(room.memory.workerNumber >= MIN);
   });
 });
