@@ -699,4 +699,17 @@ export class CreepExtension extends Creep {
     if (!this.pos.isEqualTo(standByFlag.pos)) this.goTo(standByFlag.pos, { range: 0 });
     else this.memory.isStanBy = true;
   }
+
+  /**
+   * 呼叫防御力量
+   */
+  public callDefender(targetRoomName: string, targetFlagName: string, spawnRoomName: string): void {
+    Game.rooms[spawnRoomName].spawner.addTask({
+      name: `${targetRoomName} remoteDefender`,
+      role: "attacker",
+      data: {
+        targetFlagName
+      }
+    });
+  }
 }
