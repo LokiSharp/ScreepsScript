@@ -120,7 +120,7 @@ export class CreepExtension extends Creep {
    * @param target 提供能量的结构
    * @returns 执行 harvest 或 withdraw 后的返回值
    */
-  public getEngryFrom(target: Structure | Source | Ruin | Resource<RESOURCE_ENERGY>): ScreepsReturnCode {
+  public getEnergyFrom(target: Structure | Source | Ruin | Resource<RESOURCE_ENERGY>): ScreepsReturnCode {
     let result: ScreepsReturnCode;
     // 是资源就用 pickup
     if (target instanceof Resource) result = this.pickup(target);

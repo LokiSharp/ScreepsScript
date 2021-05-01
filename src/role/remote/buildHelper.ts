@@ -33,7 +33,7 @@ export const buildHelper: CreepConfig<"buildHelper"> = {
 
     creep.memory.sourceId = source.id;
 
-    creep.getEngryFrom(source);
+    creep.getEnergyFrom(source);
     return false;
   },
   target: creep => {

@@ -29,7 +29,7 @@ export const gclUpgrader: CreepConfig<"gclUpgrader"> = {
       undefined
     );
     if (source) {
-      creep.getEngryFrom(source);
+      creep.getEnergyFrom(source);
       return true;
     }
 
@@ -65,7 +65,7 @@ export const gclUpgrader: CreepConfig<"gclUpgrader"> = {
       )
         delete creep.memory.sourceId;
 
-      creep.getEngryFrom(source);
+      creep.getEnergyFrom(source);
     }
     return false;
   },

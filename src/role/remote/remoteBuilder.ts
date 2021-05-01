@@ -30,7 +30,7 @@ export const remoteBuilder: CreepConfig<"remoteBuilder"> = {
 
     const source = Game.getObjectById(creep.memory.data.sourceId);
 
-    creep.getEngryFrom(source);
+    creep.getEnergyFrom(source);
     return false;
   },
   target: creep => {

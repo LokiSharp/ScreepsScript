@@ -89,7 +89,7 @@ const getEnergy = function (creep: Creep<"manager">, transport: RoomTransportTas
   }
 
   // 获取能量
-  const result = creep.getEngryFrom(source);
+  const result = creep.getEnergyFrom(source);
   transport.countWorkTime();
   return result === OK;
 };
