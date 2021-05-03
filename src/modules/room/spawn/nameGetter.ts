@@ -28,5 +28,5 @@ export class GetName {
   public static boostDismantler = (roomName: string): string => `${roomName} dismantler ${Game.time}`;
   public static boostRangedAttacker = (roomName: string): string => `${roomName} boostRangedAttacker ${Game.time}`;
   public static defender = (roomName: string): string => `${roomName} defender`;
-  public static scout = (roomName: string, index: number): string => `${roomName} scout ${Game.time}-${index}`;
+  public static scout = (roomName: string, index: number): string => `${roomName} scout ${index}`;
 }

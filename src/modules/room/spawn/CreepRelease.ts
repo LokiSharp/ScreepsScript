@@ -421,9 +421,10 @@ export default class RoomCreepReleaseController {
    *
    * @param targetFlagName 进攻旗帜名称
    * @param num 要孵化的数量
+   * @param keepSpawn 是否持续生成
    * @param wayPoint 路径点
    */
-  public attacker(targetFlagName = "", num = 1, wayPoint?: WayPoint): string {
+  public attacker(targetFlagName = "", num = 1, keepSpawn = false, wayPoint?: WayPoint): string {
     if (num <= 0 || num > 10) num = 1;
 
     for (let i = 0; i < num; i++) {
@@ -432,7 +433,7 @@ export default class RoomCreepReleaseController {
         role: "attacker",
         data: {
           targetFlagName: targetFlagName || DEFAULT_FLAG_NAME.ATTACK,
-          keepSpawn: false,
+          keepSpawn,
           wayPoint
         }
       });
