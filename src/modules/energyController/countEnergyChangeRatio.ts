@@ -1,5 +1,5 @@
+import { getRoomStats, setRoomStats } from "@/modules/stats";
 import { ENERGY_USE_LIMIT } from "./findStrategy";
-import { setRoomStats } from "@/modules/stats";
 
 /**
  * 统计指定房间的能量状态（包括可用能量总量、能量获取速率）
@@ -9,6 +9,10 @@ import { setRoomStats } from "@/modules/stats";
  * @returns 该房间的能量获取速率，单位（点/tick）
  */
 export const countEnergyChangeRatio = function (room: Room, withLimit = false): number {
+  if (getRoomStats(room.name).energyCalcTime === Game.time) {
+    return getRoomStats(room.name).energyGetRate;
+  }
+
   // 收集房间建筑内的可用总能量
   const structureEnergy = [room.terminal, room.storage, ...room[STRUCTURE_CONTAINER], ...room[STRUCTURE_LINK]]
     .filter(Boolean)
