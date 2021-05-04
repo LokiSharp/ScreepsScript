@@ -39,8 +39,10 @@ export const buildCompleteSite: { [constructionSiteId: string]: Structure } = {}
  */
 const saveWaiting = function (): void {
   if (!Game._needSaveConstructionData) return;
-  if (waitingConstruction.length <= 0) delete Memory[SAVE_KEY];
-  else Memory[SAVE_KEY] = JSON.stringify(waitingConstruction);
+  if (waitingConstruction.length <= 0) {
+    Game._needSaveConstructionData = false;
+    delete Memory[SAVE_KEY];
+  } else Memory[SAVE_KEY] = JSON.stringify(waitingConstruction);
 };
 
 /**
@@ -48,6 +50,7 @@ const saveWaiting = function (): void {
  * 在全局重置时调用
  */
 export function initConstructionController(): void {
+  if (!Game._needSaveConstructionData) return;
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
   waitingConstruction = JSON.parse(Memory[SAVE_KEY] || "[]").map(({ pos, type }) => {
     // 这里把位置重建出来
