@@ -48,7 +48,7 @@ delayQueue.addDelayCallback("spawnFiller", room => {
   // cpu 还是不够的话就延迟发布
   if (Game.cpu.bucket < 700) return addSpawnFillerTask(room.name);
 
-  room.work.updateTask({ type: "fillWall", priority: 1 });
+  room.work.updateTask({ type: "fillWall", priority: 6 });
 });
 
 /**
