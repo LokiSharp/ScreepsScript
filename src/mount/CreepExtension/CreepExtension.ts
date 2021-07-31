@@ -186,15 +186,14 @@ export class CreepExtension extends Creep {
   private getBuildTarget(target?: ConstructionSite): ConstructionSite {
     // 指定了目标，直接用，并且把 id 备份一下
     if (target) {
-      this.memory.constructionSiteId = target.id;
-      this.memory.constructionSitePos = [target.pos.x, target.pos.y];
-      this.memory.constructionSiteType = target.structureType;
       return target;
     }
     // 没有指定目标，或者指定的目标消失了，从本地内存查找
     else {
       const selfKeepTarget = Game.getObjectById(this.memory.constructionSiteId);
-      if (selfKeepTarget) return selfKeepTarget;
+      if (selfKeepTarget) {
+        return selfKeepTarget;
+      }
       // 本地内存里保存的 id 找不到工地了，检查下是不是造好了
       else if (this.memory.constructionSitePos) {
         // 获取曾经工地的位置
@@ -217,7 +216,6 @@ export class CreepExtension extends Creep {
           // 同时发布刷墙任务
           this.room.work.updateTask({ type: "fillWall", priority: 0 });
         }
-
         delete this.memory.constructionSiteId;
       }
     }
@@ -255,6 +253,9 @@ export class CreepExtension extends Creep {
     const target = this.getBuildTarget(targetConstruction);
 
     if (!target) return ERR_NOT_FOUND;
+    this.memory.constructionSiteId = target.id;
+    this.memory.constructionSitePos = [target.pos.x, target.pos.y];
+    this.memory.constructionSiteType = target.structureType;
     // 上面发现有墙要刷了，这个 tick 就不再造建造了
     // 防止出现造好一个 rampart，然后直接造下一个 rampart，造好后又扭头去刷第一个 rampart 的小问题出现
     if (this.memory.fillWallId) return ERR_BUSY;
