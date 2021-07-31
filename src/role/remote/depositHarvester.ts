@@ -34,7 +34,7 @@ export const depositHarvester: CreepConfig<"depositHarvester"> = {
 
     // 如果采集满了 / 冷却时间太长 / 自己快死了，就往家跑
     if (
-      creep.store.getFreeCapacity(creep.memory.depositType) <= 0 ||
+      creep.store.getFreeCapacity(RESOURCE_ENERGY) < creep.getActiveBodyparts(WORK) * 2 ||
       (targetFlag.memory.depositCooldown >= 100 && !creep.memory.working) ||
       creep.ticksToLive <= targetFlag.memory.travelTime * 2 + 20
     )
