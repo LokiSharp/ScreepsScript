@@ -226,7 +226,7 @@ const actionStrategy: ActionStrategy = {
       return creep.pos.isEqualTo(targetPos);
     },
     source: (creep, source) => {
-      if (creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) return true;
+      if (creep.store.getFreeCapacity(RESOURCE_ENERGY) < creep.getActiveBodyparts(WORK) * 2) return true;
 
       creep.getEnergyFrom(source);
 
