@@ -26,10 +26,11 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: ${{ steps.npm-cache.outputs.dir }}
-          key: ${{ matrix.os }}-node-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ matrix.os }}-python-${{ matrix.python-version }}-node-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            ${{ matrix.os }}-node-${{ matrix.node-version }}-
-            ${{ matrix.os }}-node-
+            ${{ matrix.os }}-python-${{ matrix.python-version }}-node-${{ matrix.node-version }}
+            ${{ matrix.os }}-python-${{ matrix.python-version }}-node-
+            ${{ matrix.os }}-python-
             ${{ matrix.os }}-
 
       - run: npm install

@@ -11,7 +11,7 @@ import { setCacheId } from "./setCacheId";
  *
  * @returns 对应的建筑**数组**
  */
-export function getStructureWithCache<TargetStructure extends RoomObject>(
+export function getStructureWithCache<TargetStructure extends Structure>(
   room: Room,
   type: AllRoomShortcut
 ): TargetStructure[] {

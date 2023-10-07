@@ -6,7 +6,7 @@
  * @param memoryKey 建筑 id 在房间内存中对应的字段名
  * @returns 对应的建筑
  */
-export function getStructureWithMemory<TargetStructure extends RoomObject>(
+export function getStructureWithMemory<TargetStructure extends ObjectWithId>(
   room: Room,
   privateKey: string,
   memoryKey: string
@@ -17,6 +17,8 @@ export function getStructureWithMemory<TargetStructure extends RoomObject>(
   if (!room.memory[memoryKey]) return undefined;
 
   // 从 id 获取建筑并缓存
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  // @ts-ignore
   const target: TargetStructure = Game.getObjectById(room.memory[memoryKey]);
 
   // 如果保存的 id 失效的话，就移除缓存

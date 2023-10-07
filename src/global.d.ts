@@ -28,7 +28,7 @@ type StructureWithStore =
 /**
  * 所有包含 id 字段的游戏对象
  */
-interface ObjectWithId<T extends unknown = unknown> extends RoomObject {
+interface ObjectWithId<T extends _HasId = _HasId> extends RoomObject {
   id: Id<T>;
 }
 

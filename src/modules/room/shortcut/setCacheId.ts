@@ -9,7 +9,7 @@ import { structureIdCache } from "./structureIdCache";
  * @param type 要设置到的建筑类型
  * @param ids 要设置的 id
  */
-export function setCacheId(roomName: string, type: AllRoomShortcut, ids: Id<RoomObject>[]): Id<RoomObject>[] {
+export function setCacheId(roomName: string, type: AllRoomShortcut, ids: Id<ObjectWithId>[]): Id<ObjectWithId>[] {
   if (!structureIdCache[roomName]) structureIdCache[roomName] = {};
   if (!structureIdCache[roomName][type]) structureIdCache[roomName][type] = [];
 

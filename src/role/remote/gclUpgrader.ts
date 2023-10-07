@@ -18,13 +18,15 @@ export const gclUpgrader: CreepConfig<"gclUpgrader"> = {
       return true;
     }
     let source: AllEnergySource;
-    source = ((creep.pos
-      .findInRange(FIND_MY_STRUCTURES, 1)
-      .filter(
-        structure =>
-          (structure.structureType === STRUCTURE_TERMINAL || structure.structureType === STRUCTURE_STORAGE) &&
-          structure.store.getUsedCapacity(RESOURCE_ENERGY) >= 10000
-      ) as unknown) as (StructureTerminal | StructureStorage)[]).reduce(
+    source = (
+      creep.pos
+        .findInRange(FIND_MY_STRUCTURES, 1)
+        .filter(
+          structure =>
+            (structure.structureType === STRUCTURE_TERMINAL || structure.structureType === STRUCTURE_STORAGE) &&
+            structure.store.getUsedCapacity(RESOURCE_ENERGY) >= 10000
+        ) as unknown as (StructureTerminal | StructureStorage)[]
+    ).reduce(
       (a, b) => (a?.store.getUsedCapacity(RESOURCE_ENERGY) > b?.store.getUsedCapacity(RESOURCE_ENERGY) ? a : b),
       undefined
     );

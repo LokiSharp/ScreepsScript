@@ -17,5 +17,6 @@
       "@mock/*": ["./test/unit/mock/*"]
     }
   },
+  "include": ["src/**/*.ts", "test/**/*.ts", "rollup.config.ts", "jest.config.ts"],
   "exclude": ["node_modules"]
 }

@@ -12,7 +12,7 @@ import { structureIdCache } from "./structureIdCache";
  * @param id 新的建筑 id
  */
 
-export function updateStructure(roomName: string, type: string, id: Id<RoomObject>): void {
+export function updateStructure(roomName: string, type: string, id: Id<ObjectWithId>): void {
   // 传入的建筑类型有可能不需要挂载，这里剔除掉
   if (!isShortcutStructure(type)) return;
 

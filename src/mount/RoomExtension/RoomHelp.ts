@@ -222,8 +222,7 @@ export default class RoomHelp extends RoomExtension {
               { name: "num", desc: "[可选] 要孵化的数量，1 - 10，默认为 1" },
               {
                 name: "keepSpawn",
-                desc:
-                  '[可选] 是否持续生成，置为 true 时可以执行 creepApi.remove("creepName") 来终止持续生成，默认为 false'
+                desc: '[可选] 是否持续生成，置为 true 时可以执行 creepApi.remove("creepName") 来终止持续生成，默认为 false'
               }
             ],
             functionName: "spawnAttacker"
@@ -236,8 +235,7 @@ export default class RoomHelp extends RoomExtension {
               { name: "num", desc: "[可选] 要孵化的数量，1 - 10，默认为 2" },
               {
                 name: "keepSpawn",
-                desc:
-                  '[可选] 是否持续生成，置为 true 时可以执行 creepApi.remove("creepName") 来终止持续生成，默认为 false'
+                desc: '[可选] 是否持续生成，置为 true 时可以执行 creepApi.remove("creepName") 来终止持续生成，默认为 false'
               }
             ],
             functionName: "spawnDismantler"
@@ -249,8 +247,7 @@ export default class RoomHelp extends RoomExtension {
               { name: "targetFlagName", desc: `[可选] 进攻旗帜名称，默认为 ${DEFAULT_FLAG_NAME.ATTACK}` },
               {
                 name: "keepSpawn",
-                desc:
-                  '[可选] 是否持续生成，置为 true 时可以执行 creepApi.remove("creepName") 来终止持续生成，默认为 false'
+                desc: '[可选] 是否持续生成，置为 true 时可以执行 creepApi.remove("creepName") 来终止持续生成，默认为 false'
               }
             ],
             functionName: "spawnRangedAttacker"
@@ -272,8 +269,7 @@ export default class RoomHelp extends RoomExtension {
               { name: "num", desc: "[可选] 要孵化的数量，1 - 10，默认为 2" },
               {
                 name: "keepSpawn",
-                desc:
-                  '[可选] 是否持续生成，置为 true 时可以执行 creepApi.remove("creepName") 来终止持续生成，默认为 false'
+                desc: '[可选] 是否持续生成，置为 true 时可以执行 creepApi.remove("creepName") 来终止持续生成，默认为 false'
               }
             ],
             functionName: "spawnBoostDismantler"
@@ -286,8 +282,7 @@ export default class RoomHelp extends RoomExtension {
               { name: "targetFlagName", desc: `[可选] 进攻旗帜名称，默认为 ${DEFAULT_FLAG_NAME.ATTACK}` },
               {
                 name: "keepSpawn",
-                desc:
-                  '[可选] 是否持续生成，置为 true 时可以执行 creepApi.remove("creepName") 来终止持续生成，默认为 false'
+                desc: '[可选] 是否持续生成，置为 true 时可以执行 creepApi.remove("creepName") 来终止持续生成，默认为 false'
               }
             ],
             functionName: "spawnBoostRangedAttacker"
@@ -299,8 +294,7 @@ export default class RoomHelp extends RoomExtension {
               { name: "targetFlagName", desc: `[可选] 进攻旗帜名称，默认为 ${DEFAULT_FLAG_NAME.ATTACK}` },
               {
                 name: "keepSpawn",
-                desc:
-                  '[可选] 是否持续生成，置为 true 时可以执行 creepApi.remove("creepName") 来终止持续生成，默认为 false'
+                desc: '[可选] 是否持续生成，置为 true 时可以执行 creepApi.remove("creepName") 来终止持续生成，默认为 false'
               }
             ],
             functionName: "spawnDismantleGroup"
@@ -312,8 +306,7 @@ export default class RoomHelp extends RoomExtension {
               { name: "targetFlagName", desc: `[可选] 进攻旗帜名称，默认为 ${DEFAULT_FLAG_NAME.ATTACK}` },
               {
                 name: "keepSpawn",
-                desc:
-                  '[可选] 是否持续生成，置为 true 时可以执行 creepApi.remove("creepName") 来终止持续生成，默认为 false'
+                desc: '[可选] 是否持续生成，置为 true 时可以执行 creepApi.remove("creepName") 来终止持续生成，默认为 false'
               }
             ],
             functionName: "spawnAttackGroup"
@@ -325,8 +318,7 @@ export default class RoomHelp extends RoomExtension {
               { name: "targetFlagName", desc: `[可选] 进攻旗帜名称，默认为 ${DEFAULT_FLAG_NAME.ATTACK}` },
               {
                 name: "keepSpawn",
-                desc:
-                  '[可选] 是否持续生成，置为 true 时可以执行 creepApi.remove("creepName") 来终止持续生成，默认为 false'
+                desc: '[可选] 是否持续生成，置为 true 时可以执行 creepApi.remove("creepName") 来终止持续生成，默认为 false'
               }
             ],
             functionName: "spawnBoostDismantleGroup"
@@ -338,8 +330,7 @@ export default class RoomHelp extends RoomExtension {
               { name: "targetFlagName", desc: `[可选] 进攻旗帜名称，默认为 ${DEFAULT_FLAG_NAME.ATTACK}` },
               {
                 name: "keepSpawn",
-                desc:
-                  '[可选] 是否持续生成，置为 true 时可以执行 creepApi.remove("creepName") 来终止持续生成，默认为 false'
+                desc: '[可选] 是否持续生成，置为 true 时可以执行 creepApi.remove("creepName") 来终止持续生成，默认为 false'
               }
             ],
             functionName: "spawnBoostAttackGroup"

@@ -66,6 +66,6 @@ interface StructureIdCache {
      * 每个建筑类型对应的 id 数组
      * 这里不考虑建筑是单个还是多个，统一都是数组
      */
-    [T in AllRoomShortcut]?: Id<RoomObject>[];
+    [T in AllRoomShortcut]?: Id<ObjectWithId>[];
   };
 }

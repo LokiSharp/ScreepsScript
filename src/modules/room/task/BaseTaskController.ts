@@ -16,7 +16,7 @@ enum TaskMatchResult {
   /**
    * 匹配成功，但是需要从该任务移除一个普通单位
    */
-  NeedRmoveNormal,
+  NeedRemoveNormal,
   /**
    * 匹配失败，不适合执行该任务
    */
@@ -27,8 +27,9 @@ export default class TaskController<
   // 该任务模块包含的所有任务类型
   TaskType extends string,
   // 该任务模块包含的所有任务
-  CostomTask extends RoomTask<TaskType>
-> implements InterfaceTaskController<TaskType, CostomTask> {
+  CustomTask extends RoomTask<TaskType>
+> implements InterfaceTaskController<TaskType, CustomTask>
+{
   /**
    * 本任务对象所处的房间名
    */
@@ -47,7 +48,7 @@ export default class TaskController<
   /**
    * 该模块负责的任务
    */
-  public tasks: CostomTask[] = [];
+  public tasks: CustomTask[] = [];
 
   /**
    * 当前正在执行任务的 creep
@@ -73,8 +74,8 @@ export default class TaskController<
    * @param task 要发布的新任务
    * @param opt 配置项
    */
-  public addTask(task: CostomTask, opt: AddTaskOpt = {}): number {
-    const addOpt: UpdateTaskOpt = { dispath: false };
+  public addTask(task: CustomTask, opt: AddTaskOpt = {}): number {
+    const addOpt: UpdateTaskOpt = { dispatch: false };
     Object.assign(addOpt, opt);
 
     task = this.refineNewTask(task);
@@ -91,7 +92,7 @@ export default class TaskController<
 
     // 在目标索引位置插入新任务并重新分配任务
     this.tasks.splice(insertIndex, 0, task);
-    if (addOpt.dispath) this.dispatchTask();
+    if (addOpt.dispatch) this.dispatchTask();
     this.save();
 
     return task.key;
@@ -103,7 +104,7 @@ export default class TaskController<
    *
    * @param task 输入的新任务
    */
-  private refineNewTask(task: CostomTask): CostomTask {
+  private refineNewTask(task: CustomTask): CustomTask {
     // 设置新索引
     task.key = new Date().getTime() + this.tasks.length * 0.1;
     task.unit = 0;
@@ -124,14 +125,14 @@ export default class TaskController<
    * @param opt 更新任务时的配置项
    * @returns 被更新任务的索引，如果新建了任务则返回新任务的索引，若更新了多个任务的话则返回最后一个任务的索引
    */
-  public updateTask(newTask: CostomTask, opt: UpdateTaskOpt = {}): number {
+  public updateTask(newTask: CustomTask, opt: UpdateTaskOpt = {}): number {
     const updateOpt: UpdateTaskOpt = { addWhenNotFound: true };
     Object.assign(updateOpt, opt);
 
     // 是否找到了要更新的任务
     let notFound = true;
     // 是否需要重新分派任务
-    let needRedispath = false;
+    let needRedispatch = false;
     // 要更新任务的索引
     let taskKey = newTask.key;
 
@@ -143,7 +144,7 @@ export default class TaskController<
       taskKey = newTask.key || task.key;
       // 状态变化就需要重新分派
       if (task.priority !== newTask.priority || task.need !== newTask.need || task.require !== newTask.require) {
-        needRedispath = true;
+        needRedispatch = true;
       }
 
       return Object.assign(task, newTask);
@@ -151,7 +152,7 @@ export default class TaskController<
 
     // 没找到就尝试更新、找到了就尝试重新分配
     if (notFound && updateOpt.addWhenNotFound) taskKey = this.addTask(newTask, updateOpt);
-    else if (needRedispath) this.dispatchTask();
+    else if (needRedispatch) this.dispatchTask();
 
     return taskKey;
   }
@@ -162,7 +163,7 @@ export default class TaskController<
    * @param taskKey 要查询的任务索引
    * @returns 对应的任务，没有的话则返回 undefined
    */
-  public getTask(taskKey: number): CostomTask | undefined {
+  public getTask(taskKey: number): CustomTask | undefined {
     if (!taskKey) return undefined;
     return this.tasks.find(task => task.key === taskKey);
   }
@@ -174,12 +175,14 @@ export default class TaskController<
     const roomMemory = Memory.rooms?.[this.roomName];
     if (!roomMemory) return;
     // 从内存中解析数据
-    this.tasks = JSON.parse(roomMemory[this.TASK_SAVE_KEY] || "[]") as CostomTask[];
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    this.tasks = JSON.parse(roomMemory[this.TASK_SAVE_KEY] || "[]") as CustomTask[];
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     this.creeps = JSON.parse(roomMemory[this.CREEP_SAVE_KEY] || "{}") as { [p: string]: TaskUnitInfo };
   }
 
   /**
-   * 将本房间物流任务都保存至内存
+   * 将本房间的物流任务都保存至内存
    */
   protected save(): void {
     if (!Memory.rooms) Memory.rooms = {};
@@ -205,7 +208,7 @@ export default class TaskController<
    * @param task 要添加工作单位的任务
    * @param unit 要添加的 creep
    */
-  protected setTaskUnit(task: CostomTask, unit: Creep): void {
+  protected setTaskUnit(task: CustomTask, unit: Creep): void {
     if (!task || !unit) return;
 
     task.unit = task.unit > 0 ? task.unit + 1 : 1;
@@ -226,7 +229,7 @@ export default class TaskController<
    * @param task 要移除工作单位的任务
    * @param unit 要移除的 creep
    */
-  protected removeTaskUnit(task: CostomTask, unit?: Creep): void {
+  protected removeTaskUnit(task: CustomTask, unit?: Creep): void {
     if (unit) {
       delete this.creeps[unit.name];
       delete unit.memory.taskKey;
@@ -257,7 +260,7 @@ export default class TaskController<
     // 等待分配任务的 creep 队列
     // [0] 为具有特殊体型的 creep，将优先分配
     // [1] 为普通体型的 creep，将在特殊体型的分配完后“填缝”
-    const waitDispatchList = [[], []];
+    const waitDispatchList: Creep[][] = [[], []];
     // 用已有 creep 填充待分配队列
     for (const creep of units) {
       const type = creep.memory.bodyType ? 0 : 1;
@@ -275,7 +278,7 @@ export default class TaskController<
    * @param creep 要分配任务的 creep
    * @returns 该 creep 分配到的任务
    */
-  protected dispatchCreep(creep: Creep): CostomTask {
+  protected dispatchCreep(creep: Creep): CustomTask {
     delete this.creeps[creep.name];
     delete creep.memory.taskKey;
 
@@ -290,13 +293,13 @@ export default class TaskController<
 
       // 挤掉了一个普通单位
       // 例如这个特殊任务有普通工人在做，而自己是符合任务的特殊体型，那自己就会挤占他的工作机会
-      if (result === TaskMatchResult.NeedRmoveNormal) {
+      if (result === TaskMatchResult.NeedRemoveNormal) {
         const creepName = Object.keys(this.creeps).find(name => this.creeps[name].doing === checkTask.key);
         this.removeTaskUnit(checkTask, Game.creeps[creepName]);
       }
 
       // 匹配成功，把单位设置到该任务并结束分派
-      if (result === TaskMatchResult.Ok || result === TaskMatchResult.NeedRmoveNormal) {
+      if (result === TaskMatchResult.Ok || result === TaskMatchResult.NeedRemoveNormal) {
         this.setTaskUnit(checkTask, creep);
         creep.memory.working = true;
         // creep.log(`领取任务 ${i} ${JSON.stringify(checkTask)}`)
@@ -322,7 +325,7 @@ export default class TaskController<
    * @param task 要匹配的任务
    * @param ignoreNeedLimit 是否无视任务的人数限制
    */
-  private isCreepMatchTask(creep: Creep, task: CostomTask, ignoreNeedLimit: boolean): TaskMatchResult {
+  private isCreepMatchTask(creep: Creep, task: CustomTask, ignoreNeedLimit: boolean): TaskMatchResult {
     const { require, need, unit, requireUnit } = task;
     // 该单位是特殊体型，选择对应的特殊任务
     if (creep.memory.bodyType) {
@@ -332,7 +335,7 @@ export default class TaskController<
       if (!ignoreNeedLimit && (requireUnit || 0) >= need) return TaskMatchResult.Failed;
       // 特殊任务的工作单位里有普通单位，把普通单位挤掉
       if (unit >= need && (requireUnit || 0) < unit) {
-        return TaskMatchResult.NeedRmoveNormal;
+        return TaskMatchResult.NeedRemoveNormal;
       }
     }
     // 普通单位只检查人数是否足够（人数溢出后无视此限制）
@@ -383,7 +386,7 @@ export default class TaskController<
    * 获取单位的待执行任务
    * @param creep 要获取待执行任务的 creep
    */
-  public getUnitTask(creep: Creep): CostomTask {
+  public getUnitTask(creep: Creep): CustomTask {
     let doingTask = this.getTask(this.creeps[creep.name]?.doing);
 
     // 还未分配过任务，或者任务已经完成了

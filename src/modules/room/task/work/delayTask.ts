@@ -81,5 +81,5 @@ delayQueue.addDelayCallback("addBuildTask", (room, task) => {
   }
 
   // 以指定工地为目标发布建筑
-  room.work.updateTask({ type: "build", priority: 9 }, { dispath: true });
+  room.work.updateTask({ type: "build", priority: 9 }, { dispatch: true });
 });

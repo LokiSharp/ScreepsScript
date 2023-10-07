@@ -297,12 +297,12 @@ export class CreepExtension extends Creep {
       // 获取所有没填满的墙
       const walls = this.room.find(FIND_STRUCTURES, {
         filter: s => s.hits < s.hitsMax && (s.structureType === STRUCTURE_WALL || s.structureType === STRUCTURE_RAMPART)
-      }) as (StructureWall | StructureRampart)[];
+      });
       // 没有目标就啥都不干
       if (walls.length <= 0) return false;
 
       // 找到血量最小的墙
-      targetWall = walls.sort((a, b) => a.hits - b.hits)[0];
+      targetWall = walls.sort((a, b) => a.hits - b.hits)[0] as StructureWall | StructureRampart;
 
       // 将其缓存在内存里
       this.room.memory.focusWall = {
@@ -412,6 +412,7 @@ export class CreepExtension extends Creep {
     // 否则治疗自己
     let target: Creep;
     if (creep.hitsMax - creep.hits >= this.hitsMax - this.hits) target = creep;
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     else target = this;
 
     // 进行治疗，如果失败就远程治疗

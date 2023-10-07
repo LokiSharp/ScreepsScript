@@ -48,10 +48,10 @@ const saveWaiting = function (): void {
  * 在全局重置时调用
  */
 export function initConstructionController(): void {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-argument
   waitingConstruction = JSON.parse(Memory[SAVE_KEY] || "[]").map(({ pos, type }) => {
     // 这里把位置重建出来
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-argument
     return { pos: new RoomPosition(pos.x, pos.y, pos.roomName), type };
   });
 }
@@ -80,7 +80,7 @@ const planSite = function () {
       }
       // 放置失败，下次重试
       else if (result !== OK && result !== ERR_FULL && result !== ERR_RCL_NOT_ENOUGH) {
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions,@typescript-eslint/no-base-to-string
         log(`工地 ${type} 无法放置，位置 [${pos}]，createConstructionSite 结果 ${result}`, ["建造控制器"], "yellow");
         return true;
       }

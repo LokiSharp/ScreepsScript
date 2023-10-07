@@ -26,8 +26,7 @@ export default class FactoryHelp extends FactoryExtension {
           params: [
             {
               name: "...depositTypes",
-              desc:
-                "生产线类型，必须为下列常量 RESOURCE_MIST RESOURCE_BIOMASS RESOURCE_METAL RESOURCE_SILICON，可以指定多个"
+              desc: "生产线类型，必须为下列常量 RESOURCE_MIST RESOURCE_BIOMASS RESOURCE_METAL RESOURCE_SILICON，可以指定多个"
             }
           ],
           functionName: "setchain"

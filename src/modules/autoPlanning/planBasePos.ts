@@ -178,9 +178,9 @@ export function setBornCenter(firstSpawn: StructureSpawn): void {
       const warningTip = hasWallInRange
         ? `，但是以该目标为中心的 ${BASE_SIZE}*${BASE_SIZE} 区域内存在墙体，将导致有建筑无法建筑`
         : "";
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions,@typescript-eslint/no-base-to-string
       log(`已将 ${centerPos} 设置为基地中心点${warningTip}`, ["自动规划"], hasWallInRange ? "yellow" : "green");
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions,@typescript-eslint/no-base-to-string
     } else log(`${centerPos} 无法设置为基地中心点，请手动设置`, ["自动规划"], "yellow");
   } catch (e) {
     log(`[${x - offsetX}, ${y - offsetY}, ${roomName}] 无法设置为基地中心点，请手动设置`, ["自动规划"], "yellow");

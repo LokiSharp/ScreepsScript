@@ -65,7 +65,7 @@ interface AddTaskOpt {
   /**
    * 发布任务后是否立刻重新调度
    */
-  dispath?: boolean;
+  dispatch?: boolean;
 }
 
 /**

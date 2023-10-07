@@ -71,7 +71,7 @@ interface RoomMemory {
   // 数组中每一个字符串都代表了一个监听任务，形如 "0 0 power"，第一位对应 TerminalModes，第二位对应 TerminalChannels，第三位对应资源类型
   terminalTasks: string[];
   // 房间内终端缓存的订单id
-  targetOrderId?: Id<Order>;
+  targetOrderId?: string;
   // 房间内终端要立刻支援的房间名
   targetSupportRoom?: string;
   // 当前终端要监听的资源索引

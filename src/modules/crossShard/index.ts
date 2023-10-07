@@ -95,7 +95,7 @@ const checkReply = function (sourceShard: ShardName, requestName: string, reques
   // 返回响应结果
   return {
     has: reply !== undefined && reply !== null,
-    result: reply as ScreepsReturnCode
+    result: reply as unknown as ScreepsReturnCode
   };
 };
 
@@ -124,6 +124,7 @@ function handleSelfMessage() {
     // 如果消息是请求
     else {
       // 请求有响应了就直接移除该请求
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       const reply = checkReply(selfShardName, msgName, selfData[msgName]);
       if (reply.has) {
         delete selfData[msgName];
