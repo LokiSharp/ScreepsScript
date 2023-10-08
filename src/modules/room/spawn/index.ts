@@ -46,6 +46,7 @@ export default class RoomSpawnController extends RoomAccessor<SpawnTask[]> {
    * @param task 新的孵化任务
    * @returns 当前任务在队列中的排名
    */
+  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
   public addTask(task: SpawnTask): number | ERR_NAME_EXISTS {
     // 先检查下任务是不是已经在队列里了
     if (!this.hasTask(task.name)) {

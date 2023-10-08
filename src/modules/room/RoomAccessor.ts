@@ -54,6 +54,7 @@ export default class RoomAccessor<MemoryType> {
       // 房间内存不存在，使用默认内存
       if (!Game.rooms[this.roomName].memory[this.memoryKey]) this._memory = this.defaultMemory;
       // 存在，使用 memory 中的数据
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       else this._memory = JSON.parse(Game.rooms[this.roomName].memory[this.memoryKey]) as MemoryType;
 
       return this._memory;

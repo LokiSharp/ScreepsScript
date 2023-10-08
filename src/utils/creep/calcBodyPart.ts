@@ -7,6 +7,7 @@
 export default function calcBodyPart(bodySet: BodySet): BodyPartConstant[] {
   // 把身体配置项拓展成如下形式的二维数组
   // [ [ TOUGH ], [ WORK, WORK ], [ MOVE, MOVE, MOVE ] ]
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   const bodys = Object.keys(bodySet).map(type => Array(bodySet[type]).fill(type) as BodySet[]);
   // 把二维数组展平
   return [].concat(...bodys) as BodyPartConstant[];

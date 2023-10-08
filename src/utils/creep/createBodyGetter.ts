@@ -18,6 +18,7 @@ export default function createBodyGetter(
       .find(level => {
         // 先通过等级粗略判断，再加上 dryRun 精确验证
         const availableEnergyCheck = Number(level) <= room.energyAvailable;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         const dryCheck = spawn.spawnCreep(bodyConfig[level], "bodyTester", { dryRun: true }) === OK;
 
         return availableEnergyCheck && dryCheck;
@@ -25,8 +26,6 @@ export default function createBodyGetter(
     if (!targetLevel) return [];
 
     // 获取身体部件
-    const bodys: BodyPartConstant[] = bodyConfig[targetLevel as EnergyLevel];
-
-    return bodys;
+    return bodyConfig[targetLevel as EnergyLevel];
   };
 }

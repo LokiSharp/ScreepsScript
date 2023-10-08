@@ -11,12 +11,12 @@ import { SourceMapConsumer } from "source-map";
 import colorful from "@/utils/console/colorful";
 
 // 缓存 SourceMap
-let consumer = null;
+let consumer: SourceMapConsumer = null;
 
 // 第一次报错时创建 sourceMap
 const getConsumer = function (): SourceMapConsumer {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument,@typescript-eslint/no-var-requires
   if (consumer == null) consumer = new SourceMapConsumer(require("main.js.map"));
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return consumer;
 };
 

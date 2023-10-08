@@ -10,6 +10,7 @@ export function setShortcut(isSingle: boolean) {
   return (type: AllRoomShortcut): void => {
     Object.defineProperty(Room.prototype, type, {
       get() {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         const structures = getStructureWithCache(this, type);
         return isSingle ? structures[0] : structures;
       },

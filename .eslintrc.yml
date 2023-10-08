@@ -7,7 +7,7 @@ extends:
   - "plugin:@typescript-eslint/recommended"
   - "plugin:@typescript-eslint/recommended-requiring-type-checking"
   - "plugin:prettier/recommended"
-  - "prettier/@typescript-eslint"
+  - "prettier"
   - "plugin:import/errors"
   - "plugin:import/warnings"
   - "plugin:import/typescript"
@@ -34,6 +34,7 @@ rules:
     "@typescript-eslint/prefer-for-of": "error",
     "@typescript-eslint/space-within-parens": ["off", "never"],
     "@typescript-eslint/unified-signatures": "error",
+    "@typescript-eslint/no-unused-vars": "warn",
     "arrow-parens": ["off", "as-needed"],
     camelcase: "error",
     complexity: "off",

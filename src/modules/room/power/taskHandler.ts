@@ -110,7 +110,7 @@ export const PowerTasks: PowerTaskConfigs = {
       if (creep.store[RESOURCE_OPS] < POWER_INFO[PWR_OPERATE_EXTENSION].ops) return ERR_NOT_ENOUGH_RESOURCES;
 
       // 获取能量来源
-      let sourceStructure;
+      let sourceStructure: RoomObject;
       // 只有 storage 的话就用 storage
       if (creep.room.storage && !creep.room.terminal) sourceStructure = creep.room.storage;
       // 两个都存在的话就比较那个能量多

@@ -17,8 +17,9 @@ export function getStructureWithMemory<TargetStructure extends ObjectWithId>(
   if (!room.memory[memoryKey]) return undefined;
 
   // 从 id 获取建筑并缓存
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,
   const target: TargetStructure = Game.getObjectById(room.memory[memoryKey]);
 
   // 如果保存的 id 失效的话，就移除缓存

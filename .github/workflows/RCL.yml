@@ -11,16 +11,16 @@ jobs:
     strategy:
       matrix:
         os: [windows-2019]
-        node-version: [10.x]
+        node-version: [18.x]
         RCL: ["RCL1ToRCL2", "RCL2ToRCL3", "RCL3ToRCL4", "RCL4ToRCL5", "RCL5ToRCL6", "RCL6ToRCL7", "RCL7ToRCL8"]
 
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
 
@@ -28,7 +28,7 @@ jobs:
         id: npm-cache
         run: |
           echo "::set-output name=dir::$(npm config get cache)"
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: ${{ steps.npm-cache.outputs.dir }}
           key: ${{ matrix.os }}-node-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
@@ -62,7 +62,7 @@ jobs:
         working-directory: RCLtest-result
 
       - name: Update Result Artifact
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: RCLresult
           path: RCLtest-result

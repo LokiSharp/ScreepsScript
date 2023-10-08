@@ -106,7 +106,7 @@ export function confirmNuker(): string {
     // 获取发射房间及落点旗帜
     const fireRoom = Game.rooms[fireRoomName];
     const targetFlag = Game.flags[Memory.nukerDirective[fireRoomName]];
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-base-to-string
     if (!targetFlag) return `${Game.flags[Memory.nukerDirective[fireRoomName]]} 旗帜不存在，该指令已跳过`;
 
     const actionResult = fireRoom.nuker.launchNuke(targetFlag.pos);

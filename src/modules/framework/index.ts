@@ -55,6 +55,7 @@ export default class App {
       next();
     } catch (e) {
       console.log(`<span style="color:#ef9a9a">${e as string}</sapn>`);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       Game.notify(e);
     }
   };
@@ -201,7 +202,7 @@ export default class App {
    * @param gameItem 要调用入口方法的游戏对象
    */
   private doWithCatcher(gameItem): void {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-argument
     this._catcher(gameItem[MOUNT_ENTRY_FUNCTION].bind(gameItem));
   }
 }
